@@ -609,7 +609,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       const childSeatLabel = [
         editBabySeats > 0 ? `${editBabySeats}x Babyschale` : '',
         editChildSeats > 0 ? `${editChildSeats}x Kindersitz` : '',
-        editBoosterSeats > 0 ? `${editBoosterSeats}x SitzerhÃ¶hung` : '',
+        editBoosterSeats > 0 ? `${editBoosterSeats}x Sitzerhöhung` : '',
       ]
         .filter(Boolean)
         .join(' ');
@@ -619,7 +619,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         editExtraStop && extraStopValue ? `(Zwischenstopp: ${extraStopValue})` : '',
         editChildSeat && childSeatLabel ? `(Kindersitze: ${childSeatLabel})` : '',
         editPaymentMethod ? `(Zahlung: ${editPaymentMethod === 'cash' ? 'Barzahlung' : 'Kreditkarte'})` : '',
-        editHandLuggage > 0 ? `(HandgepÃ¤ck: ${editHandLuggage})` : '',
+        editHandLuggage > 0 ? `(Handgepäck: ${editHandLuggage})` : '',
       ]
         .filter(Boolean)
         .join(' ')
@@ -753,19 +753,19 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         </div>
       ) : (
         <>
-        <div className={viewMode === 'grid' ? "space-y-4" : "bg-white rounded-[24px] border border-[#d2d2d7] overflow-hidden"}>
+        <div className={viewMode === 'grid' ? "space-y-4" : "bg-white border border-[#d2d2d7] overflow-hidden"}>
                     {viewMode === 'grid' ? bookings.map(booking => (
             <div
               key={booking.id}
               className={`relative bg-[#f8f9fb] rounded-[24px] border border-[#d9dde4] shadow-sm p-4 md:p-5 hover:shadow-md transition-all ${
-                booking.status === 'cancelled' ? 'bg-[#f3f4f6] border-[#d7d9df]' : ''
+                booking.status === 'cancelled' ? 'bg-[#e5e7eb] border-[#cfd4dc]' : ''
               }`}
             >
-              <div className="flex flex-nowrap items-center gap-1.5 sm:gap-2 mb-4">
-                <span className="inline-flex w-1/4 sm:w-auto justify-center items-center px-2 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[14px] sm:text-[18px] font-semibold">
+              <div className={`flex flex-nowrap items-center gap-1.5 sm:gap-2 mb-4 ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}>
+                <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-3 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[13px] sm:text-[18px] font-semibold">
                   {format(new Date(booking.pickup_at), 'HH:mm')}
                 </span>
-                <span className="inline-flex w-1/4 sm:w-auto justify-center items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 rounded-full text-[14px] sm:text-[18px] font-semibold tracking-wide bg-[#e7ebf3] text-[#000000]">
+                <span className="inline-flex w-auto whitespace-nowrap justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full text-[13px] sm:text-[18px] font-semibold tracking-wide bg-[#e7ebf3] text-[#000000]">
                   {booking.destination?.includes('Flughafen') ? <PlaneTakeoff size={16} className="sm:w-5 sm:h-5" /> : <PlaneLanding size={16} className="sm:w-5 sm:h-5" />}
                   {booking.destination?.includes('Flughafen') ? 'ZUM' : 'VOM'}
                 </span>
@@ -774,18 +774,18 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   const isFromAirportRide = /flughafen/i.test(String(booking?.pickup || ''));
                   if (!isFromAirportRide || !flightNumber) return null;
                   return (
-                    <span className="inline-flex w-1/4 sm:w-auto justify-center items-center px-2 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[14px] sm:text-[18px] font-semibold">
+                    <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-3 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[13px] sm:text-[18px] font-semibold">
                       {flightNumber}
                     </span>
                   );
                 })()}
-                <span className="inline-flex w-1/4 sm:w-auto justify-center items-center px-2 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[14px] sm:text-[16px] font-semibold uppercase tracking-wide">
+                <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-3 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[13px] sm:text-[16px] font-semibold uppercase tracking-wide">
                   {booking.vehicle_type || 'LIMOUSINE'}
                 </span>
                 {(() => {
                   const payment = getBookingPaymentMeta(booking);
                   return (
-                    <span className={`inline-flex w-1/4 sm:w-auto justify-center items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 rounded-full text-[14px] sm:text-[16px] font-semibold uppercase ${payment.className}`}>
+                    <span className={`inline-flex w-auto whitespace-nowrap justify-center items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full text-[13px] sm:text-[16px] font-semibold uppercase ${payment.className}`}>
                       <CreditCard size={16} className="sm:w-[18px] sm:h-[18px]" /> {payment.label}
                     </span>
                   );
@@ -793,11 +793,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.95fr_0.8fr] gap-4 items-start">
-                <div className="space-y-2.5">
+                <div className={`space-y-2.5 ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}>
                   <div className="relative pl-7 space-y-2.5">
-                    <div className="pointer-events-none absolute left-0 top-1 flex flex-col items-center text-[#000000]" aria-hidden="true">
+                    <div className="pointer-events-none absolute left-0 top-2 flex flex-col items-center text-[#000000]" aria-hidden="true">
                       <span className="h-2.5 w-2.5 rounded-full bg-[#000000]" />
-                      <span className="mt-1 h-10 w-px bg-[#000000]" />
+                      <span className="mt-1 h-8 w-px bg-[#000000]" />
                       <ChevronDown size={14} className="-mt-1" />
                     </div>
                     <div className="flex items-start gap-2">
@@ -810,7 +810,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           target="_blank"
                           rel="noopener noreferrer"
                           aria-label="Open pickup in Google Maps"
-                          className="mt-1 text-[#6a6af4] hover:text-[#0071e3] transition-colors shrink-0"
+                          className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
                         >
                           <MapPin size={21} />
                         </a>
@@ -826,7 +826,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           target="_blank"
                           rel="noopener noreferrer"
                           aria-label="Open destination in Google Maps"
-                          className="mt-1 text-[#000000] hover:text-[#0071e3] transition-colors shrink-0"
+                          className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
                         >
                           <MapPin size={21} />
                         </a>
@@ -844,7 +844,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   })()}
                 </div>
 
-                <div className="space-y-3 lg:pl-8 lg:-mt-3">
+                <div className={`space-y-3 lg:pl-8 lg:-mt-3 ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}>
                   <h3 className="font-semibold text-[#000000] text-[19px] flex items-center gap-2">
                     {booking.full_name}
                     {passengerCounts[booking.email] >= 5 && <Star size={15} className="text-yellow-400 fill-yellow-400" />}
@@ -895,7 +895,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           ) : null}
                           {seats.booster > 0 ? (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[11px] font-semibold">
-                              {seats.booster} BOOSTER
+                              {seats.booster} Sitzerhöhung
                             </span>
                           ) : null}
                         </>
@@ -905,7 +905,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 </div>
 
                 <div className="flex h-full flex-col gap-3">
-                  <div className="flex items-center justify-end w-full">
+                  <div className={`flex items-center justify-end w-full ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}>
                     <button
                       type="button"
                       onClick={() => openEditBooking(booking)}
@@ -919,7 +919,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     </div>
                   </div>
                   <select
-                    className={`w-full text-[12px] border rounded-[11px] px-3 py-2 outline-none focus:border-[#4f46e5] ${getDriverSelectTone(booking)}`}
+                    className={`w-full text-[12px] border rounded-[11px] px-3 py-2 outline-none focus:border-[#4f46e5] ${booking.status === 'cancelled' ? 'opacity-35' : ''} ${getDriverSelectTone(booking)}`}
                     value={getSelectedDriverId(booking)}
                     disabled={booking.status === 'cancelled'}
                     onChange={(e) =>
@@ -935,14 +935,15 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     <button
                       type="button"
                       onClick={() => {
+                        if (booking.status === 'cancelled') return;
                         const driverId = getSelectedDriverId(booking);
                         if (!driverId) return;
                         if (confirm('Send assignment to this driver now?')) {
                           handleAssignDriver(booking.id, driverId, true);
                         }
                       }}
-                      disabled={!getSelectedDriverId(booking)}
-                      className="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#0b1a44] text-white font-medium text-[12px] hover:bg-[#14265d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      disabled={!getSelectedDriverId(booking) || booking.status === 'cancelled'}
+                      className={`w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#0b1a44] text-white font-medium text-[12px] hover:bg-[#14265d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}
                     >
                       <Send size={12} />
                       Send
@@ -1005,17 +1006,17 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             </div>
           )) : (
             <div className="w-full overflow-x-auto">
-            <table className="w-full min-w-[930px] text-[12px] text-left">
+            <table className="w-full min-w-[930px] text-[16px] text-left">
               <thead className="text-[10px] text-[#86868b] uppercase bg-[#f5f5f7] border-b border-[#d2d2d7] tracking-wide">
                 <tr>
-                  <th className="px-1.5 py-1.5 font-medium">Time / Date</th>
-                  <th className="px-0 py-1.5 font-medium">Zum/Vom</th>
-                  <th className="px-0 py-1.5 font-medium">Fahrer</th>
-                  <th className="px-0 py-1.5 font-medium">Auto</th>
-                  <th className="px-0 py-1.5 font-medium">Route</th>
-                  <th className="px-0 py-1.5 font-medium">Fahrgast, GepÃ¤ck</th>
-                  <th className="px-0 py-1.5 font-medium">Kunde</th>
-                  <th className="px-0 py-1.5 font-medium">Zahlung</th>
+                  <th className="px-1.5 py-1.5 font-medium text-center">Time / Date</th>
+                  <th className="px-0 py-1.5 font-medium text-center">Zum/Vom</th>
+                  <th className="px-0 py-1.5 font-medium text-center">Fahrer</th>
+                  <th className="px-0 py-1.5 font-medium text-center">Auto</th>
+                  <th className="px-0 py-1.5 font-medium text-center">Route</th>
+                  <th className="px-2 py-1.5 font-medium text-center">Fahrgast, Gepäck</th>
+                  <th className="px-2 py-1.5 font-medium text-center">Kunde</th>
+                  <th className="px-0 py-1.5 font-medium text-center">Zahlung</th>
                   <th className="px-0 py-1.5 font-medium text-center">Notiz</th>
                   <th className="px-0 py-1.5 font-medium text-center">Edit</th>
                   <th className="px-0 py-1.5 font-medium text-center">X</th>
@@ -1029,27 +1030,28 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   const seats = getChildSeatCountsFromNotes(booking);
                   const hasAnySeat = seats.baby > 0 || seats.child > 0 || seats.booster > 0;
                   const directionLabel = booking.destination?.includes('Flughafen') ? 'ZUM' : 'VOM';
+                  const isCancelled = booking.status === 'cancelled';
                   return (
                     <tr
                       key={booking.id}
-                      className={`border-b border-[#f0f0f2] hover:bg-[#f5f5f7]/60 transition-all ${
-                        booking.status === 'cancelled' ? 'bg-[#f6f7f9]' : ''
+                      className={`border-b border-[#f0f0f2] transition-all ${
+                        booking.status === 'cancelled' ? 'bg-[#e5e7eb]' : 'hover:bg-[#f5f5f7]/60'
                       }`}
                     >
-                      <td className="px-1.5 py-1 align-top">
-                        <div className="flex min-h-[42px] flex-col justify-between">
+                      <td className={`px-1.5 py-1 align-top text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                        <div className="flex min-h-[42px] flex-col justify-between items-center">
                           <div className="font-semibold text-[#1d1d1f]">{format(new Date(booking.pickup_at), 'HH:mm')}</div>
-                          <div className="text-[12px] text-[#86868b]">{format(new Date(booking.pickup_at), 'dd/MM/yyyy')}</div>
+                          <div className="text-[16px] text-[#86868b]">{format(new Date(booking.pickup_at), 'dd/MM/yyyy')}</div>
                         </div>
                       </td>
-                      <td className="px-0 py-1 align-middle">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#e7ebf3] text-[#1d1d1f] text-[11px] font-semibold">
+                      <td className={`px-0 py-1 align-middle ${isCancelled ? 'opacity-35' : ''}`}>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#e7ebf3] text-[#1d1d1f] text-[16px] font-semibold">
                           {directionLabel}
                         </span>
                       </td>
-                      <td className="px-0 py-1 align-middle">
+                      <td className={`px-0 py-1 align-middle ${isCancelled ? 'opacity-35' : ''}`}>
                         <select
-                          className={`text-[11px] border rounded-[8px] px-1 py-1 w-22 outline-none focus:border-[#0071e3] ${getDriverSelectTone(booking)}`}
+                          className={`text-[16px] border rounded-[8px] px-1 py-1 w-22 outline-none focus:border-[#0071e3] ${getDriverSelectTone(booking)}`}
                           value={getSelectedDriverId(booking)}
                           disabled={booking.status === 'cancelled'}
                           onChange={(e) =>
@@ -1062,14 +1064,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           ))}
                         </select>
                       </td>
-                      <td className="px-0 py-1 align-middle">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-[#e7ebf3] text-[#1d1d1f] text-[11px] font-semibold uppercase">
+                      <td className={`px-0 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-[#e7ebf3] text-[#1d1d1f] text-[16px] font-semibold uppercase">
                           {booking.vehicle_type || 'LIMO'}
                         </span>
                       </td>
-                      <td className="px-0 py-1 align-top min-w-[145px]">
+                      <td className={`px-0 py-1 align-top min-w-[145px] ${isCancelled ? 'opacity-35' : ''}`}>
                         <div className="flex items-start gap-1.5">
-                          <div className="mt-1.5 flex flex-col items-center text-[#000000]" aria-hidden="true">
+                          <div className="mt-2.5 flex flex-col items-center text-[#000000]" aria-hidden="true">
                             <span className="h-2 w-2 rounded-full bg-[#000000]" />
                             <span className="mt-1 h-4 w-px bg-[#000000]" />
                             <ChevronDown size={12} className="-mt-1" />
@@ -1084,40 +1086,40 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           </div>
                         </div>
                       </td>
-                      <td className="px-0 py-1 align-top min-w-[140px]">
-                        <div className="flex min-h-[42px] flex-col justify-between text-[11px] text-[#1d1d1f] font-medium leading-tight">
-                          <div>{Number(booking.passengers || 0)} Pers. â€¢ {Number(booking.luggage || 0)} Koffer â€¢ {handLuggage} Handg.</div>
+                      <td className={`px-2 py-1 align-top min-w-[160px] ${isCancelled ? 'opacity-35' : ''}`}>
+                        <div className="flex min-h-[42px] flex-col justify-between text-[16px] text-[#1d1d1f] font-medium leading-tight">
+                          <div>{Number(booking.passengers || 0)} Pers. • {Number(booking.luggage || 0)} K • {handLuggage} H</div>
                           {hasAnySeat ? (
-                            <div className="text-[#6e6e73]">
-                              {seats.baby > 0 ? `${seats.baby} Baby` : ''}
-                              {seats.baby > 0 && (seats.child > 0 || seats.booster > 0) ? ' â€¢ ' : ''}
-                              {seats.child > 0 ? `${seats.child} Kind` : ''}
-                              {seats.child > 0 && seats.booster > 0 ? ' â€¢ ' : ''}
-                              {seats.booster > 0 ? `${seats.booster} Booster` : ''}
+                            <div className="text-[16px] text-[#6e6e73]">
+                              {seats.baby > 0 ? `${seats.baby} B` : ''}
+                              {seats.baby > 0 && (seats.child > 0 || seats.booster > 0) ? ' • ' : ''}
+                              {seats.child > 0 ? `${seats.child} K` : ''}
+                              {seats.child > 0 && seats.booster > 0 ? ' • ' : ''}
+                              {seats.booster > 0 ? `${seats.booster} S` : ''}
                             </div>
                           ) : <div />}
                         </div>
                       </td>
-                      <td className="px-0 py-1 align-top">
+                      <td className={`px-2 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
                         <a href={getTelHref(booking.phone)} className="block h-full hover:text-[#0071e3] transition-colors">
                           <div className="flex min-h-[42px] flex-col justify-between">
                             <div className="font-semibold text-[#1d1d1f] flex items-center gap-1.5">
                               <span>{booking.full_name}</span>
                               {passengerCounts[booking.email] >= 5 && <Star size={13} className="text-yellow-400 fill-yellow-400" />}
                             </div>
-                            <div className="text-[13px] text-[#0071e3]">{booking.phone || '-'}</div>
+                            <div className="text-[16px] text-[#0071e3]">{booking.phone || '-'}</div>
                           </div>
                         </a>
                       </td>
-                      <td className="px-0 py-1 align-top">
+                      <td className={`px-0 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
                         <div className="flex min-h-[42px] flex-col justify-between">
                           <div className="font-semibold text-[#1d1d1f]">{formatPriceDisplay(booking.price)}</div>
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${payment.className}`}>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[16px] font-semibold uppercase ${payment.className}`}>
                             <CreditCard size={11} /> {payment.label}
                           </span>
                         </div>
                       </td>
-                      <td className="px-0 py-1 align-middle text-center">
+                      <td className={`px-0 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
                         {displayNotes ? (
                           <button
                             type="button"
@@ -1130,7 +1132,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           </button>
                         ) : null}
                       </td>
-                      <td className="px-0 py-1 align-middle text-center">
+                      <td className={`px-0 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
                         <button
                           type="button"
                           onClick={() => openEditBooking(booking)}
@@ -1377,18 +1379,17 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 <button
                   type="button"
                   onClick={() => setMobileTabsOpen((prev) => !prev)}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-[10px] border border-[#d2d2d7] bg-white text-[#1d1d1f] text-[14px] font-medium"
+                  className="inline-flex items-center justify-center w-11 h-11 rounded-[12px] border border-[#d2d2d7] bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
                   aria-label="Open navigation menu"
                 >
                   <Menu size={17} />
-                  {currentTab === 'rides' ? 'Rides' : currentTab === 'drivers' ? 'Drivers' : 'Statistics'}
                 </button>
                 {mobileTabsOpen ? (
-                  <div className="absolute right-0 top-[46px] z-20 w-52 rounded-[12px] border border-[#d2d2d7] bg-white shadow-lg overflow-hidden">
+                  <div className="absolute right-0 top-[52px] z-20 w-60 rounded-[14px] border border-[#d2d2d7] bg-white shadow-lg overflow-hidden">
                     <button
                       type="button"
                       onClick={() => handleTabChange('rides')}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-[14px] text-left ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
                         currentTab === 'rides' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
                       }`}
                     >
@@ -1397,7 +1398,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     <button
                       type="button"
                       onClick={() => handleTabChange('drivers')}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-[14px] text-left ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
                         currentTab === 'drivers' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
                       }`}
                     >
@@ -1406,7 +1407,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     <button
                       type="button"
                       onClick={() => handleTabChange('stats')}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-[14px] text-left ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
                         currentTab === 'stats' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
                       }`}
                     >
@@ -1416,7 +1417,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       <button
                         type="submit"
                         onClick={() => setMobileTabsOpen(false)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-[14px] text-left text-[#1d1d1f] hover:bg-[#f5f5f7]"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left text-[#1d1d1f] hover:bg-[#f5f5f7]"
                       >
                         <XCircle size={16} /> Sign Out
                       </button>
@@ -1453,7 +1454,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             <div className="p-2 md:p-8 space-y-8">
               <div className="text-center mb-4">
                 <h2 className="text-[32px] font-semibold text-[#1d1d1f] leading-tight mb-2">Fahrt bearbeiten</h2>
-                <p className="text-[17px] text-[#86868b]">Bitte prÃ¼fen und aktualisieren Sie die Buchungsdaten.</p>
+                <p className="text-[17px] text-[#86868b]">Bitte prüfen und aktualisieren Sie die Buchungsdaten.</p>
               </div>
 
               <div className="flex items-center justify-between p-4 bg-[#f5f5f7] rounded-xl">
@@ -1539,7 +1540,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         <div className="col-span-2">
                           <input
                             className={BOOKING_FORM_INPUT_CLASS}
-                            placeholder="StraÃŸe"
+                            placeholder="Straße"
                             value={editAddress.street}
                             onChange={(e) => handleEditAddressChange('street', e.target.value)}
                           />
@@ -1561,7 +1562,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
                   <div className="flex items-center justify-between p-4 bg-[#f5f5f7] rounded-xl">
                     <div className="text-[#1d1d1f]">
-                      <p className="font-medium text-[15px]">ZusÃ¤tzlicher Stopp?</p>
+                      <p className="font-medium text-[15px]">Zusätzlicher Stopp?</p>
                       <p className="text-[13px] text-[#86868b]">+10 € Aufpreis</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -1603,7 +1604,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         <div className="col-span-2">
                           <input
                             className={BOOKING_FORM_INPUT_CLASS}
-                            placeholder="StraÃŸe"
+                            placeholder="Straße"
                             value={editExtraStopAddress.street}
                             onChange={(e) => handleExtraStopAddressChange('street', e.target.value)}
                           />
@@ -1702,7 +1703,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   </select>
                 </div>
                 <div className="bg-[#f5f5f7] p-5 rounded-2xl flex flex-col items-center justify-center gap-2">
-                  <span className="text-[13px] font-medium text-[#86868b] uppercase">HandgepÃ¤ck</span>
+                  <span className="text-[13px] font-medium text-[#86868b] uppercase">Handgepäck</span>
                   <select
                     className="w-full bg-transparent font-semibold text-[24px] text-[#1d1d1f] outline-none text-center appearance-none"
                     value={editHandLuggage}
@@ -1718,7 +1719,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               <div className="flex flex-col gap-4 p-5 bg-[#f5f5f7] rounded-xl">
                 <div className="flex items-center justify-between">
                   <div className="text-[#1d1d1f]">
-                    <p className="font-medium text-[15px]">Kindersitz benÃ¶tigt?</p>
+                    <p className="font-medium text-[15px]">Kindersitz benötigt?</p>
                     <p className="text-[13px] text-[#86868b]">Kostenlos inklusive</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -1769,7 +1770,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       </div>
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-medium text-[#86868b] uppercase">SitzerhÃ¶hung</label>
+                      <label className="text-[11px] font-medium text-[#86868b] uppercase">Sitzerhöhung</label>
                       <div className="relative">
                         <select
                           value={editBoosterSeats}
