@@ -1,0 +1,40 @@
+INSERT INTO public.bookings (
+    full_name,
+    email,
+    phone,
+    pickup,
+    destination,
+    pickup_at,
+    passengers,
+    luggage,
+    vehicle_type,
+    price,
+    status,
+    booking_reference,
+    notes,
+    ip_address,
+    confirm_token
+) VALUES
+-- TODAY (10 bookings)
+('Max Mustermann', 'max@example.com', '+436601234567', 'Flughafen Wien', 'Stephansplatz 1, 1010 Wien', CURRENT_DATE + TIME '08:00:00', 2, 2, 'Limo', 45.00, 'confirmed', 'TEST-TD-01', 'Flug OS123, Landung 07:45', '127.0.0.1', gen_random_uuid()),
+('Julia Schmidt', 'julia@example.com', '+436602345678', 'Opernring 2, 1010 Wien', 'Flughafen Wien', CURRENT_DATE + TIME '09:30:00', 4, 4, 'Kombi', 55.00, 'confirmed', 'TEST-TD-02', 'Kindersitz (9kg) benötigt', '127.0.0.1', gen_random_uuid()),
+('Thomas Müller', 'thomas@example.com', '+436603456789', 'Mariahilfer Straße 10, 1070 Wien', 'Flughafen Wien', CURRENT_DATE + TIME '11:00:00', 1, 1, 'Limo', 40.00, 'pending', 'TEST-TD-03', 'Zwischenstopp: Westbahnhof (kurz)', '127.0.0.1', gen_random_uuid()),
+('Sarah Connor', 'sarah@example.com', '+436604567890', 'Flughafen Wien', 'Schönbrunn, 1130 Wien', CURRENT_DATE + TIME '12:15:00', 6, 6, 'Bus', 85.00, 'confirmed', 'TEST-TD-04', 'Flug LH456, Großes Gepäck', '127.0.0.1', gen_random_uuid()),
+('Michael Knight', 'michael@example.com', '+436605678901', 'Praterstern, 1020 Wien', 'Flughafen Wien', CURRENT_DATE + TIME '14:00:00', 2, 1, 'Limo', 42.00, 'Wartet auf Bestätigung', 'TEST-TD-05', 'Bitte Fahrer anrufen bei Ankunft', '127.0.0.1', gen_random_uuid()),
+('Lisa Simpson', 'lisa@example.com', '+436606789012', 'Flughafen Wien', 'Donauinsel, 1220 Wien', CURRENT_DATE + TIME '15:30:00', 3, 3, 'Kombi', 58.00, 'confirmed', 'TEST-TD-06', 'Flug AUA789', '127.0.0.1', gen_random_uuid()),
+('Homer Simpson', 'homer@example.com', '+436607890123', 'Simmeringer Hauptstraße, 1110 Wien', 'Flughafen Wien', CURRENT_DATE + TIME '16:45:00', 1, 0, 'Limo', 38.00, 'confirmed', 'TEST-TD-07', 'Kindersitzerhöhung', '127.0.0.1', gen_random_uuid()),
+('Marge Simpson', 'marge@example.com', '+436608901234', 'Flughafen Wien', 'Kärntner Straße, 1010 Wien', CURRENT_DATE + TIME '18:00:00', 2, 2, 'Limo', 48.00, 'pending', 'TEST-TD-08', 'Flug BA123, Extra Stopp Hotel Sacher', '127.0.0.1', gen_random_uuid()),
+('Bart Simpson', 'bart@example.com', '+436609012345', 'Hütteldorfer Straße, 1140 Wien', 'Flughafen Wien', CURRENT_DATE + TIME '19:30:00', 5, 5, 'Bus', 90.00, 'confirmed', 'TEST-TD-09', 'Viel Gepäck', '127.0.0.1', gen_random_uuid()),
+('Maggie Simpson', 'maggie@example.com', '+436600123456', 'Flughafen Wien', 'Landstraßer Hauptstraße, 1030 Wien', CURRENT_DATE + TIME '21:00:00', 3, 2, 'Kombi', 52.00, 'confirmed', 'TEST-TD-10', 'Flug FR345, Babyschale', '127.0.0.1', gen_random_uuid()),
+
+-- TOMORROW (10 bookings)
+('James Bond', 'james@example.com', '+436601112223', 'Flughafen Wien', 'Grand Hotel, 1010 Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '07:00:00', 1, 1, 'Limo', 50.00, 'confirmed', 'TEST-TM-01', 'Flug 007, VIP Service', '127.0.0.1', gen_random_uuid()),
+('Indiana Jones', 'indy@example.com', '+436602223334', 'Museumsquartier, 1070 Wien', 'Flughafen Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '08:45:00', 2, 3, 'Kombi', 60.00, 'confirmed', 'TEST-TM-02', 'Vorsicht zerbrechlich', '127.0.0.1', gen_random_uuid()),
+('Marty McFly', 'marty@example.com', '+436603334445', 'Flughafen Wien', 'Rathausplatz, 1010 Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '10:15:00', 3, 2, 'Limo', 45.00, 'pending', 'TEST-TM-03', 'Flug DL88, Bitte pünktlich', '127.0.0.1', gen_random_uuid()),
+('Doc Brown', 'doc@example.com', '+436604445556', 'Schottenring 1, 1010 Wien', 'Flughafen Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '11:30:00', 1, 1, 'Limo', 40.00, 'confirmed', 'TEST-TM-04', 'Kindersitz für Einstein', '127.0.0.1', gen_random_uuid()),
+('Luke Skywalker', 'luke@example.com', '+436605556667', 'Flughafen Wien', 'Prater, 1020 Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '13:00:00', 4, 4, 'Kombi', 65.00, 'Wartet auf Bestätigung', 'TEST-TM-05', 'Flug XW1, Extra Stop Riesenrad', '127.0.0.1', gen_random_uuid()),
+('Leia Organa', 'leia@example.com', '+436606667778', 'Parlament, 1010 Wien', 'Flughafen Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '14:45:00', 2, 2, 'Limo', 48.00, 'confirmed', 'TEST-TM-06', 'Diplomatenstatus', '127.0.0.1', gen_random_uuid()),
+('Han Solo', 'han@example.com', '+436607778889', 'Flughafen Wien', 'Millennium Tower, 1200 Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '16:15:00', 1, 1, 'Limo', 42.00, 'confirmed', 'TEST-TM-07', 'Flug MF12, Schnellste Route bitte', '127.0.0.1', gen_random_uuid()),
+('Chewbacca', 'chewie@example.com', '+436608889990', 'Tiergarten Schönbrunn, 1130 Wien', 'Flughafen Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '17:30:00', 6, 8, 'Bus', 95.00, 'pending', 'TEST-TM-08', 'Sehr viel Gepäck, Kindersitz', '127.0.0.1', gen_random_uuid()),
+('Darth Vader', 'vader@example.com', '+436609990001', 'Flughafen Wien', 'DC Tower, 1220 Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '19:00:00', 2, 2, 'Limo', 55.00, 'confirmed', 'TEST-TM-09', 'Flug DS1, Extra Stop Stephansdom', '127.0.0.1', gen_random_uuid()),
+('Yoda', 'yoda@example.com', '+436600001112', 'Sumpfgasse 1, 1220 Wien', 'Flughafen Wien', CURRENT_DATE + INTERVAL '1 day' + TIME '20:30:00', 1, 0, 'Limo', 35.00, 'confirmed', 'TEST-TM-10', 'Kindersitz klein', '127.0.0.1', gen_random_uuid());
