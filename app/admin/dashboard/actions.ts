@@ -152,109 +152,110 @@ export async function deleteDriver(id: string) {
 }
 
 export async function updateBookingStatus(id: string, status: string) {
-  await requireSameOrigin();
-  const admin = await checkAdmin();
-  if (admin.error) return { error: admin.error || 'Unauthorized' };
-  if (!id) return { error: 'Missing booking id' };
+  try {
+    await requireSameOrigin();
+    const admin = await checkAdmin();
+    if (admin.error) return { error: admin.error || 'Unauthorized' };
+    if (!id) return { error: 'Missing booking id' };
 
-  const allowedStatuses = new Set(['pending', 'confirmed', 'cancelled', 'canceled', 'completed']);
-  if (!allowedStatuses.has(status)) return { error: 'Invalid status value' };
+    const allowedStatuses = new Set(['pending', 'confirmed', 'cancelled', 'canceled', 'completed']);
+    if (!allowedStatuses.has(status)) return { error: 'Invalid status value' };
 
-  const cancellationCandidates = status === 'cancelled' || status === 'canceled' ? ['canceled', 'cancelled'] : [status];
-  let data: any = null;
-  let updateError: any = null;
-  let finalStatus = status;
+    const cancellationCandidates = status === 'cancelled' || status === 'canceled' ? ['canceled', 'cancelled'] : [status];
+    let data: any = null;
+    let updateError: any = null;
+    let finalStatus = status;
 
-  // Try both cancellation spellings to tolerate production DB check-constraint differences.
-  for (const candidate of cancellationCandidates) {
-    const result = await supabaseAdmin
-      .from('bookings')
-      .update({ status: candidate })
-      .eq('id', id)
-      .select('id, status, driver_id, full_name, email, pickup, destination, pickup_at, price, vehicle_type, notes')
-      .maybeSingle();
-
-    if (!result.error && result.data) {
-      data = result.data;
-      updateError = null;
-      finalStatus = candidate;
-      break;
-    }
-
-    updateError = result.error;
-  }
-
-  if (updateError) {
-    return { error: updateError.message };
-  }
-  if (!data) {
-    return { error: 'Booking not found or update not permitted' };
-  }
-
-  if ((finalStatus === 'cancelled' || finalStatus === 'canceled') && data.driver_id) {
-    if (process.env.RESEND_API_KEY) {
-      const { data: driver, error: driverError } = await supabaseAdmin
-        .from('drivers')
-        .select('id, name, email')
-        .eq('id', data.driver_id)
+    // Try both cancellation spellings to tolerate production DB check-constraint differences.
+    for (const candidate of cancellationCandidates) {
+      const result = await supabaseAdmin
+        .from('bookings')
+        .update({ status: candidate })
+        .eq('id', id)
+        .select('id, status, driver_id, full_name, email, pickup, destination, pickup_at, price, vehicle_type, notes')
         .maybeSingle();
 
-      if (!driverError && driver?.email) {
-        const pickupRaw = String(data.pickup || '').toLowerCase();
-        const destinationRaw = String(data.destination || '').toLowerCase();
-        const isFromAirport = pickupRaw.includes('flughafen');
-        const isToAirport = destinationRaw.includes('flughafen');
-        const directionLabel = isFromAirport ? 'Vom Flughafen' : isToAirport ? 'Zum Flughafen' : 'Transfer';
-        const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
+      if (!result.error && result.data) {
+        data = result.data;
+        updateError = null;
+        finalStatus = candidate;
+        break;
+      }
 
-        const notesRaw = String(data.notes || '');
-        const paymentInNotes = notesRaw.toLowerCase().match(/\(zahlung:\s*([^)]+)\)/i)?.[1]?.toLowerCase() || '';
-        const flightNumberInfo = notesRaw.match(/\(Flugnummer:\s*([^)]+)\)/i)?.[1]?.trim() || '';
-        const isCardPayment =
-          paymentInNotes.includes('kredit') || paymentInNotes.includes('card') || paymentInNotes.includes('karte');
-        const isCashPayment = paymentInNotes.includes('bar') || paymentInNotes.includes('cash');
-        const paymentLabel = isCardPayment ? 'Kreditkarte' : isCashPayment ? 'Barzahlung' : '-';
-        const paymentStyle = isCardPayment
-          ? 'background:#e8f2ff;color:#0071e3;'
-          : isCashPayment
-            ? 'background:#eafaf0;color:#1f7a3f;'
-            : 'background:#f5f5f7;color:#86868b;';
+      updateError = result.error;
+    }
 
-        const safeDriverName = escapeHtml(String(driver.name || 'Fahrer'));
-        const safePassengerName = escapeHtml(String(data.full_name || ''));
-        const safePassengerEmail = escapeHtml(String(data.email || ''));
-        const pickupRawValue = String(data.pickup || '');
-        const destinationRawValue = String(data.destination || '');
-        const safePickup = escapeHtml(pickupRawValue);
-        const safeDestination = escapeHtml(destinationRawValue);
-        const pickupMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pickupRawValue)}`;
-        const destinationMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationRawValue)}`;
-        const pickupIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(pickupRawValue);
-        const destinationIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(destinationRawValue);
-        const safeVehicle = escapeHtml(String(data.vehicle_type || '-'));
-        const safePayment = escapeHtml(paymentLabel);
-        const safeFlightNumberInfo = escapeHtml(flightNumberInfo || '');
-        const { date: pickupDate, time: pickupTime } = formatDateTimeForEmail(String(data.pickup_at));
-        const safeDate = escapeHtml(pickupDate);
-        const safeTime = escapeHtml(pickupTime);
-        const safeDirectionLabel = escapeHtml(directionLabel);
-        const safePrice = escapeHtml(
-          new Intl.NumberFormat('de-AT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-            Number(data.price ?? 0),
-          ),
-        );
+    if (updateError) {
+      return { error: updateError.message };
+    }
+    if (!data) {
+      return { error: 'Booking not found or update not permitted' };
+    }
 
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        const fromCandidates = Array.from(
-          new Set([process.env.RESEND_FROM_EMAIL, 'onboarding@resend.dev'].filter(Boolean) as string[]),
-        );
+    if ((finalStatus === 'cancelled' || finalStatus === 'canceled') && data.driver_id) {
+      if (process.env.RESEND_API_KEY) {
+        const { data: driver, error: driverError } = await supabaseAdmin
+          .from('drivers')
+          .select('id, name, email')
+          .eq('id', data.driver_id)
+          .maybeSingle();
 
-        for (const from of fromCandidates) {
-          const { error } = await resend.emails.send({
-            from,
-            to: driver.email,
-            subject: `Fahrtstornierung (${directionLabel})`.trim(),
-            html: `
+        if (!driverError && driver?.email) {
+          const pickupRaw = String(data.pickup || '').toLowerCase();
+          const destinationRaw = String(data.destination || '').toLowerCase();
+          const isFromAirport = pickupRaw.includes('flughafen');
+          const isToAirport = destinationRaw.includes('flughafen');
+          const directionLabel = isFromAirport ? 'Vom Flughafen' : isToAirport ? 'Zum Flughafen' : 'Transfer';
+          const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
+
+          const notesRaw = String(data.notes || '');
+          const paymentInNotes = notesRaw.toLowerCase().match(/\(zahlung:\s*([^)]+)\)/i)?.[1]?.toLowerCase() || '';
+          const flightNumberInfo = notesRaw.match(/\(Flugnummer:\s*([^)]+)\)/i)?.[1]?.trim() || '';
+          const isCardPayment =
+            paymentInNotes.includes('kredit') || paymentInNotes.includes('card') || paymentInNotes.includes('karte');
+          const isCashPayment = paymentInNotes.includes('bar') || paymentInNotes.includes('cash');
+          const paymentLabel = isCardPayment ? 'Kreditkarte' : isCashPayment ? 'Barzahlung' : '-';
+          const paymentStyle = isCardPayment
+            ? 'background:#e8f2ff;color:#0071e3;'
+            : isCashPayment
+              ? 'background:#eafaf0;color:#1f7a3f;'
+              : 'background:#f5f5f7;color:#86868b;';
+
+          const safeDriverName = escapeHtml(String(driver.name || 'Fahrer'));
+          const safePassengerName = escapeHtml(String(data.full_name || ''));
+          const safePassengerEmail = escapeHtml(String(data.email || ''));
+          const pickupRawValue = String(data.pickup || '');
+          const destinationRawValue = String(data.destination || '');
+          const safePickup = escapeHtml(pickupRawValue);
+          const safeDestination = escapeHtml(destinationRawValue);
+          const pickupMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pickupRawValue)}`;
+          const destinationMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationRawValue)}`;
+          const pickupIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(pickupRawValue);
+          const destinationIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(destinationRawValue);
+          const safeVehicle = escapeHtml(String(data.vehicle_type || '-'));
+          const safePayment = escapeHtml(paymentLabel);
+          const safeFlightNumberInfo = escapeHtml(flightNumberInfo || '');
+          const { date: pickupDate, time: pickupTime } = formatDateTimeForEmail(String(data.pickup_at));
+          const safeDate = escapeHtml(pickupDate);
+          const safeTime = escapeHtml(pickupTime);
+          const safeDirectionLabel = escapeHtml(directionLabel);
+          const safePrice = escapeHtml(
+            new Intl.NumberFormat('de-AT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+              Number(data.price ?? 0),
+            ),
+          );
+
+          const resend = new Resend(process.env.RESEND_API_KEY);
+          const fromCandidates = Array.from(
+            new Set([process.env.RESEND_FROM_EMAIL, 'onboarding@resend.dev'].filter(Boolean) as string[]),
+          );
+
+          for (const from of fromCandidates) {
+            const { error } = await resend.emails.send({
+              from,
+              to: driver.email,
+              subject: `Fahrtstornierung (${directionLabel})`.trim(),
+              html: `
               <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
                 <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
                   <tr>
@@ -299,25 +300,29 @@ export async function updateBookingStatus(id: string, status: string) {
                 </table>
               </div>
             `,
-          });
-          if (!error) break;
+            });
+            if (!error) break;
+          }
         }
+      } else {
+        console.error('RESEND_API_KEY missing: cancellation email not sent');
       }
-    } else {
-      console.error('RESEND_API_KEY missing: cancellation email not sent');
     }
+
+    await supabaseAdmin.from('audit_logs').insert({
+      actor_user_id: admin.user?.id,
+      action: 'UPDATE_STATUS',
+      entity: 'bookings',
+      entity_id: id,
+      meta: { status: finalStatus },
+    });
+
+    revalidatePath('/admin/dashboard');
+    return { success: true, status: data.status || finalStatus };
+  } catch (error) {
+    console.error('updateBookingStatus failed:', error);
+    return { error: 'Ride status update failed. Please try again.' };
   }
-
-  await supabaseAdmin.from('audit_logs').insert({
-    actor_user_id: admin.user?.id,
-    action: 'UPDATE_STATUS',
-    entity: 'bookings',
-    entity_id: id,
-    meta: { status: finalStatus },
-  });
-
-  revalidatePath('/admin/dashboard');
-  return { success: true, status: data.status || finalStatus };
 }
 
 export async function updateBookingDetails(payload: {
@@ -554,31 +559,32 @@ export async function updateBookingDetails(payload: {
 }
 
 export async function assignDriver(bookingId: string, driverId: string, sendEmail = false) {
-  await requireSameOrigin();
-  const admin = await checkAdmin();
-  if (admin.error || !admin.supabase) return { error: admin.error || 'Unauthorized' };
-  const { supabase } = admin;
+  try {
+    await requireSameOrigin();
+    const admin = await checkAdmin();
+    if (admin.error || !admin.supabase) return { error: admin.error || 'Unauthorized' };
+    const { supabase } = admin;
 
-  if (!bookingId || !driverId) {
-    return { error: 'Missing bookingId or driverId' };
-  }
-
-  const { error: updateError } = await supabase
-    .from('bookings')
-    .update({
-      driver_id: driverId,
-      ...(sendEmail ? { status: 'pending' } : {}),
-    })
-    .eq('id', bookingId);
-
-  if (updateError) {
-    return { error: updateError.message };
-  }
-
-  if (sendEmail) {
-    if (!process.env.RESEND_API_KEY) {
-      return { error: 'Server misconfiguration: RESEND_API_KEY is missing' };
+    if (!bookingId || !driverId) {
+      return { error: 'Missing bookingId or driverId' };
     }
+
+    const { error: updateError } = await supabase
+      .from('bookings')
+      .update({
+        driver_id: driverId,
+        ...(sendEmail ? { status: 'pending' } : {}),
+      })
+      .eq('id', bookingId);
+
+    if (updateError) {
+      return { error: updateError.message };
+    }
+
+    if (sendEmail) {
+      if (!process.env.RESEND_API_KEY) {
+        return { error: 'Server misconfiguration: RESEND_API_KEY is missing' };
+      }
 
     const [{ data: booking, error: bookingError }, { data: driver, error: driverError }] = await Promise.all([
       supabaseAdmin
@@ -762,17 +768,21 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
       return { error: emailError.message };
     }
 
-    await supabaseAdmin.from('audit_logs').insert({
-      actor_user_id: admin.user?.id,
-      action: 'ASSIGN_DRIVER',
-      entity: 'bookings',
-      entity_id: bookingId,
-      meta: { driverId, emailSentTo: driver.email },
-    });
+      await supabaseAdmin.from('audit_logs').insert({
+        actor_user_id: admin.user?.id,
+        action: 'ASSIGN_DRIVER',
+        entity: 'bookings',
+        entity_id: bookingId,
+        meta: { driverId, emailSentTo: driver.email },
+      });
+    }
+    
+    revalidatePath('/admin/dashboard');
+    return { success: true, emailSent: sendEmail };
+  } catch (error) {
+    console.error('assignDriver failed:', error);
+    return { error: 'Driver assignment failed. Please try again.' };
   }
-  
-  revalidatePath('/admin/dashboard');
-  return { success: true, emailSent: sendEmail };
 }
 
 export async function fetchStats(startDate: string, endDate: string) {

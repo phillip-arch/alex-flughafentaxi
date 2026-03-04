@@ -328,73 +328,83 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   };
 
   const handleAssignDriver = async (bookingId: string, driverId: string, sendEmail = false) => {
-    if (!driverId) return;
-    const res = await assignDriver(bookingId, driverId, sendEmail);
-    if ((res as any)?.error) {
-      alert(`Failed to assign driver: ${(res as any).error}`);
-      return;
+    try {
+      if (!driverId) return;
+      const res = await assignDriver(bookingId, driverId, sendEmail);
+      if ((res as any)?.error) {
+        alert(`Failed to assign driver: ${(res as any).error}`);
+        return;
+      }
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === bookingId
+            ? {
+                ...b,
+                driver_id: driverId,
+                ...(sendEmail ? { status: 'pending' } : {}),
+                ...(sendEmail ? { confirm_token: b.confirm_token || '__PENDING_DRIVER_CONFIRM__' } : {}),
+              }
+            : b
+        )
+      );
+      setRidesCache((prev) => {
+        const cached = prev[date];
+        if (!cached) return prev;
+        return {
+          ...prev,
+          [date]: {
+            ...cached,
+            bookings: cached.bookings.map((b) =>
+              b.id === bookingId
+                ? {
+                    ...b,
+                    driver_id: driverId,
+                    ...(sendEmail ? { status: 'pending' } : {}),
+                    ...(sendEmail ? { confirm_token: b.confirm_token || '__PENDING_DRIVER_CONFIRM__' } : {}),
+                  }
+                : b
+            ),
+          },
+        };
+      });
+      setStatsCache({});
+      setDriverSelection((prev) => {
+        if (!(bookingId in prev)) return prev;
+        const next = { ...prev };
+        delete next[bookingId];
+        return next;
+      });
+    } catch (error) {
+      console.error('handleAssignDriver failed:', error);
+      alert('Failed to assign driver: Server error. Please try again.');
     }
-    setBookings((prev) =>
-      prev.map((b) =>
-        b.id === bookingId
-          ? {
-              ...b,
-              driver_id: driverId,
-              ...(sendEmail ? { status: 'pending' } : {}),
-              ...(sendEmail ? { confirm_token: b.confirm_token || '__PENDING_DRIVER_CONFIRM__' } : {}),
-            }
-          : b
-      )
-    );
-    setRidesCache((prev) => {
-      const cached = prev[date];
-      if (!cached) return prev;
-      return {
-        ...prev,
-        [date]: {
-          ...cached,
-          bookings: cached.bookings.map((b) =>
-            b.id === bookingId
-              ? {
-                  ...b,
-                  driver_id: driverId,
-                  ...(sendEmail ? { status: 'pending' } : {}),
-                  ...(sendEmail ? { confirm_token: b.confirm_token || '__PENDING_DRIVER_CONFIRM__' } : {}),
-                }
-              : b
-          ),
-        },
-      };
-    });
-    setStatsCache({});
-    setDriverSelection((prev) => {
-      if (!(bookingId in prev)) return prev;
-      const next = { ...prev };
-      delete next[bookingId];
-      return next;
-    });
   };
 
   const handleStatusChange = async (bookingId: string, status: string) => {
-    const res = await updateBookingStatus(bookingId, status);
-    if ((res as any)?.error) {
-      alert(`Failed to update ride: ${(res as any).error}`);
-      return;
+    try {
+      const res = await updateBookingStatus(bookingId, status);
+      if ((res as any)?.error) {
+        alert(`Failed to update ride: ${(res as any).error}`);
+        return;
+      }
+      const nextStatus = (res as any)?.status || status;
+      setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: nextStatus } : b)));
+      setRidesCache((prev) => {
+        const cached = prev[date];
+        if (!cached) return prev;
+        return {
+          ...prev,
+          [date]: {
+            ...cached,
+            bookings: cached.bookings.map((b) => (b.id === bookingId ? { ...b, status: nextStatus } : b)),
+          },
+        };
+      });
+      setStatsCache({});
+    } catch (error) {
+      console.error('handleStatusChange failed:', error);
+      alert('Failed to update ride: Server error. Please try again.');
     }
-    const nextStatus = (res as any)?.status || status;
-    setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: nextStatus } : b)));
-    setRidesCache((prev) => {
-      const cached = prev[date];
-      if (!cached) return prev;
-      return {
-        ...prev,
-        [date]: {
-          ...cached,
-          bookings: cached.bookings.map((b) => (b.id === bookingId ? { ...b, status: nextStatus } : b)),
-        },
-      };
-    });
-    setStatsCache({});
   };
 
   const handleAddDriver = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -1425,7 +1435,6 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     <form action="/auth/logout" method="post">
                       <button
                         type="submit"
-                        onClick={() => setMobileTabsOpen(false)}
                         className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left text-[#1d1d1f] hover:bg-[#f5f5f7]"
                       >
                         <XCircle size={16} /> Sign Out
