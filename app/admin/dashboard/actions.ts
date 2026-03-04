@@ -132,6 +132,10 @@ export async function addDriver(formData: FormData) {
     .insert([{ name, email, phone }]);
 
   if (insertError) {
+    // Unique constraint on drivers.email
+    if ((insertError as any)?.code === '23505') {
+      return { error: 'A driver with this email already exists.' };
+    }
     return safeActionError('Unable to add driver. Please try again.', 'addDriver insert failed', insertError);
   }
   revalidatePath('/admin/dashboard');
