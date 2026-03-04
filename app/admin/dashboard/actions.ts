@@ -21,6 +21,11 @@ function escapeHtml(value: string) {
     .replace(/'/g, '&#039;');
 }
 
+function safeActionError(publicMessage: string, context: string, error?: unknown) {
+  console.error(context, error);
+  return { error: publicMessage };
+}
+
 function formatDateTimeForEmail(value: string) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
@@ -127,7 +132,7 @@ export async function addDriver(formData: FormData) {
     .insert([{ name, email, phone }]);
 
   if (insertError) {
-    return { error: insertError.message };
+    return safeActionError('Unable to add driver. Please try again.', 'addDriver insert failed', insertError);
   }
   revalidatePath('/admin/dashboard');
   return { success: true };
@@ -145,7 +150,7 @@ export async function deleteDriver(id: string) {
     .eq('id', id);
 
   if (deleteError) {
-    return { error: deleteError.message };
+    return safeActionError('Unable to delete driver. Please try again.', 'deleteDriver failed', deleteError);
   }
   revalidatePath('/admin/dashboard');
   return { success: true };
@@ -186,7 +191,7 @@ export async function updateBookingStatus(id: string, status: string) {
     }
 
     if (updateError) {
-      return { error: updateError.message };
+      return safeActionError('Unable to update ride status. Please try again.', 'updateBookingStatus update failed', updateError);
     }
     if (!data) {
       return { error: 'Booking not found or update not permitted' };
@@ -377,7 +382,7 @@ export async function updateBookingDetails(payload: {
     .maybeSingle();
 
   if (updateError) {
-    return { error: updateError.message };
+    return safeActionError('Unable to save booking changes. Please try again.', 'updateBookingDetails update failed', updateError);
   }
   if (!updated) {
     return { error: 'Booking not found' };
@@ -550,7 +555,7 @@ export async function updateBookingDetails(payload: {
     }
 
     if (emailError) {
-      return { error: typeof emailError === 'object' && emailError && 'message' in emailError ? String((emailError as any).message) : 'E-Mail Versand fehlgeschlagen.' };
+      return safeActionError('E-Mail Versand fehlgeschlagen. Bitte erneut versuchen.', 'updateBookingDetails email failed', emailError);
     }
   }
 
@@ -578,7 +583,7 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
       .eq('id', bookingId);
 
     if (updateError) {
-      return { error: updateError.message };
+      return safeActionError('Unable to assign driver. Please try again.', 'assignDriver update failed', updateError);
     }
 
     if (sendEmail) {
@@ -600,11 +605,11 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     ]);
 
     if (bookingError || !booking) {
-      return { error: bookingError?.message || 'Booking not found' };
+      return safeActionError('Unable to load booking for assignment.', 'assignDriver booking lookup failed', bookingError);
     }
 
     if (driverError || !driver) {
-      return { error: driverError?.message || 'Driver not found' };
+      return safeActionError('Unable to load driver for assignment.', 'assignDriver driver lookup failed', driverError);
     }
 
     if (!driver.email) {
@@ -620,7 +625,7 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
       .eq('id', bookingId);
 
     if (tokenUpdateError) {
-      return { error: tokenUpdateError.message };
+      return safeActionError('Unable to create confirmation token.', 'assignDriver token update failed', tokenUpdateError);
     }
 
     const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -765,7 +770,7 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     });
 
     if (emailError) {
-      return { error: emailError.message };
+      return safeActionError('E-Mail Versand fehlgeschlagen. Bitte erneut versuchen.', 'assignDriver email failed', emailError);
     }
 
       await supabaseAdmin.from('audit_logs').insert({
