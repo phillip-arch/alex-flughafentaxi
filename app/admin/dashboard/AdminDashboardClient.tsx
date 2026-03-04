@@ -22,15 +22,8 @@ import { BOOKING_FORM_CARD_CLASS, BOOKING_FORM_INPUT_CLASS } from '@/lib/ui/book
 
 export default function AdminDashboardClient({ userEmail }: { userEmail: string }) {
   const AIRPORT_LABEL = 'Flughafen Wien (VIE)';
-  const [currentTab, setCurrentTab] = useState<'rides' | 'drivers' | 'stats'>(() => {
-    if (typeof window === 'undefined') return 'rides';
-    const tab = new URLSearchParams(window.location.search).get('tab');
-    return tab === 'drivers' || tab === 'stats' ? tab : 'rides';
-  });
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() => {
-    if (typeof window === 'undefined') return 'grid';
-    return new URLSearchParams(window.location.search).get('view') === 'table' ? 'table' : 'grid';
-  });
+  const [currentTab, setCurrentTab] = useState<'rides' | 'drivers' | 'stats'>('rides');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [bookings, setBookings] = useState<any[]>([]);
@@ -230,6 +223,15 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     const raw = String(booking?.notes || '');
     return Number(raw.match(/Handgep..ck:\s*(\d+)/i)?.[1] || 0);
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    const view = params.get('view');
+    setCurrentTab(tab === 'drivers' || tab === 'stats' ? tab : 'rides');
+    setViewMode(view === 'table' ? 'table' : 'grid');
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -1016,7 +1018,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   <th className="px-0 py-1.5 font-medium text-center">Route</th>
                   <th className="px-2 py-1.5 font-medium text-center">Fahrgast, Gepäck</th>
                   <th className="px-2 py-1.5 font-medium text-center">Kunde</th>
-                  <th className="px-0 py-1.5 font-medium text-center">Zahlung</th>
+                  <th className="w-[80px] px-0 py-1.5 font-medium text-center">Zahlung</th>
                   <th className="px-0 py-1.5 font-medium text-center">Notiz</th>
                   <th className="px-0 py-1.5 font-medium text-center">Edit</th>
                   <th className="px-0 py-1.5 font-medium text-center">X</th>
@@ -1086,7 +1088,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           </div>
                         </div>
                       </td>
-                      <td className={`px-2 py-1 align-top min-w-[160px] ${isCancelled ? 'opacity-35' : ''}`}>
+                      <td className={`px-2 py-1 align-top min-w-[140px] ${isCancelled ? 'opacity-35' : ''}`}>
                         <div className="flex min-h-[42px] flex-col justify-between text-[16px] text-[#1d1d1f] font-medium leading-tight">
                           <div>{Number(booking.passengers || 0)} Pers. • {Number(booking.luggage || 0)} K • {handLuggage} H</div>
                           {hasAnySeat ? (
@@ -1111,8 +1113,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           </div>
                         </a>
                       </td>
-                      <td className={`px-0 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
-                        <div className="flex min-h-[42px] flex-col justify-between">
+                      <td className={`w-[80px] px-0 py-1 align-top text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                        <div className="flex min-h-[42px] flex-col items-center justify-between">
                           <div className="font-semibold text-[#1d1d1f]">{formatPriceDisplay(booking.price)}</div>
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[16px] font-semibold uppercase ${payment.className}`}>
                             <CreditCard size={11} /> {payment.label}
