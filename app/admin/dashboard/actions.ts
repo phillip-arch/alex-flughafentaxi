@@ -157,16 +157,32 @@ export async function updateBookingStatus(id: string, status: string) {
   if (admin.error) return { error: admin.error || 'Unauthorized' };
   if (!id) return { error: 'Missing booking id' };
 
-  const allowedStatuses = new Set(['pending', 'confirmed', 'cancelled', 'completed']);
+  const allowedStatuses = new Set(['pending', 'confirmed', 'cancelled', 'canceled', 'completed']);
   if (!allowedStatuses.has(status)) return { error: 'Invalid status value' };
 
-  // Use service role after admin auth check to avoid silent RLS no-op updates.
-  const { data, error: updateError } = await supabaseAdmin
-    .from('bookings')
-    .update({ status })
-    .eq('id', id)
-    .select('id, status, driver_id, full_name, email, pickup, destination, pickup_at, price, vehicle_type, notes')
-    .maybeSingle();
+  const cancellationCandidates = status === 'cancelled' || status === 'canceled' ? ['canceled', 'cancelled'] : [status];
+  let data: any = null;
+  let updateError: any = null;
+  let finalStatus = status;
+
+  // Try both cancellation spellings to tolerate production DB check-constraint differences.
+  for (const candidate of cancellationCandidates) {
+    const result = await supabaseAdmin
+      .from('bookings')
+      .update({ status: candidate })
+      .eq('id', id)
+      .select('id, status, driver_id, full_name, email, pickup, destination, pickup_at, price, vehicle_type, notes')
+      .maybeSingle();
+
+    if (!result.error && result.data) {
+      data = result.data;
+      updateError = null;
+      finalStatus = candidate;
+      break;
+    }
+
+    updateError = result.error;
+  }
 
   if (updateError) {
     return { error: updateError.message };
@@ -175,7 +191,7 @@ export async function updateBookingStatus(id: string, status: string) {
     return { error: 'Booking not found or update not permitted' };
   }
 
-  if (status === 'cancelled' && data.driver_id) {
+  if ((finalStatus === 'cancelled' || finalStatus === 'canceled') && data.driver_id) {
     if (process.env.RESEND_API_KEY) {
       const { data: driver, error: driverError } = await supabaseAdmin
         .from('drivers')
@@ -297,11 +313,11 @@ export async function updateBookingStatus(id: string, status: string) {
     action: 'UPDATE_STATUS',
     entity: 'bookings',
     entity_id: id,
-    meta: { status },
+    meta: { status: finalStatus },
   });
 
   revalidatePath('/admin/dashboard');
-  return { success: true, status: data.status };
+  return { success: true, status: data.status || finalStatus };
 }
 
 export async function updateBookingDetails(payload: {
@@ -328,6 +344,7 @@ export async function updateBookingDetails(payload: {
     'pending',
     'confirmed',
     'cancelled',
+    'canceled',
     'completed',
   ]);
 
@@ -768,7 +785,7 @@ export async function fetchStats(startDate: string, endDate: string) {
     .select('*, driver:driver_id(name)')
     .gte('pickup_at', startDate)
     .lte('pickup_at', endDate)
-    .neq('status', 'cancelled');
+    .not('status', 'in', '("cancelled","canceled")');
 
   if (fetchError) {
     console.error('Error fetching stats:', fetchError);
@@ -786,7 +803,7 @@ export async function fetchPassengerCounts(email: string) {
     .from('bookings')
     .select('*', { count: 'exact', head: true })
     .eq('email', email)
-    .neq('status', 'cancelled');
+    .not('status', 'in', '("cancelled","canceled")');
 
   if (countError) {
     return 0;
@@ -806,7 +823,7 @@ export async function fetchPassengerCountsBatch(emails: string[]) {
     .from('bookings')
     .select('email')
     .in('email', uniqueEmails)
-    .neq('status', 'cancelled');
+    .not('status', 'in', '("cancelled","canceled")');
 
   if (error) {
     console.error('Error fetching passenger counts batch:', error);

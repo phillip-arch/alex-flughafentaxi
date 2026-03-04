@@ -94,9 +94,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const getStatusLabel = (status?: string) => {
     if (status === 'completed') return 'Completed';
     if (status === 'confirmed') return 'Confirmed';
-    if (status === 'cancelled') return 'Canceled';
+    if (status === 'cancelled' || status === 'canceled') return 'Canceled';
     return 'Waiting confirmation';
   };
+
+  const isCancelledBooking = (status?: string) => status === 'cancelled' || status === 'canceled';
 
   const getDriverSelectTone = (booking: any) => {
     if (booking?.status === 'confirmed') {
@@ -379,7 +381,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       alert(`Failed to update ride: ${(res as any).error}`);
       return;
     }
-    setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status } : b)));
+    const nextStatus = (res as any)?.status || status;
+    setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: nextStatus } : b)));
     setRidesCache((prev) => {
       const cached = prev[date];
       if (!cached) return prev;
@@ -387,7 +390,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         ...prev,
         [date]: {
           ...cached,
-          bookings: cached.bookings.map((b) => (b.id === bookingId ? { ...b, status } : b)),
+          bookings: cached.bookings.map((b) => (b.id === bookingId ? { ...b, status: nextStatus } : b)),
         },
       };
     });
@@ -496,7 +499,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
   const openEditBooking = (booking: any) => {
     const normalizedStatus =
-      booking.status === 'confirmed' || booking.status === 'cancelled'
+      booking.status === 'confirmed' || isCancelledBooking(booking.status)
         ? booking.status
         : 'pending';
 
@@ -760,10 +763,10 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             <div
               key={booking.id}
               className={`relative bg-[#f8f9fb] rounded-[24px] border border-[#d9dde4] shadow-sm p-4 md:p-5 hover:shadow-md transition-all ${
-                booking.status === 'cancelled' ? 'bg-[#e5e7eb] border-[#cfd4dc]' : ''
+                isCancelledBooking(booking.status) ? 'bg-[#e5e7eb] border-[#cfd4dc]' : ''
               }`}
             >
-              <div className={`flex flex-nowrap items-center gap-1.5 sm:gap-2 mb-4 ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}>
+              <div className={`flex flex-nowrap items-center gap-1.5 sm:gap-2 mb-4 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                 <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-3 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[13px] sm:text-[18px] font-semibold">
                   {format(new Date(booking.pickup_at), 'HH:mm')}
                 </span>
@@ -795,7 +798,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.95fr_0.8fr] gap-4 items-start">
-                <div className={`space-y-2.5 ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}>
+                <div className={`space-y-2.5 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                   <div className="relative pl-7 space-y-2.5">
                     <div className="pointer-events-none absolute left-0 top-2 flex flex-col items-center text-[#000000]" aria-hidden="true">
                       <span className="h-2.5 w-2.5 rounded-full bg-[#000000]" />
@@ -846,7 +849,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   })()}
                 </div>
 
-                <div className={`space-y-3 lg:pl-8 lg:-mt-3 ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}>
+                <div className={`space-y-3 lg:pl-8 lg:-mt-3 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                   <h3 className="font-semibold text-[#000000] text-[19px] flex items-center gap-2">
                     {booking.full_name}
                     {passengerCounts[booking.email] >= 5 && <Star size={15} className="text-yellow-400 fill-yellow-400" />}
@@ -907,7 +910,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 </div>
 
                 <div className="flex h-full flex-col gap-3">
-                  <div className={`flex items-center justify-end w-full ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}>
+                  <div className={`flex items-center justify-end w-full ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                     <button
                       type="button"
                       onClick={() => openEditBooking(booking)}
@@ -921,9 +924,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     </div>
                   </div>
                   <select
-                    className={`w-full text-[12px] border rounded-[11px] px-3 py-2 outline-none focus:border-[#4f46e5] ${booking.status === 'cancelled' ? 'opacity-35' : ''} ${getDriverSelectTone(booking)}`}
+                    className={`w-full text-[12px] border rounded-[11px] px-3 py-2 outline-none focus:border-[#4f46e5] ${isCancelledBooking(booking.status) ? 'opacity-35' : ''} ${getDriverSelectTone(booking)}`}
                     value={getSelectedDriverId(booking)}
-                    disabled={booking.status === 'cancelled'}
+                    disabled={isCancelledBooking(booking.status)}
                     onChange={(e) =>
                       setDriverSelection((prev) => ({ ...prev, [booking.id]: e.target.value }))
                     }
@@ -937,15 +940,15 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     <button
                       type="button"
                       onClick={() => {
-                        if (booking.status === 'cancelled') return;
+                        if (isCancelledBooking(booking.status)) return;
                         const driverId = getSelectedDriverId(booking);
                         if (!driverId) return;
                         if (confirm('Send assignment to this driver now?')) {
                           handleAssignDriver(booking.id, driverId, true);
                         }
                       }}
-                      disabled={!getSelectedDriverId(booking) || booking.status === 'cancelled'}
-                      className={`w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#0b1a44] text-white font-medium text-[12px] hover:bg-[#14265d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${booking.status === 'cancelled' ? 'opacity-35' : ''}`}
+                      disabled={!getSelectedDriverId(booking) || isCancelledBooking(booking.status)}
+                      className={`w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#0b1a44] text-white font-medium text-[12px] hover:bg-[#14265d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}
                     >
                       <Send size={12} />
                       Send
@@ -963,7 +966,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         <CheckCircle size={12} />
                         Activate
                       </button>
-                    ) : booking.status === 'cancelled' ? (
+                    ) : isCancelledBooking(booking.status) ? (
                     <button
                       type="button"
                       onClick={() => {
@@ -1019,9 +1022,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   <th className="px-2 py-1.5 font-medium text-center">Fahrgast, Gepäck</th>
                   <th className="px-2 py-1.5 font-medium text-center">Kunde</th>
                   <th className="w-[80px] px-0 py-1.5 font-medium text-center">Zahlung</th>
-                  <th className="px-0 py-1.5 font-medium text-center">Notiz</th>
-                  <th className="px-0 py-1.5 font-medium text-center">Edit</th>
-                  <th className="px-0 py-1.5 font-medium text-center">X</th>
+                  <th className="w-[56px] px-1.5 py-1.5 font-medium text-center">Notiz</th>
+                  <th className="w-[56px] px-1.5 py-1.5 font-medium text-center">Edit</th>
+                  <th className="w-[56px] px-1.5 py-1.5 font-medium text-center">X</th>
                 </tr>
               </thead>
               <tbody>
@@ -1032,12 +1035,12 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   const seats = getChildSeatCountsFromNotes(booking);
                   const hasAnySeat = seats.baby > 0 || seats.child > 0 || seats.booster > 0;
                   const directionLabel = booking.destination?.includes('Flughafen') ? 'ZUM' : 'VOM';
-                  const isCancelled = booking.status === 'cancelled';
+                  const isCancelled = isCancelledBooking(booking.status);
                   return (
                     <tr
                       key={booking.id}
                       className={`border-b border-[#f0f0f2] transition-all ${
-                        booking.status === 'cancelled' ? 'bg-[#e5e7eb]' : 'hover:bg-[#f5f5f7]/60'
+                        isCancelledBooking(booking.status) ? 'bg-[#e5e7eb]' : 'hover:bg-[#f5f5f7]/60'
                       }`}
                     >
                       <td className={`px-1.5 py-1 align-top text-center ${isCancelled ? 'opacity-35' : ''}`}>
@@ -1046,8 +1049,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           <div className="text-[16px] text-[#86868b]">{format(new Date(booking.pickup_at), 'dd/MM/yyyy')}</div>
                         </div>
                       </td>
-                      <td className={`px-0 py-1 align-middle ${isCancelled ? 'opacity-35' : ''}`}>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#e7ebf3] text-[#1d1d1f] text-[16px] font-semibold">
+                      <td className={`px-1.5 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                        <span className="inline-flex items-center text-[#1d1d1f] text-[16px] font-semibold">
                           {directionLabel}
                         </span>
                       </td>
@@ -1055,7 +1058,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         <select
                           className={`text-[16px] border rounded-[8px] px-1 py-1 w-22 outline-none focus:border-[#0071e3] ${getDriverSelectTone(booking)}`}
                           value={getSelectedDriverId(booking)}
-                          disabled={booking.status === 'cancelled'}
+                          disabled={isCancelledBooking(booking.status)}
                           onChange={(e) =>
                             setDriverSelection((prev) => ({ ...prev, [booking.id]: e.target.value }))
                           }
@@ -1066,8 +1069,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           ))}
                         </select>
                       </td>
-                      <td className={`px-0 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-[#e7ebf3] text-[#1d1d1f] text-[16px] font-semibold uppercase">
+                      <td className={`px-1.5 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                        <span className="inline-flex items-center text-[#1d1d1f] text-[16px] font-semibold uppercase">
                           {booking.vehicle_type || 'LIMO'}
                         </span>
                       </td>
@@ -1145,11 +1148,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           <Edit size={15} />
                         </button>
                       </td>
-                      <td className="px-0 py-1 align-middle text-center">
+                      <td className="px-1.5 py-1 align-middle text-center">
                         <button
                           type="button"
                           onClick={() => {
-                            if (booking.status === 'cancelled') {
+                            if (isCancelledBooking(booking.status)) {
                               if (confirm('Do you want to activate order?')) {
                                 handleStatusChange(booking.id, 'pending');
                               }
@@ -1160,14 +1163,18 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                             }
                           }}
                           className={`inline-flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
-                            booking.status === 'cancelled'
+                            isCancelledBooking(booking.status)
                               ? 'bg-[#e7f2ff] text-[#0071e3] hover:bg-[#dcecff]'
                               : 'bg-[#f2e9eb] text-[#d70015] hover:bg-[#ecdee1]'
                           }`}
-                          aria-label={booking.status === 'cancelled' ? 'Activate ride' : 'Cancel ride'}
-                          title={booking.status === 'cancelled' ? 'Activate ride' : 'Cancel ride'}
+                          aria-label={isCancelledBooking(booking.status) ? 'Activate ride' : 'Cancel ride'}
+                          title={isCancelledBooking(booking.status) ? 'Activate ride' : 'Cancel ride'}
                         >
-                          <X size={15} />
+                          {isCancelledBooking(booking.status) ? (
+                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#0071e3]" />
+                          ) : (
+                            <X size={15} />
+                          )}
                         </button>
                       </td>
                     </tr>
