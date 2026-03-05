@@ -5,7 +5,16 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/account/'],
+      disallow: [
+        '/admin/',
+        '/login',
+        '/forgot-password',
+        '/update-password',
+        '/book/confirm',
+        '/book/success',
+        '/driver/confirm',
+        '/account/',
+      ],
     },
     sitemap: 'https://flughafentaxi-wien.at/sitemap.xml',
   };

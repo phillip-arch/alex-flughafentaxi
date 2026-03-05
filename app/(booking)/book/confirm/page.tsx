@@ -1,6 +1,18 @@
 import { XCircle } from 'lucide-react';
 import Link from 'next/link';
 import ConfirmClient from './ConfirmClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
 
 export default async function ConfirmBookingPage({
   searchParams,

@@ -92,13 +92,6 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     setDate(nextDate);
   };
 
-  const getStatusLabel = (status?: string) => {
-    if (status === 'completed') return 'Completed';
-    if (status === 'confirmed') return 'Confirmed';
-    if (status === 'cancelled' || status === 'canceled') return 'Canceled';
-    return 'Waiting confirmation';
-  };
-
   const isCancelledBooking = (status?: string) => status === 'cancelled' || status === 'canceled';
 
   const getDriverSelectTone = (booking: any) => {
@@ -742,12 +735,12 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 isCancelledBooking(booking.status) ? 'bg-[#e5e7eb] border-[#cfd4dc]' : ''
               }`}
             >
-              <div className={`flex flex-nowrap items-center gap-1.5 sm:gap-2 mb-4 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
-                <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-3 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[13px] sm:text-[18px] font-semibold">
+              <div className={`flex flex-nowrap items-center gap-1 sm:gap-2 mb-4 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
+                <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-2.5 sm:px-4 py-1 rounded-full bg-[#e7ebf3] text-[#000000] text-[12px] sm:text-[18px] font-semibold">
                   {format(new Date(booking.pickup_at), 'HH:mm')}
                 </span>
-                <span className="inline-flex w-auto whitespace-nowrap justify-center items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full text-[13px] sm:text-[18px] font-semibold tracking-wide bg-[#e7ebf3] text-[#000000]">
-                  {booking.destination?.includes('Flughafen') ? <PlaneTakeoff size={16} className="sm:w-5 sm:h-5" /> : <PlaneLanding size={16} className="sm:w-5 sm:h-5" />}
+                <span className="inline-flex w-auto whitespace-nowrap justify-center items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1 rounded-full text-[12px] sm:text-[18px] font-semibold tracking-wide bg-[#e7ebf3] text-[#000000]">
+                  {booking.destination?.includes('Flughafen') ? <PlaneTakeoff size={14} className="sm:w-5 sm:h-5" /> : <PlaneLanding size={14} className="sm:w-5 sm:h-5" />}
                   {booking.destination?.includes('Flughafen') ? 'ZUM' : 'VOM'}
                 </span>
                 {(() => {
@@ -755,19 +748,19 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   const isFromAirportRide = /flughafen/i.test(String(booking?.pickup || ''));
                   if (!isFromAirportRide || !flightNumber) return null;
                   return (
-                    <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-3 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[13px] sm:text-[18px] font-semibold">
+                    <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-2.5 sm:px-4 py-1 rounded-full bg-[#e7ebf3] text-[#000000] text-[12px] sm:text-[18px] font-semibold">
                       {flightNumber}
                     </span>
                   );
                 })()}
-                <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-3 sm:px-4 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[13px] sm:text-[16px] font-semibold uppercase tracking-wide">
+                <span className="inline-flex w-auto whitespace-nowrap justify-center items-center px-2.5 sm:px-4 py-1 rounded-full bg-[#e7ebf3] text-[#000000] text-[12px] sm:text-[16px] font-semibold uppercase tracking-wide">
                   {booking.vehicle_type || 'LIMOUSINE'}
                 </span>
                 {(() => {
                   const payment = getBookingPaymentMeta(booking);
                   return (
-                    <span className={`inline-flex w-auto whitespace-nowrap justify-center items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full text-[13px] sm:text-[16px] font-semibold uppercase ${payment.className}`}>
-                      <CreditCard size={16} className="sm:w-[18px] sm:h-[18px]" /> {payment.label}
+                    <span className={`inline-flex w-auto whitespace-nowrap justify-center items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1 rounded-full text-[12px] sm:text-[16px] font-semibold uppercase ${payment.className}`}>
+                      <CreditCard size={14} className="sm:w-[18px] sm:h-[18px]" /> {payment.label}
                     </span>
                   );
                 })()}
@@ -775,43 +768,45 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
               <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.95fr_0.8fr] gap-4 items-start">
                 <div className={`space-y-2.5 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
-                  <div className="relative pl-7 space-y-2.5">
-                    <div className="pointer-events-none absolute left-0 top-2 flex flex-col items-center text-[#000000]" aria-hidden="true">
+                  <div className="flex items-stretch gap-2.5">
+                    <div className="pt-1 flex flex-col items-center text-[#000000] shrink-0" aria-hidden="true">
                       <span className="h-2.5 w-2.5 rounded-full bg-[#000000]" />
-                      <span className="mt-1 h-8 w-px bg-[#000000]" />
-                      <ChevronDown size={14} className="-mt-1" />
+                      <span className="my-1 w-px flex-1 bg-[#000000]" />
+                      <ChevronDown size={14} />
                     </div>
-                    <div className="flex items-start gap-2">
-                      <p className="text-[22px] font-semibold text-[#081a42] leading-snug line-clamp-2">
-                        {formatRideLocation(booking, booking.pickup, 'pickup')}
-                      </p>
-                      {!isAirportLocation(booking.pickup) ? (
-                        <a
-                          href={getGoogleMapsUrl(formatRideLocation(booking, booking.pickup, 'pickup'))}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="Open pickup in Google Maps"
-                          className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
-                        >
-                          <MapPin size={21} />
-                        </a>
-                      ) : null}
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <p className="text-[22px] font-semibold text-[#000000] leading-snug line-clamp-2">
-                        {formatRideLocation(booking, booking.destination, 'destination')}
-                      </p>
-                      {!isAirportLocation(booking.destination) ? (
-                        <a
-                          href={getGoogleMapsUrl(formatRideLocation(booking, booking.destination, 'destination'))}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="Open destination in Google Maps"
-                          className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
-                        >
-                          <MapPin size={21} />
-                        </a>
-                      ) : null}
+                    <div className="min-w-0 flex-1 space-y-2.5">
+                      <div className="flex items-start gap-2">
+                        <p className="text-[22px] font-semibold text-[#081a42] leading-snug line-clamp-2">
+                          {formatRideLocation(booking, booking.pickup, 'pickup')}
+                        </p>
+                        {!isAirportLocation(booking.pickup) ? (
+                          <a
+                            href={getGoogleMapsUrl(formatRideLocation(booking, booking.pickup, 'pickup'))}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Open pickup in Google Maps"
+                            className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
+                          >
+                            <MapPin size={21} />
+                          </a>
+                        ) : null}
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <p className="text-[22px] font-semibold text-[#000000] leading-snug line-clamp-2">
+                          {formatRideLocation(booking, booking.destination, 'destination')}
+                        </p>
+                        {!isAirportLocation(booking.destination) ? (
+                          <a
+                            href={getGoogleMapsUrl(formatRideLocation(booking, booking.destination, 'destination'))}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Open destination in Google Maps"
+                            className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
+                          >
+                            <MapPin size={21} />
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                   {(() => {
@@ -830,25 +825,27 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     {booking.full_name}
                     {passengerCounts[booking.email] >= 5 && <Star size={15} className="text-yellow-400 fill-yellow-400" />}
                   </h3>
-                  <div className="flex items-center gap-2 text-[#000000] text-[14px]">
-                    <a
-                      href={getTelHref(booking.phone)}
-                      aria-label="Call passenger"
-                      className="text-[#000000] hover:text-[#0071e3] transition-colors"
-                    >
-                      <Phone size={18} />
-                    </a>
-                    <span className="truncate">{booking.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[#000000] text-[14px]">
-                    <a
-                      href={getMailtoHref(booking.email)}
-                      aria-label="Email passenger"
-                      className="text-[#000000] hover:text-[#0071e3] transition-colors"
-                    >
-                      <Mail size={18} />
-                    </a>
-                    <span className="truncate">{booking.email}</span>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[#000000] text-[14px]">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <a
+                        href={getTelHref(booking.phone)}
+                        aria-label="Call passenger"
+                        className="text-[#000000] hover:text-[#0071e3] transition-colors shrink-0"
+                      >
+                        <Phone size={18} />
+                      </a>
+                      <span className="truncate">{booking.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <a
+                        href={getMailtoHref(booking.email)}
+                        aria-label="Email passenger"
+                        className="text-[#000000] hover:text-[#0071e3] transition-colors shrink-0"
+                      >
+                        <Mail size={18} />
+                      </a>
+                      <span className="truncate">{booking.email}</span>
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-3">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#e7ebf3] text-[#000000] text-[11px] font-semibold">
@@ -886,7 +883,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 </div>
 
                 <div className="flex h-full flex-col gap-3">
-                  <div className={`flex items-center justify-end w-full ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
+                  <div className={`flex flex-col items-end gap-2 w-full sm:flex-row sm:items-center sm:justify-end ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                     <button
                       type="button"
                       onClick={() => openEditBooking(booking)}
@@ -895,7 +892,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       <Edit size={12} />
                       Edit
                     </button>
-                    <div className="ml-auto text-right text-[30px] font-semibold text-[#081a42] leading-none">
+                    <div className="text-right text-[30px] font-semibold text-[#081a42] leading-none sm:ml-auto">
                       {formatPriceDisplay(booking.price)}
                     </div>
                   </div>
@@ -927,20 +924,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       <Send size={12} />
                       Send
                     </button>
-                    {booking.status === 'completed' ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (confirm('Do you want to activate order?')) {
-                            handleStatusChange(booking.id, 'confirmed');
-                          }
-                        }}
-                        className="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#e7f2ff] text-[#0071e3] font-medium text-[12px] hover:bg-[#dcecff] transition-colors"
-                      >
-                        <CheckCircle size={12} />
-                        Activate
-                      </button>
-                    ) : isCancelledBooking(booking.status) ? (
+                    {isCancelledBooking(booking.status) ? (
                     <button
                       type="button"
                       onClick={() => {
@@ -952,18 +936,6 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     >
                       <CheckCircle size={12} />
                       Activate
-                      </button>
-                    ) : booking.status === 'confirmed' ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (confirm('Mark this ride as completed?')) {
-                            handleStatusChange(booking.id, 'completed');
-                          }
-                        }}
-                        className="w-full px-2.5 py-1.5 rounded-full bg-[#eafaf0] text-[#1f7a3f] font-medium text-[12px] hover:bg-[#e0f6e8] transition-colors"
-                      >
-                        Complete
                       </button>
                     ) : (
                       <button
@@ -996,9 +968,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   <th className="px-2 py-1.5 font-medium text-center">Fahrgast, Gepäck</th>
                   <th className="px-2 py-1.5 font-medium text-center">Kunde</th>
                   <th className="w-[80px] px-0 py-1.5 font-medium text-center">Zahlung</th>
-                  <th className="w-[100px] md:w-[56px] px-1.5 py-1.5 font-medium text-center">Notiz</th>
-                  <th className="w-[100px] md:w-[56px] px-1.5 py-1.5 font-medium text-center">Edit</th>
-                  <th className="w-[100px] md:w-[56px] px-1.5 py-1.5 font-medium text-center">X</th>
+                  <th className="w-[120px] md:w-[56px] px-2 md:px-1.5 py-1.5 font-medium text-center">Notiz</th>
+                  <th className="w-[120px] md:w-[56px] px-2 md:px-1.5 py-1.5 font-medium text-center">Edit</th>
+                  <th className="w-[120px] md:w-[56px] px-2 md:px-1.5 py-1.5 font-medium text-center">X</th>
                 </tr>
               </thead>
               <tbody>
@@ -1053,13 +1025,13 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         </span>
                       </td>
                       <td className={`px-0 py-1 align-top min-w-[145px] ${isCancelled ? 'opacity-35' : ''}`}>
-                        <div className="flex items-start gap-1.5">
-                          <div className="mt-2.5 flex flex-col items-center text-[#000000]" aria-hidden="true">
+                        <div className="flex items-stretch gap-1.5">
+                          <div className="pt-1 flex flex-col items-center text-[#000000] shrink-0" aria-hidden="true">
                             <span className="h-2 w-2 rounded-full bg-[#000000]" />
-                            <span className="mt-1 h-4 w-px bg-[#000000]" />
-                            <ChevronDown size={12} className="-mt-1" />
+                            <span className="my-0.5 w-px flex-1 bg-[#000000]" />
+                            <ChevronDown size={12} />
                           </div>
-                          <div className="min-w-0 flex min-h-[42px] flex-col justify-between">
+                          <div className="min-w-0 flex-1 flex min-h-[42px] flex-col justify-between">
                             <div className="truncate text-[#1d1d1f] font-medium" title={formatTableRouteAddress(booking, booking.pickup, 'pickup')}>
                               {formatTableRouteAddress(booking, booking.pickup, 'pickup')}
                             </div>
@@ -1102,7 +1074,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           </span>
                         </div>
                       </td>
-                      <td className={`px-0 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                      <td className={`px-2 md:px-0 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
                         {displayNotes ? (
                           <button
                             type="button"
@@ -1115,7 +1087,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           </button>
                         ) : null}
                       </td>
-                      <td className={`px-0 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                      <td className={`px-2 md:px-0 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
                         <button
                           type="button"
                           onClick={() => openEditBooking(booking)}
@@ -1126,7 +1098,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           <Edit size={15} />
                         </button>
                       </td>
-                      <td className="px-1.5 py-1 align-middle text-center">
+                      <td className="px-2 md:px-1.5 py-1 align-middle text-center">
                         <button
                           type="button"
                           onClick={() => {

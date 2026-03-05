@@ -1,5 +1,17 @@
 import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
 
 export default function BookingSuccessPage() {
   return (
