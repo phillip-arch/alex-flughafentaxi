@@ -19,6 +19,7 @@ import {
   BarChart, Bar, PieChart, Pie, Cell
 } from 'recharts';
 import { BOOKING_FORM_CARD_CLASS, BOOKING_FORM_INPUT_CLASS } from '@/lib/ui/bookingFormStyles';
+import { composeBookingNotes, parseBookingNotes } from '@/lib/booking/notes';
 
 export default function AdminDashboardClient({ userEmail }: { userEmail: string }) {
   const AIRPORT_LABEL = 'Flughafen Wien (VIE)';
@@ -200,31 +201,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     }).format(num)} €`;
   };
 
-  const getBookingDisplayNotes = (booking: any) => {
-    const raw = String(booking?.notes || '');
-    return raw
-      .replace(/\(zahlung:\s*[^)]*\)/gi, '')
-      .replace(/\(kindersitze:\s*[^)]*\)/gi, '')
-      .replace(/\(zwischenstopp:\s*[^)]*\)/gi, '')
-      .replace(/\(flugnummer:\s*[^)]*\)/gi, '')
-      .replace(/\(handgep[^:]*:\s*[^)]*\)/gi, '')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
-  };
+  const getBookingDisplayNotes = (booking: any) => parseBookingNotes(booking?.notes).cleanedNotes;
 
-  const getChildSeatCountsFromNotes = (booking: any) => {
-    const raw = String(booking?.notes || '');
-    const block = raw.match(/\(Kindersitze:\s*([^)]+)\)/i)?.[1] || '';
-    const baby = Number(block.match(/(\d+)\s*x\s*Babyschale/i)?.[1] || 0);
-    const child = Number(block.match(/(\d+)\s*x\s*Kindersitz/i)?.[1] || 0);
-    const booster = Number(block.match(/(\d+)\s*x\s*Sitzerh(?:o|Ã¶)hung/i)?.[1] || 0);
-    return { baby, child, booster };
-  };
+  const getChildSeatCountsFromNotes = (booking: any) => parseBookingNotes(booking?.notes).childSeatCounts;
 
-  const getHandLuggageCountFromNotes = (booking: any) => {
-    const raw = String(booking?.notes || '');
-    return Number(raw.match(/Handgep..ck:\s*(\d+)/i)?.[1] || 0);
-  };
+  const getHandLuggageCountFromNotes = (booking: any) => parseBookingNotes(booking?.notes).handLuggageCount;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -329,11 +310,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
   const handleAssignDriver = async (bookingId: string, driverId: string, sendEmail = false) => {
     try {
-      if (!driverId) return;
+      if (!driverId) return false;
       const res = await assignDriver(bookingId, driverId, sendEmail);
       if ((res as any)?.error) {
         alert(`Failed to assign driver: ${(res as any).error}`);
-        return;
+        return false;
       }
       setBookings((prev) =>
         prev.map((b) =>
@@ -374,9 +355,21 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         delete next[bookingId];
         return next;
       });
+      return true;
     } catch (error) {
       console.error('handleAssignDriver failed:', error);
       alert('Failed to assign driver: Server error. Please try again.');
+      return false;
+    }
+  };
+
+  const confirmAndSendToDriver = async (bookingId: string, driverId: string) => {
+    if (!driverId) return;
+    if (confirm('Do you want to send to this driver now?')) {
+      const success = await handleAssignDriver(bookingId, driverId, true);
+      if (success) {
+        alert('Booking successfully sent to driver.');
+      }
     }
   };
 
@@ -525,24 +518,18 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     setEditDirection(inferredDirection);
     const editableAddressRaw = inferredDirection === 'from_airport' ? destinationText : pickupText;
     setEditAddress(parseAddress(editableAddressRaw));
-    const notesRaw = String(booking.notes || '');
-    const extraStopMatch = notesRaw.match(/\(Zwischenstopp:\s*([^)]+)\)/i);
-    const extractedExtraStop = extraStopMatch?.[1]?.trim() || '';
-    const handLuggageMatch = notesRaw.match(/\(Handgep[^:]*:\s*(\d+)\)/i);
-    const extractedHandLuggage = Number(handLuggageMatch?.[1] || 0);
-    const kinderseatBlockMatch = notesRaw.match(/\(Kindersitze:\s*([^)]+)\)/i);
-    const kinderseatBlock = kinderseatBlockMatch?.[1] || '';
-    const paymentMethodMatch = notesRaw.match(/\(Zahlung:\s*([^)]+)\)/i);
-    const paymentLabel = (paymentMethodMatch?.[1] || '').toLowerCase();
-    const flightNumberMatch = notesRaw.match(/\(Flugnummer:\s*([^)]+)\)/i);
-    const extractedFlightNumber = (booking.flight_number || flightNumberMatch?.[1] || '').toString().trim();
-    const babySeats = clampToRange(Number(kinderseatBlock.match(/(\d+)\s*x\s*Babyschale/i)?.[1] || 0), 0, 3);
-    const childSeats = clampToRange(Number(kinderseatBlock.match(/(\d+)\s*x\s*Kindersitz/i)?.[1] || 0), 0, 3);
-    const boosterSeats = clampToRange(Number(kinderseatBlock.match(/(\d+)\s*x\s*Sitzerh[Ã¶o]hung/i)?.[1] || 0), 0, 3);
+    const notesParsed = parseBookingNotes(booking.notes);
+    const extractedExtraStop = notesParsed.intermediateStopInfo;
+    const extractedHandLuggage = notesParsed.handLuggageCount;
+    const paymentLabel = notesParsed.paymentLabel.toLowerCase();
+    const extractedFlightNumber = (booking.flight_number || notesParsed.flightNumberInfo || '').toString().trim();
+    const babySeats = clampToRange(Number(notesParsed.childSeatCounts.baby || 0), 0, 3);
+    const childSeats = clampToRange(Number(notesParsed.childSeatCounts.child || 0), 0, 3);
+    const boosterSeats = clampToRange(Number(notesParsed.childSeatCounts.booster || 0), 0, 3);
     setEditExtraStop(Boolean(extractedExtraStop));
     setEditExtraStopAddress(extractedExtraStop ? parseAddress(extractedExtraStop) : { city: 'Wien', zip: '', street: '', houseNumber: '' });
     setEditHandLuggage(clampToRange(extractedHandLuggage, 0, 8));
-    setEditChildSeat(Boolean(kinderseatBlockMatch) || babySeats > 0 || childSeats > 0 || boosterSeats > 0);
+    setEditChildSeat(Boolean(notesParsed.childSeatInfo) || babySeats > 0 || childSeats > 0 || boosterSeats > 0);
     setEditBabySeats(babySeats);
     setEditChildSeats(childSeats);
     setEditBoosterSeats(boosterSeats);
@@ -554,13 +541,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
           ? 'cash'
           : null
     );
-    const cleanedNotes = notesRaw
-      .replace(/\s*\(Zwischenstopp:\s*[^)]*\)/gi, '')
-      .replace(/\s*\(Kindersitze:\s*[^)]*\)/gi, '')
-      .replace(/\s*\(Flugnummer:\s*[^)]*\)/gi, '')
-      .replace(/\s*\(Zahlung:\s*[^)]*\)/gi, '')
-      .replace(/\s*\(Handgep[^:]*:\s*\d+\)/gi, '')
-      .trim();
+    const cleanedNotes = notesParsed.cleanedNotes;
     setEditForm({
       id: booking.id,
       full_name: booking.full_name || '',
@@ -613,32 +594,17 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     if (e) e.preventDefault();
     setSavingEdit(true);
     try {
-      const notesWithoutExtraStop = String(editForm.notes || '')
-        .replace(/\s*\(Zwischenstopp:\s*[^)]*\)/gi, '')
-        .replace(/\s*\(Kindersitze:\s*[^)]*\)/gi, '')
-        .replace(/\s*\(Flugnummer:\s*[^)]*\)/gi, '')
-        .replace(/\s*\(Zahlung:\s*[^)]*\)/gi, '')
-        .replace(/\s*\(Handgep[^:]*:\s*\d+\)/gi, '')
-        .trim();
       const extraStopValue = formatAddress(editExtraStopAddress);
-      const childSeatLabel = [
-        editBabySeats > 0 ? `${editBabySeats}x Babyschale` : '',
-        editChildSeats > 0 ? `${editChildSeats}x Kindersitz` : '',
-        editBoosterSeats > 0 ? `${editBoosterSeats}x Sitzerhöhung` : '',
-      ]
-        .filter(Boolean)
-        .join(' ');
-      const notesComposed = [
-        notesWithoutExtraStop,
-        editDirection === 'from_airport' && editFlightNumber.trim() ? `(Flugnummer: ${editFlightNumber.trim()})` : '',
-        editExtraStop && extraStopValue ? `(Zwischenstopp: ${extraStopValue})` : '',
-        editChildSeat && childSeatLabel ? `(Kindersitze: ${childSeatLabel})` : '',
-        editPaymentMethod ? `(Zahlung: ${editPaymentMethod === 'cash' ? 'Barzahlung' : 'Kreditkarte'})` : '',
-        editHandLuggage > 0 ? `(Handgepäck: ${editHandLuggage})` : '',
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .trim();
+      const notesComposed = composeBookingNotes({
+        baseNotes: editForm.notes,
+        flightNumber: editDirection === 'from_airport' ? editFlightNumber : '',
+        intermediateStop: editExtraStop ? extraStopValue : '',
+        childSeatCounts: editChildSeat
+          ? { baby: editBabySeats, child: editChildSeats, booster: editBoosterSeats }
+          : { baby: 0, child: 0, booster: 0 },
+        paymentMethod: editPaymentMethod,
+        handLuggageCount: editHandLuggage,
+      });
 
       const payload = {
         ...editForm,
@@ -949,13 +915,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={async () => {
                         if (isCancelledBooking(booking.status)) return;
                         const driverId = getSelectedDriverId(booking);
                         if (!driverId) return;
-                        if (confirm('Send assignment to this driver now?')) {
-                          handleAssignDriver(booking.id, driverId, true);
-                        }
+                        await confirmAndSendToDriver(booking.id, driverId);
                       }}
                       disabled={!getSelectedDriverId(booking) || isCancelledBooking(booking.status)}
                       className={`w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#0b1a44] text-white font-medium text-[12px] hover:bg-[#14265d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}
@@ -1032,9 +996,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   <th className="px-2 py-1.5 font-medium text-center">Fahrgast, Gepäck</th>
                   <th className="px-2 py-1.5 font-medium text-center">Kunde</th>
                   <th className="w-[80px] px-0 py-1.5 font-medium text-center">Zahlung</th>
-                  <th className="w-[56px] px-1.5 py-1.5 font-medium text-center">Notiz</th>
-                  <th className="w-[56px] px-1.5 py-1.5 font-medium text-center">Edit</th>
-                  <th className="w-[56px] px-1.5 py-1.5 font-medium text-center">X</th>
+                  <th className="w-[100px] md:w-[56px] px-1.5 py-1.5 font-medium text-center">Notiz</th>
+                  <th className="w-[100px] md:w-[56px] px-1.5 py-1.5 font-medium text-center">Edit</th>
+                  <th className="w-[100px] md:w-[56px] px-1.5 py-1.5 font-medium text-center">X</th>
                 </tr>
               </thead>
               <tbody>
@@ -1069,9 +1033,13 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           className={`text-[16px] border rounded-[8px] px-1 py-1 w-22 outline-none focus:border-[#0071e3] ${getDriverSelectTone(booking)}`}
                           value={getSelectedDriverId(booking)}
                           disabled={isCancelledBooking(booking.status)}
-                          onChange={(e) =>
-                            setDriverSelection((prev) => ({ ...prev, [booking.id]: e.target.value }))
-                          }
+                          onChange={async (e) => {
+                            const nextDriverId = e.target.value;
+                            setDriverSelection((prev) => ({ ...prev, [booking.id]: nextDriverId }));
+
+                            if (!nextDriverId || isCancelledBooking(booking.status)) return;
+                            await confirmAndSendToDriver(booking.id, nextDriverId);
+                          }}
                         >
                           <option value="">Unassigned</option>
                           {drivers.map(d => (
@@ -1811,7 +1779,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               <div className="space-y-4">
                 <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1">Kunde</p>
                 <div className="space-y-4">
-                  <input className={BOOKING_FORM_INPUT_CLASS} placeholder="VollstÃ¤ndiger Name" value={editForm.full_name} onChange={(e) => setEditForm((p: any) => ({ ...p, full_name: e.target.value }))} />
+                  <input className={BOOKING_FORM_INPUT_CLASS} placeholder="Vollständiger Name" value={editForm.full_name} onChange={(e) => setEditForm((p: any) => ({ ...p, full_name: e.target.value }))} />
                   <input className={BOOKING_FORM_INPUT_CLASS} placeholder="Telefonnummer" value={editForm.phone} onChange={(e) => setEditForm((p: any) => ({ ...p, phone: e.target.value }))} />
                   <input className={BOOKING_FORM_INPUT_CLASS} placeholder="E-Mail" type="email" value={editForm.email} onChange={(e) => setEditForm((p: any) => ({ ...p, email: e.target.value }))} />
                 </div>

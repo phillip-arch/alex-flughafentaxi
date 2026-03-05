@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { requireSameOrigin } from '@/lib/security/origin';
 import { Resend } from 'resend';
+import { parseBookingNotes } from '@/lib/booking/notes';
 
 function normalizeBookingReference(reference?: string | null) {
   if (!reference) return '-';
@@ -217,9 +218,9 @@ export async function updateBookingStatus(id: string, status: string) {
           const directionLabel = isFromAirport ? 'Vom Flughafen' : isToAirport ? 'Zum Flughafen' : 'Transfer';
           const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
 
-          const notesRaw = String(data.notes || '');
-          const paymentInNotes = notesRaw.toLowerCase().match(/\(zahlung:\s*([^)]+)\)/i)?.[1]?.toLowerCase() || '';
-          const flightNumberInfo = notesRaw.match(/\(Flugnummer:\s*([^)]+)\)/i)?.[1]?.trim() || '';
+          const parsedNotes = parseBookingNotes(data.notes);
+          const paymentInNotes = String(parsedNotes.paymentLabel || '').toLowerCase();
+          const flightNumberInfo = parsedNotes.flightNumberInfo;
           const isCardPayment =
             paymentInNotes.includes('kredit') || paymentInNotes.includes('card') || paymentInNotes.includes('karte');
           const isCashPayment = paymentInNotes.includes('bar') || paymentInNotes.includes('cash');
@@ -232,7 +233,6 @@ export async function updateBookingStatus(id: string, status: string) {
 
           const safeDriverName = escapeHtml(String(driver.name || 'Fahrer'));
           const safePassengerName = escapeHtml(String(data.full_name || ''));
-          const safePassengerEmail = escapeHtml(String(data.email || ''));
           const pickupRawValue = String(data.pickup || '');
           const destinationRawValue = String(data.destination || '');
           const safePickup = escapeHtml(pickupRawValue);
@@ -292,8 +292,7 @@ export async function updateBookingStatus(id: string, status: string) {
                       </table>
                       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
                         <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
-                        <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safePassengerName}</td></tr>
-                        <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>E-Mail:</strong> ${safePassengerEmail}</td></tr>
+                        <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safePassengerName}</td></tr>
                       </table>
                       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
                         <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
@@ -404,25 +403,13 @@ export async function updateBookingDetails(payload: {
     const isToAirport = destinationRaw.includes('flughafen');
     const directionLabel = isFromAirport ? 'Vom Flughafen' : isToAirport ? 'Zum Flughafen' : 'Transfer';
     const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
-    const notesRaw = String(payload.notes || '');
-    const notesLower = notesRaw.toLowerCase();
-    const paymentInNotes = notesLower.match(/\(zahlung:\s*([^)]+)\)/i)?.[1]?.toLowerCase() || '';
-    const childSeatInfo = notesRaw.match(/\(Kindersitze:\s*([^)]+)\)/i)?.[1]?.trim() || '';
-    const intermediateStopInfo = notesRaw.match(/\(Zwischenstopp:\s*([^)]+)\)/i)?.[1]?.trim() || '';
-    const flightNumberInfo = notesRaw.match(/\(Flugnummer:\s*([^)]+)\)/i)?.[1]?.trim() || '';
-    const handLuggageInfo =
-      notesRaw.match(/\(Handgep(?:ä|a)e?ck:\s*(\d+)\)/i)?.[1]?.trim() ||
-      notesRaw.match(/\(Handgepaeck:\s*(\d+)\)/i)?.[1]?.trim() ||
-      '';
-    const cleanedNotes = notesRaw
-      .replace(/\(zahlung:\s*[^)]*\)/gi, '')
-      .replace(/\(kindersitze:\s*[^)]*\)/gi, '')
-      .replace(/\(zwischenstopp:\s*[^)]*\)/gi, '')
-      .replace(/\(flugnummer:\s*[^)]*\)/gi, '')
-      .replace(/\(handgep(?:ä|a)e?ck:\s*[^)]*\)/gi, '')
-      .replace(/\(handgepaeck:\s*[^)]*\)/gi, '')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
+    const parsedNotes = parseBookingNotes(payload.notes);
+    const paymentInNotes = String(parsedNotes.paymentLabel || '').toLowerCase();
+    const childSeatInfo = parsedNotes.childSeatInfo;
+    const intermediateStopInfo = parsedNotes.intermediateStopInfo;
+    const flightNumberInfo = parsedNotes.flightNumberInfo;
+    const handLuggageInfo = String(parsedNotes.handLuggageCount || 0);
+    const cleanedNotes = parsedNotes.cleanedNotes;
     const hasAdditionalInfo = Boolean(childSeatInfo || intermediateStopInfo);
     const hasNotes = Boolean(cleanedNotes);
     const isCardPayment =
@@ -652,31 +639,18 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     const destinationMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationRawValue)}`;
     const pickupIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(pickupRawValue);
     const destinationIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(destinationRawValue);
-    const safeEmail = escapeHtml(String(booking.email || ''));
     const safePhone = escapeHtml(String(booking.phone || ''));
     const phoneHref = String(booking.phone || '').replace(/[^\d+]/g, '');
     const safeVehicle = escapeHtml(String(booking.vehicle_type || '-'));
     const safePassengers = escapeHtml(String(booking.passengers ?? '-'));
     const safeLuggage = escapeHtml(String(booking.luggage ?? '-'));
-    const notesRaw = String(booking.notes || '');
-    const notesLower = notesRaw.toLowerCase();
-    const paymentInNotes = notesLower.match(/\(zahlung:\s*([^)]+)\)/i)?.[1]?.toLowerCase() || '';
-    const childSeatInfo = notesRaw.match(/\(Kindersitze:\s*([^)]+)\)/i)?.[1]?.trim() || '';
-    const intermediateStopInfo = notesRaw.match(/\(Zwischenstopp:\s*([^)]+)\)/i)?.[1]?.trim() || '';
-    const flightNumberInfo = notesRaw.match(/\(Flugnummer:\s*([^)]+)\)/i)?.[1]?.trim() || '';
-    const handLuggageInfo =
-      notesRaw.match(/\(Handgep(?:ä|a)e?ck:\s*(\d+)\)/i)?.[1]?.trim() ||
-      notesRaw.match(/\(Handgepaeck:\s*(\d+)\)/i)?.[1]?.trim() ||
-      '';
-    const cleanedNotes = notesRaw
-      .replace(/\(zahlung:\s*[^)]*\)/gi, '')
-      .replace(/\(kindersitze:\s*[^)]*\)/gi, '')
-      .replace(/\(zwischenstopp:\s*[^)]*\)/gi, '')
-      .replace(/\(flugnummer:\s*[^)]*\)/gi, '')
-      .replace(/\(handgep(?:ä|a)e?ck:\s*[^)]*\)/gi, '')
-      .replace(/\(handgepaeck:\s*[^)]*\)/gi, '')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
+    const parsedNotes = parseBookingNotes(booking.notes);
+    const paymentInNotes = String(parsedNotes.paymentLabel || '').toLowerCase();
+    const childSeatInfo = parsedNotes.childSeatInfo;
+    const intermediateStopInfo = parsedNotes.intermediateStopInfo;
+    const flightNumberInfo = parsedNotes.flightNumberInfo;
+    const handLuggageInfo = String(parsedNotes.handLuggageCount || 0);
+    const cleanedNotes = parsedNotes.cleanedNotes;
     const safeNotes = escapeHtml(cleanedNotes || '');
     const safeChildSeatInfo = escapeHtml(childSeatInfo || '-');
     const safeIntermediateStopInfo = escapeHtml(intermediateStopInfo || '-');
@@ -738,7 +712,6 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
                 <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
                   <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
                   <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safePassengerName}</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>E-Mail:</strong> ${safeEmail}</td></tr>
                   <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Telefon:</strong> <a href="tel:${phoneHref}" style="color:#0071e3;text-decoration:none;font-weight:600;">${safePhone}</a></td></tr>
                 </table>
                 <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
