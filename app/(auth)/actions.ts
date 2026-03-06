@@ -86,7 +86,7 @@ export async function requestPasswordReset(formData: FormData) {
   const appUrlRaw = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const appUrl = appUrlRaw.replace(/\/+$/, '');
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${appUrl}/auth/callback?type=recovery&next=/update-password`,
+    redirectTo: `${appUrl}/auth/callback`,
   });
 
   if (error) {

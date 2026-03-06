@@ -2,6 +2,27 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+
+  // Fallback for Supabase recovery links that incorrectly land on "/?code=..." or "/?token_hash=...".
+  // Route them through our callback handler to complete recovery safely.
+  if (path === '/') {
+    const code = request.nextUrl.searchParams.get('code');
+    const tokenHash = request.nextUrl.searchParams.get('token_hash');
+    const type = request.nextUrl.searchParams.get('type');
+
+    if (code || (tokenHash && type === 'recovery')) {
+      const callbackUrl = new URL('/auth/callback', request.url);
+      request.nextUrl.searchParams.forEach((value, key) => {
+        callbackUrl.searchParams.set(key, value);
+      });
+      if (!callbackUrl.searchParams.get('next') && callbackUrl.searchParams.get('type') === 'recovery') {
+        callbackUrl.searchParams.set('next', '/update-password');
+      }
+      return NextResponse.redirect(callbackUrl);
+    }
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -62,8 +83,6 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   // Protected Routes Logic
-  const path = request.nextUrl.pathname;
-
   // 1. Protect Admin Routes
   if (path.startsWith('/admin')) {
     // Allow access to login page
@@ -101,7 +120,9 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Run auth/session middleware only on routes that need it.
+    // Include "/" to catch password-reset links that fallback to homepage.
+    '/',
+    // Run auth/session middleware on routes that need auth protection.
     '/admin/:path*',
     '/account/:path*',
     '/login',
