@@ -41,11 +41,10 @@ export async function middleware(request: NextRequest) {
           // Default -> Lax
           const sameSiteAttribute: 'lax' | 'none' = isVercelProd ? 'lax' : (isIframePreview ? 'none' : 'lax');
 
-          // Secure logic
-          // Vercel + real domains are HTTPS; localhost usually isn't.
-          // AI Studio is HTTPS, so we treat it as secure.
-          const isLocalhost = process.env.NODE_ENV !== 'production' && !vercelEnv && !process.env.NEXT_PUBLIC_APP_URL?.startsWith('https');
-          const secureAttribute = isLocalhost ? false : true;
+          // Secure logic:
+          // - Local development must stay non-secure so auth cookies work on http://localhost.
+          // - Production/preview should be secure.
+          const secureAttribute = process.env.NODE_ENV === 'production';
 
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, {
@@ -92,9 +91,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Redirect logged-in users away from login page
+  // 3. Keep logged-in users out of auth login page
   if (path === '/login' && user) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/account', request.url));
   }
 
   return response;

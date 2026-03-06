@@ -83,9 +83,10 @@ export async function requestPasswordReset(formData: FormData) {
   });
 
   // Request Reset
-  const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrlRaw = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = appUrlRaw.replace(/\/+$/, '');
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${appUrl}/auth/callback?next=/update-password`,
+    redirectTo: `${appUrl}/auth/callback?type=recovery&next=/update-password`,
   });
 
   if (error) {
@@ -154,7 +155,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout');
-  redirect('/');
+  redirect('/account');
 }
 
 export async function signup(formData: FormData) {
@@ -190,7 +191,7 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath('/', 'layout');
-  redirect('/');
+  redirect('/account');
 }
 
 export async function adminLogin(formData: FormData) {

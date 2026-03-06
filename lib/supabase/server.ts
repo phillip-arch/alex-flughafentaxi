@@ -26,9 +26,10 @@ export const createClient = async () => {
             // SameSite logic
             const sameSiteAttribute: 'lax' | 'none' = isVercelProd ? 'lax' : (isIframePreview ? 'none' : 'lax');
 
-            // Secure logic
-            const isLocalhost = process.env.NODE_ENV !== 'production' && !vercelEnv && !process.env.NEXT_PUBLIC_APP_URL?.startsWith('https');
-            const secureAttribute = isLocalhost ? false : true;
+            // Secure logic:
+            // - Local development must stay non-secure so auth cookies work on http://localhost.
+            // - Production/preview should be secure.
+            const secureAttribute = process.env.NODE_ENV === 'production';
 
             cookieStore.set({ 
               name, 

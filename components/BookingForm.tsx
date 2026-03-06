@@ -28,6 +28,15 @@ import { createBooking } from '@/app/(booking)/actions';
 type Direction = 'to_airport' | 'from_airport' | null;
 type PaymentMethod = 'cash' | 'card' | null;
 
+interface FavoriteAddress {
+  id: string;
+  name: string;
+  city: string;
+  zip: string;
+  street: string;
+  house_number: string;
+}
+
 interface ExtendedBookingInput {
   direction: Direction;
   city: string;
@@ -55,6 +64,7 @@ interface ExtendedBookingInput {
   phone: string;
   notes: string;
   paymentMethod: PaymentMethod;
+  bookingForMyself: boolean;
   saveProfile: boolean;
 }
 
@@ -68,6 +78,9 @@ const BookingForm = () => {
   // Picker States
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
+  const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [accountDefaults, setAccountDefaults] = useState({ fullName: '', phone: '', email: '' });
 
   const [formData, setFormData] = useState<ExtendedBookingInput>({
     direction: null,
@@ -96,10 +109,79 @@ const BookingForm = () => {
     phone: '',
     notes: '',
     paymentMethod: null,
+    bookingForMyself: true,
     saveProfile: false,
   });
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const applyFavoriteAddress = (favorite: FavoriteAddress) => {
+    const city = favorite.city.toLowerCase().includes('schwechat') ? 'Schwechat' : 'Wien';
+    setFormData((prev) => ({
+      ...prev,
+      city,
+      zip: favorite.zip,
+      street: favorite.street,
+      houseNumber: favorite.house_number,
+    }));
+    setTouched((prev) => ({
+      ...prev,
+      zip: false,
+      street: false,
+      houseNumber: false,
+    }));
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadAccountData = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!isMounted || !user) return;
+
+      setIsLoggedIn(true);
+
+      const [profileResult, favoritesResult] = await Promise.all([
+        supabase.from('profiles').select('full_name, phone').eq('id', user.id).maybeSingle(),
+        supabase
+          .from('saved_addresses')
+          .select('id, name, city, zip, street, house_number')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: true }),
+      ]);
+
+      if (!isMounted) return;
+
+      if (Array.isArray(favoritesResult.data)) {
+        setFavoriteAddresses(favoritesResult.data as FavoriteAddress[]);
+      }
+
+      const defaultFullName = profileResult.data?.full_name || '';
+      const defaultPhone = profileResult.data?.phone || '';
+      const defaultEmail = user.email || '';
+      setAccountDefaults({
+        fullName: defaultFullName,
+        phone: defaultPhone,
+        email: defaultEmail,
+      });
+
+      setFormData((prev) => ({
+        ...prev,
+        fullName: prev.fullName || defaultFullName,
+        phone: prev.phone || defaultPhone,
+        email: prev.email || defaultEmail,
+      }));
+    };
+
+    void loadAccountData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [supabase]);
 
   // Clear error when all required fields in the current step are filled
   useEffect(() => {
@@ -204,6 +286,24 @@ const BookingForm = () => {
     if (touched['paymentMethod']) {
         setTouched(prev => ({ ...prev, paymentMethod: false }));
     }
+  };
+
+  const handleBookingForMyselfToggle = (checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      bookingForMyself: checked,
+      ...(checked
+        ? {
+            fullName: accountDefaults.fullName,
+            phone: accountDefaults.phone,
+            email: accountDefaults.email,
+          }
+        : {
+            fullName: '',
+            phone: '',
+            email: '',
+          }),
+    }));
   };
 
   const nextStep = () => {
@@ -499,9 +599,23 @@ const BookingForm = () => {
                     />
                   </div>
                 )}
-                <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1">
-                  {formData.direction === 'to_airport' ? 'Abholadresse' : (formData.direction === 'from_airport' ? 'Zieladresse' : 'Adresse')}
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1">
+                    {formData.direction === 'to_airport' ? 'Abholadresse' : (formData.direction === 'from_airport' ? 'Zieladresse' : 'Adresse')}
+                  </p>
+                  {isLoggedIn && favoriteAddresses.length > 0
+                    ? favoriteAddresses.map((favorite) => (
+                        <button
+                          key={favorite.id}
+                          type="button"
+                          onClick={() => applyFavoriteAddress(favorite)}
+                          className="rounded-full border border-[#d2d2d7] bg-white px-4 py-2 text-[13px] font-medium text-[#1d1d1f] transition-colors hover:border-[#86868b]"
+                        >
+                          {favorite.name}
+                        </button>
+                      ))
+                    : null}
+                </div>
 
                 <div className="grid grid-cols-3 gap-4">
                   <div className="col-span-2 relative">
@@ -929,6 +1043,28 @@ const BookingForm = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Personal Details */}
+              {isLoggedIn ? (
+                <div className="flex flex-col gap-4 p-5 bg-[#f5f5f7] rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="text-[#1d1d1f]">
+                        <p className="font-medium text-[15px]">Buchung fuer mich</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.bookingForMyself}
+                        onChange={(e) => handleBookingForMyselfToggle(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[#34c759]"></div>
+                    </label>
+                  </div>
+                </div>
+              ) : null}
 
               {/* Personal Details */}
               <div className="space-y-4">

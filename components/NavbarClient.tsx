@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Car } from 'lucide-react';
+import { Menu, X, Car, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 const NavbarClient = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -70,6 +70,15 @@ const NavbarClient = () => {
              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           </Link>
 
+          <Link
+            href="/account"
+            className="hidden md:inline-flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity text-[12px]"
+            aria-label="Konto Login"
+          >
+            <User size={16} />
+            <span>Konto</span>
+          </Link>
+
           {/* Mobile Toggle */}
           <button 
             className="md:hidden opacity-80 hover:opacity-100"
@@ -100,6 +109,13 @@ const NavbarClient = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Jetzt buchen
+            </Link>
+            <Link
+              href="/account"
+              className="text-[28px] font-semibold leading-tight"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Konto Login
             </Link>
           </nav>
         </div>

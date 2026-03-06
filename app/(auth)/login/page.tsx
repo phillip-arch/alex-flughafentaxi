@@ -125,7 +125,7 @@ export default function LoginPage() {
           {/* Toggle */}
           <div className="mt-8 text-center">
             <p className="text-[#86868b] text-[15px]">
-              {isLogin ? 'Noch kein Konto?' : 'Bereits registriert?'}
+              {isLogin ? 'Noch kein Konto?' : 'Bereits ein Konto?'}
               <button
                 type="button"
                 onClick={() => {

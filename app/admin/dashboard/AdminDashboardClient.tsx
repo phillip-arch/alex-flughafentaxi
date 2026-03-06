@@ -20,6 +20,8 @@ import {
 } from 'recharts';
 import { BOOKING_FORM_CARD_CLASS, BOOKING_FORM_INPUT_CLASS } from '@/lib/ui/bookingFormStyles';
 import { composeBookingNotes, parseBookingNotes } from '@/lib/booking/notes';
+import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
+import { APP_HEADER_CLASS, APP_PAGE_BG_CLASS } from '@/components/ui/sharedStyles';
 
 export default function AdminDashboardClient({ userEmail }: { userEmail: string }) {
   const AIRPORT_LABEL = 'Flughafen Wien (VIE)';
@@ -642,32 +644,16 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
   // Render header tabs for desktop and tablet
   const renderDesktopTabs = () => (
-    <div className="hidden md:flex items-center">
-      <button
-        onClick={() => handleTabChange('rides')}
-        className={`px-4 py-2 text-[15px] font-medium border-b-2 transition-colors flex items-center gap-2 ${
-          currentTab === 'rides' ? 'border-[#0071e3] text-[#0071e3]' : 'border-transparent text-[#86868b] hover:text-[#1d1d1f]'
-        }`}
-      >
-        <Car size={18} /> Rides
-      </button>
-      <button
-        onClick={() => handleTabChange('drivers')}
-        className={`px-4 py-2 text-[15px] font-medium border-b-2 transition-colors flex items-center gap-2 ${
-          currentTab === 'drivers' ? 'border-[#0071e3] text-[#0071e3]' : 'border-transparent text-[#86868b] hover:text-[#1d1d1f]'
-        }`}
-      >
-        <Users size={18} /> Drivers
-      </button>
-      <button
-        onClick={() => handleTabChange('stats')}
-        className={`px-4 py-2 text-[15px] font-medium border-b-2 transition-colors flex items-center gap-2 ${
-          currentTab === 'stats' ? 'border-[#0071e3] text-[#0071e3]' : 'border-transparent text-[#86868b] hover:text-[#1d1d1f]'
-        }`}
-      >
-        <BarChart3 size={18} /> Statistics
-      </button>
-    </div>
+    <UnderlineTabNav
+      className="hidden md:flex items-center"
+      items={[
+        { id: 'rides', label: 'Rides', icon: <Car size={18} /> },
+        { id: 'drivers', label: 'Drivers', icon: <Users size={18} /> },
+        { id: 'stats', label: 'Statistics', icon: <BarChart3 size={18} /> },
+      ]}
+      activeTab={currentTab}
+      onChange={handleTabChange}
+    />
   );
 
   const renderHeaderDatePicker = () => (
@@ -932,7 +918,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           handleStatusChange(booking.id, 'pending');
                         }
                       }}
-                      className="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#e7f2ff] text-[#0071e3] font-medium text-[12px] hover:bg-[#dcecff] transition-colors"
+                      className="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#eafaf0] text-[#1f7a3f] font-medium text-[12px] hover:bg-[#e0f6e8] transition-colors"
                     >
                       <CheckCircle size={12} />
                       Activate
@@ -1121,7 +1107,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           title={isCancelledBooking(booking.status) ? 'Activate ride' : 'Cancel ride'}
                         >
                           {isCancelledBooking(booking.status) ? (
-                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#0071e3]" />
+                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#1f7a3f]" />
                           ) : (
                             <X size={15} />
                           )}
@@ -1324,9 +1310,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7]">
+    <div className={APP_PAGE_BG_CLASS}>
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-[#d2d2d7] sticky top-0 z-10">
+      <header className={APP_HEADER_CLASS}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 gap-3">
             <div className="min-w-0">

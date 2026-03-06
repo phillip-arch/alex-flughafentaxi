@@ -62,10 +62,13 @@ create table public.reviews (
 create table public.saved_addresses (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
-  label text not null,
-  address text not null,
+  name text not null,
+  city text not null,
+  zip text not null,
+  street text not null,
+  house_number text not null,
   created_at timestamptz default now(),
-  unique (user_id, label)
+  unique (user_id, name)
 );
 
 -- AUDIT LOGS
