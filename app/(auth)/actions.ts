@@ -86,7 +86,8 @@ export async function requestPasswordReset(formData: FormData) {
   const appUrlRaw = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const appUrl = appUrlRaw.replace(/\/+$/, '');
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${appUrl}/auth/callback?next=/update-password`,
+    // Dedicated recovery callback avoids ambiguity with normal auth callback.
+    redirectTo: `${appUrl}/auth/callback/recovery`,
   });
 
   if (error) {
@@ -145,12 +146,60 @@ export async function login(formData: FormData) {
 
   const { email, password } = validated.data;
 
+  // Brute-force protection for user login (IP + email).
+  try {
+    const headersList = await headers();
+    const forwardedFor = headersList.get('x-forwarded-for');
+    const rawIp = forwardedFor ? forwardedFor.split(',')[0].trim() : headersList.get('x-real-ip');
+    let ip = rawIp && isIP(rawIp) ? rawIp : 'unknown';
+
+    if (ip.startsWith('::ffff:')) {
+      ip = ip.replace('::ffff:', '');
+    }
+
+    const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+
+    if (ip !== 'unknown') {
+      const { count: ipCount } = await supabaseAdmin
+        .from('auth_rate_limits')
+        .select('*', { count: 'exact', head: true })
+        .eq('ip_address', ip)
+        .eq('action', 'user_login')
+        .gte('created_at', fifteenMinsAgo);
+
+      if (ipCount && ipCount >= 8) {
+        return { error: 'Zu viele Login-Versuche. Bitte warten Sie 15 Minuten.' };
+      }
+    }
+
+    const { count: emailCount } = await supabaseAdmin
+      .from('auth_rate_limits')
+      .select('*', { count: 'exact', head: true })
+      .eq('email', email)
+      .eq('action', 'user_login')
+      .gte('created_at', fifteenMinsAgo);
+
+    if (emailCount && emailCount >= 8) {
+      return { error: 'Zu viele Login-Versuche. Bitte warten Sie 15 Minuten.' };
+    }
+
+    await supabaseAdmin.from('auth_rate_limits').insert({
+      ip_address: ip,
+      email,
+      action: 'user_login',
+    });
+  } catch (rateLimitError) {
+    // Do not block login when logging/checking rate limit fails.
+    console.error('User login rate limit error:', rateLimitError);
+  }
+
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
   if (error) {
+    await new Promise(resolve => setTimeout(resolve, 800));
     return { error: 'E-Mail oder Passwort falsch.' };
   }
 
@@ -187,7 +236,8 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    return { error: error.message };
+    console.error('Signup error:', error);
+    return { error: 'Registrierung fehlgeschlagen. Bitte pruefen Sie Ihre Eingaben oder versuchen Sie es spaeter erneut.' };
   }
 
   revalidatePath('/', 'layout');
