@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Car, User } from 'lucide-react';
+import { ArrowRight, Menu, User, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+
 const NavbarClient = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const isHomePage = pathname === '/';
 
   useEffect(() => {
     let ticking = false;
@@ -33,89 +35,100 @@ const NavbarClient = () => {
   const isAdminPage = pathname.startsWith('/admin');
   if (isAdminPage) return null;
 
+  const headerClass = isHomePage && !isScrolled
+    ? 'border-b border-black/8 bg-transparent text-[#111111]'
+    : 'border-b border-black/8 bg-[rgba(243,243,238,0.92)] text-[#111111] backdrop-blur-xl';
+
+  const navItemClass = isHomePage && !isScrolled
+    ? 'text-[#5f6368] hover:text-[#111111]'
+    : 'text-[#3c4043] hover:text-[#111111]';
+
+  const secondaryActionClass = isHomePage && !isScrolled
+    ? 'border border-black/10 bg-white text-[#111111] hover:bg-[#f4f4ef]'
+    : 'border border-black/10 bg-white text-[#111111] hover:bg-[#f4f4ef]';
+
+  const primaryActionClass = isHomePage && !isScrolled
+    ? 'bg-[#111111] text-white hover:bg-[#232325]'
+    : 'bg-[#111111] text-white hover:bg-[#232325]';
+
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-[rgba(255,255,255,0.8)] backdrop-blur-md border-b border-gray-200' : 'bg-white'
-      }`}
-    >
-      <div className="max-w-[980px] mx-auto px-4 h-[48px] flex items-center justify-between text-[#1d1d1f] text-[12px] font-light tracking-wide">
-        {/* Left: Logo (Apple style is usually centered or left, screenshot shows left) */}
-        <Link href="/" className="opacity-80 hover:opacity-100 transition-opacity">
-          <Car size={20} />
+    <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
+      <div className="mx-auto flex h-[76px] max-w-[1520px] items-center justify-between px-4 md:px-6">
+        <Link href="/" className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-current/10 text-sm font-semibold">
+            FT
+          </span>
+          <div className="leading-tight">
+            <p className="text-sm font-semibold tracking-[0.18em]">FLUGHAFENTAXI</p>
+            <p className={`text-xs ${isHomePage && !isScrolled ? 'text-[#5f6368]' : 'text-[#5f6368]'}`}>Wien Airport Transfer</p>
+          </div>
         </Link>
 
-        {/* Desktop Nav - Centered */}
-        <nav className="hidden md:flex items-center justify-center gap-8 w-full absolute left-1/2 -translate-x-1/2">
+        <nav className="hidden items-center gap-8 lg:flex">
           {navItems.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className="text-[12px] text-[#1d1d1f] opacity-80 hover:opacity-100 transition-opacity"
+              className={`text-sm font-medium transition-colors ${navItemClass}`}
             >
               {item.name}
             </Link>
           ))}
         </nav>
 
-        {/* Right: Actions (Search, Bag, Menu equivalent) */}
-        <div className="flex items-center gap-6">
-          {/* Search Icon Placeholder */}
-          <button className="opacity-80 hover:opacity-100">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </button>
-          
-          {/* Bag/Booking Icon */}
-          <Link href="/book" className="opacity-80 hover:opacity-100">
-             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          </Link>
-
+        <div className="hidden items-center gap-3 lg:flex">
           <Link
             href="/account"
-            className="hidden md:inline-flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity text-[12px]"
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${secondaryActionClass}`}
             aria-label="Konto Login"
           >
             <User size={16} />
             <span>Konto</span>
           </Link>
-
-          {/* Mobile Toggle */}
-          <button 
-            className="md:hidden opacity-80 hover:opacity-100"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          <Link
+            href="#hero-booking"
+            className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors ${primaryActionClass}`}
           >
-            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+            Fahrt buchen
+            <ArrowRight size={16} />
+          </Link>
         </div>
+
+        <button
+          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-current/10 lg:hidden"
+          aria-label={isMobileMenuOpen ? 'Menue schliessen' : 'Menue oeffnen'}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-[48px] left-0 right-0 bg-white h-screen p-8 animate-in slide-in-from-top-4 duration-300 z-50">
-          <nav className="flex flex-col gap-6 text-[#1d1d1f]">
+        <div className="border-t border-current/10 bg-[#0f0f10] px-4 py-6 text-white lg:hidden">
+          <nav className="flex flex-col gap-3">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-[28px] font-semibold leading-tight"
+                className="rounded-2xl border border-white/10 bg-white/6 px-4 py-4 text-lg font-semibold"
               >
                 {item.name}
               </Link>
             ))}
-            <Link 
-              href="/book" 
-              className="text-[28px] font-semibold leading-tight text-[#0071e3]"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Jetzt buchen
-            </Link>
             <Link
               href="/account"
-              className="text-[28px] font-semibold leading-tight"
+              className="rounded-2xl border border-white/10 bg-white/6 px-4 py-4 text-lg font-semibold"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Konto Login
+              Konto
+            </Link>
+            <Link
+              href="#hero-booking"
+              className="rounded-2xl bg-white px-4 py-4 text-lg font-semibold text-[#111111]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Fahrt buchen
             </Link>
           </nav>
         </div>

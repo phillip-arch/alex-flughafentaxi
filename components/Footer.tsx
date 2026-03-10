@@ -8,7 +8,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">FlughafenTaxi Wien</h3>
             <p className="text-slate-500 text-sm max-w-xs">
-              Reliable airport transfer service in Vienna. Fixed prices, professional drivers, and comfortable vehicles.
+              Zuverlässiger Flughafentransfer in Wien. Fixpreise, professionelle Fahrer und komfortable Fahrzeuge.
             </p>
           </div>
           
@@ -17,7 +17,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link href="/book" className="text-slate-500 hover:text-indigo-600 text-sm transition-colors">
-                  Book a Ride
+                  Fahrt buchen
                 </Link>
               </li>
               <li>
@@ -34,11 +34,11 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">Company</h4>
+            <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">Unternehmen</h4>
             <ul className="space-y-3">
               <li>
                 <Link href="/contact" className="text-slate-500 hover:text-indigo-600 text-sm transition-colors">
-                  Contact
+                  Kontakt
                 </Link>
               </li>
               <li>
@@ -48,7 +48,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/admin/login" className="text-slate-500 hover:text-indigo-600 text-sm transition-colors">
-                  Admin Login
+                  Admin-Anmeldung
                 </Link>
               </li>
             </ul>
@@ -57,14 +57,14 @@ export default function Footer() {
         
         <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-slate-400 text-xs">
-            &copy; {new Date().getFullYear()} FlughafenTaxi Wien. All rights reserved.
+            &copy; {new Date().getFullYear()} FlughafenTaxi Wien. Alle Rechte vorbehalten.
           </p>
           <div className="flex gap-6">
             <Link href="/privacy" className="text-slate-400 hover:text-slate-600 text-xs transition-colors">
-              Privacy Policy
+              Datenschutz
             </Link>
             <Link href="/terms" className="text-slate-400 hover:text-slate-600 text-xs transition-colors">
-              Terms of Service
+              Nutzungsbedingungen
             </Link>
           </div>
         </div>

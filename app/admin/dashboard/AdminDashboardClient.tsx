@@ -16,7 +16,7 @@ import {
 } from './actions';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, PieChart, Pie, Cell
+  BarChart, Bar, PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
 import { BOOKING_FORM_CARD_CLASS, BOOKING_FORM_INPUT_CLASS } from '@/lib/ui/bookingFormStyles';
 import { composeBookingNotes, parseBookingNotes } from '@/lib/booking/notes';
@@ -85,6 +85,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
   // Stats filters
   const [statsRange, setStatsRange] = useState('30'); // days
+  const [statsPaymentFilter, setStatsPaymentFilter] = useState<'all' | 'cash' | 'card'>('all');
+  const [statsDriverFilter, setStatsDriverFilter] = useState('all');
 
   const shiftRidesDate = (dayOffset: number) => {
     const parsed = new Date(`${date}T00:00:00`);
@@ -98,7 +100,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
   const getDriverSelectTone = (booking: any) => {
     if (booking?.status === 'confirmed') {
-      return 'border-green-400 bg-green-50 text-green-900';
+      return 'border-[#8fc3ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.08)_0%,rgba(36,144,255,0.14)_100%)] text-[#0a63ff]';
     }
     const waitingDriverConfirmation =
       booking?.status === 'pending' && Boolean(booking?.driver_id) && Boolean(booking?.confirm_token);
@@ -130,12 +132,12 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     if (isCash) {
       return {
         label: 'BAR',
-        className: 'bg-[#eafaf0] text-[#1f7a3f]',
+        className: 'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]',
       };
     }
     return {
       label: 'BAR',
-      className: 'bg-[#eafaf0] text-[#1f7a3f]',
+      className: 'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]',
     };
   };
 
@@ -283,8 +285,12 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
           setStatsData(cachedStats);
         } else {
           setLoading(true);
-          const end = endOfDay(new Date()).toISOString();
-          const start = startOfDay(subDays(new Date(), parseInt(statsRange))).toISOString();
+          const now = new Date();
+          const end = endOfDay(now).toISOString();
+          const start =
+            statsRange === 'today'
+              ? startOfDay(now).toISOString()
+              : startOfDay(subDays(now, parseInt(statsRange, 10))).toISOString();
           const data = await fetchStats(start, end);
           const nextStats = data || [];
           setStatsData(nextStats);
@@ -353,17 +359,17 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       return true;
     } catch (error) {
       console.error('handleAssignDriver failed:', error);
-      alert('Failed to assign driver: Server error. Please try again.');
+      alert('Fahrer konnte nicht zugewiesen werden: Serverfehler. Bitte erneut versuchen.');
       return false;
     }
   };
 
   const confirmAndSendToDriver = async (bookingId: string, driverId: string) => {
     if (!driverId) return;
-    if (confirm('Do you want to send to this driver now?')) {
+    if (confirm('Möchten Sie jetzt an diesen Fahrer senden?')) {
       const success = await handleAssignDriver(bookingId, driverId, true);
       if (success) {
-        alert('Booking successfully sent to driver.');
+        alert('Buchung wurde erfolgreich an den Fahrer gesendet.');
       }
     }
   };
@@ -372,7 +378,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     try {
       const res = await updateBookingStatus(bookingId, status);
       if ((res as any)?.error) {
-        alert(`Failed to update ride: ${(res as any).error}`);
+        alert(`Fahrt konnte nicht aktualisiert werden: ${(res as any).error}`);
         return;
       }
       const nextStatus = (res as any)?.status || status;
@@ -391,7 +397,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       setStatsCache({});
     } catch (error) {
       console.error('handleStatusChange failed:', error);
-      alert('Failed to update ride: Server error. Please try again.');
+      alert('Fahrt konnte nicht aktualisiert werden: Serverfehler. Bitte erneut versuchen.');
     }
   };
 
@@ -407,8 +413,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       const res = await addDriver(formData);
 
       // 3. Handle server-side errors
-      if (res?.error) {
-        alert(`Error adding driver: ${res.error}`);
+      if (res && 'error' in res && res.error) {
+        alert(`Fehler beim Hinzufügen des Fahrers: ${res.error}`);
         return;
       }
 
@@ -424,12 +430,12 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       await loadData();
     } catch (err) {
       console.error('Unexpected error adding driver:', err);
-      alert('An unexpected error occurred. Please try again.');
+      alert('Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen.');
     }
   };
 
   const handleDeleteDriver = async (id: string) => {
-    if (confirm('Are you sure you want to delete this driver?')) {
+    if (confirm('Möchten Sie diesen Fahrer wirklich löschen?')) {
       await deleteDriver(id);
       setDriversLoaded(false);
       setRidesCache({});
@@ -647,9 +653,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     <UnderlineTabNav
       className="hidden md:flex items-center"
       items={[
-        { id: 'rides', label: 'Rides', icon: <Car size={18} /> },
-        { id: 'drivers', label: 'Drivers', icon: <Users size={18} /> },
-        { id: 'stats', label: 'Statistics', icon: <BarChart3 size={18} /> },
+        { id: 'rides', label: 'Fahrten', icon: <Car size={18} /> },
+        { id: 'drivers', label: 'Fahrer', icon: <Users size={18} /> },
+        { id: 'stats', label: 'Statistik', icon: <BarChart3 size={18} /> },
       ]}
       activeTab={currentTab}
       onChange={handleTabChange}
@@ -662,7 +668,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         type="button"
         onClick={() => shiftRidesDate(-1)}
         className="h-9 w-5 text-[#1d1d1f] hover:text-[#0071e3] transition-colors flex items-center justify-center md:h-9 md:w-9 md:rounded-full md:border md:border-[#d2d2d7] md:bg-white md:hover:bg-[#f5f5f7]"
-        aria-label="Previous day"
+        aria-label="Vorheriger Tag"
       >
         <ChevronLeft size={18} />
       </button>
@@ -679,7 +685,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         type="button"
         onClick={() => shiftRidesDate(1)}
         className="h-9 w-5 text-[#1d1d1f] hover:text-[#0071e3] transition-colors flex items-center justify-center md:h-9 md:w-9 md:rounded-full md:border md:border-[#d2d2d7] md:bg-white md:hover:bg-[#f5f5f7]"
-        aria-label="Next day"
+        aria-label="Nächster Tag"
       >
         <ChevronRight size={18} />
       </button>
@@ -692,13 +698,13 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         onClick={() => setViewMode('grid')}
         className={`px-3 py-1.5 text-[13px] font-medium rounded-[8px] transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b]'}`}
       >
-        Grid
+        Kacheln
       </button>
       <button
         onClick={() => setViewMode('table')}
         className={`px-3 py-1.5 text-[13px] font-medium rounded-[8px] transition-all ${viewMode === 'table' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b]'}`}
       >
-        Table
+        Tabelle
       </button>
     </div>
   );
@@ -706,10 +712,10 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const renderRides = () => (
     <div className="space-y-2">
       {loading ? (
-        <div className="text-center py-12 text-[#86868b]">Loading rides...</div>
+        <div className="text-center py-12 text-[#86868b]">Fahrten werden geladen...</div>
       ) : bookings.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-[24px] border border-[#d2d2d7] text-[#86868b]">
-          No rides found for this date.
+          Keine Fahrten für dieses Datum gefunden.
         </div>
       ) : (
         <>
@@ -876,7 +882,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[12px] font-medium hover:bg-[#f5f5f7] transition-colors lg:absolute lg:top-5 lg:right-5 z-10"
                     >
                       <Edit size={12} />
-                      Edit
+                      Bearbeiten
                     </button>
                     <div className="text-right text-[30px] font-semibold text-[#081a42] leading-none sm:ml-auto">
                       {formatPriceDisplay(booking.price)}
@@ -890,7 +896,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       setDriverSelection((prev) => ({ ...prev, [booking.id]: e.target.value }))
                     }
                   >
-                    <option value="">Assign Driver...</option>
+                    <option value="">Fahrer zuweisen...</option>
                     {drivers.map(d => (
                       <option key={d.id} value={d.id}>{d.name}</option>
                     ))}
@@ -908,32 +914,32 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       className={`w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#0b1a44] text-white font-medium text-[12px] hover:bg-[#14265d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}
                     >
                       <Send size={12} />
-                      Send
+                      Senden
                     </button>
                     {isCancelledBooking(booking.status) ? (
                     <button
                       type="button"
                       onClick={() => {
-                        if (confirm('Do you want to activate order?')) {
+                        if (confirm('Möchten Sie die Bestellung aktivieren?')) {
                           handleStatusChange(booking.id, 'pending');
                         }
                       }}
-                      className="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#eafaf0] text-[#1f7a3f] font-medium text-[12px] hover:bg-[#e0f6e8] transition-colors"
+                      className="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff] font-medium text-[12px] hover:bg-[linear-gradient(135deg,rgba(10,99,255,0.16)_0%,rgba(36,144,255,0.22)_100%)] transition-colors"
                     >
                       <CheckCircle size={12} />
-                      Activate
+                      Aktivieren
                       </button>
                     ) : (
                       <button
                         type="button"
                         onClick={() => {
-                          if (confirm('Cancel this ride now?')) {
+                          if (confirm('Diese Fahrt jetzt stornieren?')) {
                             handleStatusChange(booking.id, 'cancelled');
                           }
                         }}
                         className="w-full px-2.5 py-1.5 rounded-full bg-[#f2e9eb] text-[#d70015] font-medium text-[12px] hover:bg-[#ecdee1] transition-colors"
                       >
-                        Cancel
+                        Stornieren
                       </button>
                     )}
                   </div>
@@ -946,7 +952,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             <table className="w-full min-w-[930px] text-[16px] text-left">
               <thead className="text-[10px] text-[#86868b] uppercase bg-[#f5f5f7] border-b border-[#d2d2d7] tracking-wide">
                 <tr>
-                  <th className="px-1.5 py-1.5 font-medium text-center">Time / Date</th>
+                  <th className="px-1.5 py-1.5 font-medium text-center">Zeit / Datum</th>
                   <th className="px-0 py-1.5 font-medium text-center">Zum/Vom</th>
                   <th className="px-0 py-1.5 font-medium text-center">Fahrer</th>
                   <th className="px-0 py-1.5 font-medium text-center">Auto</th>
@@ -955,7 +961,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   <th className="px-2 py-1.5 font-medium text-center">Kunde</th>
                   <th className="w-[80px] px-0 py-1.5 font-medium text-center">Zahlung</th>
                   <th className="w-[120px] md:w-[56px] px-2 md:px-1.5 py-1.5 font-medium text-center">Notiz</th>
-                  <th className="w-[120px] md:w-[56px] px-2 md:px-1.5 py-1.5 font-medium text-center">Edit</th>
+                  <th className="w-[120px] md:w-[56px] px-2 md:px-1.5 py-1.5 font-medium text-center">Bearbeiten</th>
                   <th className="w-[120px] md:w-[56px] px-2 md:px-1.5 py-1.5 font-medium text-center">X</th>
                 </tr>
               </thead>
@@ -999,7 +1005,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                             await confirmAndSendToDriver(booking.id, nextDriverId);
                           }}
                         >
-                          <option value="">Unassigned</option>
+                          <option value="">Nicht zugewiesen</option>
                           {drivers.map(d => (
                             <option key={d.id} value={d.id}>{d.name}</option>
                           ))}
@@ -1066,8 +1072,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                             type="button"
                             onClick={() => setNotesPopup({ open: true, text: displayNotes })}
                             className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#e7ebf3] text-[#1d1d1f] hover:bg-[#dbe3f0] transition-colors"
-                            aria-label="Open note"
-                            title="Open note"
+                            aria-label="Notiz öffnen"
+                            title="Notiz öffnen"
                           >
                             <FileText size={15} />
                           </button>
@@ -1078,8 +1084,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           type="button"
                           onClick={() => openEditBooking(booking)}
                           className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e7ebf3] transition-colors"
-                          aria-label="Edit booking"
-                          title="Edit booking"
+                          aria-label="Buchung bearbeiten"
+                          title="Buchung bearbeiten"
                         >
                           <Edit size={15} />
                         </button>
@@ -1089,12 +1095,12 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           type="button"
                           onClick={() => {
                             if (isCancelledBooking(booking.status)) {
-                              if (confirm('Do you want to activate order?')) {
+                              if (confirm('Möchten Sie die Bestellung aktivieren?')) {
                                 handleStatusChange(booking.id, 'pending');
                               }
                               return;
                             }
-                            if (confirm('Cancel this ride now?')) {
+                            if (confirm('Diese Fahrt jetzt stornieren?')) {
                               handleStatusChange(booking.id, 'cancelled');
                             }
                           }}
@@ -1103,11 +1109,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                               ? 'bg-[#e7f2ff] text-[#0071e3] hover:bg-[#dcecff]'
                               : 'bg-[#f2e9eb] text-[#d70015] hover:bg-[#ecdee1]'
                           }`}
-                          aria-label={isCancelledBooking(booking.status) ? 'Activate ride' : 'Cancel ride'}
-                          title={isCancelledBooking(booking.status) ? 'Activate ride' : 'Cancel ride'}
+                          aria-label={isCancelledBooking(booking.status) ? 'Fahrt aktivieren' : 'Fahrt stornieren'}
+                          title={isCancelledBooking(booking.status) ? 'Fahrt aktivieren' : 'Fahrt stornieren'}
                         >
                           {isCancelledBooking(booking.status) ? (
-                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#1f7a3f]" />
+                            <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#0a63ff]" />
                           ) : (
                             <X size={15} />
                           )}
@@ -1136,7 +1142,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   type="button"
                   onClick={() => setNotesPopup({ open: false, text: '' })}
                   className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e7ebf3] transition-colors"
-                  aria-label="Close note"
+                  aria-label="Notiz schließen"
                 >
                   <XCircle size={16} />
                 </button>
@@ -1169,7 +1175,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 <button 
                   onClick={() => handleDeleteDriver(driver.id)}
                   className="text-[#86868b] hover:text-[#d70015] p-1.5 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100"
-                  title="Delete Driver"
+                  title="Fahrer löschen"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -1180,7 +1186,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   href={`tel:${driver.phone}`}
                   className="inline-flex items-center gap-2 text-[14px] text-[#0071e3] hover:underline mt-1 bg-[#f5f5f7] px-3 py-1.5 rounded-lg w-full justify-center hover:bg-[#e8f2ff] transition-colors"
                 >
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                  <span className="w-2 h-2 rounded-full bg-[#0a63ff] animate-pulse"></span>
                   {driver.phone}
                 </a>
               )}
@@ -1190,7 +1196,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
           {drivers.length === 0 && (
             <div className="col-span-full py-12 text-center bg-white rounded-[24px] border border-[#d2d2d7] text-[#86868b]">
               <Users size={48} className="mx-auto mb-4 opacity-20" />
-              <p>No drivers found. Add one to get started.</p>
+              <p>Keine Fahrer gefunden. Fügen Sie einen Fahrer hinzu, um zu starten.</p>
             </div>
           )}
         </div>
@@ -1199,23 +1205,23 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       <div>
         <div className="bg-white rounded-[24px] border border-[#d2d2d7] shadow-sm p-8 sticky top-24">
           <h3 className="text-[19px] font-semibold text-[#1d1d1f] mb-6 flex items-center gap-2">
-            <Plus size={20} className="text-[#0071e3]" /> Add New Driver
+            <Plus size={20} className="text-[#0071e3]" /> Neuen Fahrer hinzufügen
           </h3>
           <form onSubmit={handleAddDriver} className="space-y-4">
             <div>
-              <label className="block text-[13px] font-medium text-[#1d1d1f] mb-2">Full Name</label>
-              <input type="text" name="name" required className="w-full p-3 border border-[#d2d2d7] rounded-[12px] text-[15px] focus:ring-2 focus:ring-[#0071e3] outline-none text-[#1d1d1f] transition-all" placeholder="John Doe" />
+              <label className="block text-[13px] font-medium text-[#1d1d1f] mb-2">Vollständiger Name</label>
+              <input type="text" name="name" required className="w-full p-3 border border-[#d2d2d7] rounded-[12px] text-[15px] focus:ring-2 focus:ring-[#0071e3] outline-none text-[#1d1d1f] transition-all" placeholder="Max Mustermann" />
             </div>
             <div>
-              <label className="block text-[13px] font-medium text-[#1d1d1f] mb-2">Email Address</label>
+              <label className="block text-[13px] font-medium text-[#1d1d1f] mb-2">E-Mail-Adresse</label>
               <input type="email" name="email" required className="w-full p-3 border border-[#d2d2d7] rounded-[12px] text-[15px] focus:ring-2 focus:ring-[#0071e3] outline-none text-[#1d1d1f] transition-all" placeholder="john@example.com" />
             </div>
             <div>
-              <label className="block text-[13px] font-medium text-[#1d1d1f] mb-2">Phone Number</label>
+              <label className="block text-[13px] font-medium text-[#1d1d1f] mb-2">Telefonnummer</label>
               <input type="tel" name="phone" className="w-full p-3 border border-[#d2d2d7] rounded-[12px] text-[15px] focus:ring-2 focus:ring-[#0071e3] outline-none text-[#1d1d1f] transition-all" placeholder="+43 664 1234567" />
             </div>
             <button type="submit" className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium py-3 rounded-full transition-all text-[15px] mt-4 shadow-sm hover:shadow-md active:scale-[0.98]">
-              Save Driver
+              Fahrer speichern
             </button>
           </form>
         </div>
@@ -1224,59 +1230,113 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   );
 
   const renderStats = () => {
+    const filteredByDriver = statsData.filter((b) =>
+      statsDriverFilter === 'all' ? true : (b.driver?.name || 'Nicht zugewiesen') === statsDriverFilter
+    );
+
+    const filteredForRevenue = filteredByDriver.filter((b) => {
+      if (statsPaymentFilter === 'all') return true;
+      const paymentMeta = getBookingPaymentMeta(b);
+      if (statsPaymentFilter === 'cash') return paymentMeta.label === 'BAR';
+      return paymentMeta.label === 'KARTE';
+    });
+
     // Calculate metrics
-    const totalRevenue = statsData.reduce((sum, b) => sum + Number(b.price), 0);
-    const totalRides = statsData.length;
-    const avgValue = totalRides > 0 ? totalRevenue / totalRides : 0;
+    const totalRevenue = filteredForRevenue.reduce((sum, b) => sum + Number(b.price), 0);
+    const totalRevenueForDriver = filteredByDriver.reduce((sum, b) => sum + Number(b.price), 0);
+    const totalRides = filteredByDriver.length;
+    const avgValue = totalRides > 0 ? totalRevenueForDriver / totalRides : 0;
 
     // Prepare chart data
-    const revenueByDate = statsData.reduce((acc, b) => {
+    const revenueByDate = filteredForRevenue.reduce((acc, b) => {
       const date = format(new Date(b.pickup_at), 'MMM dd');
       acc[date] = (acc[date] || 0) + Number(b.price);
       return acc;
     }, {});
     const areaChartData = Object.keys(revenueByDate).map(date => ({ date, revenue: revenueByDate[date] }));
 
-    const revenueByDriver = statsData.reduce((acc, b) => {
-      const driverName = b.driver?.name || 'Unassigned';
-      acc[driverName] = (acc[driverName] || 0) + Number(b.price);
+    const revenueByDriver = filteredForRevenue.reduce((acc, b) => {
+      const driverName = b.driver?.name || 'Nicht zugewiesen';
+      if (!acc[driverName]) {
+        acc[driverName] = { revenue: 0, rides: 0 };
+      }
+      acc[driverName].revenue += Number(b.price) || 0;
+      acc[driverName].rides += 1;
       return acc;
-    }, {});
-    const barChartData = Object.keys(revenueByDriver).map(name => ({ name, revenue: revenueByDriver[name] }));
+    }, {} as Record<string, { revenue: number; rides: number }>);
+    const barChartData = Object.keys(revenueByDriver).map((name) => ({
+      name,
+      nameWithRides: `${name} (${revenueByDriver[name].rides})`,
+      revenue: revenueByDriver[name].revenue,
+      rides: revenueByDriver[name].rides,
+    }));
+
+    const ridesByDate = filteredByDriver
+      .reduce((acc, b) => {
+        const dateKey = format(new Date(b.pickup_at), 'MMM dd');
+        acc[dateKey] = (acc[dateKey] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+    const ridesByDateData = Object.keys(ridesByDate).map((date) => ({ date, rides: ridesByDate[date] }));
+    const availableDriverNames = Array.from(
+      new Set(statsData.map((b) => b.driver?.name || 'Nicht zugewiesen'))
+    ).sort((a, b) => a.localeCompare(b, 'de'));
 
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center bg-white p-4 rounded-[18px] border border-[#d2d2d7] shadow-sm">
-          <h2 className="font-semibold text-[#1d1d1f] text-[17px]">Performance Overview</h2>
-          <select 
-            value={statsRange}
-            onChange={(e) => setStatsRange(e.target.value)}
-            className="border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3]"
-          >
-            <option value="7">Last 7 Days</option>
-            <option value="30">Last 30 Days</option>
-            <option value="90">Last 90 Days</option>
-          </select>
+          <h2 className="font-semibold text-[#1d1d1f] text-[17px]">Leistungsübersicht</h2>
+          <div className="flex items-center gap-2">
+            <select
+              value={statsDriverFilter}
+              onChange={(e) => setStatsDriverFilter(e.target.value)}
+              className="border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3]"
+            >
+              <option value="all">Alle Fahrer</option>
+              {availableDriverNames.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+            <select 
+              value={statsPaymentFilter}
+              onChange={(e) => setStatsPaymentFilter(e.target.value as 'all' | 'cash' | 'card')}
+              className="border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3]"
+            >
+              <option value="all">Alle Zahlungen</option>
+              <option value="cash">Nur Bar</option>
+              <option value="card">Nur Karte</option>
+            </select>
+            <select 
+              value={statsRange}
+              onChange={(e) => setStatsRange(e.target.value)}
+              className="border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3]"
+            >
+              <option value="today">Heute</option>
+              <option value="7">Letzte 7 Tage</option>
+              <option value="30">Letzte 30 Tage</option>
+              <option value="90">Letzte 90 Tage</option>
+            </select>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-[24px] border border-[#d2d2d7] shadow-sm">
-            <h3 className="text-[#86868b] text-[11px] font-medium uppercase tracking-wide mb-2">Total Revenue</h3>
+            <h3 className="text-[#86868b] text-[11px] font-medium uppercase tracking-wide mb-2">Gesamtumsatz</h3>
             <p className="text-[32px] font-semibold text-[#1d1d1f] tracking-tight">{formatPriceDisplay(totalRevenue)}</p>
           </div>
           <div className="bg-white p-6 rounded-[24px] border border-[#d2d2d7] shadow-sm">
-            <h3 className="text-[#86868b] text-[11px] font-medium uppercase tracking-wide mb-2">Total Rides</h3>
+            <h3 className="text-[#86868b] text-[11px] font-medium uppercase tracking-wide mb-2">Gesamtfahrten</h3>
             <p className="text-[32px] font-semibold text-[#0071e3] tracking-tight">{totalRides}</p>
           </div>
           <div className="bg-white p-6 rounded-[24px] border border-[#d2d2d7] shadow-sm">
-            <h3 className="text-[#86868b] text-[11px] font-medium uppercase tracking-wide mb-2">Avg. Booking Value</h3>
-            <p className="text-[32px] font-semibold text-green-600 tracking-tight">{formatPriceDisplay(avgValue)}</p>
+            <h3 className="text-[#86868b] text-[11px] font-medium uppercase tracking-wide mb-2">Durchschnittswert Buchung</h3>
+            <p className="text-[32px] font-semibold text-[#0a63ff] tracking-tight">{formatPriceDisplay(avgValue)}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-[24px] border border-[#d2d2d7] shadow-sm">
-            <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6">Revenue Trend</h3>
+            <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6">Umsatzverlauf</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={areaChartData}>
@@ -1291,18 +1351,33 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
           </div>
           
           <div className="bg-white p-6 rounded-[24px] border border-[#d2d2d7] shadow-sm">
-            <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6">Revenue by Driver</h3>
+            <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6">Umsatz/Fahrten pro Fahrer</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barChartData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f5f5f7" />
                   <XAxis type="number" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#86868b'}} />
-                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#86868b'}} width={100} />
+                  <YAxis dataKey="nameWithRides" type="category" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#86868b'}} width={140} />
                   <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}} />
                   <Bar dataKey="revenue" fill="#0071e3" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-[24px] border border-[#d2d2d7] shadow-sm">
+          <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6">Fahrten pro Tag ({statsDriverFilter === 'all' ? 'Alle Fahrer' : statsDriverFilter})</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={ridesByDateData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f5f5f7" />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#86868b' }} />
+                <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#86868b' }} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                <Line type="monotone" dataKey="rides" stroke="#0071e3" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
@@ -1325,7 +1400,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   type="button"
                   onClick={() => setMobileTabsOpen((prev) => !prev)}
                   className="inline-flex items-center justify-center w-11 h-11 rounded-[12px] border border-[#d2d2d7] bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
-                  aria-label="Open navigation menu"
+                  aria-label="Navigationsmenü öffnen"
                 >
                   <Menu size={17} />
                 </button>
@@ -1338,7 +1413,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         currentTab === 'rides' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
                       }`}
                     >
-                      <Car size={16} /> Rides
+                      <Car size={16} /> Fahrten
                     </button>
                     <button
                       type="button"
@@ -1347,7 +1422,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         currentTab === 'drivers' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
                       }`}
                     >
-                      <Users size={16} /> Drivers
+                      <Users size={16} /> Fahrer
                     </button>
                     <button
                       type="button"
@@ -1356,14 +1431,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         currentTab === 'stats' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
                       }`}
                     >
-                      <BarChart3 size={16} /> Statistics
+                      <BarChart3 size={16} /> Statistik
                     </button>
                     <form action="/auth/logout" method="post">
                       <button
                         type="submit"
                         className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left text-[#1d1d1f] hover:bg-[#f5f5f7]"
                       >
-                        <XCircle size={16} /> Sign Out
+                        <XCircle size={16} /> Abmelden
                       </button>
                     </form>
                   </div>
@@ -1373,7 +1448,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               <span className="text-[13px] text-[#86868b] hidden sm:block">{userEmail}</span>
               <form action="/auth/logout" method="post" className="hidden md:block">
                 <button className="text-[13px] font-medium text-[#1d1d1f] hover:text-[#0071e3] px-3 py-2 rounded-[8px] hover:bg-[#f5f5f7] transition-colors">
-                  Sign Out
+                  Abmelden
                 </button>
               </form>
             </div>
@@ -1516,7 +1591,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         onChange={(e) => setEditExtraStop(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[#34c759]"></div>
+                      <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
                     </label>
                   </div>
 
@@ -1673,7 +1748,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       onChange={(e) => setEditChildSeat(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[#34c759]"></div>
+                    <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
                   </label>
                 </div>
 
@@ -1751,7 +1826,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     onClick={() => setEditPaymentMethod('cash')}
                     className={`w-full py-4 rounded-2xl border text-[16px] font-medium transition-all ${
                       editPaymentMethod === 'cash'
-                        ? 'border-[#34c759] ring-1 ring-[#34c759] bg-[#eafaf0] text-[#1f7a3f]'
+                        ? 'border-[#0a63ff] ring-1 ring-[#0a63ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]'
                         : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
                     }`}
                   >

@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
           className="inline-flex items-center gap-2 text-[#86868b] hover:text-[#1d1d1f] transition-colors font-medium text-[15px]"
         >
           <ChevronLeft size={20} />
-          Back to Home
+          Zur Startseite
         </Link>
       </div>
 
@@ -42,10 +42,10 @@ export default function AdminLoginPage() {
             <ShieldCheck size={24} />
           </div>
           <h1 className="text-[28px] font-semibold text-[#1d1d1f] leading-tight mb-2 tracking-tight">
-            Admin Portal
+            Admin-Portal
           </h1>
           <p className="text-[#86868b] text-[15px]">
-            Sign in to manage bookings and drivers.
+            Melden Sie sich an, um Buchungen und Fahrer zu verwalten.
           </p>
         </div>
 
@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
               <input
                 type="email"
                 name="email"
-                placeholder="Admin Email"
+                placeholder="Admin-E-Mail"
                 required
                 className="w-full pl-12 p-4 rounded-xl bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[17px] outline-none placeholder:text-[#86868b] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-all"
               />
@@ -75,7 +75,7 @@ export default function AdminLoginPage() {
               <input
                 type="password"
                 name="password"
-                placeholder="Password"
+                placeholder="Passwort"
                 required
                 className="w-full pl-12 p-4 rounded-xl bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[17px] outline-none placeholder:text-[#86868b] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-all"
               />
@@ -89,7 +89,7 @@ export default function AdminLoginPage() {
               {loading ? (
                 <Loader2 size={20} className="animate-spin" />
               ) : (
-                'Sign In'
+                'Anmelden'
               )}
             </button>
           </form>

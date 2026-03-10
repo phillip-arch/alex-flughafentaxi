@@ -150,3 +150,100 @@ export async function deleteFavoriteAddress(id: string) {
   revalidatePath('/book');
   return { success: true };
 }
+
+export async function cancelOwnBooking(bookingId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Unauthorized' };
+
+  const id = (bookingId || '').trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    return { error: 'Ungueltige Buchungs-ID.' };
+  }
+
+  const { data: existing, error: existingError } = await supabase
+    .from('bookings')
+    .select('id, status, driver_id, pickup_at')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (existingError) {
+    console.error('cancelOwnBooking read failed:', existingError);
+    return { error: 'Buchung konnte nicht storniert werden.' };
+  }
+
+  if (!existing) {
+    return { error: 'Buchung nicht gefunden.' };
+  }
+
+  const status = String(existing.status || '').toLowerCase();
+  const isSentToDriver = Boolean((existing as any).driver_id);
+  if (isSentToDriver) {
+    return { error: 'Diese Buchung wurde bereits an einen Fahrer gesendet und kann nicht mehr storniert werden.' };
+  }
+  if (status === 'canceled' || status === 'cancelled') {
+    return { success: true, status: existing.status, info: 'already_canceled' as const };
+  }
+  if (status === 'completed') {
+    return { error: 'Abgeschlossene Fahrten koennen nicht storniert werden.' };
+  }
+
+  // Same cancellation cutoffs as booking lead-time rules:
+  // 07:00-22:00 => at least 3h before pickup, 22:00-07:00 => at least 8h before pickup.
+  const pickupDate = new Date(String((existing as any).pickup_at || ''));
+  if (!Number.isNaN(pickupDate.getTime())) {
+    const pickupHourVienna = Number(
+      new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Vienna',
+        hour: '2-digit',
+        hour12: false,
+      })
+        .formatToParts(pickupDate)
+        .find((part) => part.type === 'hour')?.value ?? '0',
+    );
+    const isNightTime = pickupHourVienna >= 22 || pickupHourVienna < 7;
+    const minLeadTimeHours = isNightTime ? 8 : 3;
+    const cutoff = new Date(Date.now() + minLeadTimeHours * 60 * 60 * 1000);
+    if (pickupDate < cutoff) {
+      return {
+        error: isNightTime
+          ? 'Stornierung ist fuer Fahrten zwischen 22:00 und 07:00 Uhr nur bis 8 Stunden vor Abholzeit moeglich.'
+          : 'Stornierung ist nur bis 3 Stunden vor Abholzeit moeglich.',
+      };
+    }
+  }
+
+  let finalStatus = 'canceled';
+  let updated = false;
+  for (const candidate of ['canceled', 'cancelled']) {
+    const { error: updateError } = await supabase
+      .from('bookings')
+      .update({ status: candidate })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (!updateError) {
+      finalStatus = candidate;
+      updated = true;
+      break;
+    }
+
+    if (String(updateError.code || '') === '23514') {
+      continue;
+    }
+
+    console.error('cancelOwnBooking update failed:', updateError);
+    return { error: 'Buchung konnte nicht storniert werden.' };
+  }
+
+  if (!updated) {
+    return { error: 'Buchung konnte nicht storniert werden.' };
+  }
+
+  revalidatePath('/account');
+  return { success: true, status: finalStatus };
+}

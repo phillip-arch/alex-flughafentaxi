@@ -185,9 +185,9 @@ export async function createBooking(payload: any) {
   while (retries < maxRetries) {
     booking_reference = generateSafeReference(6);
 
-    // Insert booking using the user's client (RLS applies)
-    // user_id is null for guests, or auth.uid() for logged-in users
-    const result = await supabase
+    // Insert booking with service role after server-side validation and rate limiting.
+    // This allows guest bookings while still setting user_id for authenticated users.
+    const result = await supabaseAdmin
       .from('bookings')
       .insert({
         ...bookingData,
@@ -302,7 +302,7 @@ export async function createBooking(payload: any) {
     const paymentStyle = isCardPayment
       ? 'background:#e8f2ff;color:#0071e3;'
       : isCashPayment
-        ? 'background:#eafaf0;color:#1f7a3f;'
+        ? 'background:linear-gradient(135deg,rgba(10,99,255,0.12) 0%,rgba(36,144,255,0.18) 100%);color:#0a63ff;'
         : 'background:#f5f5f7;color:#86868b;';
     const safePayment = escapeHtml(paymentLabel);
     const safePrice = escapeHtml(

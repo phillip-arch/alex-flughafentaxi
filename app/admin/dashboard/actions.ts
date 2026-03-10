@@ -69,7 +69,7 @@ async function checkAdmin() {
   }
 
   if (profileError || profile?.role !== 'admin') {
-    return { error: 'Access Denied', user: null };
+    return { error: 'Zugriff verweigert', user: null };
   }
 
   return { user, supabase };
@@ -135,9 +135,9 @@ export async function addDriver(formData: FormData) {
   if (insertError) {
     // Unique constraint on drivers.email
     if ((insertError as any)?.code === '23505') {
-      return { error: 'A driver with this email already exists.' };
+      return { error: 'Ein Fahrer mit dieser E-Mail-Adresse existiert bereits.' };
     }
-    return safeActionError('Unable to add driver. Please try again.', 'addDriver insert failed', insertError);
+    return safeActionError('Fahrer konnte nicht hinzugefügt werden. Bitte erneut versuchen.', 'addDriver insert failed', insertError);
   }
   revalidatePath('/admin/dashboard');
   return { success: true };
@@ -155,7 +155,7 @@ export async function deleteDriver(id: string) {
     .eq('id', id);
 
   if (deleteError) {
-    return safeActionError('Unable to delete driver. Please try again.', 'deleteDriver failed', deleteError);
+    return safeActionError('Fahrer konnte nicht gelöscht werden. Bitte erneut versuchen.', 'deleteDriver failed', deleteError);
   }
   revalidatePath('/admin/dashboard');
   return { success: true };
@@ -166,10 +166,10 @@ export async function updateBookingStatus(id: string, status: string) {
     await requireSameOrigin();
     const admin = await checkAdmin();
     if (admin.error) return { error: admin.error || 'Unauthorized' };
-    if (!id) return { error: 'Missing booking id' };
+    if (!id) return { error: 'Buchungs-ID fehlt' };
 
     const allowedStatuses = new Set(['pending', 'confirmed', 'cancelled', 'canceled', 'completed']);
-    if (!allowedStatuses.has(status)) return { error: 'Invalid status value' };
+    if (!allowedStatuses.has(status)) return { error: 'Ungültiger Statuswert' };
 
     const cancellationCandidates = status === 'cancelled' || status === 'canceled' ? ['canceled', 'cancelled'] : [status];
     let data: any = null;
@@ -196,10 +196,10 @@ export async function updateBookingStatus(id: string, status: string) {
     }
 
     if (updateError) {
-      return safeActionError('Unable to update ride status. Please try again.', 'updateBookingStatus update failed', updateError);
+      return safeActionError('Fahrtstatus konnte nicht aktualisiert werden. Bitte erneut versuchen.', 'updateBookingStatus update failed', updateError);
     }
     if (!data) {
-      return { error: 'Booking not found or update not permitted' };
+      return { error: 'Buchung nicht gefunden oder Aktualisierung nicht erlaubt' };
     }
 
     if ((finalStatus === 'cancelled' || finalStatus === 'canceled') && data.driver_id) {
@@ -228,7 +228,7 @@ export async function updateBookingStatus(id: string, status: string) {
           const paymentStyle = isCardPayment
             ? 'background:#e8f2ff;color:#0071e3;'
             : isCashPayment
-              ? 'background:#eafaf0;color:#1f7a3f;'
+              ? 'background:linear-gradient(135deg,rgba(10,99,255,0.12) 0%,rgba(36,144,255,0.18) 100%);color:#0a63ff;'
               : 'background:#f5f5f7;color:#86868b;';
 
           const safeDriverName = escapeHtml(String(driver.name || 'Fahrer'));
@@ -329,7 +329,7 @@ export async function updateBookingStatus(id: string, status: string) {
     return { success: true, status: data.status || finalStatus };
   } catch (error) {
     console.error('updateBookingStatus failed:', error);
-    return { error: 'Ride status update failed. Please try again.' };
+    return { error: 'Aktualisierung des Fahrtstatus fehlgeschlagen. Bitte erneut versuchen.' };
   }
 }
 
@@ -361,8 +361,8 @@ export async function updateBookingDetails(payload: {
     'completed',
   ]);
 
-  if (!payload?.id) return { error: 'Missing booking id' };
-  if (!allowedStatuses.has(payload.status)) return { error: 'Invalid status value' };
+  if (!payload?.id) return { error: 'Buchungs-ID fehlt' };
+  if (!allowedStatuses.has(payload.status)) return { error: 'Ungültiger Statuswert' };
 
   const { data: updated, error: updateError } = await supabaseAdmin
     .from('bookings')
@@ -385,15 +385,15 @@ export async function updateBookingDetails(payload: {
     .maybeSingle();
 
   if (updateError) {
-    return safeActionError('Unable to save booking changes. Please try again.', 'updateBookingDetails update failed', updateError);
+    return safeActionError('Buchungsänderungen konnten nicht gespeichert werden. Bitte erneut versuchen.', 'updateBookingDetails update failed', updateError);
   }
   if (!updated) {
-    return { error: 'Booking not found' };
+    return { error: 'Buchung nicht gefunden' };
   }
 
   if (payload.sendPassengerEmail) {
     if (!process.env.RESEND_API_KEY) {
-      return { error: 'Server misconfiguration: RESEND_API_KEY is missing' };
+      return { error: 'Server-Fehlkonfiguration: RESEND_API_KEY fehlt' };
     }
 
     const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -419,7 +419,7 @@ export async function updateBookingDetails(payload: {
     const paymentStyle = isCardPayment
       ? 'background:#e8f2ff;color:#0071e3;'
       : isCashPayment
-        ? 'background:#eafaf0;color:#1f7a3f;'
+        ? 'background:linear-gradient(135deg,rgba(10,99,255,0.12) 0%,rgba(36,144,255,0.18) 100%);color:#0a63ff;'
         : 'background:#f5f5f7;color:#86868b;';
 
     const safeName = escapeHtml(String(payload.full_name || ''));
@@ -558,11 +558,11 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
   try {
     await requireSameOrigin();
     const admin = await checkAdmin();
-    if (admin.error || !admin.supabase) return { error: admin.error || 'Unauthorized' };
+    if (admin.error || !admin.supabase) return { error: admin.error || 'Nicht autorisiert' };
     const { supabase } = admin;
 
     if (!bookingId || !driverId) {
-      return { error: 'Missing bookingId or driverId' };
+      return { error: 'bookingId oder driverId fehlt' };
     }
 
     const { error: updateError } = await supabase
@@ -574,12 +574,12 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
       .eq('id', bookingId);
 
     if (updateError) {
-      return safeActionError('Unable to assign driver. Please try again.', 'assignDriver update failed', updateError);
+      return safeActionError('Fahrer konnte nicht zugewiesen werden. Bitte erneut versuchen.', 'assignDriver update failed', updateError);
     }
 
     if (sendEmail) {
       if (!process.env.RESEND_API_KEY) {
-        return { error: 'Server misconfiguration: RESEND_API_KEY is missing' };
+        return { error: 'Server-Fehlkonfiguration: RESEND_API_KEY fehlt' };
       }
 
     const [{ data: booking, error: bookingError }, { data: driver, error: driverError }] = await Promise.all([
@@ -596,15 +596,15 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     ]);
 
     if (bookingError || !booking) {
-      return safeActionError('Unable to load booking for assignment.', 'assignDriver booking lookup failed', bookingError);
+      return safeActionError('Buchung konnte für die Zuweisung nicht geladen werden.', 'assignDriver booking lookup failed', bookingError);
     }
 
     if (driverError || !driver) {
-      return safeActionError('Unable to load driver for assignment.', 'assignDriver driver lookup failed', driverError);
+      return safeActionError('Fahrer konnte für die Zuweisung nicht geladen werden.', 'assignDriver driver lookup failed', driverError);
     }
 
     if (!driver.email) {
-      return { error: 'Selected driver has no email address' };
+      return { error: 'Der ausgewählte Fahrer hat keine E-Mail-Adresse' };
     }
 
     const confirmToken = crypto.randomUUID();
@@ -616,7 +616,7 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
       .eq('id', bookingId);
 
     if (tokenUpdateError) {
-      return safeActionError('Unable to create confirmation token.', 'assignDriver token update failed', tokenUpdateError);
+      return safeActionError('Bestätigungstoken konnte nicht erstellt werden.', 'assignDriver token update failed', tokenUpdateError);
     }
 
     const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -629,7 +629,6 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     const isToAirport = destinationRaw.includes('flughafen');
     const directionLabel = isFromAirport ? 'Vom Flughafen' : isToAirport ? 'Zum Flughafen' : 'Transfer';
     const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
-    const safeDriverName = escapeHtml(String(driver.name || 'Fahrer'));
     const safePassengerName = escapeHtml(String(booking.full_name || ''));
     const pickupRawValue = String(booking.pickup || '');
     const destinationRawValue = String(booking.destination || '');
@@ -666,7 +665,7 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     const paymentStyle = isCardPayment
       ? 'background:#e8f2ff;color:#0071e3;'
       : isCashPayment
-        ? 'background:#eafaf0;color:#1f7a3f;'
+        ? 'background:linear-gradient(135deg,rgba(10,99,255,0.12) 0%,rgba(36,144,255,0.18) 100%);color:#0a63ff;'
         : 'background:#f5f5f7;color:#86868b;';
     const safePayment = escapeHtml(paymentLabel);
     const safePrice = escapeHtml(
@@ -678,37 +677,22 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     const safeDate = escapeHtml(pickupDate);
     const safeTime = escapeHtml(pickupTime);
     const safeDirectionLabel = escapeHtml(directionLabel);
+    const extractZip = (value: string) => value.match(/\b\d{4}\b/)?.[0] || '';
+    const primaryZip = extractZip(isFromAirport ? destinationRawValue : pickupRawValue);
+    const fallbackZip = extractZip(isFromAirport ? pickupRawValue : destinationRawValue);
+    const zipForSubject = primaryZip || fallbackZip || '----';
+    const subjectTime = String(pickupTime || '').trim();
+    const driverSubject = `Neue Fahrtzuweisung - ${pickupDate}, ${subjectTime}, ${directionLabel}, ${zipForSubject}`;
 
     const { error: emailError } = await resend.emails.send({
       from,
       to: driver.email,
-      subject: `Neue Fahrtzuweisung (${directionLabel})`.trim(),
+      subject: driverSubject,
       html: `
-        <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
-          <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
+        <div style="margin:0;padding:8px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
+          <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:none;margin:0;background:#ffffff;border:none;border-radius:24px;overflow:hidden;">
             <tr>
-              <td style="padding:28px 28px 8px 28px;text-align:center;">
-                <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">FlughafenTaxi Wien</div>
-                <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:700;color:#1d1d1f;">Neue Fahrtzuweisung</h1>
-                <p style="margin:12px 0 0 0;font-size:16px;line-height:1.5;color:#86868b;">Hallo ${safeDriverName}, Ihnen wurde eine neue Fahrt zugewiesen.</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:20px 28px 8px 28px;">
-                <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:12px;background:#ffffff;border:1px solid #e5e5ea;border-radius:16px;">
-                  <tr>
-                    <td style="padding:18px 14px 16px 18px;text-align:center;width:62%;border-right:1px solid #e5e5ea;">
-                      <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Gesamtpreis</div>
-                      <div style="font-size:42px;line-height:1.05;color:#1d1d1f;font-weight:700;letter-spacing:-0.02em;">${safePrice} &euro;</div>
-                      <span style="display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;text-transform:uppercase;${paymentStyle}">${safePayment}</span>
-                    </td>
-                    <td style="padding:18px 14px 16px 14px;text-align:center;width:38%;">
-                      <div style="font-size:30px;line-height:1;margin-bottom:8px;">${directionIcon}</div>
-                      <div style="font-size:20px;line-height:1;color:#8b8b90;margin-bottom:8px;">____</div>
-                      <div style="font-size:14px;color:#1d1d1f;font-weight:700;line-height:1.3;">${safeDirectionLabel}</div>
-                    </td>
-                  </tr>
-                </table>
+              <td style="padding:12px 10px 8px 10px;">
                 <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
                   <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
                   <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safePassengerName}</td></tr>
@@ -730,14 +714,28 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
                 ${hasAdditionalInfo ? `
                 <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
                   <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Zusatzinformationen</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Kindersitze:</strong> ${safeChildSeatInfo}</td></tr>
-                  <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Zwischenstopp:</strong> ${safeIntermediateStopInfo}</td></tr>
+                  ${childSeatInfo ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Kindersitze:</strong> ${safeChildSeatInfo}</td></tr>` : ''}
+                  ${intermediateStopInfo ? `<tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Zwischenstopp:</strong> ${safeIntermediateStopInfo}</td></tr>` : ''}
                 </table>
                 ` : ''}
+                <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#ffffff;border:1px solid #e5e5ea;border-radius:16px;">
+                  <tr>
+                    <td style="padding:12px 8px 12px 10px;text-align:center;width:44%;border-right:1px solid #e5e5ea;">
+                      <div style="font-size:22px;line-height:1;margin-bottom:6px;">${directionIcon}</div>
+                      <div style="font-size:14px;line-height:1;color:#8b8b90;margin-bottom:6px;">____</div>
+                      <div style="font-size:13px;color:#1d1d1f;font-weight:700;line-height:1.2;">${safeDirectionLabel}</div>
+                    </td>
+                    <td style="padding:12px 10px 12px 8px;text-align:center;width:56%;">
+                      <div style="font-size:11px;letter-spacing:.08em;color:#86868b;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Gesamtpreis</div>
+                      <div style="font-size:30px;line-height:1.05;color:#1d1d1f;font-weight:700;letter-spacing:-0.01em;">${safePrice} &euro;</div>
+                      <span style="display:inline-block;margin-top:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;${paymentStyle}">${safePayment}</span>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
             <tr>
-              <td style="padding:18px 28px 26px 28px;text-align:center;">
+              <td style="padding:18px 10px 22px 10px;text-align:center;">
                 <a href="${confirmLink}" style="display:inline-block;background:#0071e3;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;padding:12px 24px;border-radius:9999px;">Bestaetigen Sie die Fahrt hier</a>
               </td>
             </tr>
@@ -763,7 +761,7 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     return { success: true, emailSent: sendEmail };
   } catch (error) {
     console.error('assignDriver failed:', error);
-    return { error: 'Driver assignment failed. Please try again.' };
+    return { error: 'Fahrerzuweisung fehlgeschlagen. Bitte erneut versuchen.' };
   }
 }
 

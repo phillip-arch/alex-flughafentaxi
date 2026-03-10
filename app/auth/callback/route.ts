@@ -32,5 +32,5 @@ export async function GET(request: Request) {
   }
 
   // If there's an error or no code, redirect to login with an error
-  return NextResponse.redirect(new URL('/login?error=Invalid+or+expired+link', requestUrl.origin));
+  return NextResponse.redirect(new URL('/login?error=Ungueltiger+oder+abgelaufener+Link', requestUrl.origin));
 }

@@ -17,22 +17,22 @@ export default async function AdminDashboard() {
 
   if (profileError && profileError.code !== 'PGRST116') {
     console.error('Profile fetch error:', profileError);
-    throw new Error('System Error: Failed to verify admin permissions.');
+    throw new Error('Systemfehler: Admin-Berechtigungen konnten nicht geprüft werden.');
   }
 
   if (profileError || profile?.role !== 'admin') {
     return (
       <div className="min-h-screen bg-[#f5f5f7] flex flex-col items-center justify-center p-4">
         <div className="bg-white p-8 rounded-[24px] shadow-sm border border-[#d2d2d7] max-w-md w-full text-center animate-in fade-in zoom-in duration-500">
-          <h1 className="text-[24px] font-semibold text-[#1d1d1f] mb-2 tracking-tight">Access Denied</h1>
+          <h1 className="text-[24px] font-semibold text-[#1d1d1f] mb-2 tracking-tight">Zugriff verweigert</h1>
           <p className="text-[#86868b] mb-6 text-[15px]">
-            You are logged in as <span className="font-medium text-[#1d1d1f]">{user.email}</span>, 
-            but this account does not have administrator privileges.
+            Sie sind angemeldet als <span className="font-medium text-[#1d1d1f]">{user.email}</span>,
+            aber dieses Konto hat keine Administratorrechte.
           </p>
           <div className="bg-amber-50 border border-amber-200 rounded-[12px] p-4 text-left mb-6">
             <p className="text-[11px] text-amber-800 font-mono leading-relaxed">
-              <strong>Tip for Developer:</strong><br/>
-              Run this SQL in your Supabase SQL Editor to promote this user:
+              <strong>Hinweis für Entwickler:</strong><br/>
+              Führen Sie dieses SQL im Supabase SQL Editor aus, um diesen Benutzer hochzustufen:
               <br/><br/>
               UPDATE public.profiles<br/>
               SET role = 'admin'<br/>
@@ -41,7 +41,7 @@ export default async function AdminDashboard() {
           </div>
           <form action="/auth/logout" method="post">
             <button className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium py-3 rounded-full transition-colors text-[15px]">
-              Sign Out
+              Abmelden
             </button>
           </form>
         </div>

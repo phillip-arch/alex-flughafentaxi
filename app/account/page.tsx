@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { claimGuestBookingsForUser } from '@/lib/bookings/claimGuestBookings';
 import AccountClient from './AccountClient';
 
 export const metadata: Metadata = {
@@ -20,24 +20,12 @@ export default async function AccountPage() {
 
   if (!user) redirect('/login');
 
-  // Safe one-way claim for guest bookings:
-  // Link only records with null user_id to the currently authenticated,
-  // email-verified user by exact email match (case-insensitive).
-  const userEmail = (user.email || '').trim();
-  const isEmailVerified = Boolean((user as any).email_confirmed_at || (user as any).confirmed_at);
-
-  if (userEmail && isEmailVerified) {
-    const { error: claimError } = await supabaseAdmin
-      .from('bookings')
-      .update({ user_id: user.id })
-      .is('user_id', null)
-      .ilike('email', userEmail);
-
-    if (claimError) {
-      // Do not block account page if claim fails.
-      console.error('Account booking claim failed:', claimError);
-    }
-  }
+  await claimGuestBookingsForUser({
+    userId: user.id,
+    email: user.email,
+    emailConfirmedAt: (user as any).email_confirmed_at,
+    confirmedAt: (user as any).confirmed_at,
+  });
 
   const [{ data: profile }, { data: favorites }, { data: bookings }] = await Promise.all([
     supabase.from('profiles').select('full_name, phone').eq('id', user.id).maybeSingle(),
@@ -48,7 +36,9 @@ export default async function AccountPage() {
       .order('created_at', { ascending: false }),
     supabase
       .from('bookings')
-      .select('id, booking_reference, pickup_at, pickup, destination, status, price')
+      .select(
+        'id, booking_reference, pickup_at, pickup, destination, status, price, driver_id, confirm_token, full_name, phone, email, passengers, luggage, vehicle_type, notes',
+      )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(50),

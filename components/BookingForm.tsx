@@ -15,7 +15,8 @@ import {
   Clock,
   Car,
   Users,
-  Briefcase
+  Briefcase,
+  ArrowUpDown,
 } from 'lucide-react';
 import DatePicker from './DatePicker';
 import TimePicker from './TimePicker';
@@ -83,7 +84,7 @@ const BookingForm = () => {
   const [accountDefaults, setAccountDefaults] = useState({ fullName: '', phone: '', email: '' });
 
   const [formData, setFormData] = useState<ExtendedBookingInput>({
-    direction: null,
+    direction: 'to_airport',
     city: 'Wien',
     zip: '',
     street: '',
@@ -117,18 +118,17 @@ const BookingForm = () => {
 
   const applyFavoriteAddress = (favorite: FavoriteAddress) => {
     const city = favorite.city.toLowerCase().includes('schwechat') ? 'Schwechat' : 'Wien';
+    const formattedAddress = `${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`;
     setFormData((prev) => ({
       ...prev,
       city,
       zip: favorite.zip,
-      street: favorite.street,
-      houseNumber: favorite.house_number,
+      street: formattedAddress,
+      houseNumber: '',
     }));
     setTouched((prev) => ({
       ...prev,
-      zip: false,
       street: false,
-      houseNumber: false,
     }));
   };
 
@@ -281,6 +281,11 @@ const BookingForm = () => {
     }
   };
 
+  const toggleDirection = () => {
+    const nextDirection = formData.direction === 'from_airport' ? 'to_airport' : 'from_airport';
+    handleDirectionChange(nextDirection);
+  };
+
   const handlePaymentChange = (method: PaymentMethod) => {
     setFormData(prev => ({ ...prev, paymentMethod: method }));
     if (touched['paymentMethod']) {
@@ -317,23 +322,15 @@ const BookingForm = () => {
       if (!formData.direction) {
         isValid = false;
       }
-      fieldsToValidate.push('zip', 'street', 'houseNumber');
-      if (formData.direction === 'from_airport') {
-        fieldsToValidate.push('flightNumber');
-      }
+      fieldsToValidate.push('street');
       if (formData.extraStop) {
-        fieldsToValidate.push('extraStopZip', 'extraStopStreet', 'extraStopHouseNumber');
-      }
-      if (formData.zip.trim() && !/^\d{1,4}$/.test(formData.zip.trim())) {
-        isValid = false;
-        errorMessage = errorMessage || 'Bitte geben Sie eine gueltige Postleitzahl mit maximal 4 Ziffern ein.';
-      }
-      if (formData.extraStop && formData.extraStopZip.trim() && !/^\d{1,4}$/.test(formData.extraStopZip.trim())) {
-        isValid = false;
-        errorMessage = errorMessage || 'Bitte geben Sie eine gueltige Postleitzahl mit maximal 4 Ziffern fuer den Zwischenstopp ein.';
+        fieldsToValidate.push('extraStopStreet');
       }
     } else if (currentStep === 2) {
       fieldsToValidate.push('date', 'time', 'passengers', 'luggage', 'handLuggage');
+      if (formData.direction === 'from_airport') {
+        fieldsToValidate.push('flightNumber');
+      }
       
       // Validate minimum booking time
       if (formData.date && formData.time) {
@@ -404,13 +401,6 @@ const BookingForm = () => {
         errorMessage = errorMessage || 'Bitte füllen Sie alle erforderlichen Felder aus.';
       }
 
-      if (currentStep === 1 && formData.zip.trim() && !/^\d{1,4}$/.test(formData.zip.trim())) {
-        newTouched['zip'] = true;
-      }
-      if (currentStep === 1 && formData.extraStop && formData.extraStopZip.trim() && !/^\d{1,4}$/.test(formData.extraStopZip.trim())) {
-        newTouched['extraStopZip'] = true;
-      }
-
       setTouched(newTouched);
       setError(errorMessage || 'Bitte füllen Sie alle erforderlichen Felder aus.');
       return;
@@ -463,7 +453,7 @@ const BookingForm = () => {
 
     try {
       // Construct the pickup/destination strings based on direction
-      const addressString = `${formData.street} ${formData.houseNumber}, ${formData.zip} ${formData.city}`;
+      const addressString = formData.street.trim();
       const pickup = formData.direction === 'to_airport' ? addressString : 'Flughafen Wien (VIE)';
       const destination = formData.direction === 'to_airport' ? 'Flughafen Wien (VIE)' : addressString;
       
@@ -486,7 +476,7 @@ const BookingForm = () => {
         vehicle_type: vehicleType,
         notes: formData.notes + 
                (formData.childSeat ? ` (Kindersitze: ${formData.babySeats > 0 ? `${formData.babySeats}x Babyschale ` : ''}${formData.childSeats > 0 ? `${formData.childSeats}x Kindersitz ` : ''}${formData.boosterSeats > 0 ? `${formData.boosterSeats}x Sitzerhöhung` : ''})` : '') + 
-               (formData.extraStop ? ` (Zwischenstopp: ${formData.extraStopStreet} ${formData.extraStopHouseNumber}, ${formData.extraStopZip} ${formData.extraStopCity})` : '') +
+               (formData.extraStop ? ` (Zwischenstopp: ${formData.extraStopStreet})` : '') +
                (formData.flightNumber ? ` (Flugnummer: ${formData.flightNumber})` : '') +
                (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Handgepäck: ${formData.handLuggage})` : '') +
                (formData.paymentMethod ? ` (Zahlung: ${formData.paymentMethod === 'cash' ? 'Barzahlung' : 'Kreditkarte'})` : ''),
@@ -523,69 +513,167 @@ const BookingForm = () => {
           <div 
             key={step} 
             className={`h-1 w-8 rounded-full transition-all duration-300 ${
-              currentStep >= step ? 'bg-[#0071e3]' : 'bg-[#d2d2d7]'
+              currentStep >= step ? 'bg-[#111111]' : 'bg-[#d7d3ca]'
             }`} 
           />
         ))}
       </div>
-      <span className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide">
+      <span className="text-[10px] font-medium text-[#6d7075] uppercase tracking-wide">
         Schritt {currentStep} von 3
       </span>
     </div>
   );
 
   return (
-    <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[700px] mx-auto relative overflow-hidden`}>
-      <div className="p-2 md:p-8">
-        <StepIndicator />
-
+    <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[580px] relative overflow-hidden`}>
+      <div className="px-2 pb-2 pt-2 md:px-4 md:pb-3 md:pt-3">
         <form onSubmit={handleSubmit}>
           {/* STEP 1: LOCATION */}
           {currentStep === 1 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-              <div className="text-center mb-8">
-                <h2 className="text-[32px] font-semibold text-[#1d1d1f] leading-tight mb-2">Wohin geht's?</h2>
-                <p className="text-[17px] text-[#86868b]">Wählen Sie Ihre Route.</p>
-              </div>
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+              <div className="rounded-[2.2rem] bg-transparent p-3 shadow-none">
+                <div className="flex gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start gap-4">
+                      <div className={`mt-2 flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
+                        {formData.direction === 'from_airport' ? <PlaneLanding size={18} /> : <MapPin size={18} />}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[11px] font-medium text-[#5f6975]">Abholung</p>
+                        {formData.direction === 'from_airport' ? (
+                          <div className="mt-1 flex min-h-[2.75rem] items-center">
+                            <p className="text-[16px] font-semibold tracking-[-0.03em] text-[#111111]">
+                              Flughafen Wien (VIE)
+                            </p>
+                          </div>
+                        ) : null}
+                        {formData.direction !== 'from_airport' ? (
+                          <div className="mt-1 min-h-[2.75rem] space-y-2">
+                            {isLoggedIn && favoriteAddresses.length > 0 ? (
+                              <div className="flex flex-wrap items-center gap-2">
+                                {favoriteAddresses.map((favorite) => (
+                                  <button
+                                    key={favorite.id}
+                                    type="button"
+                                    onClick={() => applyFavoriteAddress(favorite)}
+                                  className="rounded-full border border-[#d9d4c8] bg-[#f8f6f0] px-3 py-1.5 text-[11px] font-medium text-[#111111] transition-colors hover:bg-white"
+                                  >
+                                    {favorite.name}
+                                  </button>
+                                ))}
+                              </div>
+                            ) : null}
+                        <input
+                          type="text"
+                          name="street"
+                          value={formData.street}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          placeholder="Adresse eingeben"
+                          className={getInputClassName('street')}
+                        />
+                        {formData.extraStop ? (
+                          <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div>
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Zusatzstopp</p>
+                              <p className="mt-1 text-[12px] text-[#6d7075]">+10 EUR Aufpreis fuer eine weitere Adresse.</p>
+                            </div>
 
-              {/* Direction Toggle */}
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => handleDirectionChange('to_airport')}
-                  className={`flex flex-col items-center justify-center gap-3 py-6 rounded-2xl border transition-all duration-200 ${
-                    formData.direction === 'to_airport' 
-                      ? 'border-[#0071e3] ring-1 ring-[#0071e3] bg-[#f2fcfc]' 
-                      : touched['direction'] && !formData.direction 
-                        ? 'border-[#d70015] bg-[#fff2f4]' 
-                        : 'border-[#d2d2d7] hover:border-[#86868b] bg-white'
-                  }`}
-                >
-                  <PlaneTakeoff size={24} className={formData.direction === 'to_airport' ? 'text-[#0071e3]' : touched['direction'] && !formData.direction ? 'text-[#d70015]' : 'text-[#86868b]'} />
-                  <span className={`text-[14px] font-medium ${formData.direction === 'to_airport' ? 'text-[#0071e3]' : touched['direction'] && !formData.direction ? 'text-[#d70015]' : 'text-[#1d1d1f]'}`}>
-                    Zum Flughafen
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDirectionChange('from_airport')}
-                  className={`flex flex-col items-center justify-center gap-3 py-6 rounded-2xl border transition-all duration-200 ${
-                    formData.direction === 'from_airport' 
-                      ? 'border-[#0071e3] ring-1 ring-[#0071e3] bg-[#f2fcfc]' 
-                      : touched['direction'] && !formData.direction 
-                        ? 'border-[#d70015] bg-[#fff2f4]' 
-                        : 'border-[#d2d2d7] hover:border-[#86868b] bg-white'
-                  }`}
-                >
-                  <PlaneLanding size={24} className={formData.direction === 'from_airport' ? 'text-[#0071e3]' : touched['direction'] && !formData.direction ? 'text-[#d70015]' : 'text-[#86868b]'} />
-                  <span className={`text-[14px] font-medium ${formData.direction === 'from_airport' ? 'text-[#0071e3]' : touched['direction'] && !formData.direction ? 'text-[#d70015]' : 'text-[#1d1d1f]'}`}>
-                    Vom Flughafen
-                  </span>
-                </button>
+                            <input
+                              type="text"
+                              name="extraStopStreet"
+                              value={formData.extraStopStreet}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder="Zusatzadresse eingeben"
+                              className={getInputClassName('extraStopStreet')}
+                            />
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+
+                    <div className="ml-0 mt-1 flex h-8 w-12 justify-center">
+                      <div className="h-full w-px border-l border-dashed border-[#b9b6ad]" />
+                    </div>
+
+                    <div className="mt-1 flex items-start gap-4">
+                      <div className="mt-2 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
+                        <Check size={18} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
+                        {formData.direction === 'from_airport' ? (
+                          <div className="mt-1 min-h-[2.75rem] space-y-2">
+                            {isLoggedIn && favoriteAddresses.length > 0 ? (
+                              <div className="flex flex-wrap items-center gap-2">
+                                {favoriteAddresses.map((favorite) => (
+                                  <button
+                                    key={favorite.id}
+                                    type="button"
+                                    onClick={() => applyFavoriteAddress(favorite)}
+                                  className="rounded-full border border-[#d9d4c8] bg-[#f8f6f0] px-3 py-1.5 text-[11px] font-medium text-[#111111] transition-colors hover:bg-white"
+                                  >
+                                    {favorite.name}
+                                  </button>
+                                ))}
+                              </div>
+                            ) : null}
+                            <input
+                              type="text"
+                              name="street"
+                              value={formData.street}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              placeholder="Adresse eingeben"
+                              className={getInputClassName('street')}
+                            />
+                            {formData.extraStop ? (
+                              <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div>
+                                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Zusatzstopp</p>
+                                  <p className="mt-1 text-[12px] text-[#6d7075]">+10 EUR Aufpreis fuer eine weitere Adresse.</p>
+                                </div>
+
+                                <input
+                                  type="text"
+                                  name="extraStopStreet"
+                                  value={formData.extraStopStreet}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  placeholder="Zusatzadresse eingeben"
+                                  className={getInputClassName('extraStopStreet')}
+                                />
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : (
+                          <div className="mt-1 flex min-h-[2.75rem] items-center">
+                            <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
+                              Flughafen Wien (VIE)
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 flex-col justify-start gap-3 pt-8">
+                    <button
+                      type="button"
+                      onClick={toggleDirection}
+                      className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60"
+                      aria-label="Abholung und Ziel tauschen"
+                    >
+                      <ArrowUpDown size={16} />
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Address Fields */}
-              <div className="space-y-4">
+              <div className="hidden space-y-4">
                 {formData.direction === 'from_airport' && (
                   <div className="mb-1">
                     <input
@@ -679,7 +767,7 @@ const BookingForm = () => {
               </div>
 
               {/* Extra Stop Toggle */}
-              <div className="flex items-center justify-between p-4 bg-[#f5f5f7] rounded-xl">
+              <div className="hidden items-center justify-between p-4 bg-[#f5f5f7] rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="text-[#1d1d1f]">
                     <p className="font-medium text-[15px]">Zusätzlicher Stopp?</p>
@@ -694,13 +782,13 @@ const BookingForm = () => {
                     onChange={handleChange}
                     className="sr-only peer" 
                   />
-                  <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[#34c759]"></div>
+                  <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
                 </label>
               </div>
 
               {/* Extra Stop Address Fields */}
               {formData.extraStop && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="hidden space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1 mt-2">
                     Adresse Zwischenstopp
                   </p>
@@ -777,7 +865,7 @@ const BookingForm = () => {
               <button
                 type="button"
                 onClick={nextStep}
-                className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-[17px] py-5 rounded-full flex items-center justify-center gap-2 transition-all mt-6"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#111111] py-5 text-[17px] font-medium text-white transition-all hover:bg-[#232325]"
               >
                 Weiter
               </button>
@@ -788,13 +876,13 @@ const BookingForm = () => {
           {currentStep === 2 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="text-center mb-8">
-                <h2 className="text-[32px] font-semibold text-[#1d1d1f] leading-tight mb-2">Wann?</h2>
-                <p className="text-[17px] text-[#86868b]">Datum und Uhrzeit wählen.</p>
+                <h2 className="text-[32px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Wann?</h2>
+                <p className="text-[17px] text-[#6d7075]">Datum und Uhrzeit wählen.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[12px] font-medium uppercase tracking-wide text-[#86868b] mb-2 ml-1">Datum</label>
+                  <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">Datum</label>
                   <div className="relative" onClick={() => setIsDatePickerOpen(true)}>
                     <input
                       type="text"
@@ -805,14 +893,14 @@ const BookingForm = () => {
                       className={`w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none transition-all cursor-pointer ${
                         isFieldInvalid('date') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
-                          : 'border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]'
+                          : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
                       }`}
                     />
-                    <Calendar className={`absolute right-4 top-1/2 -translate-y-1/2 ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#86868b]'}`} size={20} />
+                    <Calendar className={`absolute right-4 top-1/2 -translate-y-1/2 ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#6d7075]'}`} size={20} />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[12px] font-medium uppercase tracking-wide text-[#86868b] mb-2 ml-1">Zeit</label>
+                  <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">Zeit</label>
                   <div className="relative" onClick={() => setIsTimePickerOpen(true)}>
                     <input
                       type="text"
@@ -823,10 +911,10 @@ const BookingForm = () => {
                       className={`w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none transition-all cursor-pointer ${
                         isFieldInvalid('time') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
-                          : 'border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]'
+                          : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
                       }`}
                     />
-                    <Clock className={`absolute right-4 top-1/2 -translate-y-1/2 ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#86868b]'}`} size={20} />
+                    <Clock className={`absolute right-4 top-1/2 -translate-y-1/2 ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#6d7075]'}`} size={20} />
                   </div>
                 </div>
               </div>
@@ -844,6 +932,21 @@ const BookingForm = () => {
                 onSelect={handleTimeSelect}
                 selectedTime={formData.time}
               />
+
+              {formData.direction === 'from_airport' && (
+                <div className="rounded-[1.75rem] border border-[#dad5ca] bg-white p-5">
+                  <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Flugdetails</p>
+                  <input
+                    type="text"
+                    name="flightNumber"
+                    value={formData.flightNumber}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder="Flugnummer (z.B. OS123)"
+                    className={getInputClassName('flightNumber')}
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-[#f5f5f7] p-5 rounded-2xl flex flex-col items-center justify-center gap-2">
@@ -907,7 +1010,7 @@ const BookingForm = () => {
                       onChange={handleChange}
                       className="sr-only peer" 
                     />
-                    <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[#34c759]"></div>
+                    <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
                   </label>
                 </div>
 
@@ -976,14 +1079,14 @@ const BookingForm = () => {
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="w-14 h-14 rounded-full bg-[#f5f5f7] flex items-center justify-center text-[#1d1d1f] hover:bg-[#e8e8ed] transition-colors"
+                  className="flex h-14 w-14 items-center justify-center rounded-full bg-[#ece7dd] text-[#111111] transition-colors hover:bg-[#e2dccf]"
                 >
                   <ChevronLeft size={24} />
                 </button>
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="flex-1 bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-[17px] py-3 rounded-full flex items-center justify-center gap-2 transition-all"
+                  className="flex-1 rounded-full bg-[#111111] py-3 text-[17px] font-medium text-white transition-all hover:bg-[#232325] flex items-center justify-center gap-2"
                 >
                   Weiter
                 </button>
@@ -995,8 +1098,8 @@ const BookingForm = () => {
           {currentStep === 3 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="text-center mb-4">
-                <h2 className="text-[32px] font-semibold text-[#1d1d1f] leading-tight mb-2">Übersicht</h2>
-                <p className="text-[17px] text-[#86868b]">Bitte überprüfen Sie Ihre Daten.</p>
+                <h2 className="text-[32px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Übersicht</h2>
+                <p className="text-[17px] text-[#6d7075]">Bitte überprüfen Sie Ihre Daten.</p>
               </div>
 
               {/* Price Card - Apple Style Summary */}
@@ -1060,7 +1163,7 @@ const BookingForm = () => {
                         onChange={(e) => handleBookingForMyselfToggle(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[#34c759]"></div>
+                      <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
                     </label>
                   </div>
                 </div>
@@ -1112,7 +1215,7 @@ const BookingForm = () => {
                     onClick={() => handlePaymentChange('cash')}
                     className={`flex-1 flex flex-col items-center justify-center gap-2 py-3 rounded-xl border transition-all duration-200 ${
                       formData.paymentMethod === 'cash' 
-                        ? 'border-[#34c759] bg-[#eafaf0] text-[#1f7a3f]' 
+                        ? 'border-[#0a63ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]' 
                         : touched['paymentMethod'] && !formData.paymentMethod
                           ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                           : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
@@ -1159,14 +1262,14 @@ const BookingForm = () => {
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="w-14 h-14 rounded-full bg-[#f5f5f7] flex items-center justify-center text-[#1d1d1f] hover:bg-[#e8e8ed] transition-colors"
+                  className="flex h-14 w-14 items-center justify-center rounded-full bg-[#ece7dd] text-[#111111] transition-colors hover:bg-[#e2dccf]"
                 >
                   <ChevronLeft size={24} />
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-[17px] py-3 rounded-full flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                  className="flex-1 rounded-full bg-[#111111] py-3 text-[17px] font-medium text-white transition-all hover:bg-[#232325] disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading ? 'Wird gebucht...' : 'Kostenpflichtig buchen'}
                 </button>

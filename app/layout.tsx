@@ -16,13 +16,13 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     template: '%s | FlughafenTaxi Wien',
-    default: 'FlughafenTaxi Wien | Reliable Airport Transfer',
+    default: 'FlughafenTaxi Wien | Zuverlässiger Flughafentransfer',
   },
-  description: 'Book your airport transfer in Vienna. Fixed prices, reliable service, and comfortable rides to and from Vienna International Airport.',
+  description: 'Buchen Sie Ihren Flughafentransfer in Wien. Fixpreise, zuverlässiger Service und komfortable Fahrten zum und vom Flughafen Wien.',
   metadataBase: new URL('https://flughafentaxi-wien.at'),
   openGraph: {
     title: 'FlughafenTaxi Wien',
-    description: 'Reliable airport transfer in Vienna.',
+    description: 'Zuverlässiger Flughafentransfer in Wien.',
     url: 'https://flughafentaxi-wien.at',
     siteName: 'FlughafenTaxi Wien',
     locale: 'de_AT',
