@@ -592,130 +592,126 @@ const BookingForm = () => {
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="-ml-1 rounded-[2.2rem] bg-transparent p-3 shadow-none md:-ml-2">
                 <div className="flex gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start gap-4">
-                      <div className={`mt-2 flex h-[2.1rem] w-[2.1rem] shrink-0 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
-                        {formData.direction === 'from_airport' ? <PlaneLanding size={13} /> : <MapPin size={13} />}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-[11px] font-medium text-[#5f6975]">Abholung</p>
-                        {formData.direction === 'from_airport' ? (
-                          <div className="mt-1 flex min-h-[2.75rem] items-center">
-                            <p className="text-[16px] font-semibold tracking-[-0.03em] text-[#111111]">
-                              Flughafen Wien (VIE)
-                            </p>
-                          </div>
-                        ) : null}
-                        {formData.direction !== 'from_airport' ? (
-                          <div className="mt-1 min-h-[2.75rem] space-y-2">
-                            {isLoggedIn && favoriteAddresses.length > 0 ? (
-                              <div className="flex flex-wrap items-center gap-2">
-                                {favoriteAddresses.map((favorite) => (
-                                  <button
-                                    key={favorite.id}
-                                    type="button"
-                                    onClick={() => applyFavoriteAddress(favorite)}
-                                  className="rounded-full border border-[#d9d4c8] bg-[#f8f6f0] px-3 py-1.5 text-[11px] font-medium text-[#111111] transition-colors hover:bg-white"
-                                  >
-                                    {favorite.name}
-                                  </button>
-                                ))}
-                              </div>
-                            ) : null}
-                        <input
-                          type="text"
-                          name="street"
-                          value={formData.street}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          placeholder="Adresse eingeben"
-                          className={getInputClassName('street')}
-                        />
-                        {formData.extraStop ? (
-                          <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <div>
-                              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Zusatzstopp</p>
-                              <p className="mt-1 text-[12px] text-[#6d7075]">+10 EUR Aufpreis fuer eine weitere Adresse.</p>
-                            </div>
-
-                            <input
-                              type="text"
-                              name="extraStopStreet"
-                              value={formData.extraStopStreet}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              placeholder="Zusatzadresse eingeben"
-                              className={getInputClassName('extraStopStreet')}
-                            />
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
+                  <div className="flex w-[2.1rem] shrink-0 flex-col items-center pt-2">
+                    <div className={`flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
+                      {formData.direction === 'from_airport' ? <PlaneLanding size={13} /> : <MapPin size={13} />}
+                    </div>
+                    <div className="h-[3.9rem] w-px bg-[#111111]" />
+                    <div className="flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
+                      <Check size={13} />
+                    </div>
                   </div>
-                </div>
 
-                    <div className="ml-0 mt-1 flex h-8 w-12 justify-center">
-                      <div className="h-full w-px border-l border-dashed border-[#b9b6ad]" />
+                  <div className="min-w-0 flex-1">
+                    <div>
+                      <p className="text-[11px] font-medium text-[#5f6975]">Abholung</p>
+                      {formData.direction === 'from_airport' ? (
+                        <div className="mt-1 flex min-h-[2.75rem] items-center">
+                          <p className="text-[16px] font-semibold tracking-[-0.03em] text-[#111111]">
+                            Flughafen Wien (VIE)
+                          </p>
+                        </div>
+                      ) : null}
+                      {formData.direction !== 'from_airport' ? (
+                        <div className="mt-1 min-h-[2.75rem] space-y-2">
+                          {isLoggedIn && favoriteAddresses.length > 0 ? (
+                            <div className="flex flex-wrap items-center gap-2">
+                              {favoriteAddresses.map((favorite) => (
+                                <button
+                                  key={favorite.id}
+                                  type="button"
+                                  onClick={() => applyFavoriteAddress(favorite)}
+                                  className="rounded-full border border-[#d9d4c8] bg-[#f8f6f0] px-3 py-1.5 text-[11px] font-medium text-[#111111] transition-colors hover:bg-white"
+                                >
+                                  {favorite.name}
+                                </button>
+                              ))}
+                            </div>
+                          ) : null}
+                          <input
+                            type="text"
+                            name="street"
+                            value={formData.street}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            placeholder="Adresse eingeben"
+                            className={getInputClassName('street')}
+                          />
+                          {formData.extraStop ? (
+                            <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                              <div>
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Zusatzstopp</p>
+                                <p className="mt-1 text-[12px] text-[#6d7075]">+10 EUR Aufpreis fuer eine weitere Adresse.</p>
+                              </div>
+
+                              <input
+                                type="text"
+                                name="extraStopStreet"
+                                value={formData.extraStopStreet}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                placeholder="Zusatzadresse eingeben"
+                                className={getInputClassName('extraStopStreet')}
+                              />
+                            </div>
+                          ) : null}
+                        </div>
+                      ) : null}
                     </div>
 
-                    <div className="mt-1 flex items-start gap-4">
-                      <div className="mt-2 flex h-[2.1rem] w-[2.1rem] shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
-                        <Check size={13} />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
-                        {formData.direction === 'from_airport' ? (
-                          <div className="mt-1 min-h-[2.75rem] space-y-2">
-                            {isLoggedIn && favoriteAddresses.length > 0 ? (
-                              <div className="flex flex-wrap items-center gap-2">
-                                {favoriteAddresses.map((favorite) => (
-                                  <button
-                                    key={favorite.id}
-                                    type="button"
-                                    onClick={() => applyFavoriteAddress(favorite)}
+                    <div className="mt-2">
+                      <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
+                      {formData.direction === 'from_airport' ? (
+                        <div className="mt-1 min-h-[2.75rem] space-y-2">
+                          {isLoggedIn && favoriteAddresses.length > 0 ? (
+                            <div className="flex flex-wrap items-center gap-2">
+                              {favoriteAddresses.map((favorite) => (
+                                <button
+                                  key={favorite.id}
+                                  type="button"
+                                  onClick={() => applyFavoriteAddress(favorite)}
                                   className="rounded-full border border-[#d9d4c8] bg-[#f8f6f0] px-3 py-1.5 text-[11px] font-medium text-[#111111] transition-colors hover:bg-white"
-                                  >
-                                    {favorite.name}
-                                  </button>
-                                ))}
+                                >
+                                  {favorite.name}
+                                </button>
+                              ))}
+                            </div>
+                          ) : null}
+                          <input
+                            type="text"
+                            name="street"
+                            value={formData.street}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            placeholder="Adresse eingeben"
+                            className={getInputClassName('street')}
+                          />
+                          {formData.extraStop ? (
+                            <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                              <div>
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Zusatzstopp</p>
+                                <p className="mt-1 text-[12px] text-[#6d7075]">+10 EUR Aufpreis fuer eine weitere Adresse.</p>
                               </div>
-                            ) : null}
-                            <input
-                              type="text"
-                              name="street"
-                              value={formData.street}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              placeholder="Adresse eingeben"
-                              className={getInputClassName('street')}
-                            />
-                            {formData.extraStop ? (
-                              <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                                <div>
-                                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Zusatzstopp</p>
-                                  <p className="mt-1 text-[12px] text-[#6d7075]">+10 EUR Aufpreis fuer eine weitere Adresse.</p>
-                                </div>
 
-                                <input
-                                  type="text"
-                                  name="extraStopStreet"
-                                  value={formData.extraStopStreet}
-                                  onChange={handleChange}
-                                  onBlur={handleBlur}
-                                  placeholder="Zusatzadresse eingeben"
-                                  className={getInputClassName('extraStopStreet')}
-                                />
-                              </div>
-                            ) : null}
-                          </div>
-                        ) : (
-                          <div className="mt-1 flex min-h-[2.75rem] items-center">
-                            <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
-                              Flughafen Wien (VIE)
-                            </p>
-                          </div>
-                        )}
-                      </div>
+                              <input
+                                type="text"
+                                name="extraStopStreet"
+                                value={formData.extraStopStreet}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                placeholder="Zusatzadresse eingeben"
+                                className={getInputClassName('extraStopStreet')}
+                              />
+                            </div>
+                          ) : null}
+                        </div>
+                      ) : (
+                        <div className="mt-1 flex min-h-[2.75rem] items-center">
+                          <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
+                            Flughafen Wien (VIE)
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-col justify-start gap-3 pt-8">
