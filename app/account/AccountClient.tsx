@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import {
   Car,
@@ -80,6 +81,8 @@ export default function AccountClient({
   initialFavorites: Favorite[];
   initialBookings: Booking[];
 }) {
+  const searchParams = useSearchParams();
+  const requestedTab = searchParams.get('tab');
   const [name, setName] = useState(initialName || '');
   const [phone, setPhone] = useState(initialPhone || '');
   const [favorites, setFavorites] = useState<Favorite[]>(initialFavorites || []);
@@ -94,7 +97,14 @@ export default function AccountClient({
   const [bookingNotice, setBookingNotice] = useState<string | null>(null);
   const [cancelingBookingId, setCancelingBookingId] = useState<string | null>(null);
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('upcoming');
-  const [activeTab, setActiveTab] = useState<AccountTab>('buchen');
+  const [activeTab, setActiveTab] = useState<AccountTab>(
+    requestedTab === 'profil' ||
+      requestedTab === 'favoriten' ||
+      requestedTab === 'buchungsverlauf' ||
+      requestedTab === 'buchen'
+      ? requestedTab
+      : 'buchen',
+  );
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 

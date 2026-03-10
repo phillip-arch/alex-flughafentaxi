@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { 
   Plane, 
@@ -28,6 +28,8 @@ import { createBooking } from '@/app/(booking)/actions';
 // Types
 type Direction = 'to_airport' | 'from_airport' | null;
 type PaymentMethod = 'cash' | 'card' | null;
+
+const PENDING_BOOKING_STORAGE_KEY = 'pending-booking-form';
 
 interface FavoriteAddress {
   id: string;
@@ -71,6 +73,7 @@ interface ExtendedBookingInput {
 
 const BookingForm = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = supabaseBrowser();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -115,6 +118,36 @@ const BookingForm = () => {
   });
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (pathname !== '/book' && pathname !== '/account') return;
+
+    const raw = window.sessionStorage.getItem(PENDING_BOOKING_STORAGE_KEY);
+    if (!raw) return;
+
+    try {
+      const parsed = JSON.parse(raw) as {
+        formData?: Partial<ExtendedBookingInput>;
+        currentStep?: number;
+      };
+
+      if (parsed.formData) {
+        setFormData((prev) => ({
+          ...prev,
+          ...parsed.formData,
+        }));
+      }
+
+      if (parsed.currentStep && parsed.currentStep >= 1 && parsed.currentStep <= 3) {
+        setCurrentStep(parsed.currentStep);
+      }
+    } catch {
+      // Ignore malformed persisted state.
+    } finally {
+      window.sessionStorage.removeItem(PENDING_BOOKING_STORAGE_KEY);
+    }
+  }, [pathname]);
 
   const applyFavoriteAddress = (favorite: FavoriteAddress) => {
     const city = favorite.city.toLowerCase().includes('schwechat') ? 'Schwechat' : 'Wien';
@@ -407,6 +440,32 @@ const BookingForm = () => {
     }
 
     setError(null);
+    if (currentStep === 1 && pathname === '/') {
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.setItem(
+          PENDING_BOOKING_STORAGE_KEY,
+          JSON.stringify({
+            currentStep: 2,
+            formData: {
+              direction: formData.direction,
+              city: formData.city,
+              zip: formData.zip,
+              street: formData.street,
+              houseNumber: formData.houseNumber,
+              extraStop: formData.extraStop,
+              extraStopCity: formData.extraStopCity,
+              extraStopZip: formData.extraStopZip,
+              extraStopStreet: formData.extraStopStreet,
+              extraStopHouseNumber: formData.extraStopHouseNumber,
+            },
+          }),
+        );
+      }
+
+      router.push(isLoggedIn ? '/account?tab=buchen' : '/book');
+      return;
+    }
+
     if (currentStep < 3) setCurrentStep((prev) => prev + 1);
   };
 
