@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { claimGuestBookingsForUser } from '@/lib/bookings/claimGuestBookings';
 import { cookies, headers } from 'next/headers';
 import { isIP } from 'net';
 
@@ -32,7 +33,7 @@ export async function requestPasswordReset(formData: FormData) {
 
   const validated = ResetSchema.safeParse({ email: rawEmail });
   if (!validated.success) {
-    return { error: validated.error.issues[0]?.message || 'Invalid Email' };
+    return { error: validated.error.issues[0]?.message || 'Ungültige E-Mail-Adresse' };
   }
 
   const { email } = validated.data;
@@ -108,7 +109,7 @@ export async function updatePassword(formData: FormData) {
 
   const validated = UpdatePasswordSchema.safeParse(rawData);
   if (!validated.success) {
-    return { error: validated.error.issues[0]?.message || 'Invalid Password' };
+    return { error: validated.error.issues[0]?.message || 'Ungültiges Passwort' };
   }
 
   const { password } = validated.data;
@@ -141,7 +142,7 @@ export async function login(formData: FormData) {
   // 1. Validate Input
   const validated = AuthSchema.safeParse(rawData);
   if (!validated.success) {
-    return { error: validated.error.issues[0]?.message || 'Invalid Credentials' };
+    return { error: validated.error.issues[0]?.message || 'Ungültige Anmeldedaten' };
   }
 
   const { email, password } = validated.data;
@@ -193,7 +194,7 @@ export async function login(formData: FormData) {
     console.error('User login rate limit error:', rateLimitError);
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data: authData, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
@@ -202,6 +203,13 @@ export async function login(formData: FormData) {
     await new Promise(resolve => setTimeout(resolve, 800));
     return { error: 'E-Mail oder Passwort falsch.' };
   }
+
+  await claimGuestBookingsForUser({
+    userId: authData.user.id,
+    email: authData.user.email,
+    emailConfirmedAt: (authData.user as any).email_confirmed_at,
+    confirmedAt: (authData.user as any).confirmed_at,
+  });
 
   revalidatePath('/', 'layout');
   redirect('/account');
@@ -220,12 +228,12 @@ export async function signup(formData: FormData) {
   // 1. Validate Input
   const validated = AuthSchema.safeParse(rawData);
   if (!validated.success) {
-    return { error: validated.error.issues[0]?.message || 'Invalid Credentials' };
+    return { error: validated.error.issues[0]?.message || 'Ungültige Anmeldedaten' };
   }
 
   const { email, password } = validated.data;
 
-  const { error } = await supabase.auth.signUp({
+  const { data: signUpData, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -238,6 +246,15 @@ export async function signup(formData: FormData) {
   if (error) {
     console.error('Signup error:', error);
     return { error: 'Registrierung fehlgeschlagen. Bitte pruefen Sie Ihre Eingaben oder versuchen Sie es spaeter erneut.' };
+  }
+
+  if (signUpData?.user) {
+    await claimGuestBookingsForUser({
+      userId: signUpData.user.id,
+      email: signUpData.user.email,
+      emailConfirmedAt: (signUpData.user as any).email_confirmed_at,
+      confirmedAt: (signUpData.user as any).confirmed_at,
+    });
   }
 
   revalidatePath('/', 'layout');
@@ -256,7 +273,7 @@ export async function adminLogin(formData: FormData) {
   // 1. Validate Input
   const validated = AuthSchema.safeParse(rawData);
   if (!validated.success) {
-    return { error: validated.error.issues[0]?.message || 'Invalid Credentials' };
+    return { error: validated.error.issues[0]?.message || 'Ungültige Anmeldedaten' };
   }
 
   const { email, password } = validated.data;
@@ -286,7 +303,7 @@ export async function adminLogin(formData: FormData) {
       if (countError) {
         console.error('Rate limit check failed:', countError);
       } else if (ipCount && ipCount >= 5) {
-        return { error: 'Too many login attempts. Please wait 15 minutes.' };
+        return { error: 'Zu viele Login-Versuche. Bitte warten Sie 15 Minuten.' };
       }
     }
 
@@ -314,7 +331,7 @@ export async function adminLogin(formData: FormData) {
   if (authError || !authData.user) {
     // Artificial delay to prevent timing attacks
     await new Promise(resolve => setTimeout(resolve, 1000));
-    return { error: 'Invalid Credentials' };
+    return { error: 'Ungültige Anmeldedaten' };
   }
 
   // 3. Verify Admin Role
@@ -328,7 +345,7 @@ export async function adminLogin(formData: FormData) {
     // Not an admin: sign them out immediately
     await supabase.auth.signOut();
     await new Promise(resolve => setTimeout(resolve, 1000));
-    return { error: 'Access Denied: Unauthorized Account' };
+    return { error: 'Zugriff verweigert: Unbefugtes Konto' };
   }
 
   revalidatePath('/', 'layout');

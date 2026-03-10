@@ -10,7 +10,7 @@ export async function GET(request: Request) {
 
   // Reject explicit non-recovery flows on this dedicated endpoint.
   if (type && type !== 'recovery') {
-    return NextResponse.redirect(new URL('/login?error=Invalid+or+expired+link', requestUrl.origin));
+    return NextResponse.redirect(new URL('/login?error=Ungueltiger+oder+abgelaufener+Link', requestUrl.origin));
   }
 
   // Most Supabase email links arrive with "code".
@@ -38,5 +38,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(new URL('/login?error=Invalid+or+expired+link', requestUrl.origin));
+  return NextResponse.redirect(new URL('/login?error=Ungueltiger+oder+abgelaufener+Link', requestUrl.origin));
 }
