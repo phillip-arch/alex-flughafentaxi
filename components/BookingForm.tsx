@@ -594,8 +594,8 @@ const BookingForm = () => {
                 <div className="flex gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start gap-4">
-                      <div className={`mt-2 flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
-                        {formData.direction === 'from_airport' ? <PlaneLanding size={18} /> : <MapPin size={18} />}
+                      <div className={`mt-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
+                        {formData.direction === 'from_airport' ? <PlaneLanding size={11} /> : <MapPin size={11} />}
                       </div>
                       <div className="flex-1">
                         <p className="text-[11px] font-medium text-[#5f6975]">Abholung</p>
@@ -659,8 +659,8 @@ const BookingForm = () => {
                     </div>
 
                     <div className="mt-1 flex items-start gap-4">
-                      <div className="mt-2 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
-                        <Check size={18} />
+                      <div className="mt-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
+                        <Check size={11} />
                       </div>
                       <div className="flex-1">
                         <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
