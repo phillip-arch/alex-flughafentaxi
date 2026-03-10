@@ -585,17 +585,17 @@ const BookingForm = () => {
 
   return (
     <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[580px] relative overflow-hidden`}>
-      <div className="px-2 pb-2 pt-2 md:px-4 md:pb-3 md:pt-3">
+      <div className="px-1 pb-2 pt-2 md:px-2 md:pb-3 md:pt-3">
         <form onSubmit={handleSubmit}>
           {/* STEP 1: LOCATION */}
           {currentStep === 1 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-              <div className="rounded-[2.2rem] bg-transparent p-3 shadow-none">
+              <div className="-ml-1 rounded-[2.2rem] bg-transparent p-3 shadow-none md:-ml-2">
                 <div className="flex gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start gap-4">
-                      <div className={`mt-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
-                        {formData.direction === 'from_airport' ? <PlaneLanding size={11} /> : <MapPin size={11} />}
+                      <div className={`mt-2 flex h-[2.1rem] w-[2.1rem] shrink-0 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
+                        {formData.direction === 'from_airport' ? <PlaneLanding size={13} /> : <MapPin size={13} />}
                       </div>
                       <div className="flex-1">
                         <p className="text-[11px] font-medium text-[#5f6975]">Abholung</p>
@@ -659,8 +659,8 @@ const BookingForm = () => {
                     </div>
 
                     <div className="mt-1 flex items-start gap-4">
-                      <div className="mt-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
-                        <Check size={11} />
+                      <div className="mt-2 flex h-[2.1rem] w-[2.1rem] shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
+                        <Check size={13} />
                       </div>
                       <div className="flex-1">
                         <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
@@ -924,7 +924,7 @@ const BookingForm = () => {
               <button
                 type="button"
                 onClick={nextStep}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#111111] py-5 text-[17px] font-medium text-white transition-all hover:bg-[#232325]"
+                className="-ml-1 mt-6 flex w-[calc(100%+0.25rem)] items-center justify-center gap-2 rounded-full bg-[#111111] py-5 text-[17px] font-medium text-white transition-all hover:bg-[#232325] md:-ml-2 md:w-[calc(100%+0.5rem)]"
               >
                 Weiter
               </button>

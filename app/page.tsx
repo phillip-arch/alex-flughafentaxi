@@ -62,7 +62,7 @@ export default function Home() {
             <p className="mt-6 max-w-xl text-lg leading-[1.45] text-[#5f6368] md:text-xl">
               Premium Flughafentransfers mit starkem Kontrast, klaren Preisen und einer Buchung, die sofort zur Fahrt fuehrt.
             </p>
-            <div id="hero-booking" className="relative mt-6 w-full max-w-[620px]">
+            <div id="hero-booking" className="relative mt-5 w-full max-w-[620px]">
               <div className="absolute -left-8 top-12 hidden h-24 w-24 rounded-full bg-[#0a63ff]/20 blur-3xl lg:block" />
               <div className="rounded-[2rem] bg-transparent px-0 py-2 shadow-none md:px-0 md:py-2">
                 <BookingForm />
