@@ -56,12 +56,12 @@ export default function Home() {
 
       <section className="relative overflow-hidden bg-[var(--color-surface)] text-[var(--color-text)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(17,17,17,0.05),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(10,99,255,0.12),_transparent_24%)]" />
-        <div className="app-container relative grid gap-8 pb-10 pt-20 lg:grid-cols-2 lg:items-center lg:gap-10 lg:pb-14 lg:pt-24">
+        <div className="app-container relative grid gap-8 pb-10 pt-24 lg:grid-cols-2 lg:items-center lg:gap-10 lg:pb-14 lg:pt-24">
           <div className="max-w-2xl">
-            <h1 className="ui-heading-xl mt-4 max-w-[16ch] !leading-[1.02] md:mt-0 md:text-[3.76rem]">
+            <h1 className="ui-heading-xl mt-4 mb-6 max-w-[16ch] !leading-[1.02] md:mt-0 md:mb-8 md:text-[3.76rem]">
               Flughafentaxi Wien: Sicher & pünktlich mit Alex
             </h1>
-            <p className="ui-copy-compact mt-6 max-w-xl text-lg md:text-xl">
+            <p className="ui-copy-compact mt-0 max-w-xl text-lg md:text-xl">
               Premium Flughafentransfers mit starkem Kontrast, klaren Preisen und einer Buchung, die sofort zur Fahrt fuehrt.
             </p>
             <div id="hero-booking" className="relative mt-5 w-full max-w-[620px]">
