@@ -18,6 +18,7 @@ import {
   Briefcase,
   ArrowUpDown,
   Plus,
+  Minus,
 } from 'lucide-react';
 import DatePicker from './DatePicker';
 import TimePicker from './TimePicker';
@@ -75,6 +76,14 @@ interface ExtendedBookingInput {
 type BookingFormProps = {
   onDirectionChange?: (direction: Direction) => void;
 };
+
+type StepperFieldName =
+  | 'passengers'
+  | 'luggage'
+  | 'handLuggage'
+  | 'babySeats'
+  | 'childSeats'
+  | 'boosterSeats';
 
 const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
   const router = useRouter();
@@ -333,6 +342,69 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
       ...prev,
       extraStop: !prev.extraStop,
     }));
+  };
+
+  const updateStepperValue = (name: StepperFieldName, delta: -1 | 1, min: number, max: number) => {
+    setFormData((prev) => {
+      const currentValue = prev[name];
+      const numericValue = typeof currentValue === 'number' ? currentValue : null;
+
+      if (delta < 0) {
+        if (numericValue === null) return prev;
+        return {
+          ...prev,
+          [name]: Math.max(min, numericValue - 1),
+        };
+      }
+
+      const nextValue =
+        numericValue === null
+          ? (min === 0 ? 1 : min)
+          : Math.min(max, numericValue + 1);
+
+      return {
+        ...prev,
+        [name]: nextValue,
+      };
+    });
+  };
+
+  const renderStepper = (
+    name: StepperFieldName,
+    label: string,
+    min: number,
+    max: number,
+    value: number | '',
+    compact = false
+  ) => {
+    const displayValue = value === '' ? '--' : value;
+
+    return (
+      <div className={`flex flex-col items-center justify-center rounded-2xl bg-[#f5f5f7] ${compact ? 'gap-2 p-3' : 'gap-3 p-5'}`}>
+        <span className={`font-medium uppercase text-[#86868b] ${compact ? 'text-[11px]' : 'text-[13px]'}`}>{label}</span>
+        <div className="flex w-full items-center justify-between gap-2 rounded-full border border-[#d2d2d7] bg-white px-2 py-2">
+          <button
+            type="button"
+            onClick={() => updateStepperValue(name, -1, min, max)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f3ee]"
+            aria-label={`${label} verringern`}
+          >
+            <Minus size={16} />
+          </button>
+          <span className={`min-w-[2.2rem] text-center font-semibold text-[#1d1d1f] ${compact ? 'text-[20px]' : 'text-[24px]'}`}>
+            {displayValue}
+          </span>
+          <button
+            type="button"
+            onClick={() => updateStepperValue(name, 1, min, max)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f3ee]"
+            aria-label={`${label} erhöhen`}
+          >
+            <Plus size={16} />
+          </button>
+        </div>
+      </div>
+    );
   };
 
   const handlePaymentChange = (method: PaymentMethod) => {
@@ -608,28 +680,28 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="-ml-1 rounded-[2.2rem] bg-transparent p-3 shadow-none md:-ml-2">
                 <div className="flex gap-4">
-                  <div className="flex w-[2.1rem] shrink-0 flex-col items-center pt-2">
+                  <div className="flex w-[2.1rem] shrink-0 flex-col items-center pt-[1.45rem]">
                     <div className={`flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={13} /> : <MapPin size={13} />}
                     </div>
-                    <div className="h-[3.9rem] w-px bg-[#111111]" />
-                    <div className="-mt-1 flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
+                    <div className="h-[3.55rem] w-px bg-[#111111]" />
+                    <div className="-mt-0.9 flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
                       <Check size={13} />
                     </div>
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div>
+                    <div className="min-h-[4.75rem]">
                       <p className="text-[11px] font-medium text-[#5f6975]">Abholung</p>
                       {formData.direction === 'from_airport' ? (
-                        <div className="mt-1 flex min-h-[2.75rem] items-center">
-                          <p className="text-[16px] font-semibold tracking-[-0.03em] text-[#111111]">
+                        <div className="mt-1 flex min-h-[3.5rem] items-start pt-[0.45rem]">
+                          <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
                             Flughafen Wien (VIE)
                           </p>
                         </div>
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
-                        <div className="mt-1 min-h-[2.75rem] space-y-2">
+                        <div className="mt-1 min-h-[3.5rem] space-y-2">
                           {isLoggedIn && favoriteAddresses.length > 0 ? (
                             <div className="flex flex-wrap items-center gap-2">
                               {favoriteAddresses.map((favorite) => (
@@ -675,10 +747,10 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                       ) : null}
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-3 min-h-[4.75rem]">
                       <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
                       {formData.direction === 'from_airport' ? (
-                        <div className="mt-1 min-h-[2.75rem] space-y-2">
+                        <div className="mt-1 min-h-[3.5rem] space-y-2">
                           {isLoggedIn && favoriteAddresses.length > 0 ? (
                             <div className="flex flex-wrap items-center gap-2">
                               {favoriteAddresses.map((favorite) => (
@@ -722,7 +794,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                           ) : null}
                         </div>
                       ) : (
-                        <div className="mt-1 flex min-h-[2.75rem] items-center">
+                        <div className="mt-1 flex min-h-[3.5rem] items-start pt-[0.45rem]">
                           <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
                             Flughafen Wien (VIE)
                           </p>
@@ -730,7 +802,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                       )}
                     </div>
                   </div>
-                  <div className="flex shrink-0 flex-col justify-start pt-6">
+                  <div className="flex shrink-0 flex-col justify-start pt-[1.35rem]">
                     <button
                       type="button"
                       onClick={toggleExtraStop}
@@ -742,7 +814,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                     <button
                       type="button"
                       onClick={toggleDirection}
-                      className="mt-[2.9rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60"
+                      className="mt-[3.1rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60"
                       aria-label="Abholung und Ziel tauschen"
                     >
                       <ArrowUpDown size={16} />
@@ -1029,7 +1101,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                 </div>
               )}
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="hidden grid grid-cols-3 gap-4">
                 <div className="bg-[#f5f5f7] p-5 rounded-2xl flex flex-col items-center justify-center gap-2">
                   <span className="text-[13px] font-medium text-[#86868b] uppercase">Personen</span>
                   <div className="relative w-full">
@@ -1074,6 +1146,18 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                 </div>
               </div>
 
+              <div className="hidden grid grid-cols-3 gap-4">
+                {renderStepper('passengers', 'Personen', 1, 8, formData.passengers)}
+                {renderStepper('luggage', 'Koffer', 0, 8, formData.luggage)}
+                {renderStepper('handLuggage', 'Handgepäck', 0, 8, formData.handLuggage)}
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                {renderStepper('passengers', 'Personen', 1, 8, formData.passengers)}
+                {renderStepper('luggage', 'Koffer', 0, 8, formData.luggage)}
+                {renderStepper('handLuggage', 'Handgepäck', 0, 8, formData.handLuggage)}
+              </div>
+
               {/* Child Seat Toggle */}
               <div className="flex flex-col gap-4 p-5 bg-[#f5f5f7] rounded-xl">
                 <div className="flex items-center justify-between">
@@ -1096,7 +1180,8 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                 </div>
 
                 {formData.childSeat && (
-                  <div className="grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
+                  <>
+                  <div className="hidden grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
                     <div className="flex flex-col gap-1">
                       <label className="text-[11px] font-medium text-[#86868b] uppercase">Babyschale</label>
                       <div className="relative">
@@ -1146,6 +1231,22 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                       </div>
                     </div>
                   </div>
+                  <div className="hidden grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
+                    {renderStepper('babySeats', 'Babyschale', 0, 3, formData.babySeats, true)}
+                    {renderStepper('childSeats', 'Kindersitz', 0, 3, formData.childSeats, true)}
+                    {renderStepper('boosterSeats', 'Sitzerhöhung', 0, 3, formData.boosterSeats, true)}
+                  </div>
+                  <div className="hidden grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
+                    {renderStepper('babySeats', 'Babyschale', 0, 3, formData.babySeats, true)}
+                    {renderStepper('childSeats', 'Kindersitz', 0, 3, formData.childSeats, true)}
+                    {renderStepper('boosterSeats', 'Sitzerhöhung', 0, 3, formData.boosterSeats, true)}
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
+                    {renderStepper('babySeats', 'Babyschale', 0, 3, formData.babySeats, true)}
+                    {renderStepper('childSeats', 'Kindersitz', 0, 3, formData.childSeats, true)}
+                    {renderStepper('boosterSeats', 'Sitzerhöhung', 0, 3, formData.boosterSeats, true)}
+                  </div>
+                  </>
                 )}
               </div>
 
