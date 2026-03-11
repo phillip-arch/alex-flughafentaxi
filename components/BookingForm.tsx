@@ -17,6 +17,7 @@ import {
   Users,
   Briefcase,
   ArrowUpDown,
+  Plus,
 } from 'lucide-react';
 import DatePicker from './DatePicker';
 import TimePicker from './TimePicker';
@@ -325,6 +326,13 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
   const toggleDirection = () => {
     const nextDirection = formData.direction === 'from_airport' ? 'to_airport' : 'from_airport';
     handleDirectionChange(nextDirection);
+  };
+
+  const toggleExtraStop = () => {
+    setFormData((prev) => ({
+      ...prev,
+      extraStop: !prev.extraStop,
+    }));
   };
 
   const handlePaymentChange = (method: PaymentMethod) => {
@@ -722,11 +730,19 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                       )}
                     </div>
                   </div>
-                  <div className="flex shrink-0 flex-col justify-start gap-3 pt-8">
+                  <div className="flex shrink-0 flex-col justify-start pt-6">
+                    <button
+                      type="button"
+                      onClick={toggleExtraStop}
+                      className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60"
+                      aria-label="Zusatzstopp hinzufügen"
+                    >
+                      <Plus size={16} />
+                    </button>
                     <button
                       type="button"
                       onClick={toggleDirection}
-                      className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60"
+                      className="mt-[2.9rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60"
                       aria-label="Abholung und Ziel tauschen"
                     >
                       <ArrowUpDown size={16} />
@@ -939,7 +955,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
           {currentStep === 2 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="text-center mb-8">
-                <h2 className="text-[32px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Wann?</h2>
+                <h2 className="text-[21px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Wann?</h2>
                 <p className="text-[17px] text-[#6d7075]">Datum und Uhrzeit wählen.</p>
               </div>
 
@@ -963,7 +979,9 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">Zeit</label>
+                  <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">
+                    {formData.direction === 'from_airport' ? 'Landezeit' : 'Zeit'}
+                  </label>
                   <div className="relative" onClick={() => setIsTimePickerOpen(true)}>
                     <input
                       type="text"
@@ -1161,12 +1179,12 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
           {currentStep === 3 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="text-center mb-4">
-                <h2 className="text-[32px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Übersicht</h2>
+                <h2 className="text-[21px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Übersicht</h2>
                 <p className="text-[17px] text-[#6d7075]">Bitte überprüfen Sie Ihre Daten.</p>
               </div>
 
               {/* Price Card - Apple Style Summary */}
-              <div className="bg-[#f5f5f7] rounded-[24px] p-6 md:p-8 text-center">
+              <div className="hidden bg-[#f5f5f7] rounded-[24px] p-6 md:p-8 text-center">
                 <p className="text-[12px] font-semibold uppercase tracking-wide text-[#86868b] mb-2">Gesamtpreis</p>
                 <p className="text-[48px] font-semibold text-[#1d1d1f] leading-none mb-4 tracking-tight">{totalPrice} €</p>
                 
@@ -1312,6 +1330,49 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                   placeholder="Anmerkungen (optional)"
                   className="w-full p-3 rounded-xl bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[17px] placeholder:text-[#86868b] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] outline-none resize-none transition-all"
                 />
+              </div>
+
+              <div className="bg-[#f5f5f7] rounded-[24px] p-6 md:p-8 text-center">
+                <p className="text-[12px] font-semibold uppercase tracking-wide text-[#86868b] mb-2">Gesamtpreis</p>
+                <p className="text-[48px] font-semibold text-[#1d1d1f] leading-none mb-4 tracking-tight">{totalPrice} €</p>
+                
+                <div className="flex items-center justify-center gap-2 text-[14px] font-medium text-[#1d1d1f] mb-6">
+                  {formData.direction === 'to_airport' ? (
+                    <>
+                      <span>{formData.zip} {formData.city}</span>
+                      <ChevronRight size={14} className="text-[#86868b]" />
+                      <span>Flughafen VIE</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Flughafen VIE</span>
+                      <ChevronRight size={14} className="text-[#86868b]" />
+                      <span>{formData.zip} {formData.city}</span>
+                    </>
+                  )}
+                </div>
+
+                <div className="bg-white rounded-[16px] p-4 border border-[#d2d2d7]/50 shadow-sm max-w-[320px] mx-auto">
+                  <div className="flex items-center justify-center gap-2 text-[#1d1d1f] font-semibold mb-3">
+                    <Car size={18} className="text-[#0071e3]" />
+                    <span>Fahrzeug: {vehicleType}</span>
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px] text-[#86868b] font-medium">
+                    <div className="flex items-center gap-1.5" title="Personen">
+                      <Users size={16} />
+                      <span>{formData.passengers || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5" title="Koffer">
+                      <Briefcase size={16} />
+                      <span>{formData.luggage || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5" title="Handgepäck">
+                      <Briefcase size={14} className="opacity-70" />
+                      <span>{formData.handLuggage || 0}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {error && (

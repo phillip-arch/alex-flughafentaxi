@@ -73,13 +73,33 @@ export default function BookingPageClient() {
 
   return (
     <div className="app-container py-10 md:py-12">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)] lg:items-start">
-        <section>
-          <h1 className="ui-heading-lg mb-6 text-[2.1rem] md:text-[2.5rem]">Transfer buchen</h1>
-          <BookingForm onDirectionChange={setDirection} />
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)]">
+        <section className="order-1 lg:col-start-1 lg:row-start-1">
+          <h1 className="ui-heading-lg mb-12 text-center text-[2.1rem] md:text-[2.5rem]">Transfer buchen</h1>
+          <div className="mt-10 md:mt-12">
+            <BookingForm onDirectionChange={setDirection} />
+          </div>
         </section>
 
-        <aside className="space-y-4">
+        <section className="order-2 lg:order-3 lg:col-span-2 lg:row-start-2">
+          <Card as="section" className="rounded-[2rem] p-5 md:p-6" variant="default">
+            <div className="flex items-center gap-2">
+              <BadgeCheck size={18} className="text-[var(--color-primary)]" />
+              <h2 className="text-xl font-semibold tracking-[-0.03em]">Trusted by passengers</h2>
+            </div>
+            <p className="mt-3 text-sm font-semibold text-[var(--color-text)]">★★★★★ 4.9 / 5 rating</p>
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {reviews.map((review) => (
+                <Card key={review.author} className="rounded-[1.5rem] p-4" variant="muted">
+                  <p className="text-sm font-medium text-[var(--color-text)]">"{review.quote}"</p>
+                  <p className="ui-copy mt-3 text-sm">- {review.author}</p>
+                </Card>
+              ))}
+            </div>
+          </Card>
+        </section>
+
+        <aside className="order-3 self-start lg:order-2 lg:col-start-2 lg:row-start-1 lg:sticky lg:top-24">
           <Card as="section" className="rounded-[2rem] p-5 md:p-6" variant="default">
             <h2 className="ui-panel-title">Important Info.</h2>
             <div className="mt-4">
@@ -123,27 +143,8 @@ export default function BookingPageClient() {
             </div>
           </Card>
         </aside>
-      </div>
 
-      <section className="mt-8">
-        <Card as="section" className="rounded-[2rem] p-5 md:p-6" variant="default">
-          <div className="flex items-center gap-2">
-            <BadgeCheck size={18} className="text-[var(--color-primary)]" />
-            <h2 className="text-xl font-semibold tracking-[-0.03em]">Trusted by passengers</h2>
-          </div>
-          <p className="mt-3 text-sm font-semibold text-[var(--color-text)]">★★★★★ 4.9 / 5 rating</p>
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {reviews.map((review) => (
-              <Card key={review.author} className="rounded-[1.5rem] p-4" variant="muted">
-                <p className="text-sm font-medium text-[var(--color-text)]">"{review.quote}"</p>
-                <p className="ui-copy mt-3 text-sm">- {review.author}</p>
-              </Card>
-            ))}
-          </div>
-        </Card>
-      </section>
-
-      <section className="mt-6">
+        <section className="order-4 lg:col-span-2 lg:row-start-3">
         <Card as="section" className="rounded-[2rem] p-5 md:p-6" variant="default">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="flex items-center gap-3 rounded-[1rem] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3">
@@ -164,7 +165,8 @@ export default function BookingPageClient() {
             </div>
           </div>
         </Card>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }

@@ -57,7 +57,7 @@ function formatDateTimeForEmail(value: string) {
 
 const BookingSchema = z.object({
   full_name: z.string().min(2, 'Name ist zu kurz'),
-  email: z.string().email('UngÃ¼ltige E-Mail Adresse'),
+  email: z.string().email('Ungültige E-Mail Adresse'),
   phone: z.string().min(6, 'Telefonnummer ist zu kurz'),
   pickup: z.string().min(2, 'Abholort ist erforderlich'),
   destination: z.string().min(2, 'Zielort ist erforderlich'),
@@ -83,7 +83,7 @@ export async function createBooking(payload: any) {
   // 1. Extract and validate payload
   const validated = BookingSchema.safeParse(payload);
   if (!validated.success) {
-    return { error: validated.error.issues[0]?.message || 'UngÃ¼ltige Eingabe' };
+    return { error: validated.error.issues[0]?.message || 'Ungültige Eingabe' };
   }
   
   const { _zip, _extraStop, ...bookingData } = validated.data;
@@ -110,12 +110,12 @@ export async function createBooking(payload: any) {
 
     if (ipError) {
       console.error('IP rate limit check error:', ipError);
-      return { error: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es spÃ¤ter erneut.' };
+      return { error: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.' };
     }
 
     if (ipCount && ipCount >= ipRateLimit) {
       return {
-        error: `Zu viele Anfragen von diesem GerÃ¤t. Bitte warten Sie ${rateWindowMinutes} Minuten.`,
+        error: `Zu viele Anfragen von diesem Gerät. Bitte warten Sie ${rateWindowMinutes} Minuten.`,
       };
     }
   }
@@ -129,12 +129,12 @@ export async function createBooking(payload: any) {
 
   if (emailError) {
     console.error('Email rate limit check error:', emailError);
-    return { error: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es spÃ¤ter erneut.' };
+    return { error: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.' };
   }
 
   if (emailCount && emailCount >= emailRateLimit) {
     return {
-      error: `Zu viele Buchungsanfragen fÃ¼r diese E-Mail. Bitte warten Sie ${rateWindowMinutes} Minuten.`,
+      error: `Zu viele Buchungsanfragen für diese E-Mail. Bitte warten Sie ${rateWindowMinutes} Minuten.`,
     };
   }
 
@@ -230,7 +230,7 @@ export async function createBooking(payload: any) {
   const isFromAirport = pickupRaw.includes('flughafen');
   const isToAirport = destinationRaw.includes('flughafen');
   const directionLabel = isFromAirport ? 'Vom Flughafen' : isToAirport ? 'Zum Flughafen' : 'Transfer';
-  const directionIcon = isFromAirport ? 'ðŸ›¬' : isToAirport ? 'ðŸ›«' : 'âœˆï¸';
+  const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
 
   if (!process.env.RESEND_API_KEY) {
     // Keep existing local dev behavior if email provider is not configured.
@@ -274,7 +274,7 @@ export async function createBooking(payload: any) {
     const intermediateStopInfo = notesRaw.match(/\(Zwischenstopp:\s*([^)]+)\)/i)?.[1]?.trim() || '';
     const flightNumberInfo = notesRaw.match(/\(Flugnummer:\s*([^)]+)\)/i)?.[1]?.trim() || '';
     const handLuggageInfo =
-      notesRaw.match(/\(Handgep(?:Ã¤|a)e?ck:\s*(\d+)\)/i)?.[1]?.trim() ||
+      notesRaw.match(/\(Handgep(?:Ã¤|ä|a)e?ck:\s*(\d+)\)/i)?.[1]?.trim() ||
       notesRaw.match(/\(Handgepaeck:\s*(\d+)\)/i)?.[1]?.trim() ||
       '';
     const cleanedNotes = notesRaw
@@ -282,7 +282,7 @@ export async function createBooking(payload: any) {
       .replace(/\(kindersitze:\s*[^)]*\)/gi, '')
       .replace(/\(zwischenstopp:\s*[^)]*\)/gi, '')
       .replace(/\(flugnummer:\s*[^)]*\)/gi, '')
-      .replace(/\(handgep(?:Ã¤|a)e?ck:\s*[^)]*\)/gi, '')
+      .replace(/\(handgep(?:Ã¤|ä|a)e?ck:\s*[^)]*\)/gi, '')
       .replace(/\(handgepaeck:\s*[^)]*\)/gi, '')
       .replace(/\s{2,}/g, ' ')
       .trim();
@@ -359,7 +359,7 @@ export async function createBooking(payload: any) {
                     <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Fahrzeug:</strong> ${safeVehicle}</td></tr>
                     <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Personen:</strong> ${safePassengers}</td></tr>
                     <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Koffer:</strong> ${safeLuggage}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>HandgepÃ¤ck:</strong> ${safeHandLuggageInfo}</td></tr>
+                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Handgepäck:</strong> ${safeHandLuggageInfo}</td></tr>
                     ${hasNotes ? `<tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Notizen:</strong> ${safeNotes}</td></tr>` : ''}
                   </table>
                   ${hasAdditionalInfo ? `
@@ -380,8 +380,8 @@ export async function createBooking(payload: any) {
                 <td style="padding:0 28px 28px 28px;">
                   <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
                     <tr><td style="padding:16px 18px 10px 18px;font-size:15px;line-height:1.4;color:#1d1d1f;font-weight:700;">Aenderungen &amp; Stornierungen</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">â€¢ Fuer Fahrten bis 22:00 Uhr:<br/>Aenderungen oder Stornierungen sind bis spaetestens 3 Stunden vor Abholzeit moeglich.</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">â€¢ Fuer Fahrten zwischen 22:00 und 07:00 Uhr:<br/>Aenderungen oder Stornierungen sind mindestens 8 Stunden vor Abholzeit erforderlich.</td></tr>
+                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">• Fuer Fahrten bis 22:00 Uhr:<br/>Aenderungen oder Stornierungen sind bis spaetestens 3 Stunden vor Abholzeit moeglich.</td></tr>
+                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">• Fuer Fahrten zwischen 22:00 und 07:00 Uhr:<br/>Aenderungen oder Stornierungen sind mindestens 8 Stunden vor Abholzeit erforderlich.</td></tr>
                     <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">Weitere Details finden Sie hier:<br/><a href="${appUrl}/faq" style="color:#0071e3;text-decoration:none;font-weight:600;">FAQ</a></td></tr>
                     <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">Fragen? Starten Sie einen WhatsApp-Chat mit uns.</td></tr>
                     <tr><td style="padding:0 18px 16px 18px;"><a href="https://wa.me/?text=Hallo%20FlughafenTaxi%20Wien%2C%20ich%20habe%20eine%20Frage%20zu%20meiner%20Buchung." style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;">WhatsApp Chat starten</a></td></tr>
