@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import BookingForm from '@/components/BookingForm';
+import BookingPageClient from './BookingPageClient';
 
 export const metadata: Metadata = {
   title: 'Fahrt buchen',
@@ -7,10 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function BookingPage() {
-  return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8 text-center">Transfer buchen</h1>
-      <BookingForm />
-    </div>
-  );
+  return <BookingPageClient />;
 }

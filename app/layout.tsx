@@ -41,7 +41,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body suppressHydrationWarning className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+      <body suppressHydrationWarning className="app-shell font-sans antialiased">
         {children}
         <FooterGate />
       </body>

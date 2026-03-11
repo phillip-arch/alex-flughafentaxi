@@ -71,7 +71,11 @@ interface ExtendedBookingInput {
   saveProfile: boolean;
 }
 
-const BookingForm = () => {
+type BookingFormProps = {
+  onDirectionChange?: (direction: Direction) => void;
+};
+
+const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const supabase = supabaseBrowser();
@@ -118,6 +122,10 @@ const BookingForm = () => {
   });
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    onDirectionChange?.(formData.direction);
+  }, [formData.direction, onDirectionChange]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -597,7 +605,7 @@ const BookingForm = () => {
                       {formData.direction === 'from_airport' ? <PlaneLanding size={13} /> : <MapPin size={13} />}
                     </div>
                     <div className="h-[3.9rem] w-px bg-[#111111]" />
-                    <div className="flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
+                    <div className="-mt-1 flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
                       <Check size={13} />
                     </div>
                   </div>
@@ -659,7 +667,7 @@ const BookingForm = () => {
                       ) : null}
                     </div>
 
-                    <div className="mt-2">
+                    <div className="mt-3">
                       <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[2.75rem] space-y-2">

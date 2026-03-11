@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Menu, User, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import Button from '@/components/ui/Button';
 
 const NavbarClient = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -43,17 +44,9 @@ const NavbarClient = () => {
     ? 'text-[#5f6368] hover:text-[#111111]'
     : 'text-[#3c4043] hover:text-[#111111]';
 
-  const secondaryActionClass = isHomePage && !isScrolled
-    ? 'border border-black/10 bg-white text-[#111111] hover:bg-[#f4f4ef]'
-    : 'border border-black/10 bg-white text-[#111111] hover:bg-[#f4f4ef]';
-
-  const primaryActionClass = isHomePage && !isScrolled
-    ? 'bg-[#111111] text-white hover:bg-[#232325]'
-    : 'bg-[#111111] text-white hover:bg-[#232325]';
-
   return (
     <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
-      <div className="mx-auto flex h-[76px] max-w-[1520px] items-center justify-between px-4 md:px-6">
+      <div className="app-container flex h-[76px] items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-current/10 text-sm font-semibold">
             FT
@@ -77,21 +70,22 @@ const NavbarClient = () => {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <Link
+          <Button
             href="/account"
-            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${secondaryActionClass}`}
-            aria-label="Konto Login"
+            className="px-4 py-2 text-sm font-medium"
+            variant="secondary"
           >
             <User size={16} />
             <span>Konto</span>
-          </Link>
-          <Link
+          </Button>
+          <Button
             href="#hero-booking"
-            className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors ${primaryActionClass}`}
+            className="px-5 py-3 text-sm font-semibold"
+            variant="primary"
           >
             Fahrt buchen
             <ArrowRight size={16} />
-          </Link>
+          </Button>
         </div>
 
         <button
