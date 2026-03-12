@@ -2,9 +2,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
+  CarFront,
   Clock3,
   MapPinned,
   ShieldCheck,
+  Wallet,
+  PlaneTakeoff,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
@@ -26,6 +29,24 @@ const serviceHighlights = [
     title: 'Live geplant fuer Flughafenfahrten',
     description: 'Klare Ablaufe fuer Gepaeck, Flugnummern und verlassliche Treffpunkte.',
     icon: MapPinned,
+  },
+];
+
+const airportBenefits = [
+  {
+    title: 'Direkt ab Ihrer Adresse',
+    description: 'Abholung in Wien, Schwechat und umliegenden Bezirken ohne Umwege im Buchungsprozess.',
+    icon: CarFront,
+  },
+  {
+    title: 'Fixpreis vor der Fahrt',
+    description: 'Der Fahrpreis steht vor der Buchung fest. Keine Ueberraschungen bei Ankunft oder Abflug.',
+    icon: Wallet,
+  },
+  {
+    title: 'Verlaesslich bis zum Terminal',
+    description: 'Gleiche klare Ablaeufe bei Flughafenabholung, Hoteltransfer und fruehen Abfahrten.',
+    icon: PlaneTakeoff,
   },
 ];
 
@@ -62,11 +83,11 @@ export default function Home() {
             <h1 className="ui-heading-xl max-w-[14ch] !text-[2.14rem] !leading-[1.02] md:!text-[3.01rem]">
               Flughafentaxi Wien: Sicher & pünktlich mit Alex
             </h1>
-            <p className="ui-copy-compact max-w-[34rem] text-[0.9rem] md:text-[0.96rem]">
+            <p className="ui-copy-compact max-w-[34rem]">
               Premium Flughafentransfers mit starkem Kontrast, klaren Preisen und einer Buchung, die sofort zur Fahrt fuehrt.
             </p>
             </div>
-            <div id="hero-booking" className="relative mt-5 w-full max-w-[720px] lg:-ml-2">
+            <div id="hero-booking" className="relative mt-5 w-full max-w-[740px] lg:-ml-2">
               <div className="absolute -left-8 top-12 hidden h-24 w-24 rounded-full bg-[#0a63ff]/20 blur-3xl lg:block" />
               <div className="rounded-[2rem] bg-transparent px-0 py-2 shadow-none md:px-0 md:py-2">
                 <BookingForm />
@@ -85,6 +106,40 @@ export default function Home() {
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08)_0%,rgba(17,17,17,0.18)_100%)]" />
           </Card>
+        </div>
+      </section>
+
+      <section className="border-b border-[var(--color-border)] bg-[var(--color-surface)] py-16 md:py-20">
+        <div className="app-container">
+          <div className="max-w-[72rem]">
+            <h3 className="ui-heading-md max-w-[18ch] text-[var(--color-text)]">
+              Schnell geplant, klar bepreist und direkt zum Flughafen.
+            </h3>
+            <p className="ui-copy mt-6 max-w-[64rem] leading-8">
+              Ob Transfer zum Flughafen Wien oder Abholung nach der Landung: Die Buchung bleibt kompakt, der Preis steht
+              vorab fest und die Fahrt ist in wenigen Schritten reserviert.
+            </p>
+            <p className="ui-copy mt-5 max-w-[56rem] leading-8">
+              Falls Sie statt Wien Airport ein anderes Ziel fahren moechten, bleibt der Ablauf derselbe: Adresse,
+              Zeitfenster und Fahrzeug in einer klaren Reihenfolge.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-8 md:grid-cols-3">
+            {airportBenefits.map(({ title, description, icon: Icon }) => (
+              <div key={title} className="max-w-[26rem]">
+                <span className="flex h-10 w-10 items-center justify-center text-[var(--color-text)]">
+                  <Icon size={24} strokeWidth={2.1} />
+                </span>
+                <h6 className="ui-heading-sm mt-5 text-[var(--color-text)]">
+                  {title}
+                </h6>
+                <p className="ui-copy mt-4 text-base leading-8">
+                  {description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -49,11 +49,11 @@ const NavbarClient = () => {
       <div className="app-container flex h-[76px] items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-current/10 text-sm font-semibold">
-            FT
+            FA
           </span>
           <div className="leading-tight">
             <p className="text-sm font-semibold tracking-[0.18em]">FLUGHAFENTAXI</p>
-            <p className={`text-xs ${isHomePage && !isScrolled ? 'text-[#5f6368]' : 'text-[#5f6368]'}`}>Wien Airport Transfer</p>
+            <p className={`text-[1rem] font-medium tracking-[0.12em] [font-family:'Segoe_Print','Bradley_Hand','Comic_Sans_MS',cursive] ${isHomePage && !isScrolled ? 'text-[#5f6368]' : 'text-[#5f6368]'}`}>Alex</p>
           </div>
         </Link>
 
