@@ -116,7 +116,7 @@ p {
   .app-container {
     margin-inline: auto;
     width: 100%;
-    max-width: 1520px;
+    max-width: 1372px;
     padding-inline: 1rem;
   }
 
@@ -178,6 +178,7 @@ p {
       transform 160ms ease,
       box-shadow 160ms ease;
     cursor: pointer;
+    text-decoration: none;
   }
 
   .ui-button:hover {
@@ -186,6 +187,12 @@ p {
 
   .ui-button-primary {
     background: var(--color-surface-dark);
+    color: var(--color-text-inverse);
+  }
+
+  .ui-button-primary:visited,
+  .ui-button-primary:hover,
+  .ui-button-primary:active {
     color: var(--color-text-inverse);
   }
 
@@ -199,6 +206,12 @@ p {
     color: var(--color-text);
   }
 
+  .ui-button-secondary:visited,
+  .ui-button-secondary:hover,
+  .ui-button-secondary:active {
+    color: var(--color-text);
+  }
+
   .ui-button-secondary:hover {
     background: #f4f4ef;
   }
@@ -206,6 +219,12 @@ p {
   .ui-button-ghost-dark {
     border-color: rgba(255, 255, 255, 0.16);
     background: rgba(255, 255, 255, 0.06);
+    color: var(--color-text-inverse);
+  }
+
+  .ui-button-ghost-dark:visited,
+  .ui-button-ghost-dark:hover,
+  .ui-button-ghost-dark:active {
     color: var(--color-text-inverse);
   }
 
@@ -310,5 +329,11 @@ p {
 @media (min-width: 768px) {
   .app-container {
     padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-container {
+    padding-inline: 3.5rem;
   }
 }

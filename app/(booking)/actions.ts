@@ -65,7 +65,7 @@ const BookingSchema = z.object({
     message: 'Abholzeit muss in der Zukunft liegen',
   }),
   passengers: z.number().int().min(1).max(8),
-  luggage: z.number().int().min(0).max(10),
+  luggage: z.number().int().min(0).max(8),
   vehicle_type: z.enum(['Limo', 'Kombi', 'Bus']),
   notes: z.string().optional(),
   _zip: z.string().optional(),

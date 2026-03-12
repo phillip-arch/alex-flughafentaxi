@@ -2,12 +2,12 @@ export type VehicleType = 'Limo' | 'Kombi' | 'Bus';
 
 export function determineVehicle(passengers: number, suitcases: number, handLuggage: number): VehicleType {
   // 1. Limo (Limousine)
-  if (passengers <= 3 && suitcases <= 2 && handLuggage <= 3) {
+  if (passengers <= 2 && suitcases <= 2 && handLuggage <= 2) {
     return 'Limo';
   }
   
   // 2. Kombi (Station Wagon)
-  if (passengers <= 4 && suitcases <= 3 && handLuggage <= 4) {
+  if (passengers <= 4 && suitcases <= 4 && handLuggage <= 4) {
     return 'Kombi';
   }
   

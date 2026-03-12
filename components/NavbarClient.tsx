@@ -79,8 +79,8 @@ const NavbarClient = () => {
             <span>Konto</span>
           </Button>
           <Button
-            href="#hero-booking"
-            className="px-5 py-3 text-sm font-semibold"
+            href="/book"
+            className="px-5 py-3 text-sm font-semibold !text-white"
             variant="primary"
           >
             Fahrt buchen
@@ -118,8 +118,8 @@ const NavbarClient = () => {
               Konto
             </Link>
             <Link
-              href="#hero-booking"
-              className="rounded-2xl bg-white px-4 py-4 text-lg font-semibold text-[#111111]"
+              href="/book"
+              className="rounded-2xl bg-white px-4 py-4 text-lg font-semibold !text-[#111111]"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Fahrt buchen

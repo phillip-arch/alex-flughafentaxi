@@ -34,12 +34,12 @@ const coverageAreas = ['Innere Stadt', 'Leopoldstadt', 'Landstrasse', 'Favoriten
 const fleetOptions = [
   {
     name: 'Business Sedan',
-    details: 'Ideal fuer 1 bis 3 Fahrgaeste mit gepflegtem, ruhigem Auftritt.',
+    details: 'Ideal fuer bis zu 2 Fahrgaeste mit zwei Koffern und zwei Handgepaeckstuecken.',
     meta: 'Mercedes E-Klasse Niveau',
   },
   {
     name: 'Van Transfer',
-    details: 'Mehr Platz fuer Familien, Gruppen und mehrere Koffer.',
+    details: 'Mehr Platz fuer Familien, Gruppen und bis zu 8 Fahrgaeste mit Gepaeck.',
     meta: 'Bis zu 8 Personen',
   },
   {
@@ -56,17 +56,17 @@ export default function Home() {
 
       <section className="relative overflow-hidden bg-[var(--color-surface)] text-[var(--color-text)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(17,17,17,0.05),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(10,99,255,0.12),_transparent_24%)]" />
-        <div className="app-container relative grid gap-8 pb-10 pt-24 lg:grid-cols-2 lg:items-center lg:gap-10 lg:pb-14 lg:pt-24">
-          <div className="max-w-2xl">
-            <div className="mt-4 flex flex-col gap-8 md:mt-0 md:gap-10">
-            <h1 className="ui-heading-xl max-w-[16ch] !leading-[1.02] md:text-[3.76rem]">
+        <div className="app-container relative grid gap-8 pb-10 pt-24 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-8 lg:pb-14 lg:pt-32">
+          <div className="max-w-[38rem]">
+            <div className="mt-5 flex flex-col gap-5 md:mt-6 md:gap-6">
+            <h1 className="ui-heading-xl max-w-[14ch] !text-[2.14rem] !leading-[1.02] md:!text-[3.01rem]">
               Flughafentaxi Wien: Sicher & pünktlich mit Alex
             </h1>
-            <p className="ui-copy-compact max-w-xl text-lg md:text-xl">
+            <p className="ui-copy-compact max-w-[34rem] text-[0.9rem] md:text-[0.96rem]">
               Premium Flughafentransfers mit starkem Kontrast, klaren Preisen und einer Buchung, die sofort zur Fahrt fuehrt.
             </p>
             </div>
-            <div id="hero-booking" className="relative mt-5 w-full max-w-[620px]">
+            <div id="hero-booking" className="relative mt-5 w-full max-w-[600px]">
               <div className="absolute -left-8 top-12 hidden h-24 w-24 rounded-full bg-[#0a63ff]/20 blur-3xl lg:block" />
               <div className="rounded-[2rem] bg-transparent px-0 py-2 shadow-none md:px-0 md:py-2">
                 <BookingForm />
@@ -74,7 +74,7 @@ export default function Home() {
             </div>
           </div>
 
-          <Card className="relative min-h-[360px] overflow-hidden rounded-[2.5rem] bg-[var(--color-bg)] lg:min-h-[620px]" variant="default">
+          <Card className="relative w-full min-h-[360px] overflow-hidden rounded-[2.5rem] bg-[var(--color-bg)] lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end" variant="default">
             <Image
               src="https://images.pexels.com/photos/9519974/pexels-photo-9519974.jpeg"
               alt="Flughafentaxi Wien"
@@ -207,7 +207,7 @@ export default function Home() {
       </section>
 
       <section id="flotte" className="bg-[#111111] py-20 text-white">
-        <div className="mx-auto max-w-[1520px] px-4 md:px-6">
+        <div className="mx-auto max-w-[1372px] px-4 md:px-6">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-white/56">Fleet</p>

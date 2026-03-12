@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import {
@@ -64,10 +64,10 @@ function InfoPanel({ direction }: { direction: Direction }) {
       </div>
 
       <div className="mt-5 border-t border-[var(--color-border)] pt-5">
-        <p className="text-sm font-semibold text-[var(--color-text)]">Booking time requirements</p>
-        <div className="ui-copy mt-3 space-y-2 text-sm leading-6">
-          <p>• Rides until 22:00 → book at least 3 hours before</p>
-          <p>• Rides between 22:00–07:00 → book at least 8 hours before</p>
+        <p className="text-sm font-semibold text-[var(--color-text)]">Minimum Advance Booking Time</p>
+        <div className="ui-copy mt-3 space-y-1 text-sm leading-6">
+          <p>22:00–07:00 → book ≥ 3h before</p>
+          <p>07:00-22:00 → book ≥ 8h before</p>
         </div>
       </div>
 
@@ -187,3 +187,4 @@ export default function BookingPageClient() {
     </>
   );
 }
+
