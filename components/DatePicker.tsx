@@ -102,9 +102,6 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate }: 
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
-          <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[#86868b]">
-            Datum wählen
-          </p>
           <h2 className="text-[19px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
             {monthNames[month]} {year}
           </h2>
