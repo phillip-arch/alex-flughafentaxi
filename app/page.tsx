@@ -74,7 +74,7 @@ export default function Home() {
             </div>
           </div>
 
-          <Card className="relative w-full min-h-[360px] overflow-hidden rounded-[2.5rem] bg-[var(--color-bg)] lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end" variant="default">
+          <Card className="relative w-full min-h-[360px] overflow-hidden rounded-[2.5rem] bg-[var(--color-bg)] lg:mt-6 lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end" variant="default">
             <Image
               src="https://images.pexels.com/photos/9519974/pexels-photo-9519974.jpeg"
               alt="Flughafentaxi Wien"

@@ -11,7 +11,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
-import Navbar from '@/components/Navbar';
+import NavbarClient from '@/components/NavbarClient';
 import Card from '@/components/ui/Card';
 
 type Direction = 'to_airport' | 'from_airport' | null;
@@ -122,7 +122,7 @@ export default function BookingPageClient() {
 
   return (
     <>
-      <Navbar />
+      <NavbarClient />
       <div className="app-container py-28 md:py-28">
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)]">
           <section className="order-1">
