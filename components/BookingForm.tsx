@@ -1034,57 +1034,65 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">Datum</label>
-                  <div className="relative" onClick={() => setIsDatePickerOpen(true)}>
+                  <div className="relative">
                     <input
                       type="text"
                       name="date"
                       value={formData.date}
                       readOnly
                       placeholder="TT.MM.JJJJ"
+                      onClick={() => setIsDatePickerOpen(true)}
                       className={`w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none transition-all cursor-pointer ${
                         isFieldInvalid('date') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
                           : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
                       }`}
                     />
-                    <Calendar className={`absolute right-4 top-1/2 -translate-y-1/2 ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#6d7075]'}`} size={20} />
+                    <Calendar
+                      onClick={() => setIsDatePickerOpen(true)}
+                      className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
+                      size={20}
+                    />
+                    <DatePicker 
+                      isOpen={isDatePickerOpen}
+                      onClose={() => setIsDatePickerOpen(false)}
+                      onSelect={handleDateSelect}
+                      selectedDate={formData.date}
+                    />
                   </div>
                 </div>
                 <div>
                   <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">
                     {formData.direction === 'from_airport' ? 'Landezeit' : 'Zeit'}
                   </label>
-                  <div className="relative" onClick={() => setIsTimePickerOpen(true)}>
+                  <div className="relative">
                     <input
                       type="text"
                       name="time"
                       value={formData.time}
                       readOnly
                       placeholder="--:--"
+                      onClick={() => setIsTimePickerOpen(true)}
                       className={`w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none transition-all cursor-pointer ${
                         isFieldInvalid('time') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
                           : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
                       }`}
                     />
-                    <Clock className={`absolute right-4 top-1/2 -translate-y-1/2 ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#6d7075]'}`} size={20} />
+                    <Clock
+                      onClick={() => setIsTimePickerOpen(true)}
+                      className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
+                      size={20}
+                    />
+                    <TimePicker 
+                      isOpen={isTimePickerOpen}
+                      onClose={() => setIsTimePickerOpen(false)}
+                      onSelect={handleTimeSelect}
+                      selectedTime={formData.time}
+                    />
                   </div>
                 </div>
               </div>
-
-              <DatePicker 
-                isOpen={isDatePickerOpen}
-                onClose={() => setIsDatePickerOpen(false)}
-                onSelect={handleDateSelect}
-                selectedDate={formData.date}
-              />
-
-              <TimePicker 
-                isOpen={isTimePickerOpen}
-                onClose={() => setIsTimePickerOpen(false)}
-                onSelect={handleTimeSelect}
-                selectedTime={formData.time}
-              />
 
               {formData.direction === 'from_airport' && (
                 <div className="rounded-[1.75rem] border border-[#dad5ca] bg-white p-5">

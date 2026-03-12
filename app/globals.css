@@ -171,6 +171,24 @@ p {
     text-shadow: 0.01em 0 currentColor;
   }
 
+  .ui-text-block-lg {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .ui-text-block-sm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .ui-copy-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
   .ui-copy {
     color: var(--color-text-muted);
     font-size: clamp(0.9rem, 1.05vw, 0.96rem);

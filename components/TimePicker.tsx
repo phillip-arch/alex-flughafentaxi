@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface TimePickerProps {
   isOpen: boolean;
@@ -13,6 +13,7 @@ interface TimePickerProps {
 export default function TimePicker({ isOpen, onClose, onSelect, selectedTime }: TimePickerProps) {
   const [hour, setHour] = useState<string | null>(null);
   const [minute, setMinute] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (selectedTime) {
@@ -22,120 +23,144 @@ export default function TimePicker({ isOpen, onClose, onSelect, selectedTime }: 
         setMinute(m);
       }
     } else {
-      // Reset to null when opening without a selected time
       setHour(null);
       setMinute(null);
     }
   }, [selectedTime, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const incrementHour = () => {
-    let h = hour ? parseInt(hour) : 12; // Default start at 12
-    h = (h + 1) % 24;
-    setHour(h.toString().padStart(2, '0'));
+    let value = hour ? parseInt(hour, 10) : 12;
+    value = (value + 1) % 24;
+    setHour(value.toString().padStart(2, '0'));
   };
 
   const decrementHour = () => {
-    let h = hour ? parseInt(hour) : 12;
-    h = (h - 1 + 24) % 24;
-    setHour(h.toString().padStart(2, '0'));
+    let value = hour ? parseInt(hour, 10) : 12;
+    value = (value - 1 + 24) % 24;
+    setHour(value.toString().padStart(2, '0'));
   };
 
   const incrementMinute = () => {
-    let m = minute ? parseInt(minute) : 0; // Default start at 00
-    m = (m + 5) % 60; // 5 minute steps
-    setMinute(m.toString().padStart(2, '0'));
+    let value = minute ? parseInt(minute, 10) : 0;
+    value = (value + 5) % 60;
+    setMinute(value.toString().padStart(2, '0'));
   };
 
   const decrementMinute = () => {
-    let m = minute ? parseInt(minute) : 0;
-    m = (m - 5 + 60) % 60; // 5 minute steps
-    setMinute(m.toString().padStart(2, '0'));
+    let value = minute ? parseInt(minute, 10) : 0;
+    value = (value - 5 + 60) % 60;
+    setMinute(value.toString().padStart(2, '0'));
   };
 
   const handleConfirm = () => {
-    if (hour && minute) {
-      onSelect(`${hour}:${minute}`);
-      onClose();
-    }
+    if (!hour || !minute) return;
+    onSelect(`${hour}:${minute}`);
+    onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-[360px] overflow-hidden animate-in zoom-in-95 duration-200">
-        
-        <div className="p-8 pb-4">
-          <p className="text-[11px] font-bold text-[#86868b] uppercase tracking-[0.15em] mb-8 text-center">
-            ZEIT WÄHLEN
-          </p>
+    <div
+      ref={containerRef}
+      className="absolute left-0 top-full z-40 mt-3 w-[min(19rem,calc(100vw-3rem))] rounded-[1.375rem] border border-[#e6e1d7] bg-white p-3.5 shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-top-2 duration-200"
+    >
+      <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[#86868b]">
+        Zeit wählen
+      </p>
 
-          <div className="flex items-center justify-center gap-4 mb-8">
-            {/* Hour Column */}
-            <div className="flex flex-col items-center gap-4">
-              <button type="button" onClick={incrementHour} className="text-[#86868b] hover:text-[#0071e3] transition-colors p-2">
-                <ChevronUp size={24} />
-              </button>
-              
-              <div className="w-[80px] h-[80px] bg-[#f5f5f7] rounded-[20px] flex items-center justify-center">
-                <span className={`text-[36px] font-semibold tracking-tight ${hour ? 'text-[#1d1d1f]' : 'text-[#d2d2d7]'}`}>
-                  {hour || '--'}
-                </span>
-              </div>
+      <div className="mb-4 flex items-center justify-center gap-3">
+        <div className="flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={incrementHour}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
+          >
+            <ChevronUp size={18} />
+          </button>
 
-              <button type="button" onClick={decrementHour} className="text-[#86868b] hover:text-[#0071e3] transition-colors p-2">
-                <ChevronDown size={24} />
-              </button>
-              
-              <span className="text-[11px] font-bold text-[#86868b] uppercase tracking-wider mt-1">
-                STUNDE
-              </span>
-            </div>
-
-            <div className="text-[36px] font-light text-[#d2d2d7] pb-8">:</div>
-
-            {/* Minute Column */}
-            <div className="flex flex-col items-center gap-4">
-              <button type="button" onClick={incrementMinute} className="text-[#86868b] hover:text-[#0071e3] transition-colors p-2">
-                <ChevronUp size={24} />
-              </button>
-              
-              <div className="w-[80px] h-[80px] bg-[#f5f5f7] rounded-[20px] flex items-center justify-center">
-                <span className={`text-[36px] font-semibold tracking-tight ${minute ? 'text-[#1d1d1f]' : 'text-[#d2d2d7]'}`}>
-                  {minute || '--'}
-                </span>
-              </div>
-
-              <button type="button" onClick={decrementMinute} className="text-[#86868b] hover:text-[#0071e3] transition-colors p-2">
-                <ChevronDown size={24} />
-              </button>
-
-              <span className="text-[11px] font-bold text-[#86868b] uppercase tracking-wider mt-1">
-                MINUTE
-              </span>
-            </div>
+          <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[#f5f5f7]">
+            <span className={`text-[24px] font-semibold tracking-[-0.03em] ${hour ? 'text-[#1d1d1f]' : 'text-[#d2d2d7]'}`}>
+              {hour || '--'}
+            </span>
           </div>
+
+          <button
+            type="button"
+            onClick={decrementHour}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
+          >
+            <ChevronDown size={18} />
+          </button>
+
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#86868b]">
+            Stunde
+          </span>
         </div>
 
-        {/* Footer */}
-        <div className="p-6 pt-0 flex items-center justify-between gap-4">
-          <button 
+        <div className="pb-6 text-[24px] font-light text-[#c3c6cc]">:</div>
+
+        <div className="flex flex-col items-center gap-2">
+          <button
             type="button"
-            onClick={onClose}
-            className="flex-1 text-[13px] font-bold text-[#86868b] hover:text-[#1d1d1f] uppercase tracking-wider py-4 transition-colors"
+            onClick={incrementMinute}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
           >
-            Abbruch
+            <ChevronUp size={18} />
           </button>
-          <button 
+
+          <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[#f5f5f7]">
+            <span className={`text-[24px] font-semibold tracking-[-0.03em] ${minute ? 'text-[#1d1d1f]' : 'text-[#d2d2d7]'}`}>
+              {minute || '--'}
+            </span>
+          </div>
+
+          <button
             type="button"
-            onClick={handleConfirm}
-            disabled={!hour || !minute}
-            className="flex-1 bg-[#1d1d1f] hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed text-white text-[13px] font-bold uppercase tracking-wider py-4 rounded-[16px] transition-all shadow-lg shadow-black/10"
+            onClick={decrementMinute}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
           >
-            Fertig
+            <ChevronDown size={18} />
           </button>
+
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#86868b]">
+            Minute
+          </span>
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={handleConfirm}
+        disabled={!hour || !minute}
+        className="w-full rounded-[1rem] bg-[#111111] px-4 py-3 text-[12px] font-bold uppercase tracking-[0.15em] text-white transition-all hover:bg-[#232325] disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Fertig
+      </button>
     </div>
   );
 }

@@ -75,11 +75,10 @@ export default function Home() {
     <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <Navbar />
 
-      <section className="relative overflow-hidden bg-[var(--color-surface)] text-[var(--color-text)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(17,17,17,0.05),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(10,99,255,0.12),_transparent_24%)]" />
+      <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
         <div className="app-container relative grid gap-8 pb-10 pt-24 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-8 lg:pb-14 lg:pt-32">
           <div className="max-w-[38rem]">
-            <div className="mt-5 flex flex-col gap-5 md:mt-6 md:gap-6">
+            <div className="ui-text-block-lg mt-5 md:mt-6">
             <h1 className="ui-heading-xl max-w-[14ch] !text-[2.14rem] !leading-[1.02] md:!text-[3.01rem]">
               Flughafentaxi Wien: Sicher & pünktlich mit Alex
             </h1>
@@ -111,30 +110,32 @@ export default function Home() {
 
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface)] py-16 md:py-20">
         <div className="app-container">
-          <div className="max-w-[72rem]">
-            <h3 className="ui-heading-md max-w-[18ch] text-[var(--color-text)]">
+          <div className="ui-text-block-lg max-w-[72rem]">
+            <h3 className="ui-heading-md text-[var(--color-text)]">
               Schnell geplant, klar bepreist und direkt zum Flughafen.
             </h3>
-            <p className="ui-copy mt-6 max-w-[64rem] leading-8">
-              Ob Transfer zum Flughafen Wien oder Abholung nach der Landung: Die Buchung bleibt kompakt, der Preis steht
-              vorab fest und die Fahrt ist in wenigen Schritten reserviert.
-            </p>
-            <p className="ui-copy mt-5 max-w-[56rem] leading-8">
-              Falls Sie statt Wien Airport ein anderes Ziel fahren moechten, bleibt der Ablauf derselbe: Adresse,
-              Zeitfenster und Fahrzeug in einer klaren Reihenfolge.
-            </p>
+            <div className="ui-copy-group max-w-[64rem]">
+              <p className="ui-copy-compact">
+                Ob Transfer zum Flughafen Wien oder Abholung nach der Landung: Die Buchung bleibt kompakt, der Preis steht
+                vorab fest und die Fahrt ist in wenigen Schritten reserviert.
+              </p>
+              <p className="ui-copy-compact max-w-[56rem]">
+                Falls Sie statt Wien Airport ein anderes Ziel fahren moechten, bleibt der Ablauf derselbe: Adresse,
+                Zeitfenster und Fahrzeug in einer klaren Reihenfolge.
+              </p>
+            </div>
           </div>
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             {airportBenefits.map(({ title, description, icon: Icon }) => (
-              <div key={title} className="max-w-[26rem]">
+              <div key={title} className="ui-text-block-sm max-w-[26rem]">
                 <span className="flex h-10 w-10 items-center justify-center text-[var(--color-text)]">
                   <Icon size={24} strokeWidth={2.1} />
                 </span>
-                <h6 className="ui-heading-sm mt-5 text-[var(--color-text)]">
+                <h6 className="ui-heading-sm text-[var(--color-text)]">
                   {title}
                 </h6>
-                <p className="ui-copy mt-4 text-base leading-8">
+                <p className="ui-copy-compact">
                   {description}
                 </p>
               </div>
@@ -150,8 +151,10 @@ export default function Home() {
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#111111] text-white">
                 <Icon size={18} />
               </span>
-              <h3 className="mt-4 text-xl font-semibold tracking-[-0.03em]">{title}</h3>
-              <p className="ui-copy mt-2 text-sm leading-7">{description}</p>
+              <div className="ui-text-block-sm mt-4">
+                <h3 className="text-xl font-semibold tracking-[-0.03em]">{title}</h3>
+                <p className="ui-copy-compact">{description}</p>
+              </div>
             </Card>
           ))}
         </div>
@@ -161,12 +164,14 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <div>
             <p className="ui-eyebrow border-none bg-transparent p-0">Service areas</p>
-            <h2 className="ui-heading-lg mt-4 max-w-md md:text-5xl">
-              Gebaut fuer Wege zwischen Stadt, Hotel und Terminal.
-            </h2>
-            <p className="ui-copy mt-5 max-w-md text-base leading-8">
-              Die Startseite setzt auf grosse Kontraste, klare Entscheidungen und genau die Informationen, die vor einer Buchung relevant sind.
-            </p>
+            <div className="ui-text-block-lg mt-4">
+              <h2 className="ui-heading-lg max-w-md md:text-5xl">
+                Gebaut fuer Wege zwischen Stadt, Hotel und Terminal.
+              </h2>
+              <p className="ui-copy-compact max-w-md">
+                Die Startseite setzt auf grosse Kontraste, klare Entscheidungen und genau die Informationen, die vor einer Buchung relevant sind.
+              </p>
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -179,10 +184,12 @@ export default function Home() {
                 variant={index === 0 ? 'dark' : 'section'}
               >
                 <p className={`text-sm ${index === 0 ? 'text-white/64' : 'text-[var(--color-text-muted)]'}`}>Zone {index + 1}</p>
-                <h3 className="mt-4 text-2xl font-semibold tracking-[-0.03em]">{area}</h3>
-                <p className={`mt-2 text-sm leading-7 ${index === 0 ? 'text-white/72' : 'text-[var(--color-text-muted)]'}`}>
-                  Direkte Abholung mit Fokus auf Flughafenlogik statt klassischem Taxi-Look.
-                </p>
+                <div className="ui-text-block-sm mt-4">
+                  <h3 className="text-2xl font-semibold tracking-[-0.03em]">{area}</h3>
+                  <p className={`ui-copy-compact ${index === 0 ? 'text-white/72' : 'text-[var(--color-text-muted)]'}`}>
+                    Direkte Abholung mit Fokus auf Flughafenlogik statt klassischem Taxi-Look.
+                  </p>
+                </div>
               </Card>
             ))}
           </div>
@@ -194,35 +201,43 @@ export default function Home() {
           <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <Card className="rounded-[2rem] p-8" variant="muted">
             <p className="ui-eyebrow border-none bg-transparent p-0">Booking flow</p>
-            <h2 className="ui-heading-lg mt-4 max-w-lg md:text-5xl">
-              Vor der Fahrt ist alles klar.
-            </h2>
-            <p className="ui-copy mt-5 max-w-xl text-base leading-8">
-              Adresse, Zeitfenster und Fahrzeugwahl bleiben direkt lesbar. Keine ueberladene Taxi-Seite, sondern eine klare Strecke bis zur Buchung.
-            </p>
+            <div className="ui-text-block-lg mt-4">
+              <h2 className="ui-heading-lg max-w-lg md:text-5xl">
+                Vor der Fahrt ist alles klar.
+              </h2>
+              <p className="ui-copy-compact max-w-xl">
+                Adresse, Zeitfenster und Fahrzeugwahl bleiben direkt lesbar. Keine ueberladene Taxi-Seite, sondern eine klare Strecke bis zur Buchung.
+              </p>
+            </div>
           </Card>
 
           <div className="grid gap-4 sm:grid-cols-3">
             <Card className="rounded-[2rem] p-6" variant="section">
               <p className="text-sm font-semibold text-[var(--color-text-muted)]">01</p>
-              <h3 className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">Adresse</h3>
-              <p className="ui-copy mt-3 text-sm leading-7">
-                Eine klare Startadresse oder Ankunft am Flughafen ohne Umwege im Formular.
-              </p>
+              <div className="ui-text-block-sm mt-4">
+                <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">Adresse</h3>
+                <p className="ui-copy-compact">
+                  Eine klare Startadresse oder Ankunft am Flughafen ohne Umwege im Formular.
+                </p>
+              </div>
             </Card>
             <Card className="rounded-[2rem] p-6" variant="section">
               <p className="text-sm font-semibold text-[var(--color-text-muted)]">02</p>
-              <h3 className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">Zeit</h3>
-              <p className="ui-copy mt-3 text-sm leading-7">
-                Datum, Uhrzeit und Flugdetails sitzen im zweiten Schritt genau dort, wo sie erwartet werden.
-              </p>
+              <div className="ui-text-block-sm mt-4">
+                <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">Zeit</h3>
+                <p className="ui-copy-compact">
+                  Datum, Uhrzeit und Flugdetails sitzen im zweiten Schritt genau dort, wo sie erwartet werden.
+                </p>
+              </div>
             </Card>
             <Card className="rounded-[2rem] p-6" variant="section">
               <p className="text-sm font-semibold text-[var(--color-text-muted)]">03</p>
-              <h3 className="mt-4 text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">Bestaetigen</h3>
-              <p className="ui-copy mt-3 text-sm leading-7">
-                Fahrzeug, Preis und Kontaktdaten bleiben reduziert, damit der Abschluss schnell bleibt.
-              </p>
+              <div className="ui-text-block-sm mt-4">
+                <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">Bestaetigen</h3>
+                <p className="ui-copy-compact">
+                  Fahrzeug, Preis und Kontaktdaten bleiben reduziert, damit der Abschluss schnell bleibt.
+                </p>
+              </div>
             </Card>
           </div>
           </div>
@@ -245,16 +260,22 @@ export default function Home() {
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <Card className="rounded-3xl p-5" variant="section">
-                <p className="text-3xl font-semibold tracking-[-0.04em]">24/7</p>
-                <p className="ui-copy mt-1 text-sm">verfuegbar fuer Ankunft und Abflug</p>
+                <div className="ui-text-block-sm">
+                  <p className="text-3xl font-semibold tracking-[-0.04em]">24/7</p>
+                  <p className="ui-copy-compact">verfuegbar fuer Ankunft und Abflug</p>
+                </div>
               </Card>
               <Card className="rounded-3xl p-5" variant="section">
-                <p className="text-3xl font-semibold tracking-[-0.04em]">38 EUR</p>
-                <p className="ui-copy mt-1 text-sm">ab Wien zum Flughafen</p>
+                <div className="ui-text-block-sm">
+                  <p className="text-3xl font-semibold tracking-[-0.04em]">38 EUR</p>
+                  <p className="ui-copy-compact">ab Wien zum Flughafen</p>
+                </div>
               </Card>
               <Card className="rounded-3xl p-5" variant="section">
-                <p className="text-3xl font-semibold tracking-[-0.04em]">5.0</p>
-                <p className="ui-copy mt-1 text-sm">fokussiert auf Zuverlaessigkeit</p>
+                <div className="ui-text-block-sm">
+                  <p className="text-3xl font-semibold tracking-[-0.04em]">5.0</p>
+                  <p className="ui-copy-compact">fokussiert auf Zuverlaessigkeit</p>
+                </div>
               </Card>
             </div>
           </Card>
@@ -266,9 +287,11 @@ export default function Home() {
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-white/56">Fleet</p>
-              <h2 className="mt-4 max-w-2xl text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
-                Weniger dekorativ, mehr transportbereit.
-              </h2>
+              <div className="ui-text-block-lg mt-4">
+                <h2 className="max-w-2xl text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+                  Weniger dekorativ, mehr transportbereit.
+                </h2>
+              </div>
             </div>
             <Link
               href="/book"
@@ -288,10 +311,12 @@ export default function Home() {
                 }`}
               >
                 <p className={`text-sm ${index === 1 ? 'text-[#0f0f10]/62' : 'text-white/52'}`}>{option.meta}</p>
-                <h3 className="mt-6 text-3xl font-semibold tracking-[-0.04em]">{option.name}</h3>
-                <p className={`mt-4 text-sm leading-7 ${index === 1 ? 'text-[#0f0f10]/74' : 'text-white/72'}`}>
-                  {option.details}
-                </p>
+                <div className="ui-text-block-sm mt-6">
+                  <h3 className="text-3xl font-semibold tracking-[-0.04em]">{option.name}</h3>
+                  <p className={`ui-copy-compact ${index === 1 ? 'text-[#0f0f10]/74' : 'text-white/72'}`}>
+                    {option.details}
+                  </p>
+                </div>
               </article>
             ))}
           </div>
