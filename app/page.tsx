@@ -66,7 +66,7 @@ export default function Home() {
               Premium Flughafentransfers mit starkem Kontrast, klaren Preisen und einer Buchung, die sofort zur Fahrt fuehrt.
             </p>
             </div>
-            <div id="hero-booking" className="relative mt-5 w-full max-w-[600px]">
+            <div id="hero-booking" className="relative mt-5 w-full max-w-[720px] lg:-ml-2">
               <div className="absolute -left-8 top-12 hidden h-24 w-24 rounded-full bg-[#0a63ff]/20 blur-3xl lg:block" />
               <div className="rounded-[2rem] bg-transparent px-0 py-2 shadow-none md:px-0 md:py-2">
                 <BookingForm />
@@ -74,7 +74,7 @@ export default function Home() {
             </div>
           </div>
 
-          <Card className="relative w-full min-h-[360px] overflow-hidden rounded-[2.5rem] bg-[var(--color-bg)] lg:mt-6 lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end" variant="default">
+          <Card className="relative w-full min-h-[360px] overflow-hidden rounded-none bg-[var(--color-bg)] lg:mt-6 lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end" variant="default">
             <Image
               src="https://images.pexels.com/photos/9519974/pexels-photo-9519974.jpeg"
               alt="Flughafentaxi Wien"
