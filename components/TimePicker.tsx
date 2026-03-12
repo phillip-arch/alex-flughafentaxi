@@ -87,7 +87,7 @@ export default function TimePicker({ isOpen, onClose, onSelect, selectedTime }: 
   return (
     <div
       ref={containerRef}
-      className="absolute left-0 top-full z-40 mt-3 w-[min(19rem,calc(100vw-3rem))] rounded-[1.375rem] border border-[#e6e1d7] bg-white p-3.5 shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-top-2 duration-200"
+      className="absolute right-0 top-full z-40 mt-3 w-[min(19rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] rounded-[1.375rem] border border-[#e6e1d7] bg-white p-3.5 shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-top-2 duration-200 sm:left-0 sm:right-auto sm:w-[19rem] sm:max-w-none"
     >
       <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[#86868b]">
         Zeit wählen
