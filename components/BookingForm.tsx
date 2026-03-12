@@ -678,7 +678,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
           {/* STEP 1: LOCATION */}
           {currentStep === 1 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-              <div className="-ml-2 rounded-[2.2rem] bg-transparent py-3 pl-3 pr-0 shadow-none md:-ml-2 md:pl-3 md:pr-0">
+              <div className="-ml-2 rounded-[2.2rem] bg-transparent py-3 pl-3 pr-0 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
                 <div className="flex gap-4">
                   <div className="flex w-[2.1rem] shrink-0 flex-col items-center pt-[1.45rem]">
                     <div className={`flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
@@ -802,7 +802,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                       )}
                     </div>
                   </div>
-                  <div className="-mr-2 flex shrink-0 flex-col justify-start pt-[1.35rem] md:-mr-3">
+                  <div className="-mr-1 flex shrink-0 flex-col justify-start pt-[1.35rem] md:-mr-2">
                     <button
                       type="button"
                       onClick={toggleExtraStop}
