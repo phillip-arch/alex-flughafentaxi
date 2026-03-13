@@ -89,7 +89,7 @@ export default function Home() {
             <div id="hero-booking" className="relative mt-5 w-full max-w-[740px] lg:-ml-2">
               <div className="absolute -left-8 top-12 hidden h-24 w-24 rounded-full bg-[#0a63ff]/20 blur-3xl lg:block" />
               <div className="rounded-[2rem] bg-transparent px-0 py-2 shadow-none md:px-0 md:py-2">
-                <BookingForm />
+                <BookingForm showStepIndicator={false} />
               </div>
             </div>
           </div>

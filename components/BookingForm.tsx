@@ -16,6 +16,7 @@ import {
   Car,
   Users,
   Briefcase,
+  ShoppingBag,
   ArrowUpDown,
   Plus,
   Minus,
@@ -75,6 +76,7 @@ interface ExtendedBookingInput {
 
 type BookingFormProps = {
   onDirectionChange?: (direction: Direction) => void;
+  showStepIndicator?: boolean;
 };
 
 type StepperFieldName =
@@ -85,7 +87,7 @@ type StepperFieldName =
   | 'childSeats'
   | 'boosterSeats';
 
-const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
+const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFormProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const supabase = supabaseBrowser();
@@ -283,6 +285,12 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
   // Calculate price with vehicle surcharge
   const vehiclePrice = calculateVehiclePrice(basePrice, vehicleType);
   const totalPrice = vehiclePrice + extraStopPrice;
+  const routeSummary =
+    formData.direction === 'to_airport'
+      ? `${formData.zip} ${formData.city} → Flughafen VIE`
+      : `Flughafen VIE → ${formData.zip} ${formData.city}`;
+  const streetSummary = [formData.street, formData.houseNumber].filter(Boolean).join(' ').trim() || 'Noch nicht gew\u00E4hlt';
+  const dateSummary = [formData.date, formData.time].filter(Boolean).join(' | ') || 'Noch nicht gew\u00E4hlt';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -380,9 +388,9 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
     const displayValue = value === '' ? '--' : value;
 
     return (
-      <div className={`flex flex-col items-center justify-center rounded-2xl bg-[#f5f5f7] ${compact ? 'gap-2 p-3' : 'gap-3 p-5'}`}>
+      <div className={`flex flex-col items-center justify-center rounded-[14px] bg-[#f5f5f7] ${compact ? 'gap-1.5 p-2.5' : 'gap-2 p-3.5'} md:rounded-2xl`}>
         <span className={`font-medium uppercase text-[#86868b] ${compact ? 'text-[11px]' : 'text-[13px]'}`}>{label}</span>
-        <div className="flex w-full items-center justify-between gap-2 rounded-full border border-[#d2d2d7] bg-white px-2 py-2">
+        <div className="flex h-12 w-full items-center justify-between gap-2 rounded-[14px] border border-[#d2d2d7] bg-white px-2 md:rounded-full">
           <button
             type="button"
             onClick={() => updateStepperValue(name, -1, min, max)}
@@ -392,8 +400,8 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
             <Minus size={16} />
           </button>
           <span className={`min-w-[2.2rem] text-center font-semibold text-[#1d1d1f] ${compact ? 'text-[20px]' : 'text-[24px]'}`}>
-            {displayValue}
-          </span>
+              {displayValue}
+            </span>
           <button
             type="button"
             onClick={() => updateStepperValue(name, 1, min, max)}
@@ -481,7 +489,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
         if (selectedDate < minBookingTime) {
           isValid = false;
           if (isNightTime) {
-            errorMessage = 'Für Fahrten zwischen 22:00 und 07:00 Uhr ist eine Vorlaufzeit von 8 Stunden erforderlich.';
+            errorMessage = 'F?r Fahrten zwischen 22:00 und 07:00 Uhr ist eine Vorlaufzeit von 8 Stunden erforderlich.';
           } else {
             errorMessage = 'Kurzfristige Buchungen sind nur bis 3 Stunden vor Abholung möglich.';
           }
@@ -652,22 +660,39 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
     }
   };
 
-  // Helper for step indicator
+  const stepItems = [
+    { key: 1, label: 'Route', icon: MapPin },
+    { key: 2, label: 'Details', icon: Calendar },
+    { key: 3, label: 'Confirm', icon: Check },
+  ] as const;
+
   const StepIndicator = () => (
-    <div className="flex flex-col items-center mb-10">
-      <div className="flex items-center gap-2 mb-2">
-        {[1, 2, 3].map((step) => (
-          <div 
-            key={step} 
-            className={`h-1 w-8 rounded-full transition-all duration-300 ${
-              currentStep >= step ? 'bg-[#111111]' : 'bg-[#d7d3ca]'
-            }`} 
-          />
-        ))}
-      </div>
-      <span className="text-[10px] font-medium text-[#6d7075] uppercase tracking-wide">
-        Schritt {currentStep} von 3
-      </span>
+    <div className="mb-8 flex items-center justify-center gap-2.5 md:mb-10 md:gap-3.5">
+      {stepItems.map((step, index) => {
+        const Icon = step.icon;
+        const isCurrent = currentStep === step.key;
+        const isComplete = currentStep > step.key;
+
+        return (
+          <React.Fragment key={step.key}>
+            <div
+              className={`flex items-center gap-2 rounded-full border px-3 py-2 transition-all ${
+                isCurrent
+                  ? 'border-[#111111] bg-[#111111] text-white'
+                  : isComplete
+                    ? 'border-[#0a63ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]'
+                    : 'border-[#d8d4ca] bg-white text-[#86868b]'
+              }`}
+            >
+              <Icon size={14} />
+              <span className="text-[12px] font-semibold tracking-[-0.02em]">{step.label}</span>
+            </div>
+            {index < stepItems.length - 1 ? (
+              <ChevronRight size={14} className="text-[#b1aba0]" />
+            ) : null}
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 
@@ -675,6 +700,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
     <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] relative overflow-hidden`}>
       <div className="px-1 pb-2 pt-2 md:px-2 md:pb-3 md:pt-3">
         <form onSubmit={handleSubmit}>
+          {showStepIndicator ? <StepIndicator /> : null}
           {/* STEP 1: LOCATION */}
           {currentStep === 1 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -863,7 +889,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                       value={formData.city}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none appearance-none transition-all ${
+                      className={`h-12 w-full rounded-[14px] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all md:rounded-xl ${
                         isFieldInvalid('city') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]' 
                           : 'border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]'
@@ -921,8 +947,8 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
               <div className="hidden items-center justify-between p-4 bg-[#f5f5f7] rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="text-[#1d1d1f]">
-                    <p className="font-medium text-[15px]">Zusätzlicher Stopp?</p>
-                    <p className="text-[13px] text-[#86868b]">+10 € Aufpreis</p>
+                    <p className="font-medium text-[15px]">Zus?tzlicher Stopp?</p>
+                    <p className="text-[13px] text-[#86868b]">+10 EUR Aufpreis</p>
                   </div>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -951,7 +977,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                         value={formData.extraStopCity}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className={`w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none appearance-none transition-all ${
+                        className={`h-12 w-full rounded-[14px] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all md:rounded-xl ${
                           isFieldInvalid('extraStopCity') 
                             ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]' 
                             : 'border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]'
@@ -1042,7 +1068,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                       readOnly
                       placeholder="TT.MM.JJJJ"
                       onClick={() => setIsDatePickerOpen(true)}
-                      className={`w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none transition-all cursor-pointer ${
+                      className={`h-12 w-full rounded-[14px] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:rounded-xl ${
                         isFieldInvalid('date') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
                           : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
@@ -1073,7 +1099,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                       readOnly
                       placeholder="--:--"
                       onClick={() => setIsTimePickerOpen(true)}
-                      className={`w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none transition-all cursor-pointer ${
+                      className={`h-12 w-full rounded-[14px] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:rounded-xl ${
                         isFieldInvalid('time') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
                           : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
@@ -1109,47 +1135,65 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                 </div>
               )}
 
-              <div className="hidden grid grid-cols-3 gap-4">
-                <div className="bg-[#f5f5f7] p-5 rounded-2xl flex flex-col items-center justify-center gap-2">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="flex flex-col gap-1.5">
                   <span className="text-[13px] font-medium text-[#86868b] uppercase">Personen</span>
                   <div className="relative w-full">
+                    <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b]">
+                      <Users size={16} />
+                    </div>
                     <select
                       name="passengers"
                       value={formData.passengers}
                       onChange={handleChange}
-                      className={`bg-transparent font-semibold text-[24px] text-[#1d1d1f] outline-none text-center w-full appearance-none z-10 relative ${formData.passengers === '' ? 'text-[#86868b]' : ''}`}
+                      className={`h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white pl-10 pr-9 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl ${formData.passengers === '' ? 'text-[#86868b]' : ''}`}
                     >
                       <option value="" disabled>--</option>
                       {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n}</option>)}
                     </select>
+                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b]">
+                      <ChevronRight size={14} className="rotate-90" />
+                    </div>
                   </div>
                 </div>
-                <div className="bg-[#f5f5f7] p-5 rounded-2xl flex flex-col items-center justify-center gap-2">
+                <div className="flex flex-col gap-1.5">
                   <span className="text-[13px] font-medium text-[#86868b] uppercase">Koffer</span>
                   <div className="relative w-full">
+                    <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b]">
+                      <Briefcase size={16} />
+                    </div>
                     <select
                       name="luggage"
                       value={formData.luggage}
                       onChange={handleChange}
-                      className={`bg-transparent font-semibold text-[24px] text-[#1d1d1f] outline-none text-center w-full appearance-none z-10 relative ${formData.luggage === '' ? 'text-[#86868b]' : ''}`}
+                      className={`h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white pl-10 pr-9 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl ${formData.luggage === '' ? 'text-[#86868b]' : ''}`}
                     >
                       <option value="" disabled>--</option>
                       {[0,1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n}</option>)}
                     </select>
+                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b]">
+                      <ChevronRight size={14} className="rotate-90" />
+                    </div>
                   </div>
                 </div>
-                <div className="bg-[#f5f5f7] p-5 rounded-2xl flex flex-col items-center justify-center gap-2">
+                <div className="flex flex-col gap-1.5">
                   <span className="text-[13px] font-medium text-[#86868b] uppercase">Handgepäck</span>
                   <div className="relative w-full">
+                    <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b]">
+                      <ShoppingBag size={16} />
+                    </div>
                     <select
                       name="handLuggage"
                       value={formData.handLuggage}
                       onChange={handleChange}
-                      className={`bg-transparent font-semibold text-[24px] text-[#1d1d1f] outline-none text-center w-full appearance-none z-10 relative ${formData.handLuggage === '' ? 'text-[#86868b]' : ''}`}
+                      className={`h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white pl-10 pr-9 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl ${formData.handLuggage === '' ? 'text-[#86868b]' : ''}`}
                     >
                       <option value="" disabled>--</option>
                       {[0,1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n}</option>)}
                     </select>
+                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b]">
+                      <ChevronRight size={14} className="rotate-90" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1160,14 +1204,14 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                 {renderStepper('handLuggage', 'Handgepäck', 0, 8, formData.handLuggage)}
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="hidden grid grid-cols-3 gap-4">
                 {renderStepper('passengers', 'Personen', 1, 8, formData.passengers)}
                 {renderStepper('luggage', 'Koffer', 0, 8, formData.luggage)}
                 {renderStepper('handLuggage', 'Handgepäck', 0, 8, formData.handLuggage)}
               </div>
 
               {/* Child Seat Toggle */}
-              <div className="flex flex-col gap-4 p-5 bg-[#f5f5f7] rounded-xl">
+              <div className="flex flex-col gap-4 rounded-[14px] bg-[#f5f5f7] p-4 md:rounded-xl md:p-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="text-[#1d1d1f]">
@@ -1189,7 +1233,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
 
                 {formData.childSeat && (
                   <>
-                  <div className="hidden grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
+                  <div className="grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
                     <div className="flex flex-col gap-1">
                       <label className="text-[11px] font-medium text-[#86868b] uppercase">Babyschale</label>
                       <div className="relative">
@@ -1197,7 +1241,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                           name="babySeats"
                           value={formData.babySeats}
                           onChange={handleChange}
-                          className="w-full p-2 rounded-lg bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[15px] outline-none appearance-none"
+                          className="h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white px-3 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl"
                         >
                           {[0,1,2,3].map(n => <option key={n} value={n}>{n}</option>)}
                         </select>
@@ -1213,7 +1257,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                           name="childSeats"
                           value={formData.childSeats}
                           onChange={handleChange}
-                          className="w-full p-2 rounded-lg bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[15px] outline-none appearance-none"
+                          className="h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white px-3 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl"
                         >
                           {[0,1,2,3].map(n => <option key={n} value={n}>{n}</option>)}
                         </select>
@@ -1229,7 +1273,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                           name="boosterSeats"
                           value={formData.boosterSeats}
                           onChange={handleChange}
-                          className="w-full p-2 rounded-lg bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[15px] outline-none appearance-none"
+                          className="h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white px-3 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl"
                         >
                           {[0,1,2,3].map(n => <option key={n} value={n}>{n}</option>)}
                         </select>
@@ -1249,7 +1293,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                     {renderStepper('childSeats', 'Kindersitz', 0, 3, formData.childSeats, true)}
                     {renderStepper('boosterSeats', 'Sitzerhöhung', 0, 3, formData.boosterSeats, true)}
                   </div>
-                  <div className="grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
+                  <div className="hidden grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
                     {renderStepper('babySeats', 'Babyschale', 0, 3, formData.babySeats, true)}
                     {renderStepper('childSeats', 'Kindersitz', 0, 3, formData.childSeats, true)}
                     {renderStepper('boosterSeats', 'Sitzerhöhung', 0, 3, formData.boosterSeats, true)}
@@ -1292,46 +1336,61 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                 <p className="text-[17px] text-[#6d7075]">Bitte überprüfen Sie Ihre Daten.</p>
               </div>
 
-              {/* Price Card - Apple Style Summary */}
-              <div className="hidden bg-[#f5f5f7] rounded-[24px] p-6 md:p-8 text-center">
-                <p className="text-[12px] font-semibold uppercase tracking-wide text-[#86868b] mb-2">Gesamtpreis</p>
-                <p className="text-[48px] font-semibold text-[#1d1d1f] leading-none mb-4 tracking-tight">{totalPrice} €</p>
-                
-                <div className="flex items-center justify-center gap-2 text-[14px] font-medium text-[#1d1d1f] mb-6">
-                  {formData.direction === 'to_airport' ? (
-                    <>
-                      <span>{formData.zip} {formData.city}</span>
-                      <ChevronRight size={14} className="text-[#86868b]" />
-                      <span>Flughafen VIE</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Flughafen VIE</span>
-                      <ChevronRight size={14} className="text-[#86868b]" />
-                      <span>{formData.zip} {formData.city}</span>
-                    </>
-                  )}
+              <div className="rounded-[28px] border border-[#d8d4ca] bg-[linear-gradient(180deg,#fbfaf6_0%,#f4f5f8_100%)] p-6 text-left shadow-[0_20px_48px_rgba(17,17,17,0.07)] md:p-8">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-[#6d7075]">Gesamtpreis</p>
+                    <p className="mt-2 text-[58px] font-semibold leading-none tracking-[-0.05em] text-[#0a63ff] md:text-[62px]">
+                      {totalPrice} {'€'}
+                    </p>
+                  </div>
+                  <span className="inline-flex items-center rounded-full border border-[#d6e5ff] bg-white/90 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#0a63ff] shadow-sm">
+                    Fixpreis
+                  </span>
                 </div>
 
-                {/* Vehicle Info Card */}
-                <div className="bg-white rounded-[16px] p-4 border border-[#d2d2d7]/50 shadow-sm max-w-[320px] mx-auto">
-                  <div className="flex items-center justify-center gap-2 text-[#1d1d1f] font-semibold mb-3">
-                    <Car size={18} className="text-[#0071e3]" />
-                    <span>Fahrzeug: {vehicleType}</span>
+                <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#d6e5ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.08)_0%,rgba(36,144,255,0.15)_100%)] px-4 py-2 text-[14px] font-medium text-[#1d1d1f]">
+                  <MapPin size={15} className="text-[#0a63ff]" />
+                  <span>{routeSummary}</span>
+                </div>
+
+                <div className="mt-5 grid gap-3 md:grid-cols-2">
+                  <div className="rounded-[18px] border border-[#d2d2d7]/70 bg-white p-4 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <Calendar size={16} className="mt-0.5 text-[#0a63ff]" />
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86868b]">Datum</p>
+                        <p className="mt-1 text-[15px] font-medium text-[#1d1d1f]">{dateSummary}</p>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px] text-[#86868b] font-medium">
-                    <div className="flex items-center gap-1.5" title="Personen">
-                      <Users size={16} />
-                      <span>{formData.passengers || 0}</span>
+                  <div className="rounded-[18px] border border-[#d2d2d7]/70 bg-white p-4 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <MapPin size={16} className="mt-0.5 text-[#0a63ff]" />
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86868b]">Straße</p>
+                        <p className="mt-1 text-[15px] font-medium text-[#1d1d1f]">{streetSummary}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5" title="Koffer">
-                      <Briefcase size={16} />
-                      <span>{formData.luggage || 0}</span>
+                  </div>
+                  <div className="rounded-[18px] border border-[#d2d2d7]/70 bg-white p-4 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <Users size={16} className="mt-0.5 text-[#0a63ff]" />
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86868b]">Passagiere</p>
+                        <p className="mt-1 text-[15px] font-medium text-[#1d1d1f]">{formData.passengers || 0} Personen</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5" title="Handgepäck">
-                      <Briefcase size={14} className="opacity-70" />
-                      <span>{formData.handLuggage || 0}</span>
+                  </div>
+                  <div className="rounded-[18px] border border-[#d2d2d7]/70 bg-white p-4 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <Car size={16} className="mt-0.5 text-[#0a63ff]" />
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86868b]">Fahrzeug</p>
+                        <p className="mt-1 text-[15px] font-medium leading-[1.45] text-[#1d1d1f]">
+                          {vehicleType} | {formData.luggage || 0} Koffer | {formData.handLuggage || 0} Handgepäck
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1343,7 +1402,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="text-[#1d1d1f]">
-                        <p className="font-medium text-[15px]">Buchung fuer mich</p>
+                        <p className="font-medium text-[15px]">Buchung für mich</p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -1403,7 +1462,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                   <button
                     type="button"
                     onClick={() => handlePaymentChange('cash')}
-                    className={`flex-1 flex flex-col items-center justify-center gap-2 py-3 rounded-xl border transition-all duration-200 ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[14px] border py-3 transition-all duration-200 md:rounded-xl ${
                       formData.paymentMethod === 'cash' 
                         ? 'border-[#0a63ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]' 
                         : touched['paymentMethod'] && !formData.paymentMethod
@@ -1416,7 +1475,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                   <button
                     type="button"
                     onClick={() => handlePaymentChange('card')}
-                    className={`flex-1 flex flex-col items-center justify-center gap-2 py-3 rounded-xl border transition-all duration-200 ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[14px] border py-3 transition-all duration-200 md:rounded-xl ${
                       formData.paymentMethod === 'card' 
                         ? 'border-[#0071e3] bg-[#f2fcfc] text-[#0071e3]' 
                         : touched['paymentMethod'] && !formData.paymentMethod
@@ -1437,13 +1496,13 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                   onChange={handleChange}
                   rows={3}
                   placeholder="Anmerkungen (optional)"
-                  className="w-full p-3 rounded-xl bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[17px] placeholder:text-[#86868b] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] outline-none resize-none transition-all"
+                  className="w-full rounded-[14px] border border-[#d2d2d7] bg-white p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none resize-none transition-all focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] md:rounded-xl"
                 />
               </div>
 
-              <div className="bg-[#f5f5f7] rounded-[24px] p-6 md:p-8 text-center">
+              <div className="hidden rounded-[24px] border border-[#d8d4ca] bg-[linear-gradient(180deg,#faf8f4_0%,#f5f5f7_100%)] p-6 shadow-[0_20px_50px_rgba(17,17,17,0.06)] md:p-8">
                 <p className="text-[12px] font-semibold uppercase tracking-wide text-[#86868b] mb-2">Gesamtpreis</p>
-                <p className="text-[48px] font-semibold text-[#1d1d1f] leading-none mb-4 tracking-tight">{totalPrice} €</p>
+                <p className="text-[48px] font-semibold text-[#1d1d1f] leading-none mb-4 tracking-tight">{totalPrice} {'\u20AC'}</p>
                 
                 <div className="flex items-center justify-center gap-2 text-[14px] font-medium text-[#1d1d1f] mb-6">
                   {formData.direction === 'to_airport' ? (
@@ -1462,7 +1521,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                 </div>
 
                 <div className="bg-white rounded-[16px] p-4 border border-[#d2d2d7]/50 shadow-sm max-w-[320px] mx-auto">
-                  <div className="flex items-center justify-center gap-2 text-[#1d1d1f] font-semibold mb-3">
+                    <div className="flex items-center gap-1.5" title="Handgepäck">
                     <Car size={18} className="text-[#0071e3]" />
                     <span>Fahrzeug: {vehicleType}</span>
                   </div>
@@ -1504,7 +1563,7 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
                   disabled={loading}
                   className="flex-1 rounded-full bg-[#111111] py-3 text-[17px] font-medium text-white transition-all hover:bg-[#232325] disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {loading ? 'Wird gebucht...' : 'Kostenpflichtig buchen'}
+                  {loading ? 'Wird gebucht...' : 'Jetzt buchen'}
                 </button>
               </div>
             </div>
@@ -1516,3 +1575,4 @@ const BookingForm = ({ onDirectionChange }: BookingFormProps) => {
 };
 
 export default BookingForm;
+
