@@ -39,6 +39,7 @@
   --radius-xl: 2rem;
   --radius-2xl: 2.5rem;
   --radius-pill: 999px;
+  --radius-field: 0.625rem;
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -316,7 +317,7 @@ p {
   .ui-input {
     width: 100%;
     min-height: 3rem;
-    border-radius: 0.75rem;
+    border-radius: var(--radius-field);
     border: 1px solid var(--color-border-soft);
     background: var(--color-surface-soft);
     padding: 0.625rem 1rem;
@@ -328,12 +329,6 @@ p {
       border-color 160ms ease,
       background-color 160ms ease,
       box-shadow 160ms ease;
-  }
-
-  @media (min-width: 768px) {
-    .ui-input {
-      border-radius: 1rem;
-    }
   }
 
   .ui-input::placeholder {
