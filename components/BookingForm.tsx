@@ -20,6 +20,7 @@ import {
   ArrowUpDown,
   Plus,
   Minus,
+  LucideIcon,
 } from 'lucide-react';
 import DatePicker from './DatePicker';
 import TimePicker from './TimePicker';
@@ -87,6 +88,8 @@ type StepperFieldName =
   | 'childSeats'
   | 'boosterSeats';
 
+type InlineSelectFieldName = StepperFieldName;
+
 const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFormProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -101,6 +104,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accountDefaults, setAccountDefaults] = useState({ fullName: '', phone: '', email: '' });
+  const [openInlineSelect, setOpenInlineSelect] = useState<InlineSelectFieldName | null>(null);
 
   const [formData, setFormData] = useState<ExtendedBookingInput>({
     direction: 'to_airport',
@@ -138,6 +142,31 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   useEffect(() => {
     onDirectionChange?.(formData.direction);
   }, [formData.direction, onDirectionChange]);
+
+  useEffect(() => {
+    if (!openInlineSelect) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target?.closest('[data-inline-select-root="true"]')) {
+        setOpenInlineSelect(null);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpenInlineSelect(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [openInlineSelect]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -385,7 +414,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     value: number | '',
     compact = false
   ) => {
-    const displayValue = value === '' ? '--' : value;
+  const displayValue = value === '' ? '--' : value;
 
     return (
       <div className={`flex flex-col items-center justify-center rounded-[14px] bg-[#f5f5f7] ${compact ? 'gap-1.5 p-2.5' : 'gap-2 p-3.5'} md:rounded-2xl`}>
@@ -410,6 +439,76 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
           >
             <Plus size={16} />
           </button>
+        </div>
+      </div>
+    );
+  };
+
+  const handleInlineSelect = (name: InlineSelectFieldName, value: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setOpenInlineSelect(null);
+  };
+
+  const renderInlineSelect = (
+    name: InlineSelectFieldName,
+    label: string,
+    options: number[],
+    value: number | '',
+    Icon?: LucideIcon
+  ) => {
+    const isOpen = openInlineSelect === name;
+    const displayValue = value === '' ? '--' : String(value);
+
+    return (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[13px] font-medium text-[#86868b] uppercase">{label}</span>
+        <div className="relative" data-inline-select-root="true">
+          {Icon ? (
+            <div className="pointer-events-none absolute left-3 top-1/2 z-[1] -translate-y-1/2 text-[#86868b]">
+              <Icon size={16} />
+            </div>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => setOpenInlineSelect(isOpen ? null : name)}
+            className={`flex h-12 w-full items-center justify-between rounded-[14px] border border-[#d2d2d7] bg-white py-0 text-left text-[15px] text-[#1d1d1f] outline-none transition-all md:rounded-xl ${
+              Icon ? 'pl-10' : 'pl-3'
+            } pr-3 ${value === '' ? 'text-[#86868b]' : ''}`}
+            aria-expanded={isOpen}
+            aria-haspopup="listbox"
+          >
+            <span>{displayValue}</span>
+            <ChevronRight size={14} className={`text-[#86868b] transition-transform ${isOpen ? 'rotate-[270deg]' : 'rotate-90'}`} />
+          </button>
+
+          {isOpen ? (
+            <div className="absolute left-0 right-0 top-[calc(100%+0.45rem)] z-30 rounded-[16px] border border-[#d8d4ca] bg-white p-2 shadow-[0_16px_40px_rgba(17,17,17,0.12)]">
+              <div className="grid max-h-60 grid-cols-1 gap-1 overflow-y-auto">
+                {options.map((option) => {
+                  const selected = option === value;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => handleInlineSelect(name, option)}
+                      className={`rounded-[12px] px-3 py-2 text-left text-[15px] transition-colors ${
+                        selected
+                          ? 'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] font-medium text-[#0a63ff]'
+                          : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                      }`}
+                      role="option"
+                      aria-selected={selected}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     );
@@ -1136,66 +1235,9 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
               )}
 
               <div className="grid grid-cols-3 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[13px] font-medium text-[#86868b] uppercase">Personen</span>
-                  <div className="relative w-full">
-                    <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b]">
-                      <Users size={16} />
-                    </div>
-                    <select
-                      name="passengers"
-                      value={formData.passengers}
-                      onChange={handleChange}
-                      className={`h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white pl-10 pr-9 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl ${formData.passengers === '' ? 'text-[#86868b]' : ''}`}
-                    >
-                      <option value="" disabled>--</option>
-                      {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n}</option>)}
-                    </select>
-                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b]">
-                      <ChevronRight size={14} className="rotate-90" />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[13px] font-medium text-[#86868b] uppercase">Koffer</span>
-                  <div className="relative w-full">
-                    <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b]">
-                      <Briefcase size={16} />
-                    </div>
-                    <select
-                      name="luggage"
-                      value={formData.luggage}
-                      onChange={handleChange}
-                      className={`h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white pl-10 pr-9 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl ${formData.luggage === '' ? 'text-[#86868b]' : ''}`}
-                    >
-                      <option value="" disabled>--</option>
-                      {[0,1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n}</option>)}
-                    </select>
-                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b]">
-                      <ChevronRight size={14} className="rotate-90" />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[13px] font-medium text-[#86868b] uppercase">Handgepäck</span>
-                  <div className="relative w-full">
-                    <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#86868b]">
-                      <ShoppingBag size={16} />
-                    </div>
-                    <select
-                      name="handLuggage"
-                      value={formData.handLuggage}
-                      onChange={handleChange}
-                      className={`h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white pl-10 pr-9 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl ${formData.handLuggage === '' ? 'text-[#86868b]' : ''}`}
-                    >
-                      <option value="" disabled>--</option>
-                      {[0,1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n}</option>)}
-                    </select>
-                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b]">
-                      <ChevronRight size={14} className="rotate-90" />
-                    </div>
-                  </div>
-                </div>
+                {renderInlineSelect('passengers', 'Personen', [1, 2, 3, 4, 5, 6, 7, 8], formData.passengers, Users)}
+                {renderInlineSelect('luggage', 'Koffer', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.luggage, Briefcase)}
+                {renderInlineSelect('handLuggage', 'Handgep?ck', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.handLuggage, ShoppingBag)}
               </div>
 
               <div className="hidden grid grid-cols-3 gap-4">
@@ -1234,54 +1276,9 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                 {formData.childSeat && (
                   <>
                   <div className="grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-medium text-[#86868b] uppercase">Babyschale</label>
-                      <div className="relative">
-                        <select
-                          name="babySeats"
-                          value={formData.babySeats}
-                          onChange={handleChange}
-                          className="h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white px-3 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl"
-                        >
-                          {[0,1,2,3].map(n => <option key={n} value={n}>{n}</option>)}
-                        </select>
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[#86868b]">
-                          <ChevronRight size={14} className="rotate-90" />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-medium text-[#86868b] uppercase">Kindersitz</label>
-                      <div className="relative">
-                        <select
-                          name="childSeats"
-                          value={formData.childSeats}
-                          onChange={handleChange}
-                          className="h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white px-3 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl"
-                        >
-                          {[0,1,2,3].map(n => <option key={n} value={n}>{n}</option>)}
-                        </select>
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[#86868b]">
-                          <ChevronRight size={14} className="rotate-90" />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-medium text-[#86868b] uppercase">Sitzerhöhung</label>
-                      <div className="relative">
-                        <select
-                          name="boosterSeats"
-                          value={formData.boosterSeats}
-                          onChange={handleChange}
-                          className="h-12 w-full appearance-none rounded-[14px] border border-[#d2d2d7] bg-white px-3 py-0 text-[15px] text-[#1d1d1f] outline-none md:rounded-xl"
-                        >
-                          {[0,1,2,3].map(n => <option key={n} value={n}>{n}</option>)}
-                        </select>
-                        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[#86868b]">
-                          <ChevronRight size={14} className="rotate-90" />
-                        </div>
-                      </div>
-                    </div>
+                    {renderInlineSelect('babySeats', 'Babyschale', [0, 1, 2, 3], formData.babySeats)}
+                    {renderInlineSelect('childSeats', 'Kindersitz', [0, 1, 2, 3], formData.childSeats)}
+                    {renderInlineSelect('boosterSeats', 'Sitzerh?hung', [0, 1, 2, 3], formData.boosterSeats)}
                   </div>
                   <div className="hidden grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
                     {renderStepper('babySeats', 'Babyschale', 0, 3, formData.babySeats, true)}
