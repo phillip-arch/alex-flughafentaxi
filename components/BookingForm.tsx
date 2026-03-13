@@ -93,6 +93,8 @@ type InlineSelectFieldName = StepperFieldName;
 const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFormProps) => {
   const router = useRouter();
   const pathname = usePathname();
+  const isHomepageForm = pathname === '/';
+  const allowExtendedDropdownSpace = !isHomepageForm;
   const supabase = supabaseBrowser();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -539,14 +541,13 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     }));
   };
 
-  const nextStep = () => {
-    // Validation logic for each step
+  const validateStep = (step: number, markTouched = true) => {
     let isValid = true;
     const fieldsToValidate: (keyof ExtendedBookingInput)[] = [];
 
     let errorMessage: string | null = null;
 
-    if (currentStep === 1) {
+    if (step === 1) {
       if (!formData.direction) {
         isValid = false;
       }
@@ -554,18 +555,16 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
       if (formData.extraStop) {
         fieldsToValidate.push('extraStopStreet');
       }
-    } else if (currentStep === 2) {
+    } else if (step === 2) {
       fieldsToValidate.push('date', 'time', 'passengers', 'luggage', 'handLuggage');
       if (formData.direction === 'from_airport') {
         fieldsToValidate.push('flightNumber');
       }
       
-      // Validate minimum booking time
       if (formData.date && formData.time) {
         const [day, month, year] = formData.date.split('.');
         const [hours, minutes] = formData.time.split(':');
         
-        // Create date object for selected time
         const selectedDate = new Date(
           parseInt(year),
           parseInt(month) - 1,
@@ -576,13 +575,8 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
         
         const now = new Date();
         const selectedHour = selectedDate.getHours();
-        
-        // Determine minimum lead time based on time of day
-        // Night/Early Morning (22:00 - 07:00): 8 hours
-        // Day (07:00 - 22:00): 3 hours
         const isNightTime = selectedHour >= 22 || selectedHour < 7;
         const minLeadTimeHours = isNightTime ? 8 : 3;
-        
         const minBookingTime = new Date(now.getTime() + minLeadTimeHours * 60 * 60 * 1000);
 
         if (selectedDate < minBookingTime) {
@@ -590,51 +584,59 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
           if (isNightTime) {
             errorMessage = 'F?r Fahrten zwischen 22:00 und 07:00 Uhr ist eine Vorlaufzeit von 8 Stunden erforderlich.';
           } else {
-            errorMessage = 'Kurzfristige Buchungen sind nur bis 3 Stunden vor Abholung möglich.';
+            errorMessage = 'Kurzfristige Buchungen sind nur bis 3 Stunden vor Abholung m??glich.';
           }
         }
       }
     }
 
-    // Check if any required field is empty
     fieldsToValidate.forEach(field => {
       const value = formData[field];
       if ((typeof value === 'string' && !value.trim()) || value === '') {
         isValid = false;
         if (!errorMessage) {
-            errorMessage = 'Bitte füllen Sie alle erforderlichen Felder aus.';
+            errorMessage = 'Bitte f??llen Sie alle erforderlichen Felder aus.';
         }
       }
     });
 
     if (!isValid) {
-      // Mark only missing/invalid fields as touched
-      const newTouched = { ...touched };
-      fieldsToValidate.forEach(field => {
-        const value = formData[field];
-        if ((typeof value === 'string' && !value.trim()) || value === '') {
-          newTouched[field] = true;
+      if (markTouched) {
+        const newTouched = { ...touched };
+        fieldsToValidate.forEach(field => {
+          const value = formData[field];
+          if ((typeof value === 'string' && !value.trim()) || value === '') {
+            newTouched[field] = true;
+          }
+        });
+        
+        if (errorMessage && errorMessage !== 'Bitte f??llen Sie alle erforderlichen Felder aus.' && step === 2) {
+          newTouched['date'] = true;
+          newTouched['time'] = true;
         }
-      });
-      
-      // If we have a specific error message (like timing), ensure date/time are touched
-      if (errorMessage && errorMessage !== 'Bitte füllen Sie alle erforderlichen Felder aus.' && currentStep === 2) {
-        newTouched['date'] = true;
-        newTouched['time'] = true;
-      }
-      
-      // If direction is missing in step 1, mark it as touched
-      if (currentStep === 1 && !formData.direction) {
-        newTouched['direction'] = true;
-        errorMessage = errorMessage || 'Bitte füllen Sie alle erforderlichen Felder aus.';
+        
+        if (step === 1 && !formData.direction) {
+          newTouched['direction'] = true;
+          errorMessage = errorMessage || 'Bitte f??llen Sie alle erforderlichen Felder aus.';
+        }
+
+        setTouched(newTouched);
       }
 
-      setTouched(newTouched);
-      setError(errorMessage || 'Bitte füllen Sie alle erforderlichen Felder aus.');
-      return;
+      setError(errorMessage || 'Bitte f??llen Sie alle erforderlichen Felder aus.');
+      return false;
     }
 
     setError(null);
+    return true;
+  };
+
+  const nextStep = () => {
+    const isValid = validateStep(currentStep);
+    if (!isValid) {
+      return;
+    }
+
     if (currentStep === 1 && pathname === '/') {
       if (typeof window !== 'undefined') {
         window.sessionStorage.setItem(
@@ -662,6 +664,26 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     }
 
     if (currentStep < 3) setCurrentStep((prev) => prev + 1);
+  };
+
+  const handleStepIndicatorClick = (targetStep: number) => {
+    if (targetStep === currentStep) return;
+
+    if (targetStep < currentStep) {
+      setError(null);
+      setCurrentStep(targetStep);
+      return;
+    }
+
+    for (let step = currentStep; step < targetStep; step += 1) {
+      const isValid = validateStep(step);
+      if (!isValid) {
+        setCurrentStep(step);
+        return;
+      }
+    }
+
+    setCurrentStep(targetStep);
   };
 
   const prevStep = () => {
@@ -774,18 +796,21 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
 
         return (
           <React.Fragment key={step.key}>
-            <div
+            <button
+              type="button"
+              onClick={() => handleStepIndicatorClick(step.key)}
               className={`flex items-center gap-2 rounded-full border px-3 py-2 transition-all ${
                 isCurrent
                   ? 'border-[#111111] bg-[#111111] text-white'
                   : isComplete
                     ? 'border-[#0a63ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]'
-                    : 'border-[#d8d4ca] bg-white text-[#86868b]'
+                    : 'border-[#d8d4ca] bg-white text-[#86868b] hover:border-[#bdb7aa] hover:text-[#5f6975]'
               }`}
+              aria-current={isCurrent ? 'step' : undefined}
             >
               <Icon size={14} />
               <span className="text-[12px] font-semibold tracking-[-0.02em]">{step.label}</span>
-            </div>
+            </button>
             {index < stepItems.length - 1 ? (
               <ChevronRight size={14} className="text-[#b1aba0]" />
             ) : null}
@@ -796,8 +821,12 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   );
 
   return (
-    <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] relative overflow-hidden`}>
-      <div className="px-1 pb-2 pt-2 md:px-2 md:pb-3 md:pt-3">
+    <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
+      <div
+        className={`px-1 pt-2 md:px-2 md:pt-3 ${
+          allowExtendedDropdownSpace ? 'pb-12 md:pb-14' : 'pb-2 md:pb-3'
+        }`}
+      >
         <form onSubmit={handleSubmit}>
           {showStepIndicator ? <StepIndicator /> : null}
           {/* STEP 1: LOCATION */}

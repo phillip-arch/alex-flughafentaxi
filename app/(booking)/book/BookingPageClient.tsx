@@ -7,7 +7,6 @@ import {
   PlaneTakeoff,
   ShieldCheck,
   TimerReset,
-  Users,
   Wallet,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
@@ -31,13 +30,6 @@ const reviews = [
   },
 ];
 
-const supportItems = [
-  'Fixed price',
-  'Professional drivers',
-  'Free waiting time',
-  'Flight delay monitoring',
-];
-
 const paymentItems = [
   { label: 'Cash', icon: Wallet },
   { label: 'Visa', icon: CreditCard },
@@ -50,7 +42,7 @@ function InfoPanel({ direction }: { direction: Direction }) {
 
   return (
     <Card as="section" className="rounded-[2rem] p-5 md:p-6" variant="default">
-      <h2 className="ui-panel-title">Important Info.</h2>
+      <h2 className="ui-panel-title">Airport transfer information</h2>
       <div className="mt-4">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]">
           {infoBlock.title}
@@ -140,17 +132,17 @@ export default function BookingPageClient() {
         </div>
 
         <section className="mt-8">
-          <Card as="section" className="rounded-[2rem] p-5 md:p-6" variant="default">
+          <Card as="section" className="rounded-[1.75rem] p-4 md:p-5" variant="default">
             <div className="flex items-center gap-2">
               <BadgeCheck size={18} className="text-[var(--color-primary)]" />
-              <h2 className="text-xl font-semibold tracking-[-0.03em]">Trusted by passengers</h2>
+              <h2 className="text-lg font-semibold tracking-[-0.03em]">Trusted by passengers</h2>
             </div>
-            <p className="mt-3 text-sm font-semibold text-[var(--color-text)]">★★★★★ 4.9 / 5 rating</p>
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
+            <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">★★★★★ 4.9 / 5 rating</p>
+            <div className="mt-4 grid gap-2.5 md:grid-cols-3">
               {reviews.map((review) => (
-                <Card key={review.author} className="rounded-[1.5rem] p-4" variant="muted">
-                  <p className="text-sm font-medium text-[var(--color-text)]">"{review.quote}"</p>
-                  <p className="ui-copy mt-3 text-sm">- {review.author}</p>
+                <Card key={review.author} className="rounded-[1.15rem] p-3.5" variant="muted">
+                  <p className="text-[14px] font-medium leading-5 text-[var(--color-text)]">"{review.quote}"</p>
+                  <p className="ui-copy mt-2 text-[13px]">- {review.author}</p>
                 </Card>
               ))}
             </div>
@@ -162,23 +154,23 @@ export default function BookingPageClient() {
         </section>
 
         <section className="mt-6">
-          <Card as="section" className="rounded-[2rem] p-5 md:p-6" variant="default">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="flex items-center gap-3 rounded-[1rem] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3">
-                <ShieldCheck size={18} className="text-[var(--color-primary)]" />
-                <span className="text-sm font-medium text-[var(--color-text)]">{supportItems[0]}</span>
+          <Card as="section" className="rounded-[1.5rem] p-3.5 md:p-4" variant="default">
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2 text-[13px] font-medium text-[var(--color-text)]">
+                <ShieldCheck size={14} className="text-[var(--color-primary)]" />
+                <span>Fixed price</span>
               </div>
-              <div className="flex items-center gap-3 rounded-[1rem] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3">
-                <Users size={18} className="text-[var(--color-primary)]" />
-                <span className="text-sm font-medium text-[var(--color-text)]">{supportItems[1]}</span>
+              <div className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2 text-[13px] font-medium text-[var(--color-text)]">
+                <TimerReset size={14} className="text-[var(--color-primary)]" />
+                <span>Free waiting</span>
               </div>
-              <div className="flex items-center gap-3 rounded-[1rem] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3">
-                <TimerReset size={18} className="text-[var(--color-primary)]" />
-                <span className="text-sm font-medium text-[var(--color-text)]">{supportItems[2]}</span>
+              <div className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2 text-[13px] font-medium text-[var(--color-text)]">
+                <PlaneTakeoff size={14} className="text-[var(--color-primary)]" />
+                <span>Flight tracking</span>
               </div>
-              <div className="flex items-center gap-3 rounded-[1rem] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3">
-                <PlaneTakeoff size={18} className="text-[var(--color-primary)]" />
-                <span className="text-sm font-medium text-[var(--color-text)]">{supportItems[3]}</span>
+              <div className="flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2 text-[13px] font-medium text-[var(--color-text)]">
+                <BadgeCheck size={14} className="text-[var(--color-primary)]" />
+                <span>Professional drivers</span>
               </div>
             </div>
           </Card>
