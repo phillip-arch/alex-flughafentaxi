@@ -318,8 +318,8 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   const totalPrice = vehiclePrice + extraStopPrice;
   const routeSummary =
     formData.direction === 'to_airport'
-      ? `${formData.zip} ${formData.city} → Flughafen VIE`
-      : `Flughafen VIE → ${formData.zip} ${formData.city}`;
+      ? `${formData.zip} ${formData.city} ? Flughafen VIE`
+      : `Flughafen VIE ? ${formData.zip} ${formData.city}`;
   const streetSummary = [formData.street, formData.houseNumber].filter(Boolean).join(' ').trim() || 'Noch nicht gew\u00E4hlt';
   const dateSummary = [formData.date, formData.time].filter(Boolean).join(' | ') || 'Noch nicht gew\u00E4hlt';
 
