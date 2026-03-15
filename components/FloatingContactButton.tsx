@@ -80,9 +80,9 @@ export default function FloatingContactButton() {
   }
 
   return (
-    <div ref={containerRef} className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
+    <div ref={containerRef} className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 md:gap-2">
       {isOpen ? (
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-end gap-3 md:gap-2">
           {contactOptions.map((option) => {
             const Icon = option.icon;
 
@@ -96,7 +96,7 @@ export default function FloatingContactButton() {
 
                 <Link
                   href={option.href}
-                  className={`inline-flex h-[48px] w-[48px] items-center justify-center rounded-full shadow-[0_16px_38px_rgba(17,17,17,0.22)] transition-colors ${option.className}`}
+                  className={`inline-flex h-[56px] w-[56px] items-center justify-center rounded-full shadow-[0_16px_38px_rgba(17,17,17,0.22)] transition-colors md:h-[48px] md:w-[48px] ${option.className}`}
                   onClick={() => setIsOpen(false)}
                 >
                   <Icon className="h-[18px] w-[18px] text-white" />
@@ -110,7 +110,7 @@ export default function FloatingContactButton() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="inline-flex h-[48px] w-[48px] items-center justify-center rounded-full bg-[#1679FF] text-white shadow-[0_16px_38px_rgba(17,17,17,0.22)] transition-colors hover:bg-[#0f6ae8]"
+        className="inline-flex h-[56px] w-[56px] items-center justify-center rounded-full bg-[#1679FF] text-white shadow-[0_16px_38px_rgba(17,17,17,0.22)] transition-colors hover:bg-[#0f6ae8] md:h-[48px] md:w-[48px]"
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Close contact options' : 'Open contact options'}
       >
