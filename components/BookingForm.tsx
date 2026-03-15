@@ -802,7 +802,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     'inline-flex min-w-[220px] items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#111111] px-8 py-4 text-[17px] font-medium text-white transition-all hover:bg-[#232325] md:min-w-[176px] md:px-[1.6rem] md:py-[0.8rem]';
 
   const StepIndicator = () => (
-    <div className="mb-8 flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:mb-10 md:gap-1 md:overflow-visible md:pb-0">
+    <div className="mt-2 mb-8 flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:mt-0 md:mb-10 md:gap-1 md:overflow-visible md:pb-0">
       {stepItems.map((step, index) => {
         const Icon = step.icon;
         const isCurrent = currentStep === step.key;
@@ -813,7 +813,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
             <button
               type="button"
               onClick={() => handleStepIndicatorClick(step.key)}
-                className={`inline-flex shrink-0 items-center gap-0.5 rounded-full border px-2 py-1 text-[10px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
+                className={`inline-flex shrink-0 items-center gap-0.5 rounded-full border px-2.5 py-1.5 text-[12px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
                 isCurrent
                   ? 'border-[#1679FF] bg-[#1679FF] text-white'
                   : isComplete
@@ -822,11 +822,11 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
               }`}
               aria-current={isCurrent ? 'step' : undefined}
             >
-                <Icon size={13} strokeWidth={2.2} className="md:h-4 md:w-4" />
-                <span className="text-[9px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
+                <Icon size={15} strokeWidth={2.2} className="md:h-4 md:w-4" />
+                <span className="text-[11px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
               </button>
               {index < stepItems.length - 1 ? (
-                <ChevronRight size={10} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
+                <ChevronRight size={12} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
               ) : null}
           </React.Fragment>
         );
