@@ -99,7 +99,7 @@ export default function FloatingContactButton() {
                   className={`inline-flex h-[56px] w-[56px] items-center justify-center rounded-full shadow-[0_16px_38px_rgba(17,17,17,0.22)] transition-colors md:h-[48px] md:w-[48px] ${option.className}`}
                   onClick={() => setIsOpen(false)}
                 >
-                  <Icon className="h-[18px] w-[18px] text-white" />
+                  <Icon className="h-[22px] w-[22px] text-white md:h-[18px] md:w-[18px]" />
                 </Link>
               </div>
             );
@@ -114,7 +114,7 @@ export default function FloatingContactButton() {
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Close contact options' : 'Open contact options'}
       >
-        {isOpen ? <X size={18} /> : <Phone size={18} />}
+        {isOpen ? <X size={22} className="md:h-[18px] md:w-[18px]" /> : <Phone size={22} className="md:h-[18px] md:w-[18px]" />}
       </button>
     </div>
   );
