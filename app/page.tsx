@@ -103,7 +103,7 @@ export default function Home() {
         <div className="app-container relative grid gap-8 pb-10 pt-22 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-20 lg:pb-14 lg:pt-28">
           <div className="max-w-[38rem]">
             <div className="ui-text-block-lg mt-5 md:mt-6">
-              <h1 className="ui-heading-xl max-w-[14ch] !text-[2.14rem] !leading-[1.02] md:!text-[3.01rem]">
+              <h1 className="ui-heading-xl max-w-[16ch] !text-[2rem] !leading-[1.02] md:!text-[3.01rem]">
                 Flughafentaxi Wien: Sicher und puenktlich mit Alex
               </h1>
               <p className="ui-copy-compact max-w-[34rem]">

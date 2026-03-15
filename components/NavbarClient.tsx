@@ -45,9 +45,9 @@ const NavbarClient = () => {
 
   return (
     <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
-      <div className="app-container flex h-[72px] items-center justify-between">
+      <div className="app-container flex h-[66px] items-center justify-between lg:h-[72px]">
         <Link href="/" className="flex items-center">
-          <span className="relative block h-12 w-[220px] overflow-hidden">
+          <span className="relative block h-11 w-[220px] overflow-hidden lg:h-12">
             <Image
               src="https://web-site.website/images/aflogo.jpg"
               alt="Flughafentaxi Alex Logo"
@@ -90,7 +90,7 @@ const NavbarClient = () => {
         </div>
 
         <button
-          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/12 text-white lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center text-white lg:hidden"
           aria-label={isMobileMenuOpen ? 'Menue schliessen' : 'Menue oeffnen'}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
