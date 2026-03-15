@@ -501,7 +501,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
       return !value.trim();
     }
 
-    return value === '' || value === null;
+    return value === null;
   };
 
   const parseSelectedDateTime = () => {
