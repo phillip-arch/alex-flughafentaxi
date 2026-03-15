@@ -140,6 +140,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   });
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const REQUIRED_FIELDS_ERROR = 'Bitte fuellen Sie alle erforderlichen Felder aus.';
 
   useEffect(() => {
     onDirectionChange?.(formData.direction);
@@ -266,41 +267,6 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
       isMounted = false;
     };
   }, [supabase]);
-
-  // Clear error when all required fields in the current step are filled
-  useEffect(() => {
-    if (!error) return;
-
-    let allFilled = true;
-    if (currentStep === 1) {
-      if (!formData.direction || !formData.zip.trim() || !formData.street.trim() || !formData.houseNumber.trim()) allFilled = false;
-      if (formData.direction === 'from_airport' && !formData.flightNumber.trim()) allFilled = false;
-      if (formData.extraStop && (!formData.extraStopZip.trim() || !formData.extraStopStreet.trim() || !formData.extraStopHouseNumber.trim())) allFilled = false;
-    } else if (currentStep === 2) {
-      if (!formData.date || !formData.time || formData.passengers === '' || formData.luggage === '' || formData.handLuggage === '') {
-        allFilled = false;
-      } else if (error !== 'Bitte fuellen Sie alle erforderlichen Felder aus.') {
-        // Check if the specific time error is resolved
-        const [day, month, year] = formData.date.split('.');
-        const [hours, minutes] = formData.time.split(':');
-        const selectedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes));
-        const now = new Date();
-        const selectedHour = selectedDate.getHours();
-        const isNightTime = selectedHour >= 22 || selectedHour < 7;
-        const minLeadTimeHours = isNightTime ? 8 : 3;
-        const minBookingTime = new Date(now.getTime() + minLeadTimeHours * 60 * 60 * 1000);
-        if (selectedDate < minBookingTime) {
-          allFilled = false;
-        }
-      }
-    } else if (currentStep === 3) {
-      if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.paymentMethod) allFilled = false;
-    }
-
-    if (allFilled) {
-      setError(null);
-    }
-  }, [formData, currentStep, error]);
 
   // Derived state for price (mock calculation)
   const basePrice = 38;
@@ -467,11 +433,12 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     Icon?: LucideIcon
   ) => {
     const isOpen = openInlineSelect === name;
+    const isInvalid = touched[name] && value === '';
     const displayValue = value === '' ? '--' : String(value);
 
     return (
       <div className="flex min-w-0 flex-col gap-1.5">
-        <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#86868b] sm:text-[13px]">{label}</span>
+        <span className={`text-[11px] font-medium uppercase tracking-[0.05em] sm:text-[13px] ${isInvalid ? 'text-[#d70015]' : 'text-[#86868b]'}`}>{label}</span>
         <div className="relative min-w-0" data-inline-select-root="true">
           {Icon ? (
             <div className="pointer-events-none absolute left-3 top-1/2 z-[1] -translate-y-1/2 text-[#86868b]">
@@ -481,9 +448,15 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
           <button
             type="button"
             onClick={() => setOpenInlineSelect(isOpen ? null : name)}
-            className={`flex h-12 w-full items-center justify-between rounded-[var(--radius-field)] border border-[#d2d2d7] bg-white py-0 text-left text-[14px] text-[#1d1d1f] outline-none transition-all sm:text-[15px] md:h-[2.4rem] md:text-[12px] ${
+            className={`flex h-12 w-full items-center justify-between rounded-[var(--radius-field)] border bg-white py-0 text-left text-[14px] text-[#1d1d1f] outline-none transition-all sm:text-[15px] md:h-[2.4rem] md:text-[12px] ${
               Icon ? 'pl-10 md:pl-8' : 'pl-3 md:pl-[0.8rem]'
-            } pr-3 md:pr-[0.8rem] ${value === '' ? 'text-[#86868b]' : ''}`}
+            } pr-3 md:pr-[0.8rem] ${
+              isInvalid
+                ? 'border-[#d70015] text-[#d70015]'
+                : value === ''
+                  ? 'border-[#d2d2d7] text-[#86868b]'
+                  : 'border-[#d2d2d7]'
+            }`}
             aria-expanded={isOpen}
             aria-haspopup="listbox"
           >
@@ -521,6 +494,107 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     );
   };
 
+  const isMissingField = (field: keyof ExtendedBookingInput) => {
+    const value = formData[field];
+
+    if (typeof value === 'string') {
+      return !value.trim();
+    }
+
+    return value === '' || value === null;
+  };
+
+  const parseSelectedDateTime = () => {
+    if (!formData.date || !formData.time) return null;
+
+    const [day, month, year] = formData.date.split('.');
+    const [hours, minutes] = formData.time.split(':');
+    const selectedDate = new Date(
+      Number.parseInt(year, 10),
+      Number.parseInt(month, 10) - 1,
+      Number.parseInt(day, 10),
+      Number.parseInt(hours, 10),
+      Number.parseInt(minutes, 10)
+    );
+
+    if (Number.isNaN(selectedDate.getTime())) {
+      return null;
+    }
+
+    return selectedDate;
+  };
+
+  const getLeadTimeError = () => {
+    const selectedDate = parseSelectedDateTime();
+    if (!selectedDate) return REQUIRED_FIELDS_ERROR;
+
+    const now = new Date();
+    const selectedHour = selectedDate.getHours();
+    const isNightTime = selectedHour >= 22 || selectedHour < 7;
+    const minLeadTimeHours = isNightTime ? 8 : 3;
+    const minBookingTime = new Date(now.getTime() + minLeadTimeHours * 60 * 60 * 1000);
+
+    if (selectedDate >= minBookingTime) {
+      return null;
+    }
+
+    return isNightTime
+      ? 'Fuer Fahrten zwischen 22:00 und 07:00 Uhr ist eine Vorlaufzeit von 8 Stunden erforderlich.'
+      : 'Kurzfristige Buchungen sind nur bis 3 Stunden vor Abholung moeglich.';
+  };
+
+  const getStepValidation = (step: number) => {
+    const requiredFields: (keyof ExtendedBookingInput)[] = [];
+
+    if (step === 1) {
+      requiredFields.push('street');
+      if (formData.extraStop) {
+        requiredFields.push('extraStopStreet');
+      }
+    } else if (step === 2) {
+      requiredFields.push('date', 'time', 'passengers', 'luggage', 'handLuggage');
+      if (formData.direction === 'from_airport') {
+        requiredFields.push('flightNumber');
+      }
+    } else if (step === 3) {
+      requiredFields.push('fullName', 'email', 'phone', 'paymentMethod');
+    }
+
+    const missingFields = requiredFields.filter(isMissingField);
+    if (missingFields.length > 0) {
+      return {
+        isValid: false,
+        missingFields,
+        errorMessage: REQUIRED_FIELDS_ERROR,
+      };
+    }
+
+    if (step === 2) {
+      const leadTimeError = getLeadTimeError();
+      if (leadTimeError) {
+        return {
+          isValid: false,
+          missingFields: [] as (keyof ExtendedBookingInput)[],
+          errorMessage: leadTimeError,
+        };
+      }
+    }
+
+    return {
+      isValid: true,
+      missingFields: [] as (keyof ExtendedBookingInput)[],
+      errorMessage: null,
+    };
+  };
+
+  useEffect(() => {
+    if (!error) return;
+
+    if (getStepValidation(currentStep).isValid) {
+      setError(null);
+    }
+  }, [formData, currentStep, error]);
+
   const handlePaymentChange = (method: PaymentMethod) => {
     setFormData(prev => ({ ...prev, paymentMethod: method }));
     if (touched['paymentMethod']) {
@@ -547,88 +621,24 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   };
 
   const validateStep = (step: number, markTouched = true) => {
-    let isValid = true;
-    const fieldsToValidate: (keyof ExtendedBookingInput)[] = [];
+    const validation = getStepValidation(step);
 
-    let errorMessage: string | null = null;
-
-    if (step === 1) {
-      if (!formData.direction) {
-        isValid = false;
-      }
-      fieldsToValidate.push('street');
-      if (formData.extraStop) {
-        fieldsToValidate.push('extraStopStreet');
-      }
-    } else if (step === 2) {
-      fieldsToValidate.push('date', 'time', 'passengers', 'luggage', 'handLuggage');
-      if (formData.direction === 'from_airport') {
-        fieldsToValidate.push('flightNumber');
-      }
-      
-      if (formData.date && formData.time) {
-        const [day, month, year] = formData.date.split('.');
-        const [hours, minutes] = formData.time.split(':');
-        
-        const selectedDate = new Date(
-          parseInt(year),
-          parseInt(month) - 1,
-          parseInt(day),
-          parseInt(hours),
-          parseInt(minutes)
-        );
-        
-        const now = new Date();
-        const selectedHour = selectedDate.getHours();
-        const isNightTime = selectedHour >= 22 || selectedHour < 7;
-        const minLeadTimeHours = isNightTime ? 8 : 3;
-        const minBookingTime = new Date(now.getTime() + minLeadTimeHours * 60 * 60 * 1000);
-
-        if (selectedDate < minBookingTime) {
-          isValid = false;
-          if (isNightTime) {
-            errorMessage = 'Fuer Fahrten zwischen 22:00 und 07:00 Uhr ist eine Vorlaufzeit von 8 Stunden erforderlich.';
-          } else {
-            errorMessage = 'Kurzfristige Buchungen sind nur bis 3 Stunden vor Abholung moeglich.';
-          }
-        }
-      }
-    }
-
-    fieldsToValidate.forEach(field => {
-      const value = formData[field];
-      if ((typeof value === 'string' && !value.trim()) || value === '') {
-        isValid = false;
-        if (!errorMessage) {
-            errorMessage = 'Bitte fuellen Sie alle erforderlichen Felder aus.';
-        }
-      }
-    });
-
-    if (!isValid) {
+    if (!validation.isValid) {
       if (markTouched) {
         const newTouched = { ...touched };
-        fieldsToValidate.forEach(field => {
-          const value = formData[field];
-          if ((typeof value === 'string' && !value.trim()) || value === '') {
-            newTouched[field] = true;
-          }
+        validation.missingFields.forEach((field) => {
+          newTouched[field] = true;
         });
-        
-        if (errorMessage && errorMessage !== 'Bitte fuellen Sie alle erforderlichen Felder aus.' && step === 2) {
+
+        if (validation.errorMessage && validation.errorMessage !== REQUIRED_FIELDS_ERROR && step === 2) {
           newTouched['date'] = true;
           newTouched['time'] = true;
-        }
-        
-        if (step === 1 && !formData.direction) {
-          newTouched['direction'] = true;
-          errorMessage = errorMessage || 'Bitte fuellen Sie alle erforderlichen Felder aus.';
         }
 
         setTouched(newTouched);
       }
 
-      setError(errorMessage || 'Bitte fuellen Sie alle erforderlichen Felder aus.');
+      setError(validation.errorMessage || REQUIRED_FIELDS_ERROR);
       return false;
     }
 
@@ -711,27 +721,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
       return;
     }
     
-    // Validate Step 3 fields
-    const step3Fields: (keyof ExtendedBookingInput)[] = ['fullName', 'email', 'phone', 'paymentMethod'];
-    let isValid = true;
-    
-    step3Fields.forEach(field => {
-      const value = formData[field];
-      if ((typeof value === 'string' && !value.trim()) || value === null) {
-        isValid = false;
-      }
-    });
-
-    if (!isValid) {
-      const newTouched = { ...touched };
-      step3Fields.forEach(field => {
-        const value = formData[field];
-        if ((typeof value === 'string' && !value.trim()) || value === null) {
-          newTouched[field] = true;
-        }
-      });
-      setTouched(newTouched);
-      setError('Bitte fuellen Sie alle erforderlichen Felder aus.');
+    if (!validateStep(3)) {
       return;
     }
 
@@ -799,7 +789,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   ] as const;
   const actionRowClass = 'mt-4 flex items-center gap-3';
   const primaryActionButtonClass =
-    'inline-flex min-w-[220px] items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#111111] px-8 py-4 text-[17px] font-medium text-white transition-all hover:bg-[#232325] md:min-w-[176px] md:px-[1.6rem] md:py-[0.8rem]';
+    'inline-flex w-full flex-1 items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#111111] px-8 py-4 text-[17px] font-medium text-white transition-all hover:bg-[#232325] md:min-w-[176px] md:w-auto md:flex-none md:px-[1.6rem] md:py-[0.8rem]';
 
   const StepIndicator = () => (
     <div className="mt-2 mb-8 flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:mt-0 md:mb-10 md:gap-1 md:overflow-visible md:pb-0">
@@ -1506,7 +1496,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                     onClick={() => handlePaymentChange('cash')}
                     className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
                       formData.paymentMethod === 'cash' 
-                        ? 'border-[#0a63ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]' 
+                        ? 'border-[#1f9d55] bg-[#1f9d55] text-white' 
                         : touched['paymentMethod'] && !formData.paymentMethod
                           ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                           : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
@@ -1519,7 +1509,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                     onClick={() => handlePaymentChange('card')}
                     className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
                       formData.paymentMethod === 'card' 
-                        ? 'border-[#0071e3] bg-[#f2fcfc] text-[#0071e3]' 
+                        ? 'border-[#1679FF] bg-[#1679FF] text-white' 
                         : touched['paymentMethod'] && !formData.paymentMethod
                           ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                           : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
