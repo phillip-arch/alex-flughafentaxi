@@ -36,11 +36,13 @@ const contactOptions = [
     href: `https://wa.me/${WHATSAPP_NUMBER}`,
     className: 'bg-[#25D366] text-white hover:bg-[#1fb959]',
     icon: WhatsAppIcon,
+    hoverLabel: undefined,
   },
   {
     href: `viber://chat?number=${VIBER_NUMBER}`,
     className: 'bg-[#7360f2] text-white hover:bg-[#6552dc]',
     icon: ViberIcon,
+    hoverLabel: undefined,
   },
 ] as const;
 
