@@ -1,26 +1,32 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'FAQ - Frequently Asked Questions',
-  description: 'Answers to common questions about our airport transfer service in Vienna.',
+  title: 'FAQ - Haeufige Fragen',
+  description: 'Antworten auf haeufige Fragen zu unserem Flughafentransfer in Wien.',
 };
 
 export default function FAQPage() {
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">Frequently Asked Questions</h1>
-      <div className="space-y-6 max-w-3xl">
-        <div className="p-6 border rounded-2xl">
-          <h3 className="text-xl font-bold mb-2">How do I find my driver?</h3>
-          <p className="text-slate-600">Your driver will be waiting for you at the arrival hall with a name sign.</p>
+    <div className="container mx-auto max-w-3xl px-4 py-12">
+      <h1 className="mb-8 text-4xl font-bold">Haeufige Fragen</h1>
+      <div className="space-y-6">
+        <div className="rounded-2xl border p-6">
+          <h2 className="mb-2 text-xl font-bold">Wie finde ich meinen Fahrer?</h2>
+          <p className="text-slate-600">
+            Ihr Fahrer wartet in der Ankunftshalle mit einem Namensschild auf Sie.
+          </p>
         </div>
-        <div className="p-6 border rounded-2xl">
-          <h3 className="text-xl font-bold mb-2">Can I pay by card?</h3>
-          <p className="text-slate-600">Yes, all our drivers accept major credit and debit cards.</p>
+        <div className="rounded-2xl border p-6">
+          <h2 className="mb-2 text-xl font-bold">Kann ich mit Karte bezahlen?</h2>
+          <p className="text-slate-600">
+            Ja, wir akzeptieren gaengige Kreditkarten sowie Apple Pay.
+          </p>
         </div>
-        <div className="p-6 border rounded-2xl">
-          <h3 className="text-xl font-bold mb-2">What if my flight is delayed?</h3>
-          <p className="text-slate-600">We monitor flight times. Your driver will adjust the pickup time accordingly at no extra cost.</p>
+        <div className="rounded-2xl border p-6">
+          <h2 className="mb-2 text-xl font-bold">Was passiert bei Flugverspaetungen?</h2>
+          <p className="text-slate-600">
+            Wir verfolgen Ihren Flug und passen die Abholzeit automatisch an.
+          </p>
         </div>
       </div>
     </div>

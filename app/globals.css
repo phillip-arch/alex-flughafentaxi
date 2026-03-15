@@ -369,6 +369,11 @@ p {
 }
 
 @media (min-width: 768px) {
+  .ui-input {
+    min-height: 2.4rem;
+    padding: 0.5rem 0.8rem;
+  }
+
   .app-container {
     padding-inline: 1.5rem;
   }

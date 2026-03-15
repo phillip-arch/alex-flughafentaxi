@@ -226,7 +226,7 @@ export default function AccountClient({
                 type="button"
                 onClick={() => setMobileTabsOpen((prev) => !prev)}
                 className="inline-flex items-center justify-center w-11 h-11 rounded-[12px] border border-[#d2d2d7] bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
-                aria-label="Open account menu"
+                aria-label="Kontomenue oeffnen"
               >
                 <Menu size={17} />
               </button>
@@ -565,7 +565,7 @@ export default function AccountClient({
                                   href={getGoogleMapsUrl(b.pickup)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  aria-label="Open pickup in Google Maps"
+                            aria-label="Abholort in Google Maps oeffnen"
                                   className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
                                 >
                                   <MapPin size={20} />
@@ -579,7 +579,7 @@ export default function AccountClient({
                                   href={getGoogleMapsUrl(b.destination)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  aria-label="Open destination in Google Maps"
+                            aria-label="Ziel in Google Maps oeffnen"
                                   className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
                                 >
                                   <MapPin size={20} />
@@ -641,7 +641,7 @@ export default function AccountClient({
                                 ) : null}
                                 {seats.booster > 0 ? (
                                   <span className={RIDE_PILL_SMALL_CLASS}>
-                                    {seats.booster} SITZERHOEHUNG
+                                    {seats.booster} Sitzerhöhung
                                   </span>
                                 ) : null}
                               </div>

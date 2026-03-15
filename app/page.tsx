@@ -4,6 +4,7 @@ import {
   ArrowRight,
   CarFront,
   Clock3,
+  ChevronDown,
   MapPinned,
   ShieldCheck,
   Wallet,
@@ -70,23 +71,48 @@ const fleetOptions = [
   },
 ];
 
+const faqItems = [
+  {
+    question: 'Wie frueh sollte ich meinen Flughafentransfer buchen?',
+    answer:
+      'Fahrten bis 22:00 sollten mindestens 3 Stunden vorher gebucht werden. Fuer Nachtfahrten zwischen 22:00 und 07:00 planen wir mindestens 8 Stunden Vorlauf ein.',
+  },
+  {
+    question: 'Was passiert bei einer verspaeteten Landung?',
+    answer:
+      'Flugankuenfte werden mitverfolgt. Bei Verspaetungen passen wir die Abholzeit automatisch an, damit die Fahrt trotzdem sauber koordiniert bleibt.',
+  },
+  {
+    question: 'Kann ich Kindersitze und Zusatzgepaeck angeben?',
+    answer:
+      'Ja. Babyschale, Kindersitz, Sitzerhoehung sowie Koffer und Handgepaeck koennen direkt im Buchungsformular ausgewaehlt werden.',
+  },
+  {
+    question: 'Welche Zahlungsarten sind moeglich?',
+    answer:
+      'Sie koennen Barzahlung, Visa, Mastercard und Apple Pay nutzen. Die Auswahl erfolgt direkt im letzten Buchungsschritt.',
+  },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <Navbar />
 
       <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
-        <div className="app-container relative grid gap-8 pb-10 pt-24 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-8 lg:pb-14 lg:pt-32">
+        <div className="app-container relative grid gap-8 pb-10 pt-22 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-20 lg:pb-14 lg:pt-28">
           <div className="max-w-[38rem]">
             <div className="ui-text-block-lg mt-5 md:mt-6">
-            <h1 className="ui-heading-xl max-w-[14ch] !text-[2.14rem] !leading-[1.02] md:!text-[3.01rem]">
-              Flughafentaxi Wien: Sicher & pünktlich mit Alex
-            </h1>
-            <p className="ui-copy-compact max-w-[34rem]">
-              Premium Flughafentransfers mit starkem Kontrast, klaren Preisen und einer Buchung, die sofort zur Fahrt fuehrt.
-            </p>
+              <h1 className="ui-heading-xl max-w-[14ch] !text-[2.14rem] !leading-[1.02] md:!text-[3.01rem]">
+                Flughafentaxi Wien: Sicher und puenktlich mit Alex
+              </h1>
+              <p className="ui-copy-compact max-w-[34rem]">
+                Buchen Sie Ihr Flughafentaxi in Wien schnell und unkompliziert. Mit Fixpreis,
+                zuverlaessigem Service und puenktlicher Abholung bringen wir Sie komfortabel zum
+                Flughafen Wien (VIE) oder holen Sie nach Ihrer Landung direkt ab.
+              </p>
             </div>
-            <div id="hero-booking" className="relative mt-5 w-full max-w-[740px] lg:-ml-2">
+            <div id="hero-booking" className="relative mt-2 w-full max-w-[740px] lg:-ml-2">
               <div className="absolute -left-8 top-12 hidden h-24 w-24 rounded-full bg-[#0a63ff]/20 blur-3xl lg:block" />
               <div className="rounded-[2rem] bg-transparent px-0 py-2 shadow-none md:px-0 md:py-2">
                 <BookingForm showStepIndicator={false} />
@@ -94,7 +120,10 @@ export default function Home() {
             </div>
           </div>
 
-          <Card className="relative w-full min-h-[360px] overflow-hidden rounded-none bg-[var(--color-bg)] lg:mt-6 lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end" variant="default">
+          <Card
+            className="relative w-full min-h-[360px] overflow-hidden rounded-none bg-[var(--color-bg)] lg:mt-6 lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end"
+            variant="default"
+          >
             <Image
               src="https://images.pexels.com/photos/9519974/pexels-photo-9519974.jpeg"
               alt="Flughafentaxi Wien"
@@ -116,12 +145,13 @@ export default function Home() {
             </h3>
             <div className="ui-copy-group max-w-[64rem]">
               <p className="ui-copy-compact">
-                Ob Transfer zum Flughafen Wien oder Abholung nach der Landung: Die Buchung bleibt kompakt, der Preis steht
-                vorab fest und die Fahrt ist in wenigen Schritten reserviert.
+                Ob Transfer zum Flughafen Wien oder Abholung nach der Landung: Die Buchung bleibt
+                kompakt, der Preis steht vorab fest und die Fahrt ist in wenigen Schritten
+                reserviert.
               </p>
               <p className="ui-copy-compact max-w-[56rem]">
-                Falls Sie statt Wien Airport ein anderes Ziel fahren moechten, bleibt der Ablauf derselbe: Adresse,
-                Zeitfenster und Fahrzeug in einer klaren Reihenfolge.
+                Falls Sie statt Wien Airport ein anderes Ziel fahren moechten, bleibt der Ablauf
+                derselbe: Adresse, Zeitfenster und Fahrzeug in einer klaren Reihenfolge.
               </p>
             </div>
           </div>
@@ -132,12 +162,8 @@ export default function Home() {
                 <span className="flex h-10 w-10 items-center justify-center text-[var(--color-text)]">
                   <Icon size={24} strokeWidth={2.1} />
                 </span>
-                <h6 className="ui-heading-sm text-[var(--color-text)]">
-                  {title}
-                </h6>
-                <p className="ui-copy-compact">
-                  {description}
-                </p>
+                <h6 className="ui-heading-sm text-[var(--color-text)]">{title}</h6>
+                <p className="ui-copy-compact">{description}</p>
               </div>
             ))}
           </div>
@@ -163,13 +189,14 @@ export default function Home() {
       <section id="gebiete" className="app-container py-20">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <div>
-            <p className="ui-eyebrow border-none bg-transparent p-0">Service areas</p>
+            <p className="ui-eyebrow border-none bg-transparent p-0">Servicebereiche</p>
             <div className="ui-text-block-lg mt-4">
               <h2 className="ui-heading-lg max-w-md md:text-5xl">
                 Gebaut fuer Wege zwischen Stadt, Hotel und Terminal.
               </h2>
               <p className="ui-copy-compact max-w-md">
-                Die Startseite setzt auf grosse Kontraste, klare Entscheidungen und genau die Informationen, die vor einer Buchung relevant sind.
+                Die Startseite setzt auf grosse Kontraste, klare Entscheidungen und genau die
+                Informationen, die vor einer Buchung relevant sind.
               </p>
             </div>
           </div>
@@ -179,14 +206,26 @@ export default function Home() {
               <Card
                 key={area}
                 className={`rounded-[1.75rem] p-6 ${
-                  index === 0 ? 'border border-white/10 bg-[var(--color-surface-dark)] text-white' : 'text-[var(--color-text)]'
+                  index === 0
+                    ? 'border border-white/10 bg-[var(--color-surface-dark)] text-white'
+                    : 'text-[var(--color-text)]'
                 }`}
                 variant={index === 0 ? 'dark' : 'section'}
               >
-                <p className={`text-sm ${index === 0 ? 'text-white/64' : 'text-[var(--color-text-muted)]'}`}>Zone {index + 1}</p>
+                <p
+                  className={`text-sm ${
+                    index === 0 ? 'text-white/64' : 'text-[var(--color-text-muted)]'
+                  }`}
+                >
+                  Zone {index + 1}
+                </p>
                 <div className="ui-text-block-sm mt-4">
                   <h3 className="text-2xl font-semibold tracking-[-0.03em]">{area}</h3>
-                  <p className={`ui-copy-compact ${index === 0 ? 'text-white/72' : 'text-[var(--color-text-muted)]'}`}>
+                  <p
+                    className={`ui-copy-compact ${
+                      index === 0 ? 'text-white/72' : 'text-[var(--color-text-muted)]'
+                    }`}
+                  >
                     Direkte Abholung mit Fokus auf Flughafenlogik statt klassischem Taxi-Look.
                   </p>
                 </div>
@@ -199,62 +238,63 @@ export default function Home() {
       <section className="bg-white py-20">
         <div className="app-container">
           <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <Card className="rounded-[2rem] p-8" variant="muted">
-            <p className="ui-eyebrow border-none bg-transparent p-0">Booking flow</p>
-            <div className="ui-text-block-lg mt-4">
-              <h2 className="ui-heading-lg max-w-lg md:text-5xl">
-                Vor der Fahrt ist alles klar.
-              </h2>
-              <p className="ui-copy-compact max-w-xl">
-                Adresse, Zeitfenster und Fahrzeugwahl bleiben direkt lesbar. Keine ueberladene Taxi-Seite, sondern eine klare Strecke bis zur Buchung.
-              </p>
-            </div>
-          </Card>
+            <Card className="rounded-[2rem] p-8" variant="muted">
+              <p className="ui-eyebrow border-none bg-transparent p-0">Buchungsablauf</p>
+              <div className="ui-text-block-lg mt-4">
+                <h2 className="ui-heading-lg max-w-lg md:text-5xl">Vor der Fahrt ist alles klar.</h2>
+                <p className="ui-copy-compact max-w-xl">
+                  Adresse, Zeitfenster und Fahrzeugwahl bleiben direkt lesbar. Keine ueberladene
+                  Taxi-Seite, sondern eine klare Strecke bis zur Buchung.
+                </p>
+              </div>
+            </Card>
 
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Card className="rounded-[2rem] p-6" variant="section">
-              <p className="text-sm font-semibold text-[var(--color-text-muted)]">01</p>
-              <div className="ui-text-block-sm mt-4">
-                <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">Adresse</h3>
-                <p className="ui-copy-compact">
-                  Eine klare Startadresse oder Ankunft am Flughafen ohne Umwege im Formular.
-                </p>
-              </div>
-            </Card>
-            <Card className="rounded-[2rem] p-6" variant="section">
-              <p className="text-sm font-semibold text-[var(--color-text-muted)]">02</p>
-              <div className="ui-text-block-sm mt-4">
-                <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">Zeit</h3>
-                <p className="ui-copy-compact">
-                  Datum, Uhrzeit und Flugdetails sitzen im zweiten Schritt genau dort, wo sie erwartet werden.
-                </p>
-              </div>
-            </Card>
-            <Card className="rounded-[2rem] p-6" variant="section">
-              <p className="text-sm font-semibold text-[var(--color-text-muted)]">03</p>
-              <div className="ui-text-block-sm mt-4">
-                <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">Bestaetigen</h3>
-                <p className="ui-copy-compact">
-                  Fahrzeug, Preis und Kontaktdaten bleiben reduziert, damit der Abschluss schnell bleibt.
-                </p>
-              </div>
-            </Card>
-          </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Card className="rounded-[2rem] p-6" variant="section">
+                <p className="text-sm font-semibold text-[var(--color-text-muted)]">01</p>
+                <div className="ui-text-block-sm mt-4">
+                  <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+                    Adresse
+                  </h3>
+                  <p className="ui-copy-compact">
+                    Eine klare Startadresse oder Ankunft am Flughafen ohne Umwege im Formular.
+                  </p>
+                </div>
+              </Card>
+              <Card className="rounded-[2rem] p-6" variant="section">
+                <p className="text-sm font-semibold text-[var(--color-text-muted)]">02</p>
+                <div className="ui-text-block-sm mt-4">
+                  <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+                    Zeit
+                  </h3>
+                  <p className="ui-copy-compact">
+                    Datum, Uhrzeit und Flugdetails sitzen im zweiten Schritt genau dort, wo sie
+                    erwartet werden.
+                  </p>
+                </div>
+              </Card>
+              <Card className="rounded-[2rem] p-6" variant="section">
+                <p className="text-sm font-semibold text-[var(--color-text-muted)]">03</p>
+                <div className="ui-text-block-sm mt-4">
+                  <h3 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+                    Bestaetigen
+                  </h3>
+                  <p className="ui-copy-compact">
+                    Fahrzeug, Preis und Kontaktdaten bleiben reduziert, damit der Abschluss schnell
+                    bleibt.
+                  </p>
+                </div>
+              </Card>
+            </div>
           </div>
 
           <Card className="mt-8 rounded-[2rem] p-6 md:p-8" variant="muted">
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button
-                href="#hero-booking"
-                className="rounded-2xl"
-              >
+              <Button href="#hero-booking" className="rounded-2xl">
                 Jetzt Fahrt planen
                 <ArrowRight size={16} />
               </Button>
-              <Button
-                href="/preise"
-                className="rounded-2xl"
-              >
+              <Button href="/preise" className="rounded-2xl">
                 Preise ansehen
               </Button>
             </div>
@@ -286,7 +326,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1372px] px-4 md:px-6">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-white/56">Fleet</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-white/56">Flotte</p>
               <div className="ui-text-block-lg mt-4">
                 <h2 className="max-w-2xl text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
                   Weniger dekorativ, mehr transportbereit.
@@ -307,13 +347,21 @@ export default function Home() {
               <article
                 key={option.name}
                 className={`rounded-[2rem] p-6 ${
-                  index === 1 ? 'bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white' : 'border border-white/10 bg-white/6 text-white'
+                  index === 1
+                    ? 'bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white'
+                    : 'border border-white/10 bg-white/6 text-white'
                 }`}
               >
-                <p className={`text-sm ${index === 1 ? 'text-[#0f0f10]/62' : 'text-white/52'}`}>{option.meta}</p>
+                <p className={`text-sm ${index === 1 ? 'text-[#0f0f10]/62' : 'text-white/52'}`}>
+                  {option.meta}
+                </p>
                 <div className="ui-text-block-sm mt-6">
                   <h3 className="text-3xl font-semibold tracking-[-0.04em]">{option.name}</h3>
-                  <p className={`ui-copy-compact ${index === 1 ? 'text-[#0f0f10]/74' : 'text-white/72'}`}>
+                  <p
+                    className={`ui-copy-compact ${
+                      index === 1 ? 'text-[#0f0f10]/74' : 'text-white/72'
+                    }`}
+                  >
                     {option.details}
                   </p>
                 </div>
@@ -323,6 +371,42 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="faq" className="border-t border-[var(--color-border)] bg-white py-20">
+        <div className="app-container">
+          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+            <div className="ui-text-block-lg max-w-xl">
+              <p className="ui-eyebrow border-none bg-transparent p-0">FAQ</p>
+              <h2 className="ui-heading-lg">Haeufige Fragen vor der Buchung.</h2>
+              <p className="ui-copy-compact">
+                Die wichtigsten Antworten zu Vorlaufzeit, Flugtracking, Kindersitzen und Zahlung
+                bleiben direkt auf der Startseite erreichbar.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {faqItems.map((item) => (
+                <details
+                  key={item.question}
+                  className="group rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-4"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                    <span className="text-lg font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+                      {item.question}
+                    </span>
+                    <ChevronDown
+                      size={18}
+                      className="shrink-0 text-[var(--color-text-muted)] transition-transform duration-200 group-open:rotate-180"
+                    />
+                  </summary>
+                  <p className="ui-copy-compact mt-4 pr-8 text-[var(--color-text-muted)]">
+                    {item.answer}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

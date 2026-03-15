@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Menu, User, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -37,24 +38,24 @@ const NavbarClient = () => {
   if (isAdminPage) return null;
 
   const headerClass = isHomePage && !isScrolled
-    ? 'border-b border-black/8 bg-transparent text-[#111111]'
-    : 'border-b border-black/8 bg-[rgba(243,243,238,0.92)] text-[#111111] backdrop-blur-xl';
+    ? 'border-b border-white/10 bg-[#000000] text-white'
+    : 'border-b border-white/10 bg-[rgba(0,0,0,0.94)] text-white backdrop-blur-xl';
 
-  const navItemClass = isHomePage && !isScrolled
-    ? 'text-[#5f6368] hover:text-[#111111]'
-    : 'text-[#3c4043] hover:text-[#111111]';
+  const navItemClass = 'text-white/72 hover:text-white';
 
   return (
     <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
-      <div className="app-container flex h-[76px] items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-current/10 text-sm font-semibold">
-            FA
+      <div className="app-container flex h-[72px] items-center justify-between">
+        <Link href="/" className="flex items-center">
+          <span className="relative block h-12 w-[220px] overflow-hidden">
+            <Image
+              src="https://web-site.website/images/aflogo.jpg"
+              alt="Flughafentaxi Alex Logo"
+              fill
+              sizes="220px"
+              className="object-contain object-left"
+            />
           </span>
-          <div className="leading-tight">
-            <p className="text-sm font-semibold tracking-[0.18em]">FLUGHAFENTAXI</p>
-            <p className={`text-[1rem] font-medium tracking-[0.12em] [font-family:'Segoe_Print','Bradley_Hand','Comic_Sans_MS',cursive] ${isHomePage && !isScrolled ? 'text-[#5f6368]' : 'text-[#5f6368]'}`}>Alex</p>
-          </div>
         </Link>
 
         <nav className="hidden items-center gap-8 lg:flex">
@@ -72,7 +73,7 @@ const NavbarClient = () => {
         <div className="hidden items-center gap-3 lg:flex">
           <Button
             href="/account"
-            className="px-4 py-2 text-sm font-medium"
+            className="border-white/12 bg-white/8 px-4 py-2 text-sm font-medium !text-white hover:bg-white/12"
             variant="secondary"
           >
             <User size={16} />
@@ -89,7 +90,7 @@ const NavbarClient = () => {
         </div>
 
         <button
-          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-current/10 lg:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/12 text-white lg:hidden"
           aria-label={isMobileMenuOpen ? 'Menue schliessen' : 'Menue oeffnen'}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
@@ -98,7 +99,7 @@ const NavbarClient = () => {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="border-t border-current/10 bg-[#0f0f10] px-4 py-6 text-white lg:hidden">
+        <div className="border-t border-current/10 bg-[#000000] px-4 py-6 text-white lg:hidden">
           <nav className="flex flex-col gap-3">
             {navItems.map((item) => (
               <Link

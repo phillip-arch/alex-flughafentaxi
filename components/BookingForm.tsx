@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -279,7 +279,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     } else if (currentStep === 2) {
       if (!formData.date || !formData.time || formData.passengers === '' || formData.luggage === '' || formData.handLuggage === '') {
         allFilled = false;
-      } else if (error !== 'Bitte füllen Sie alle erforderlichen Felder aus.') {
+      } else if (error !== 'Bitte fuellen Sie alle erforderlichen Felder aus.') {
         // Check if the specific time error is resolved
         const [day, month, year] = formData.date.split('.');
         const [hours, minutes] = formData.time.split(':');
@@ -318,10 +318,10 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   const totalPrice = vehiclePrice + extraStopPrice;
   const routeSummary =
     formData.direction === 'to_airport'
-      ? `${formData.zip} ${formData.city} ? Flughafen VIE`
-      : `Flughafen VIE ? ${formData.zip} ${formData.city}`;
-  const streetSummary = [formData.street, formData.houseNumber].filter(Boolean).join(' ').trim() || 'Noch nicht gew\u00E4hlt';
-  const dateSummary = [formData.date, formData.time].filter(Boolean).join(' | ') || 'Noch nicht gew\u00E4hlt';
+      ? `${formData.zip} ${formData.city} -> Flughafen VIE`
+      : `Flughafen VIE -> ${formData.zip} ${formData.city}`;
+  const streetSummary = [formData.street, formData.houseNumber].filter(Boolean).join(' ').trim() || 'Noch nicht gewaehlt';
+  const dateSummary = [formData.date, formData.time].filter(Boolean).join(' | ') || 'Noch nicht gewaehlt';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -369,6 +369,11 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     if (touched['direction']) {
         setTouched(prev => ({ ...prev, direction: false }));
     }
+  };
+
+  const scrollToPageTop = () => {
+    if (typeof window === 'undefined') return;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const toggleDirection = () => {
@@ -419,13 +424,13 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   const displayValue = value === '' ? '--' : value;
 
     return (
-      <div className={`flex flex-col items-center justify-center rounded-[14px] bg-[#f5f5f7] ${compact ? 'gap-1.5 p-2.5' : 'gap-2 p-3.5'} md:rounded-2xl`}>
+      <div className={`flex flex-col items-center justify-center rounded-[14px] bg-[#f5f5f7] ${compact ? 'gap-1.5 p-2.5 md:gap-[0.3rem] md:p-2' : 'gap-2 p-3.5 md:gap-[0.4rem] md:p-[0.7rem]'} md:rounded-2xl`}>
         <span className={`font-medium uppercase text-[#86868b] ${compact ? 'text-[11px]' : 'text-[13px]'}`}>{label}</span>
-        <div className="flex h-12 w-full items-center justify-between gap-2 rounded-[14px] border border-[#d2d2d7] bg-white px-2 md:rounded-full">
+        <div className="flex h-12 w-full items-center justify-between gap-2 rounded-[14px] border border-[#d2d2d7] bg-white px-2 md:h-[2.4rem] md:gap-[0.4rem] md:px-[0.4rem] md:rounded-full">
           <button
             type="button"
             onClick={() => updateStepperValue(name, -1, min, max)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f3ee]"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f3ee] md:h-[1.8rem] md:w-[1.8rem]"
             aria-label={`${label} verringern`}
           >
             <Minus size={16} />
@@ -436,8 +441,8 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
           <button
             type="button"
             onClick={() => updateStepperValue(name, 1, min, max)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f3ee]"
-            aria-label={`${label} erhöhen`}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f3ee] md:h-[1.8rem] md:w-[1.8rem]"
+            aria-label={`${label} erhoehen`}
           >
             <Plus size={16} />
           </button>
@@ -476,9 +481,9 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
           <button
             type="button"
             onClick={() => setOpenInlineSelect(isOpen ? null : name)}
-            className={`flex h-12 w-full items-center justify-between rounded-[var(--radius-field)] border border-[#d2d2d7] bg-white py-0 text-left text-[14px] text-[#1d1d1f] outline-none transition-all sm:text-[15px] ${
-              Icon ? 'pl-10' : 'pl-3'
-            } pr-3 ${value === '' ? 'text-[#86868b]' : ''}`}
+            className={`flex h-12 w-full items-center justify-between rounded-[var(--radius-field)] border border-[#d2d2d7] bg-white py-0 text-left text-[14px] text-[#1d1d1f] outline-none transition-all sm:text-[15px] md:h-[2.4rem] md:text-[12px] ${
+              Icon ? 'pl-10 md:pl-8' : 'pl-3 md:pl-[0.8rem]'
+            } pr-3 md:pr-[0.8rem] ${value === '' ? 'text-[#86868b]' : ''}`}
             aria-expanded={isOpen}
             aria-haspopup="listbox"
           >
@@ -496,7 +501,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       key={option}
                       type="button"
                       onClick={() => handleInlineSelect(name, option)}
-                      className={`rounded-[12px] px-3 py-2 text-left text-[15px] transition-colors ${
+                      className={`rounded-[12px] px-3 py-2 text-left text-[15px] transition-colors md:px-[0.8rem] md:py-[0.4rem] md:text-[12px] ${
                         selected
                           ? 'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] font-medium text-[#0a63ff]'
                           : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
@@ -582,9 +587,9 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
         if (selectedDate < minBookingTime) {
           isValid = false;
           if (isNightTime) {
-            errorMessage = 'F?r Fahrten zwischen 22:00 und 07:00 Uhr ist eine Vorlaufzeit von 8 Stunden erforderlich.';
+            errorMessage = 'Fuer Fahrten zwischen 22:00 und 07:00 Uhr ist eine Vorlaufzeit von 8 Stunden erforderlich.';
           } else {
-            errorMessage = 'Kurzfristige Buchungen sind nur bis 3 Stunden vor Abholung m??glich.';
+            errorMessage = 'Kurzfristige Buchungen sind nur bis 3 Stunden vor Abholung moeglich.';
           }
         }
       }
@@ -595,7 +600,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
       if ((typeof value === 'string' && !value.trim()) || value === '') {
         isValid = false;
         if (!errorMessage) {
-            errorMessage = 'Bitte f??llen Sie alle erforderlichen Felder aus.';
+            errorMessage = 'Bitte fuellen Sie alle erforderlichen Felder aus.';
         }
       }
     });
@@ -610,20 +615,20 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
           }
         });
         
-        if (errorMessage && errorMessage !== 'Bitte f??llen Sie alle erforderlichen Felder aus.' && step === 2) {
+        if (errorMessage && errorMessage !== 'Bitte fuellen Sie alle erforderlichen Felder aus.' && step === 2) {
           newTouched['date'] = true;
           newTouched['time'] = true;
         }
         
         if (step === 1 && !formData.direction) {
           newTouched['direction'] = true;
-          errorMessage = errorMessage || 'Bitte f??llen Sie alle erforderlichen Felder aus.';
+          errorMessage = errorMessage || 'Bitte fuellen Sie alle erforderlichen Felder aus.';
         }
 
         setTouched(newTouched);
       }
 
-      setError(errorMessage || 'Bitte f??llen Sie alle erforderlichen Felder aus.');
+      setError(errorMessage || 'Bitte fuellen Sie alle erforderlichen Felder aus.');
       return false;
     }
 
@@ -663,7 +668,10 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
       return;
     }
 
-    if (currentStep < 3) setCurrentStep((prev) => prev + 1);
+    if (currentStep < 3) {
+      setCurrentStep((prev) => prev + 1);
+      requestAnimationFrame(scrollToPageTop);
+    }
   };
 
   const handleStepIndicatorClick = (targetStep: number) => {
@@ -672,6 +680,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     if (targetStep < currentStep) {
       setError(null);
       setCurrentStep(targetStep);
+      requestAnimationFrame(scrollToPageTop);
       return;
     }
 
@@ -684,11 +693,13 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     }
 
     setCurrentStep(targetStep);
+    requestAnimationFrame(scrollToPageTop);
   };
 
   const prevStep = () => {
     setError(null);
     setCurrentStep((prev) => prev - 1);
+    requestAnimationFrame(scrollToPageTop);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -720,7 +731,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
         }
       });
       setTouched(newTouched);
-      setError('Bitte füllen Sie alle erforderlichen Felder aus.');
+      setError('Bitte fuellen Sie alle erforderlichen Felder aus.');
       return;
     }
 
@@ -751,10 +762,10 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
         luggage: formData.luggage,
         vehicle_type: vehicleType,
         notes: formData.notes + 
-               (formData.childSeat ? ` (Kindersitze: ${formData.babySeats > 0 ? `${formData.babySeats}x Babyschale ` : ''}${formData.childSeats > 0 ? `${formData.childSeats}x Kindersitz ` : ''}${formData.boosterSeats > 0 ? `${formData.boosterSeats}x Sitzerhöhung` : ''})` : '') + 
+               (formData.childSeat ? ` (Kindersitze: ${formData.babySeats > 0 ? `${formData.babySeats}x Babyschale ` : ''}${formData.childSeats > 0 ? `${formData.childSeats}x Kindersitz ` : ''}${formData.boosterSeats > 0 ? `${formData.boosterSeats}x Sitzerhoehung` : ''})` : '') + 
                (formData.extraStop ? ` (Zwischenstopp: ${formData.extraStopStreet})` : '') +
                (formData.flightNumber ? ` (Flugnummer: ${formData.flightNumber})` : '') +
-               (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Handgepäck: ${formData.handLuggage})` : '') +
+               (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Handgepaeck: ${formData.handLuggage})` : '') +
                (formData.paymentMethod ? ` (Zahlung: ${formData.paymentMethod === 'cash' ? 'Barzahlung' : 'Kreditkarte'})` : ''),
         _zip: formData.zip,
         _extraStop: formData.extraStop,
@@ -762,7 +773,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
 
       // 1. Validate (Basic check)
       if (!formData.fullName || !formData.email || !formData.phone) {
-        throw new Error('Bitte füllen Sie alle Kontaktfelder aus.');
+        throw new Error('Bitte fuellen Sie alle Kontaktfelder aus.');
       }
 
       // 2. Submit via Server Action (handles token generation and emails)
@@ -784,11 +795,14 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   const stepItems = [
     { key: 1, label: 'Route', icon: MapPin },
     { key: 2, label: 'Details', icon: Calendar },
-    { key: 3, label: 'Confirm', icon: Check },
+    { key: 3, label: 'Bestaetigen', icon: Check },
   ] as const;
+  const actionRowClass = 'mt-4 flex items-center gap-3';
+  const primaryActionButtonClass =
+    'inline-flex min-w-[220px] items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#111111] px-8 py-4 text-[17px] font-medium text-white transition-all hover:bg-[#232325] md:min-w-[176px] md:px-[1.6rem] md:py-[0.8rem]';
 
   const StepIndicator = () => (
-    <div className="mb-8 flex items-center justify-center gap-2.5 md:mb-10 md:gap-3.5">
+    <div className="mb-8 flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:mb-10 md:gap-1 md:overflow-visible md:pb-0">
       {stepItems.map((step, index) => {
         const Icon = step.icon;
         const isCurrent = currentStep === step.key;
@@ -799,21 +813,21 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
             <button
               type="button"
               onClick={() => handleStepIndicatorClick(step.key)}
-              className={`flex items-center gap-2 rounded-full border px-3 py-2 transition-all ${
+                className={`inline-flex shrink-0 items-center gap-0.5 rounded-full border px-2 py-1 text-[10px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
                 isCurrent
-                  ? 'border-[#111111] bg-[#111111] text-white'
+                  ? 'border-[#1679FF] bg-[#1679FF] text-white'
                   : isComplete
-                    ? 'border-[#0a63ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]'
-                    : 'border-[#d8d4ca] bg-white text-[#86868b] hover:border-[#bdb7aa] hover:text-[#5f6975]'
+                    ? 'border-[#1679FF] bg-[#1679FF] text-white'
+                    : 'border-[#ddd8cd] bg-white text-[#111111] hover:border-[#cbc4b6]'
               }`}
               aria-current={isCurrent ? 'step' : undefined}
             >
-              <Icon size={14} />
-              <span className="text-[12px] font-semibold tracking-[-0.02em]">{step.label}</span>
-            </button>
-            {index < stepItems.length - 1 ? (
-              <ChevronRight size={14} className="text-[#b1aba0]" />
-            ) : null}
+                <Icon size={13} strokeWidth={2.2} className="md:h-4 md:w-4" />
+                <span className="text-[9px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
+              </button>
+              {index < stepItems.length - 1 ? (
+                <ChevronRight size={10} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
+              ) : null}
           </React.Fragment>
         );
       })}
@@ -824,14 +838,20 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
       <div
         className={`px-1 pt-2 md:px-2 md:pt-3 ${
-          allowExtendedDropdownSpace ? 'pb-12 md:pb-14' : 'pb-2 md:pb-3'
+          allowExtendedDropdownSpace ? 'pb-0 md:pb-1' : 'pb-2 md:pb-3'
         }`}
       >
         <form onSubmit={handleSubmit}>
           {showStepIndicator ? <StepIndicator /> : null}
           {/* STEP 1: LOCATION */}
-          {currentStep === 1 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+            {currentStep === 1 && (
+              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                {!isHomepageForm && (
+                  <div className="text-center mb-6">
+                    <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Route</h2>
+                    <p className="text-[12px] text-[#6d7075]">Abholung und Ziel festlegen.</p>
+                  </div>
+                )}
               <div className="-ml-2 rounded-[2.2rem] bg-transparent py-3 pl-3 pr-0 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
                 <div className="flex gap-4">
                   <div className="flex w-[2.1rem] shrink-0 flex-col items-center pt-[1.45rem]">
@@ -839,7 +859,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       {formData.direction === 'from_airport' ? <PlaneLanding size={13} /> : <MapPin size={13} />}
                     </div>
                     <div className="h-[3.55rem] w-px bg-[#111111]" />
-                    <div className="-mt-0.9 flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white shadow-[0_10px_24px_rgba(10,99,255,0.3)]">
+                    <div className="-mt-0.9 flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white">
                       <Check size={13} />
                     </div>
                   </div>
@@ -960,15 +980,15 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                     <button
                       type="button"
                       onClick={toggleExtraStop}
-                      className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60"
-                      aria-label="Zusatzstopp hinzufügen"
+                      className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
+                      aria-label="Zusatzstopp hinzufuegen"
                     >
                       <Plus size={16} />
                     </button>
                     <button
                       type="button"
                       onClick={toggleDirection}
-                      className="mt-[3.1rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60"
+                      className="mt-[3.1rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
                       aria-label="Abholung und Ziel tauschen"
                     >
                       <ArrowUpDown size={16} />
@@ -1017,7 +1037,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       value={formData.city}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all ${
+                      className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all md:h-[2.4rem] md:px-[0.8rem] ${
                         isFieldInvalid('city') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]' 
                           : 'border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]'
@@ -1053,7 +1073,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       value={formData.street}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      placeholder="Straße"
+                      placeholder="Strasse"
                       className={getInputClassName('street')}
                     />
                   </div>
@@ -1087,7 +1107,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                     onChange={handleChange}
                     className="sr-only peer" 
                   />
-                  <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
+                  <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
                 </label>
               </div>
 
@@ -1105,7 +1125,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                         value={formData.extraStopCity}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all ${
+                        className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all md:h-[2.4rem] md:px-[0.8rem] ${
                           isFieldInvalid('extraStopCity') 
                             ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]' 
                             : 'border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]'
@@ -1141,7 +1161,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                         value={formData.extraStopStreet}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        placeholder="Straße"
+                        placeholder="Strasse"
                         className={getInputClassName('extraStopStreet')}
                       />
                     </div>
@@ -1167,13 +1187,15 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                 </div>
               )}
 
-              <button
-                type="button"
-                onClick={nextStep}
-                className="-ml-1 mt-6 flex w-[calc(100%+0.25rem)] items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#111111] py-5 text-[17px] font-medium text-white transition-all hover:bg-[#232325] md:-ml-2 md:w-[calc(100%+0.5rem)]"
-              >
-                Weiter
-              </button>
+              <div className={actionRowClass}>
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    className={primaryActionButtonClass}
+                  >
+                  Weiter
+                </button>
+              </div>
             </div>
           )}
 
@@ -1181,8 +1203,8 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
           {currentStep === 2 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="text-center mb-8">
-                <h2 className="text-[21px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Wann?</h2>
-                <p className="text-[17px] text-[#6d7075]">Datum und Uhrzeit wählen.</p>
+                <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Wann?</h2>
+                <p className="text-[12px] text-[#6d7075]">Datum und Uhrzeit waehlen.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1196,7 +1218,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       readOnly
                       placeholder="TT.MM.JJJJ"
                       onClick={() => setIsDatePickerOpen(true)}
-                      className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer ${
+                      className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] ${
                         isFieldInvalid('date') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
                           : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
@@ -1227,7 +1249,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       readOnly
                       placeholder="--:--"
                       onClick={() => setIsTimePickerOpen(true)}
-                      className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer ${
+                      className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] ${
                         isFieldInvalid('time') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
                           : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
@@ -1249,8 +1271,8 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
               </div>
 
               {formData.direction === 'from_airport' && (
-                <div className="rounded-[1.75rem] border border-[#dad5ca] bg-white p-5">
-                  <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Flugdetails</p>
+                <div>
+                  <p className="mb-3 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Flugdetails</p>
                   <input
                     type="text"
                     name="flightNumber"
@@ -1266,19 +1288,19 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
               <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 {renderInlineSelect('passengers', 'Personen', [1, 2, 3, 4, 5, 6, 7, 8], formData.passengers, Users)}
                 {renderInlineSelect('luggage', 'Koffer', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.luggage, Briefcase)}
-                {renderInlineSelect('handLuggage', 'Handgepäck', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.handLuggage, ShoppingBag)}
+                {renderInlineSelect('handLuggage', 'Handgepaeck', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.handLuggage, ShoppingBag)}
               </div>
 
               <div className="hidden grid grid-cols-3 gap-4">
                 {renderStepper('passengers', 'Personen', 1, 8, formData.passengers)}
                 {renderStepper('luggage', 'Koffer', 0, 8, formData.luggage)}
-                {renderStepper('handLuggage', 'Handgepäck', 0, 8, formData.handLuggage)}
+                {renderStepper('handLuggage', 'Handgepaeck', 0, 8, formData.handLuggage)}
               </div>
 
               <div className="hidden grid grid-cols-3 gap-4">
                 {renderStepper('passengers', 'Personen', 1, 8, formData.passengers)}
                 {renderStepper('luggage', 'Koffer', 0, 8, formData.luggage)}
-                {renderStepper('handLuggage', 'Handgepäck', 0, 8, formData.handLuggage)}
+                {renderStepper('handLuggage', 'Handgepaeck', 0, 8, formData.handLuggage)}
               </div>
 
               {/* Child Seat Toggle */}
@@ -1286,7 +1308,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="text-[#1d1d1f]">
-                      <p className="font-medium text-[15px]">Kindersitz benötigt?</p>
+                      <p className="font-medium text-[15px]">Kindersitz benoetigt?</p>
                       <p className="text-[13px] text-[#86868b]">Kostenlos inklusive</p>
                     </div>
                   </div>
@@ -1298,7 +1320,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       onChange={handleChange}
                       className="sr-only peer" 
                     />
-                    <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
+                    <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
                   </label>
                 </div>
 
@@ -1307,22 +1329,22 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                   <div className="grid grid-cols-3 gap-3 border-t border-[#d2d2d7]/30 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
                     {renderInlineSelect('babySeats', 'Babyschale', [0, 1, 2, 3], formData.babySeats)}
                     {renderInlineSelect('childSeats', 'Kindersitz', [0, 1, 2, 3], formData.childSeats)}
-                    {renderInlineSelect('boosterSeats', 'Sitzerhöhung', [0, 1, 2, 3], formData.boosterSeats)}
+                    {renderInlineSelect('boosterSeats', 'Sitzerhoehung', [0, 1, 2, 3], formData.boosterSeats)}
                   </div>
                   <div className="hidden grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
                     {renderStepper('babySeats', 'Babyschale', 0, 3, formData.babySeats, true)}
                     {renderStepper('childSeats', 'Kindersitz', 0, 3, formData.childSeats, true)}
-                    {renderStepper('boosterSeats', 'Sitzerhöhung', 0, 3, formData.boosterSeats, true)}
+                    {renderStepper('boosterSeats', 'Sitzerhoehung', 0, 3, formData.boosterSeats, true)}
                   </div>
                   <div className="hidden grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
                     {renderStepper('babySeats', 'Babyschale', 0, 3, formData.babySeats, true)}
                     {renderStepper('childSeats', 'Kindersitz', 0, 3, formData.childSeats, true)}
-                    {renderStepper('boosterSeats', 'Sitzerhöhung', 0, 3, formData.boosterSeats, true)}
+                    {renderStepper('boosterSeats', 'Sitzerhoehung', 0, 3, formData.boosterSeats, true)}
                   </div>
                   <div className="hidden grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
                     {renderStepper('babySeats', 'Babyschale', 0, 3, formData.babySeats, true)}
                     {renderStepper('childSeats', 'Kindersitz', 0, 3, formData.childSeats, true)}
-                    {renderStepper('boosterSeats', 'Sitzerhöhung', 0, 3, formData.boosterSeats, true)}
+                    {renderStepper('boosterSeats', 'Sitzerhoehung', 0, 3, formData.boosterSeats, true)}
                   </div>
                   </>
                 )}
@@ -1335,19 +1357,19 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                 </div>
               )}
 
-              <div className="flex gap-3 mt-6">
+              <div className={actionRowClass}>
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-field)] bg-[#ece7dd] text-[#111111] transition-colors hover:bg-[#e2dccf]"
+                  className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-field)] bg-[#ece7dd] text-[#111111] transition-colors hover:bg-[#e2dccf] md:h-[2.8rem] md:w-[2.8rem]"
                 >
                   <ChevronLeft size={24} />
                 </button>
-                <button
-                  type="button"
-                  onClick={nextStep}
-                  className="flex-1 rounded-[var(--radius-field)] bg-[#111111] py-3 text-[17px] font-medium text-white transition-all hover:bg-[#232325] flex items-center justify-center gap-2"
-                >
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    className={primaryActionButtonClass}
+                  >
                   Weiter
                 </button>
               </div>
@@ -1358,69 +1380,63 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
           {currentStep === 3 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="text-center mb-4">
-                <h2 className="text-[21px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Übersicht</h2>
-                <p className="text-[17px] text-[#6d7075]">Bitte überprüfen Sie Ihre Daten.</p>
+                <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Uebersicht</h2>
+                <p className="text-[12px] text-[#6d7075]">Bitte ueberpruefen Sie Ihre Daten.</p>
               </div>
 
-              <div className="rounded-[28px] border border-[#d8d4ca] bg-[linear-gradient(180deg,#fbfaf6_0%,#f4f5f8_100%)] p-6 text-left shadow-[0_20px_48px_rgba(17,17,17,0.07)] md:p-8">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
-                    <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-[#6d7075]">Gesamtpreis</p>
-                    <p className="mt-2 text-[58px] font-semibold leading-none tracking-[-0.05em] text-[#0a63ff] md:text-[62px]">
-                      {totalPrice} {'€'}
-                    </p>
+                <div className="rounded-[22px] border border-[#d8d4ca] bg-[#fbfaf8] p-4 text-left shadow-[0_10px_28px_rgba(17,17,17,0.05)] md:p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Gesamtpreis</p>
+                      <p className="mt-1 text-[46px] font-semibold leading-none tracking-[-0.05em] text-[#0a63ff] md:text-[52px]">
+                        {totalPrice} EUR
+                      </p>
+                    </div>
+                    <span className="inline-flex items-center rounded-full bg-[#1679FF] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
+                      Fixpreis
+                    </span>
                   </div>
-                  <span className="inline-flex items-center rounded-full border border-[#d6e5ff] bg-white/90 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#0a63ff] shadow-sm">
-                    Fixpreis
-                  </span>
-                </div>
 
-                <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#d6e5ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.08)_0%,rgba(36,144,255,0.15)_100%)] px-4 py-2 text-[14px] font-medium text-[#1d1d1f]">
-                  <MapPin size={15} className="text-[#0a63ff]" />
-                  <span>{routeSummary}</span>
-                </div>
+                  <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#d6e5ff] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1d1d1f]">
+                    <MapPin size={14} className="text-[#0a63ff]" />
+                    <span>{routeSummary}</span>
+                  </div>
 
-                <div className="mt-5 grid gap-3 md:grid-cols-2">
-                  <div className="rounded-[18px] border border-[#d2d2d7]/70 bg-white p-4 shadow-sm">
-                    <div className="flex items-start gap-3">
-                      <Calendar size={16} className="mt-0.5 text-[#0a63ff]" />
-                      <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86868b]">Datum</p>
-                        <p className="mt-1 text-[15px] font-medium text-[#1d1d1f]">{dateSummary}</p>
+                  <div className="mt-4 rounded-[18px] border border-[#e3dfd5] bg-white px-4 py-4">
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="flex items-start gap-2.5">
+                        <Calendar size={15} className="mt-0.5 text-[#0a63ff]" />
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Datum</p>
+                          <p className="mt-0.5 text-[14px] font-medium text-[#1d1d1f]">{dateSummary}</p>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="rounded-[18px] border border-[#d2d2d7]/70 bg-white p-4 shadow-sm">
-                    <div className="flex items-start gap-3">
-                      <MapPin size={16} className="mt-0.5 text-[#0a63ff]" />
-                      <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86868b]">Straße</p>
-                        <p className="mt-1 text-[15px] font-medium text-[#1d1d1f]">{streetSummary}</p>
+                      <div className="flex items-start gap-2.5">
+                        <MapPin size={15} className="mt-0.5 text-[#0a63ff]" />
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Strasse</p>
+                          <p className="mt-0.5 text-[14px] font-medium text-[#1d1d1f]">{streetSummary}</p>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="rounded-[18px] border border-[#d2d2d7]/70 bg-white p-4 shadow-sm">
-                    <div className="flex items-start gap-3">
-                      <Users size={16} className="mt-0.5 text-[#0a63ff]" />
-                      <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86868b]">Passagiere</p>
-                        <p className="mt-1 text-[15px] font-medium text-[#1d1d1f]">{formData.passengers || 0} Personen</p>
+                      <div className="flex items-start gap-2.5">
+                        <Users size={15} className="mt-0.5 text-[#0a63ff]" />
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Personen</p>
+                          <p className="mt-0.5 text-[14px] font-medium text-[#1d1d1f]">{formData.passengers || 0} Personen</p>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="rounded-[18px] border border-[#d2d2d7]/70 bg-white p-4 shadow-sm">
-                    <div className="flex items-start gap-3">
-                      <Car size={16} className="mt-0.5 text-[#0a63ff]" />
-                      <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86868b]">Fahrzeug</p>
-                        <p className="mt-1 text-[15px] font-medium leading-[1.45] text-[#1d1d1f]">
-                          {vehicleType} | {formData.luggage || 0} Koffer | {formData.handLuggage || 0} Handgepäck
-                        </p>
+                      <div className="flex items-start gap-2.5">
+                        <Car size={15} className="mt-0.5 text-[#0a63ff]" />
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Fahrzeug</p>
+                          <p className="mt-0.5 text-[14px] font-medium leading-[1.35] text-[#1d1d1f]">
+                            {vehicleType} | {formData.luggage || 0} Koffer | {formData.handLuggage || 0} Handgepaeck
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
               {/* Personal Details */}
               {isLoggedIn ? (
@@ -1428,7 +1444,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="text-[#1d1d1f]">
-                        <p className="font-medium text-[15px]">Buchung für mich</p>
+                        <p className="font-medium text-[15px]">Buchung fuer mich</p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -1438,7 +1454,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                         onChange={(e) => handleBookingForMyselfToggle(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
+                      <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
                     </label>
                   </div>
                 </div>
@@ -1488,7 +1504,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                   <button
                     type="button"
                     onClick={() => handlePaymentChange('cash')}
-                    className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
                       formData.paymentMethod === 'cash' 
                         ? 'border-[#0a63ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]' 
                         : touched['paymentMethod'] && !formData.paymentMethod
@@ -1496,12 +1512,12 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                           : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
                     }`}
                   >
-                    <span className="text-[14px] font-medium">Barzahlung</span>
+                    <span className="text-[14px] font-medium md:text-[12px]">Barzahlung</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handlePaymentChange('card')}
-                    className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
                       formData.paymentMethod === 'card' 
                         ? 'border-[#0071e3] bg-[#f2fcfc] text-[#0071e3]' 
                         : touched['paymentMethod'] && !formData.paymentMethod
@@ -1509,7 +1525,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                           : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
                     }`}
                   >
-                    <span className="text-[14px] font-medium">Kreditkarte</span>
+                    <span className="text-[14px] font-medium md:text-[12px]">Kreditkarte</span>
                   </button>
                 </div>
               </div>
@@ -1522,7 +1538,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                   onChange={handleChange}
                   rows={3}
                   placeholder="Anmerkungen (optional)"
-                  className="w-full rounded-[var(--radius-field)] border border-[#d2d2d7] bg-white p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none resize-none transition-all focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]"
+                  className="w-full rounded-[var(--radius-field)] border border-[#d2d2d7] bg-white p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none resize-none transition-all focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] md:p-[0.8rem]"
                 />
               </div>
 
@@ -1547,7 +1563,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                 </div>
 
                 <div className="bg-white rounded-[16px] p-4 border border-[#d2d2d7]/50 shadow-sm max-w-[320px] mx-auto">
-                    <div className="flex items-center gap-1.5" title="Handgepäck">
+                    <div className="flex items-center gap-1.5" title="Handgepaeck">
                     <Car size={18} className="text-[#0071e3]" />
                     <span>Fahrzeug: {vehicleType}</span>
                   </div>
@@ -1561,7 +1577,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       <Briefcase size={16} />
                       <span>{formData.luggage || 0}</span>
                     </div>
-                    <div className="flex items-center gap-1.5" title="Handgepäck">
+                    <div className="flex items-center gap-1.5" title="Handgepaeck">
                       <Briefcase size={14} className="opacity-70" />
                       <span>{formData.handLuggage || 0}</span>
                     </div>
@@ -1576,19 +1592,19 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                 </div>
               )}
 
-              <div className="flex gap-3 mt-6">
+              <div className={actionRowClass}>
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-field)] bg-[#ece7dd] text-[#111111] transition-colors hover:bg-[#e2dccf]"
+                  className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-field)] bg-[#ece7dd] text-[#111111] transition-colors hover:bg-[#e2dccf] md:h-[2.8rem] md:w-[2.8rem]"
                 >
                   <ChevronLeft size={24} />
                 </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 rounded-[var(--radius-field)] bg-[#111111] py-3 text-[17px] font-medium text-white transition-all hover:bg-[#232325] disabled:opacity-50 flex items-center justify-center gap-2"
-                >
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`${primaryActionButtonClass} disabled:opacity-50`}
+                  >
                   {loading ? 'Wird gebucht...' : 'Jetzt buchen'}
                 </button>
               </div>
@@ -1601,4 +1617,5 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
 };
 
 export default BookingForm;
+
 
