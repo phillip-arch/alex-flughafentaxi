@@ -897,7 +897,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder="Adresse eingeben"
-                            className={getInputClassName('street')}
+                            className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
                           />
                           {formData.extraStop ? (
                             <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -946,7 +946,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder="Adresse eingeben"
-                            className={getInputClassName('street')}
+                            className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
                           />
                           {formData.extraStop ? (
                             <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -983,7 +983,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
                       aria-label="Zusatzstopp hinzufuegen"
                     >
-                      <Plus size={16} />
+                      <Plus size={16} className="-translate-x-[2px]" />
                     </button>
                     <button
                       type="button"
@@ -991,7 +991,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       className="mt-[3.1rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
                       aria-label="Abholung und Ziel tauschen"
                     >
-                      <ArrowUpDown size={16} />
+                      <ArrowUpDown size={16} className="-translate-x-[2px]" />
                     </button>
                   </div>
                 </div>
