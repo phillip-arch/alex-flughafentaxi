@@ -2,6 +2,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Metadata } from 'next';
 import FooterGate from '@/components/FooterGate';
+import FloatingContactButton from '@/components/FloatingContactButton';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -43,6 +44,7 @@ export default function RootLayout({
     <html lang="de" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body suppressHydrationWarning className="app-shell font-sans antialiased">
         {children}
+        <FloatingContactButton />
         <FooterGate />
       </body>
     </html>
