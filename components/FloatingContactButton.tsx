@@ -48,23 +48,8 @@ const contactOptions = [
 
 export default function FloatingContactButton() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDesktopHoverMode, setIsDesktopHoverMode] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
-    const updateMode = () => setIsDesktopHoverMode(mediaQuery.matches);
-
-    updateMode();
-    mediaQuery.addEventListener('change', updateMode);
-
-    return () => {
-      mediaQuery.removeEventListener('change', updateMode);
-    };
-  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -95,11 +80,7 @@ export default function FloatingContactButton() {
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2"
-      onMouseEnter={isDesktopHoverMode ? () => setIsOpen(true) : undefined}
-    >
+    <div ref={containerRef} className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
       {isOpen ? (
         <div className="flex flex-col items-end gap-2">
           {contactOptions.map((option) => {
@@ -128,17 +109,8 @@ export default function FloatingContactButton() {
 
       <button
         type="button"
-        onClick={() => {
-          if (isOpen) {
-            setIsOpen(false);
-            return;
-          }
-
-          if (!isDesktopHoverMode) {
-            setIsOpen((prev) => !prev);
-          }
-        }}
-        className="inline-flex items-center justify-center rounded-full bg-[#1679FF] p-3 text-white shadow-[0_16px_38px_rgba(17,17,17,0.22)] transition-colors hover:bg-[#0f6ae8]"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="inline-flex h-[48px] w-[48px] items-center justify-center rounded-full bg-[#1679FF] text-white shadow-[0_16px_38px_rgba(17,17,17,0.22)] transition-colors hover:bg-[#0f6ae8]"
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Close contact options' : 'Open contact options'}
       >
