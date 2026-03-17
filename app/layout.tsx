@@ -1,4 +1,4 @@
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Archivo, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Metadata } from 'next';
 import FooterGate from '@/components/FooterGate';
@@ -7,6 +7,11 @@ import FloatingContactButton from '@/components/FloatingContactButton';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
+});
+
+const archivo = Archivo({
+  subsets: ['latin'],
+  variable: '--font-display',
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -41,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="de" className={`${inter.variable} ${archivo.variable} ${jetbrainsMono.variable}`}>
       <body suppressHydrationWarning className="app-shell font-sans antialiased">
         {children}
         <FloatingContactButton />

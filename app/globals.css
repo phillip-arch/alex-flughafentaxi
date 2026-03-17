@@ -3,6 +3,7 @@
 
 :root {
   --font-sans: "Inter", "Segoe UI", Arial, sans-serif;
+  --font-display: "Archivo", "Inter", "Segoe UI", Arial, sans-serif;
   --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 
   --color-bg: #f3f3ee;
@@ -91,6 +92,7 @@ h5,
 h6 {
   margin: 0;
   color: var(--color-text);
+  font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.04em;
   line-height: 0.98;
@@ -149,8 +151,8 @@ p {
   }
 
   .ui-heading-lg {
-    font-size: clamp(2rem, 4vw, 3rem);
-    line-height: 1;
+    font-size: clamp(2.125rem, 4.6vw, 3.375rem);
+    line-height: 1.02;
     letter-spacing: -0.05em;
     font-weight: 900;
     text-shadow: 0.012em 0 currentColor;
@@ -182,6 +184,13 @@ p {
     display: flex;
     flex-direction: column;
     gap: 0.9rem;
+  }
+
+  .ui-feature-card-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.8125rem;
   }
 
   .ui-copy-group {
@@ -238,6 +247,33 @@ p {
   }
 
   .ui-button-primary:hover {
+    background: #232325;
+  }
+
+  .ui-button-booking-primary {
+    display: inline-flex;
+    width: 100%;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-field);
+    background: #000000;
+    padding: 1rem 2rem;
+    font-size: 1.0625rem;
+    font-weight: 500;
+    color: #ffffff !important;
+    transition: background-color 160ms ease, color 160ms ease, opacity 160ms ease;
+    text-decoration: none;
+  }
+
+  .ui-button-booking-primary:visited,
+  .ui-button-booking-primary:hover,
+  .ui-button-booking-primary:active {
+    color: #ffffff !important;
+  }
+
+  .ui-button-booking-primary:hover {
     background: #232325;
   }
 
@@ -369,6 +405,13 @@ p {
 }
 
 @media (min-width: 768px) {
+  .ui-button-booking-primary {
+    width: auto;
+    min-width: 11rem;
+    flex: none;
+    padding: 0.8rem 1.6rem;
+  }
+
   .ui-input {
     min-height: 2.4rem;
     padding: 0.5rem 0.8rem;
