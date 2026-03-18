@@ -392,7 +392,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     return (
       <div className={`flex flex-col items-center justify-center rounded-[14px] bg-[#f5f5f7] ${compact ? 'gap-1.5 p-2.5 md:gap-[0.3rem] md:p-2' : 'gap-2 p-3.5 md:gap-[0.4rem] md:p-[0.7rem]'} md:rounded-2xl`}>
         <span className={`font-medium uppercase text-[#86868b] ${compact ? 'text-[11px]' : 'text-[13px]'}`}>{label}</span>
-        <div className="flex h-12 w-full items-center justify-between gap-2 rounded-[14px] border border-[#d2d2d7] bg-white px-2 md:h-[2.4rem] md:gap-[0.4rem] md:px-[0.4rem] md:rounded-full">
+        <div className="ui-field-surface flex h-12 w-full items-center justify-between gap-2 rounded-[14px] border border-[#d2d2d7] px-2 md:h-[2.4rem] md:gap-[0.4rem] md:px-[0.4rem] md:rounded-full">
           <button
             type="button"
             onClick={() => updateStepperValue(name, -1, min, max)}
@@ -448,7 +448,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
           <button
             type="button"
             onClick={() => setOpenInlineSelect(isOpen ? null : name)}
-            className={`flex h-12 w-full items-center justify-between rounded-[var(--radius-field)] border bg-white py-0 text-left text-[14px] text-[#1d1d1f] outline-none transition-all sm:text-[15px] md:h-[2.4rem] md:text-[12px] ${
+            className={`ui-field-surface flex h-12 w-full items-center justify-between rounded-[var(--radius-field)] border py-0 text-left text-[14px] text-[#1d1d1f] outline-none transition-all sm:text-[15px] md:h-[2.4rem] md:text-[12px] ${
               Icon ? 'pl-10 md:pl-8' : 'pl-3 md:pl-[0.8rem]'
             } pr-3 md:pr-[0.8rem] ${
               isInvalid
@@ -1026,7 +1026,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       value={formData.city}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all md:h-[2.4rem] md:px-[0.8rem] ${
+                      className={`ui-field-surface h-12 w-full rounded-[var(--radius-field)] border px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all md:h-[2.4rem] md:px-[0.8rem] ${
                         isFieldInvalid('city') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]' 
                           : 'border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]'
@@ -1114,7 +1114,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                         value={formData.extraStopCity}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all md:h-[2.4rem] md:px-[0.8rem] ${
+                        className={`ui-field-surface h-12 w-full rounded-[var(--radius-field)] border px-3 py-0 text-[17px] text-[#1d1d1f] outline-none appearance-none transition-all md:h-[2.4rem] md:px-[0.8rem] ${
                           isFieldInvalid('extraStopCity') 
                             ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]' 
                             : 'border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]'
@@ -1207,7 +1207,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       readOnly
                       placeholder="TT.MM.JJJJ"
                       onClick={() => setIsDatePickerOpen(true)}
-                      className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] ${
+                      className={`ui-field-surface h-12 w-full rounded-[var(--radius-field)] border px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] ${
                         isFieldInvalid('date') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
                           : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
@@ -1238,7 +1238,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       readOnly
                       placeholder="--:--"
                       onClick={() => setIsTimePickerOpen(true)}
-                      className={`h-12 w-full rounded-[var(--radius-field)] border bg-white px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] ${
+                      className={`ui-field-surface h-12 w-full rounded-[var(--radius-field)] border px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] ${
                         isFieldInvalid('time') 
                           ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
                           : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
@@ -1527,7 +1527,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                   onChange={handleChange}
                   rows={3}
                   placeholder="Anmerkungen (optional)"
-                  className="w-full rounded-[var(--radius-field)] border border-[#d2d2d7] bg-white p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none resize-none transition-all focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] md:p-[0.8rem]"
+                  className="ui-field-surface w-full rounded-[var(--radius-field)] border border-[#d2d2d7] p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none resize-none transition-all focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] md:p-[0.8rem]"
                 />
               </div>
 

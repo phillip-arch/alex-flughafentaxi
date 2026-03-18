@@ -5,11 +5,12 @@ import {
   ChevronDown,
   ChevronRight,
   Briefcase,
-  Bus,
-  CarFront,
+  BusFront,
+  CarTaxiFront,
   Phone,
   ShoppingBag,
   Users,
+  Van,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
@@ -18,24 +19,34 @@ import { ViberIcon, WhatsAppIcon } from '@/components/ui/ContactIcons';
 
 const faqItems = [
   {
-    question: 'Wie frueh sollte ich meinen Flughafentransfer buchen?',
+    question: 'Wie erkenne ich meinen Fahrer?',
     answer:
-      'Fahrten bis 22:00 sollten mindestens 3 Stunden vorher gebucht werden. Fuer Nachtfahrten zwischen 22:00 und 07:00 planen wir mindestens 8 Stunden Vorlauf ein.',
+      'Der Fahrer holt Sie puenktlich am Terminal ab. Eine persoenliche Abholung mit Namensschild ist gegen Aufpreis moeglich.',
   },
   {
-    question: 'Was passiert bei einer verspaeteten Landung?',
+    question: 'Sind Kindersitze verfuegbar?',
     answer:
-      'Flugankuenfte werden mitverfolgt. Bei Verspaetungen passen wir die Abholzeit automatisch an, damit die Fahrt trotzdem sauber koordiniert bleibt.',
+      'Ja, bitte geben Sie den Bedarf bei der Buchung an. Wir stellen Babyschalen und Sitzkissen kostenlos zur Verfuegung.',
   },
   {
-    question: 'Kann ich Kindersitze und Zusatzgepaeck angeben?',
+    question: 'Koennen Haustiere mitfahren?',
     answer:
-      'Ja. Babyschale, Kindersitz, Sitzerhoehung sowie Koffer und Handgepaeck koennen direkt im Buchungsformular ausgewaehlt werden.',
+      'Haustiere reisen in geeigneten Transportboxen mit; geben Sie uns vorab Bescheid.',
   },
   {
-    question: 'Welche Zahlungsarten sind moeglich?',
+    question: 'Gibt es Zusatzkosten bei Verspaetungen?',
     answer:
-      'Sie koennen Barzahlung, Visa, Mastercard und Apple Pay nutzen. Die Auswahl erfolgt direkt im letzten Buchungsschritt.',
+      'Wir ueberwachen Ihren Flug und passen die Abholzeit an. Bei unverschuldeten Verspaetungen entstehen keine Zusatzkosten.',
+  },
+  {
+    question: 'Kann ich auch vom Hotel zum Flughafen buchen?',
+    answer:
+      'Ja, unser Service gilt in beide Richtungen. Geben Sie bei der Buchung Ihre Abholadresse an.',
+  },
+  {
+    question: 'Welche Zahlungsmethoden gibt es?',
+    answer:
+      'Sie koennen bar, per Karte oder per Mobile Pay zahlen und erhalten eine digitale Rechnung.',
   },
 ];
 
@@ -45,19 +56,19 @@ const vehicleCategories = [
   {
     title: 'Limousine',
     description: 'Preiswerte Option fuer Alleinreisende oder Paare',
-    icon: CarFront,
+    icon: CarTaxiFront,
     specs: ['2 Personen', '2 Koffer', '2 Handgepaeck'],
   },
   {
     title: 'Kombi',
     description: 'Ideal fuer Gruppen & Familien - mehr Platz fuer Gepaeck.',
-    icon: CarFront,
+    icon: Van,
     specs: ['4 Personen', '4 Koffer', '4 Handgepaeck'],
   },
   {
     title: 'Bus',
     description: 'Ideal fuer groessere Gruppen - viel Platz fuer Fahrgaeste und Gepaeck.',
-    icon: Bus,
+    icon: BusFront,
     specs: ['8 Personen', '8 Koffer', '8 Handgepaeck'],
   },
 ];
@@ -108,7 +119,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#f7f9fc] py-14 md:py-18">
+      <section className="bg-white py-14 md:py-18">
         <div className="app-container">
           <div className={homepageSectionWidthClass}>
             <div className="flex justify-center">
@@ -127,7 +138,7 @@ export default function Home() {
                 {
                   title: 'Puenktlich und planbar',
                   description:
-                    'Unsere Fahrer*innen warten mit Namensschild in der Ankunftshalle, ueberwachen Ihren Flug und passen die Abholzeit bei Verspaetungen an.',
+                    'Wir verfolgen Ihren Flug und holen Sie puenktlich am Terminal ab. Persoenliche Abholung mit Namensschild ist gegen Aufpreis moeglich.',
                 },
                 {
                   title: 'Komfort und Sicherheit',
@@ -142,16 +153,16 @@ export default function Home() {
               ].map(({ title, description }) => (
                 <div
                   key={title}
-                  className="mx-auto flex w-full max-w-[26.5rem] items-start gap-4 rounded-[1.55rem] border border-[#edf2f8] bg-white px-5 py-5 shadow-[0_8px_22px_rgba(17,17,17,0.045)] md:px-6 md:py-6"
+                  className="ui-card-surface-light mx-auto flex w-full max-w-[26.5rem] items-start gap-4 px-5 py-5 md:px-6 md:py-6"
                 >
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679FF] md:h-13 md:w-13">
+                  <span className="ui-icon-badge-accent">
                     <Check size={22} strokeWidth={2.4} />
                   </span>
                   <div className="ui-text-block-sm gap-1.5 pt-0.5">
                     <h3 className="text-[1.28rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.38rem]">
                       {title}
                     </h3>
-                    <p className="ui-copy-compact text-[#6a7d96]">
+                    <p className="ui-copy-sm text-[#6a7d96]">
                       {description}
                     </p>
                   </div>
@@ -168,9 +179,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-white py-14 md:py-18">
+      <section className="section-shell-tight-top bg-white">
         <div className="app-container">
-          <div>
+          <div className={homepageSectionWidthClass}>
             <div className="ui-text-block-sm mx-auto max-w-[44rem] text-center">
               <h2 className="ui-heading-lg text-[#111827]">Fahrzeugkategorien</h2>
               <p className="ui-copy-compact text-[#6a7d96]">
@@ -178,34 +189,34 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="mt-10 grid gap-5 lg:grid-cols-3">
+            <div className="ui-card-grid-relaxed mt-10 lg:grid-cols-3">
               {vehicleCategories.map(({ title, description, icon: Icon, specs }) => (
                 <div
                   key={title}
-                  className="rounded-[2rem] bg-[#000000] px-6 py-7 text-white shadow-[0_16px_42px_rgba(17,17,17,0.12)] md:px-7 md:py-8"
+                  className="ui-card-surface-light mx-auto w-full max-w-[26.5rem] px-5 py-5 text-[#111827] md:px-6 md:py-6"
                 >
-                  <span className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[var(--color-booking-accent)] text-white">
-                    <Icon size={22} strokeWidth={2.1} />
+                  <span className="ui-icon-badge-accent">
+                    <Icon size={20} strokeWidth={2.2} />
                   </span>
 
-                  <div className="ui-text-block-sm mt-8">
-                    <h3 className="text-[2rem] font-semibold tracking-[-0.05em] !text-white">
+                  <div className="mt-6 flex flex-col gap-2.5">
+                    <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.72rem]">
                       {title}
                     </h3>
-                    <p className="ui-copy-compact text-white/68">{description}</p>
+                    <p className="ui-copy-sm text-[#6b7280]">{description}</p>
                   </div>
 
-                  <div className="mt-10 space-y-5">
+                  <div className="mt-7 space-y-3.5 border-t border-[#edf2f7] pt-5">
                     {specs.map((spec, index) => (
-                      <div key={spec} className="flex items-center gap-3 text-white">
+                      <div key={spec} className="flex items-center gap-2.5 text-[#111827]">
                         {index === 0 ? (
-                          <Users size={20} className="text-[var(--color-booking-accent)]" />
+                          <Users size={17} className="text-[#6b7280]" />
                         ) : index === 1 ? (
-                          <Briefcase size={20} className="text-[var(--color-booking-accent)]" />
+                          <Briefcase size={17} className="text-[#6b7280]" />
                         ) : (
-                          <ShoppingBag size={20} className="text-[var(--color-booking-accent)]" />
+                          <ShoppingBag size={17} className="text-[#6b7280]" />
                         )}
-                        <span className="ui-copy-compact text-white/88">{spec}</span>
+                        <span className="text-[0.96rem] leading-none text-[#1f2937]">{spec}</span>
                       </div>
                     ))}
                   </div>
@@ -218,6 +229,172 @@ export default function Home() {
                 Fahrt buchen
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell-tight-top bg-white">
+        <div className="app-container">
+          <div className={homepageSectionWidthClass}>
+            <div className="ui-card-surface-light overflow-hidden lg:grid lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">
+              <div className="px-6 py-7 md:px-8 md:py-8">
+                <div className="ui-text-block-sm max-w-[34rem]">
+                  <h2 className="ui-heading-lg text-[#111827]">Ueberblick ueber den Flughafen Wien (VIE)</h2>
+                  <p className="ui-copy-compact text-[#6a7d96]">
+                    Der Flughafen Wien verfuegt ueber drei Eingaenge: Terminal 1 (T1), Terminal 1A
+                    (T1A) und Terminal 3 (T3). Von dort fuehren Wege zu zwei grossen
+                    Gate-Bereichen. Passagiere, die ueber Terminal 1 abfliegen, gelangen
+                    normalerweise in die Schengen-Bereiche B, C und D; Reisende ueber Terminal 3
+                    bewegen sich zu den Non-Schengen-Bereichen F und G. Bewegliche Gehwege,
+                    Rolltreppen und klare Beschilderung erleichtern die Orientierung.
+                  </p>
+
+                  <div className="pt-2">
+                    <h3 className="ui-heading-sm text-[#111827]">Terminal-Tipps</h3>
+                    <p className="ui-copy-compact mt-3 text-[#6a7d96]">
+                      Ihr Boardingpass zeigt Ihnen den richtigen Terminal: Gates B/C/D bedeuten
+                      Check-in in Terminal 1; Gates F/G bedeuten Check-in in Terminal 3.
+                      Star-Alliance-Fluggesellschaften wie Austrian Airlines nutzen vorrangig T3,
+                      waehrend Billig- und Charterairlines oftmals T1A waehlen.
+                    </p>
+                  </div>
+
+                  <div className="pt-2">
+                    <h3 className="ui-heading-sm text-[#111827]">Wann sollte ich am Flughafen sein?</h3>
+                    <p className="ui-copy-compact mt-3 text-[#6a7d96]">
+                      Fuer Fluege innerhalb Europas wird empfohlen, etwa 2 Stunden vor Abflug am
+                      Flughafen zu sein. Fuer Non-Schengen- und Langstreckenfluege sind 3 Stunden
+                      ratsam, fuer USA-Fluege sogar 3 1/2-4 Stunden. Reisen Sie mit Sondergepaeck
+                      oder in Gruppen, planen Sie zusaetzliche Zeit ein.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative min-h-[260px] border-t border-[#e9edf3] lg:min-h-full lg:border-l lg:border-t-0">
+                <Image
+                  src="https://images.pexels.com/photos/358319/pexels-photo-358319.jpeg?auto=compress&cs=tinysrgb&w=1400"
+                  alt="Flughafen Wien Terminal"
+                  fill
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 40vw, 100vw"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(17,17,17,0.08)_100%)]" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell-tight-top bg-white">
+        <div className="app-container">
+          <div className={homepageSectionWidthClass}>
+            <div className="ui-card-surface-light px-6 py-7 md:px-8 md:py-8">
+              <div className="ui-text-block-sm max-w-[52rem]">
+                <h2 className="ui-heading-lg text-[#111827]">
+                  Flughafentaxi Wien - Zuverlaessiger Transfer zum Flughafen
+                </h2>
+                <p className="ui-copy-compact text-[#6a7d96]">
+                  Seit vielen Jahren bringen wir Fahrgaeste zuverlaessig zum Flughafen Wien.
+                  Unsere ortskundigen Fahrer, transparente Fixpreise und zahlreiche zufriedene
+                  Kunden stehen fuer einen Service, auf den Sie sich verlassen koennen.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" className="border-t border-[var(--color-border)] bg-white py-20">
+        <div className="app-container">
+          <div className={homepageSectionWidthClass}>
+            <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+            <div className="ui-text-block-lg max-w-xl">
+              <p className="ui-eyebrow border-none bg-transparent p-0">FAQ</p>
+              <h2 className="ui-heading-lg">Haeufige Fragen vor der Buchung.</h2>
+              <p className="ui-copy-compact">
+                Die wichtigsten Antworten zu Vorlaufzeit, Flugtracking, Kindersitzen und Zahlung
+                bleiben direkt auf der Startseite erreichbar.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {faqItems.map((item) => (
+                <details
+                  key={item.question}
+                  className="group rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-4"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                    <span className="text-lg font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+                      {item.question}
+                    </span>
+                    <ChevronDown
+                      size={18}
+                      className="shrink-0 text-[var(--color-text-muted)] transition-transform duration-200 group-open:rotate-180"
+                    />
+                  </summary>
+                  <p className="ui-copy-compact mt-4 pr-8 text-[var(--color-text-muted)]">
+                    {item.answer}
+                  </p>
+                </details>
+              ))}
+            </div>
+            </div>
+
+            <div className="mt-10 flex justify-center lg:mt-12">
+              <Link href="/book" className="ui-button-booking-primary">
+                Fahrt buchen
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-14 md:py-18">
+        <div className="app-container">
+          <div className="ui-text-block-sm max-w-[40rem]">
+            <h2 className="ui-heading-lg text-[#111827]">Beliebte Strecken</h2>
+            <p className="ui-copy-compact text-[#7a8596]">
+              Entdecken Sie unsere detaillierten Routenbeschreibungen. Jede Seite enthaelt eine
+              Vergleichstabelle, Tipps und FAQs.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-x-10 gap-y-0 lg:grid-cols-2">
+            {[
+              'Terminal 1 -> Landstrasse-Wien Mitte',
+              'Terminal 1 -> Internationaler Busbahnhof Wien',
+              'Terminal 1 -> Stephansplatz',
+              'Terminal 1 -> Ernst-Happel-Stadion',
+              'Terminal 1 -> Bahnhof Meidling (Schedifkaplatz)',
+              'Terminal 1 -> Praterstern',
+              'Terminal 1 -> Westbahnhof',
+              'Terminal 1 -> Belvedere Palace',
+              'Terminal 1 -> Hauptbahnhof',
+              'Terminal 1 -> AKH (Wiener Allgemeines Krankenhaus)',
+              'Terminal 1 -> Schwedenplatz',
+              'Terminal 1 -> Schoenbrunn Palace',
+              'Terminal 1 -> Floridsdorf Bahnhof',
+              'Terminal 1 -> Suedtiroler Platz (Hauptbahnhof)',
+              'Terminal 3 -> Internationaler Busbahnhof Wien',
+              'Terminal 3 -> Westbahnhof',
+              'Terminal 3 -> Lugner City',
+              'Terminal 3 -> Praterstern',
+              'Terminal 3 -> Belvedere Palace',
+              'Terminal 3 -> Schwedenplatz',
+              'Terminal 3 -> Ernst-Happel-Stadion',
+            ].map((trip) => (
+              <a
+                key={trip}
+                href="/book"
+                className="flex items-center justify-between gap-6 border-b border-[#e8edf3] py-6 text-[#2d3345] transition-colors hover:text-[#111827]"
+              >
+                <span className="text-[1.05rem] leading-[1.45] md:text-[1.1rem]">{trip}</span>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2e3445] text-white">
+                  <ChevronRight size={20} />
+                </span>
+              </a>
+            ))}
           </div>
         </div>
       </section>
@@ -477,85 +654,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="faq" className="border-t border-[var(--color-border)] bg-white py-20">
-        <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-            <div className="ui-text-block-lg max-w-xl">
-              <p className="ui-eyebrow border-none bg-transparent p-0">FAQ</p>
-              <h2 className="ui-heading-lg">Haeufige Fragen vor der Buchung.</h2>
-              <p className="ui-copy-compact">
-                Die wichtigsten Antworten zu Vorlaufzeit, Flugtracking, Kindersitzen und Zahlung
-                bleiben direkt auf der Startseite erreichbar.
-              </p>
-            </div>
 
-            <div className="space-y-3">
-              {faqItems.map((item) => (
-                <details
-                  key={item.question}
-                  className="group rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-4"
-                >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
-                    <span className="text-lg font-semibold tracking-[-0.03em] text-[var(--color-text)]">
-                      {item.question}
-                    </span>
-                    <ChevronDown
-                      size={18}
-                      className="shrink-0 text-[var(--color-text-muted)] transition-transform duration-200 group-open:rotate-180"
-                    />
-                  </summary>
-                  <p className="ui-copy-compact mt-4 pr-8 text-[var(--color-text-muted)]">
-                    {item.answer}
-                  </p>
-                </details>
-              ))}
-            </div>
-            </div>
-
-            <div className="mt-10 flex justify-center lg:mt-12">
-              <Link href="/book" className="ui-button-booking-primary">
-                Fahrt buchen
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-14 md:py-18">
-        <div className="app-container">
-          <div className="ui-text-block-sm max-w-[40rem]">
-            <h2 className="ui-heading-lg text-[#111827]">Popular trips in Vienna</h2>
-            <p className="ui-copy-compact text-[#7a8596]">Explore popular trips in Vienna</p>
-          </div>
-
-          <div className="mt-10 grid gap-x-10 gap-y-0 lg:grid-cols-2">
-            {[
-              'From Wien Praterstern To Bahnhof Wien Floridsdorf',
-              'From Vienna Central Train Station To Ernst-Happel-Stadion',
-              'From Vienna Central Train Station To Bahnhof Wien Floridsdorf',
-              'From Terminal 1 Vienna Airport To Schonbrunn Palace',
-              'From Terminal 3 Vienna Airport To Belvedere Palace',
-              'From Terminal 3 Vienna Airport To Bahnhof Wien Meidling',
-              'From Vienna Central Train Station To Terminal 3 Vienna Airport',
-              'From Vienna Central Train Station To Wien Westbahnhof',
-              'From Terminal 1 Vienna Airport To Landstrasse-Wien Mitte',
-              'From Terminal 1 Vienna Airport To Belvedere Palace',
-            ].map((trip) => (
-              <a
-                key={trip}
-                href="/book"
-                className="flex items-center justify-between gap-6 border-b border-[#e8edf3] py-6 text-[#2d3345] transition-colors hover:text-[#111827]"
-              >
-                <span className="text-[1.05rem] leading-[1.45] md:text-[1.1rem]">{trip}</span>
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2e3445] text-white">
-                  <ChevronRight size={20} />
-                </span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
