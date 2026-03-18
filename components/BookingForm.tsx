@@ -788,8 +788,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     { key: 3, label: 'Bestaetigen', icon: Check },
   ] as const;
   const actionRowClass = 'mt-4 flex items-center gap-3';
-  const primaryActionButtonClass =
-    'inline-flex w-full flex-1 items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#111111] px-8 py-4 text-[17px] font-medium text-white transition-all hover:bg-[#232325] md:min-w-[176px] md:w-auto md:flex-none md:px-[1.6rem] md:py-[0.8rem]';
+  const primaryActionButtonClass = 'ui-button-booking-primary';
 
   const StepIndicator = () => (
     <div className="mt-2 mb-8 flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:mt-0 md:mb-10 md:gap-1 md:overflow-visible md:pb-0">

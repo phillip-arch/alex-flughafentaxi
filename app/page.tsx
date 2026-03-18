@@ -5,8 +5,11 @@ import {
   ChevronDown,
   ChevronRight,
   Briefcase,
+  Bus,
+  CarFront,
   Phone,
   ShoppingBag,
+  Users,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
@@ -38,6 +41,27 @@ const faqItems = [
 
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
 
+const vehicleCategories = [
+  {
+    title: 'Limousine',
+    description: 'Preiswerte Option fuer Alleinreisende oder Paare',
+    icon: CarFront,
+    specs: ['2 Personen', '2 Koffer', '2 Handgepaeck'],
+  },
+  {
+    title: 'Kombi',
+    description: 'Ideal fuer Gruppen & Familien - mehr Platz fuer Gepaeck.',
+    icon: CarFront,
+    specs: ['4 Personen', '4 Koffer', '4 Handgepaeck'],
+  },
+  {
+    title: 'Bus',
+    description: 'Ideal fuer groessere Gruppen - viel Platz fuer Fahrgaeste und Gepaeck.',
+    icon: Bus,
+    specs: ['8 Personen', '8 Koffer', '8 Handgepaeck'],
+  },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
@@ -47,13 +71,16 @@ export default function Home() {
         <div className="app-container relative grid gap-8 pb-10 pt-22 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-20 lg:pb-14 lg:pt-28">
           <div className="max-w-[38rem]">
             <div className="ui-text-block-lg mt-5 md:mt-6">
-              <h1 className="ui-heading-xl max-w-[16ch] !text-[2rem] !leading-[1.02] md:!text-[3.01rem]">
-                Flughafentaxi Wien: Sicher und puenktlich <span className="text-[#1679FF]">mit Alex</span>
+              <h1 className="ui-heading-xl max-w-[19ch] !text-[2rem] !leading-[1.02] md:!text-[3.01rem]">
+                <span>Flughafentaxi Wien</span>
+                <br />
+                <span>Ihr professioneller Flughafen Taxi Service</span>
               </h1>
               <p className="ui-copy-compact max-w-[34rem]">
-                Buchen Sie Ihr Flughafentaxi in Wien schnell und unkompliziert. Mit Fixpreis,
-                zuverlaessigem Service und puenktlicher Abholung bringen wir Sie komfortabel zum
-                Flughafen Wien (VIE) oder holen Sie nach Ihrer Landung direkt ab.
+                Willkommen bei Flughafentaxi Wien Alex - Ihrem 24/7 Transfer-Service vom
+                Flughafen Wien Schwechat. Wir bringen Sie puenktlich und komfortabel zu allen
+                Bahnhoefen, Hotels und Sehenswuerdigkeiten und bieten feste Preise ohne
+                Ueberraschungen.
               </p>
             </div>
             <div id="hero-booking" className="relative mt-2 w-full max-w-[740px] lg:-ml-2">
@@ -85,9 +112,8 @@ export default function Home() {
         <div className="app-container">
           <div className={homepageSectionWidthClass}>
             <div className="flex justify-center">
-              <h2 className="ui-heading-lg inline-flex flex-col items-center text-center text-[#111827]">
-                <span>Flughafentaxi Wien -</span>
-                <span>Fixpreis, puenktlich &amp; zuverlaessig</span>
+              <h2 className="ui-heading-lg text-center text-[#111827]">
+                Warum unser Flughafentaxi?
               </h2>
             </div>
 
@@ -95,19 +121,23 @@ export default function Home() {
               {[
                 {
                   title: 'Fixpreis garantiert',
-                  description: 'Keine versteckten Kosten.',
+                  description:
+                    'Der Preis wird vorab vereinbart, sodass Sie keine versteckten Gebuehren erwarten.',
                 },
                 {
-                  title: 'Puenktliche Abholung',
-                  description: 'Verlaesslich und sicher.',
+                  title: 'Puenktlich und planbar',
+                  description:
+                    'Unsere Fahrer*innen warten mit Namensschild in der Ankunftshalle, ueberwachen Ihren Flug und passen die Abholzeit bei Verspaetungen an.',
                 },
                 {
-                  title: 'Online buchen',
-                  description: 'In wenigen Schritten erledigt.',
+                  title: 'Komfort und Sicherheit',
+                  description:
+                    'Moderne, klimatisierte Fahrzeuge mit regelmaessiger Wartung, Kindersitzen auf Anfrage und erfahrenen Fahrer*innen.',
                 },
                 {
-                  title: 'Direkt erreichbar',
-                  description: 'Telefon, WhatsApp & Viber.',
+                  title: '24/7-Verfuegbarkeit',
+                  description:
+                    'Unser Service steht rund um die Uhr an sieben Tagen der Woche bereit, erreichbar per Telefon, WhatsApp & Viber.',
                 },
               ].map(({ title, description }) => (
                 <div
@@ -121,9 +151,63 @@ export default function Home() {
                     <h3 className="text-[1.28rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.38rem]">
                       {title}
                     </h3>
-                    <p className="text-[0.95rem] leading-[1.55] text-[#6a7d96] md:text-[1rem]">
+                    <p className="ui-copy-compact text-[#6a7d96]">
                       {description}
                     </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 flex justify-center md:mt-10">
+              <Link href="/book" className="ui-button-booking-primary">
+                Fahrt buchen
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-14 md:py-18">
+        <div className="app-container">
+          <div>
+            <div className="ui-text-block-sm mx-auto max-w-[44rem] text-center">
+              <h2 className="ui-heading-lg text-[#111827]">Fahrzeugkategorien</h2>
+              <p className="ui-copy-compact text-[#6a7d96]">
+                Unsere Fahrzeuge passen zu jedem Bedarf - von Einzelpersonen bis Gruppen.
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-5 lg:grid-cols-3">
+              {vehicleCategories.map(({ title, description, icon: Icon, specs }) => (
+                <div
+                  key={title}
+                  className="rounded-[2rem] bg-[#000000] px-6 py-7 text-white shadow-[0_16px_42px_rgba(17,17,17,0.12)] md:px-7 md:py-8"
+                >
+                  <span className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[var(--color-booking-accent)] text-white">
+                    <Icon size={22} strokeWidth={2.1} />
+                  </span>
+
+                  <div className="ui-text-block-sm mt-8">
+                    <h3 className="text-[2rem] font-semibold tracking-[-0.05em] !text-white">
+                      {title}
+                    </h3>
+                    <p className="ui-copy-compact text-white/68">{description}</p>
+                  </div>
+
+                  <div className="mt-10 space-y-5">
+                    {specs.map((spec, index) => (
+                      <div key={spec} className="flex items-center gap-3 text-white">
+                        {index === 0 ? (
+                          <Users size={20} className="text-[var(--color-booking-accent)]" />
+                        ) : index === 1 ? (
+                          <Briefcase size={20} className="text-[var(--color-booking-accent)]" />
+                        ) : (
+                          <ShoppingBag size={20} className="text-[var(--color-booking-accent)]" />
+                        )}
+                        <span className="ui-copy-compact text-white/88">{spec}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -143,7 +227,7 @@ export default function Home() {
           <div className={homepageSectionWidthClass}>
             <div className="rounded-[2.25rem] border border-[#d9e6fb] bg-[#f3f8ff] px-6 py-8 md:px-10 md:py-10 lg:grid lg:grid-cols-[1.1fr_0.78fr] lg:items-center lg:gap-12">
               <div className="max-w-[44rem]">
-                <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1679FF] md:text-[13px]">
+                <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.18em] text-[var(--color-booking-accent)] md:text-[13px]">
                   <Phone size={16} strokeWidth={2.2} />
                   Sofort erreichbar
                 </span>
@@ -160,7 +244,7 @@ export default function Home() {
                 <a
                   href="tel:+436764826069"
                   aria-label="Call"
-                  className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1679FF] text-white shadow-[0_14px_32px_rgba(22,121,255,0.22)] transition-colors hover:bg-[#0f6ae8] md:h-12 md:w-12"
+                  className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-booking-accent)] text-white shadow-[0_14px_32px_rgba(22,121,255,0.22)] transition-colors hover:bg-[#0f6ae8] md:h-12 md:w-12"
                 >
                   <Phone size={26} className="text-white md:h-[18px] md:w-[18px]" />
                 </a>

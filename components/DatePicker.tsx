@@ -98,11 +98,11 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate }: 
   return (
     <div
       ref={containerRef}
-      className="absolute left-0 top-full z-40 mt-3 w-[min(19rem,calc(100vw-3rem))] rounded-[1.375rem] border border-[#e6e1d7] bg-white p-3.5 shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-top-2 duration-200"
+      className="absolute left-0 top-full z-40 mt-3 w-[min(19rem,calc(100vw-3rem))] rounded-[1.375rem] border border-[#e6e1d7] bg-white p-2.5 shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-top-2 duration-200"
     >
-      <div className="mb-3 flex items-start justify-between gap-3">
+      <div className="mb-2 flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-[19px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
+          <h2 className="text-[16px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
             {monthNames[month]} {year}
           </h2>
         </div>
@@ -125,15 +125,15 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate }: 
         </div>
       </div>
 
-      <div className="mb-2 grid grid-cols-7">
+      <div className="mb-1 grid grid-cols-7">
         {dayNames.map((day) => (
-          <div key={day} className="py-1.5 text-center text-[10px] font-bold text-[#86868b]">
+          <div key={day} className="py-0.5 text-center text-[10px] font-bold text-[#86868b]">
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-y-1.5">
+      <div className="grid grid-cols-7 gap-y-0.5">
         {Array.from({ length: startDayIndex }).map((_, index) => (
           <div key={`empty-${index}`} />
         ))}
@@ -154,7 +154,7 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate }: 
               onClick={() => !disabled && handleDayClick(day)}
               disabled={disabled}
               className={`
-                mx-auto flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-medium transition-all
+                mx-auto flex h-[1.8rem] w-[1.8rem] items-center justify-center rounded-full text-[13px] font-medium transition-all
                 ${isSelected ? 'bg-[#0a63ff] text-white shadow-md' : ''}
                 ${!isSelected && !disabled ? 'text-[#1d1d1f] hover:bg-[#f5f5f7]' : ''}
                 ${isToday && !isSelected && !disabled ? 'font-bold text-[#0a63ff]' : ''}
