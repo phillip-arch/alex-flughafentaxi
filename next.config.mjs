@@ -19,6 +19,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.pexels.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com',
+      },
     ],
   },
 };

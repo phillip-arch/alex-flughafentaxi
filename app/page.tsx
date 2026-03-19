@@ -5,12 +5,9 @@ import {
   ChevronDown,
   ChevronRight,
   Briefcase,
-  BusFront,
-  CarTaxiFront,
   Phone,
   ShoppingBag,
   Users,
-  Van,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
@@ -56,19 +53,19 @@ const vehicleCategories = [
   {
     title: 'Limousine',
     description: 'Preiswerte Option fuer Alleinreisende oder Paare',
-    icon: CarTaxiFront,
+    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
     specs: ['2 Personen', '2 Koffer', '2 Handgepaeck'],
   },
   {
     title: 'Kombi',
     description: 'Ideal fuer Gruppen & Familien - mehr Platz fuer Gepaeck.',
-    icon: Van,
+    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
     specs: ['4 Personen', '4 Koffer', '4 Handgepaeck'],
   },
   {
     title: 'Bus',
     description: 'Ideal fuer groessere Gruppen - viel Platz fuer Fahrgaeste und Gepaeck.',
-    icon: BusFront,
+    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
     specs: ['8 Personen', '8 Koffer', '8 Handgepaeck'],
   },
 ];
@@ -190,14 +187,20 @@ export default function Home() {
             </div>
 
             <div className="ui-card-grid-relaxed mt-10 lg:grid-cols-3">
-              {vehicleCategories.map(({ title, description, icon: Icon, specs }) => (
+              {vehicleCategories.map(({ title, description, imageSrc, specs }) => (
                 <div
                   key={title}
                   className="ui-card-surface-light mx-auto w-full max-w-[26.5rem] px-5 py-5 text-[#111827] md:px-6 md:py-6"
                 >
-                  <span className="ui-icon-badge-accent">
-                    <Icon size={20} strokeWidth={2.2} />
-                  </span>
+                  <div className="relative h-[7.5rem] overflow-hidden rounded-[1.1rem] border border-[#e9edf3] bg-white p-2">
+                    <Image
+                      src={imageSrc}
+                      alt={title}
+                      fill
+                      className="object-contain"
+                      sizes="(min-width: 1024px) 18rem, 100vw"
+                    />
+                  </div>
 
                   <div className="mt-6 flex flex-col gap-2.5">
                     <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.72rem]">
