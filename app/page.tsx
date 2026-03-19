@@ -190,14 +190,14 @@ export default function Home() {
               {vehicleCategories.map(({ title, description, imageSrc, specs }) => (
                 <div
                   key={title}
-                  className="ui-card-surface-light mx-auto w-full max-w-[26.5rem] px-5 py-5 text-[#111827] md:px-6 md:py-6"
+                  className="ui-card-surface-light group mx-auto w-full max-w-[26.5rem] px-5 py-5 text-[#111827] transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(17,17,17,0.08)] md:px-6 md:py-6"
                 >
                   <div className="relative -mx-5 -mt-5 mb-5 h-[10.5rem] overflow-hidden rounded-t-[1.55rem] border-b border-[#e9edf3] bg-white md:-mx-6 md:-mt-6 md:mb-6">
                     <Image
                       src={imageSrc}
                       alt={title}
                       fill
-                      className="object-contain"
+                      className="object-contain transition-transform duration-300 ease-out group-hover:scale-[1.03]"
                       sizes="(min-width: 1024px) 18rem, 100vw"
                     />
                   </div>
