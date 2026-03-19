@@ -192,7 +192,7 @@ export default function Home() {
                   key={title}
                   className="ui-card-surface-light mx-auto w-full max-w-[26.5rem] px-5 py-5 text-[#111827] md:px-6 md:py-6"
                 >
-                  <div className="relative h-[7.5rem] overflow-hidden rounded-[1.1rem] border border-[#e9edf3] bg-white p-2">
+                  <div className="relative -mx-5 -mt-5 mb-5 h-[10.5rem] overflow-hidden rounded-t-[1.55rem] border-b border-[#e9edf3] bg-white md:-mx-6 md:-mt-6 md:mb-6">
                     <Image
                       src={imageSrc}
                       alt={title}
