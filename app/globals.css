@@ -261,8 +261,12 @@ p {
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background: #edf4ff;
-    color: #1679ff;
+    background: var(--color-booking-accent-soft);
+    color: var(--color-booking-accent);
+  }
+
+  .ui-icon-accent {
+    color: var(--color-booking-accent);
   }
 
   @media (min-width: 768px) {

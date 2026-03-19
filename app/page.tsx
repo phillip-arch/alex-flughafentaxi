@@ -213,11 +213,11 @@ export default function Home() {
                     {specs.map((spec, index) => (
                       <div key={spec} className="flex items-center gap-2.5 text-[#111827]">
                         {index === 0 ? (
-                          <Users size={17} className="text-[#6b7280]" />
+                          <Users size={17} className="ui-icon-accent" />
                         ) : index === 1 ? (
-                          <Briefcase size={17} className="text-[#6b7280]" />
+                          <Briefcase size={17} className="ui-icon-accent" />
                         ) : (
-                          <ShoppingBag size={17} className="text-[#6b7280]" />
+                          <ShoppingBag size={17} className="ui-icon-accent" />
                         )}
                         <span className="text-[0.96rem] leading-none text-[#1f2937]">{spec}</span>
                       </div>
