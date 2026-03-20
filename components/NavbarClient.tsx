@@ -125,14 +125,14 @@ const NavbarClient = () => {
 
       {isMobileMenuOpen && (
         <div className="fixed inset-x-0 bottom-0 top-[66px] bg-white text-[#111111] lg:hidden">
-          <div className="flex h-full flex-col px-11 pb-12 pt-10">
-            <nav className="flex flex-col gap-10">
+          <div className="flex h-full flex-col px-11 pb-12 pt-8">
+            <nav className="flex flex-col gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-[2.6rem] font-semibold tracking-[-0.06em] text-[#111111]"
+                className="text-[2.2rem] font-semibold tracking-[-0.055em] text-[#111111]"
               >
                 {item.name}
               </Link>
@@ -140,20 +140,20 @@ const NavbarClient = () => {
             <Link
               href="/account"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="text-[2.6rem] font-semibold tracking-[-0.06em] text-[#111111]"
+              className="text-[2.2rem] font-semibold tracking-[-0.055em] text-[#111111]"
             >
               Konto
             </Link>
             <Link
               href="/book"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="text-[2.6rem] font-semibold tracking-[-0.06em] text-[#111111]"
+              className="text-[2.2rem] font-semibold tracking-[-0.055em] text-[#111111]"
             >
               Fahrt buchen
             </Link>
             </nav>
 
-            <div className="mt-auto pt-10">
+            <div className="mt-auto pt-8">
               <Link
                 href={buildLangHref(nextLang)}
                 onClick={() => setIsMobileMenuOpen(false)}
