@@ -124,44 +124,83 @@ const NavbarClient = () => {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="fixed inset-x-0 bottom-0 top-[66px] bg-white text-[#111111] lg:hidden">
-          <div className="flex h-full flex-col px-11 pb-12 pt-8">
-            <nav className="flex flex-col gap-8">
-            {navItems.map((item) => (
+        <div className="fixed inset-0 bg-white text-[#111111] lg:hidden">
+          <div className="flex h-[66px] items-center justify-between bg-[#000000] px-4 text-white">
+            <Link href="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+              <span className="relative block h-11 w-[120px] overflow-hidden">
+                <Image
+                  src="https://web-site.website/images/aflogo.jpg"
+                  alt="Flughafentaxi Alex Logo"
+                  fill
+                  sizes="120px"
+                  className="object-contain object-left"
+                />
+              </span>
+            </Link>
+
+            <div className="flex items-center gap-3">
               <Link
-                key={item.name}
-                href={item.href}
+                href="/account"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-[2.2rem] font-semibold tracking-[-0.055em] text-[#111111]"
+                className="text-[15px] font-medium text-white"
               >
-                {item.name}
+                Konto
               </Link>
-            ))}
-            <Link
-              href="/account"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-[2.2rem] font-semibold tracking-[-0.055em] text-[#111111]"
-            >
-              Konto
-            </Link>
-            <Link
-              href="/book"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-[2.2rem] font-semibold tracking-[-0.055em] text-[#111111]"
-            >
-              Fahrt buchen
-            </Link>
+              <Link
+                href="/book"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="rounded-full bg-white px-4 py-2 text-[15px] font-medium text-[#111111]"
+              >
+                Buchen
+              </Link>
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white"
+                aria-label="Menue schliessen"
+              >
+                <X size={22} />
+              </button>
+            </div>
+          </div>
+
+          <div className="relative flex min-h-[calc(100vh-66px)] flex-col px-8 pb-24 pt-8">
+            <nav className="flex flex-col items-start gap-8">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111]"
+                >
+                  {item.name}
+                </Link>
+              ))}
+              <Link
+                href="/account"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111]"
+              >
+                Konto
+              </Link>
+              <Link
+                href="/book"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111]"
+              >
+                Fahrt buchen
+              </Link>
             </nav>
 
-            <div className="mt-auto pt-8">
+            <div className="absolute bottom-8 left-8">
               <Link
                 href={buildLangHref(nextLang)}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="inline-flex items-center gap-3 text-[1rem] font-medium text-[#111111]"
+                className="inline-flex items-center gap-3 text-[0.95rem] font-medium text-[#111111]"
                 aria-label={`Switch language to ${nextLang.toUpperCase()}`}
               >
                 <Globe size={20} strokeWidth={2.1} />
-                <span className="text-[1rem] font-medium uppercase">{nextLang}</span>
+                <span className="text-[0.95rem] font-medium uppercase">{nextLang}</span>
               </Link>
             </div>
           </div>
