@@ -269,6 +269,22 @@ p {
     color: var(--color-booking-accent);
   }
 
+  .ui-icon-button-accent {
+    display: inline-flex;
+    height: 1.85rem;
+    width: 1.85rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: var(--color-booking-accent-soft);
+    color: #111111;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+
+  .ui-icon-button-accent:hover {
+    background: #dfeeff;
+  }
+
   .ui-contact-fab {
     display: inline-flex;
     height: 56px;

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost-dark';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost-dark' | 'booking-primary';
 
 type SharedProps = {
   children: ReactNode;
@@ -24,6 +24,8 @@ function getVariantClass(variant: ButtonVariant) {
       return 'ui-button ui-button-secondary';
     case 'ghost-dark':
       return 'ui-button ui-button-ghost-dark';
+    case 'booking-primary':
+      return 'ui-button ui-button-booking-primary';
     default:
       return 'ui-button ui-button-primary';
   }

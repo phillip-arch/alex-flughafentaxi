@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { login, signup } from '../actions';
 import { Car, Mail, Lock, User, ArrowRight, Loader2, ChevronLeft } from 'lucide-react';
@@ -9,6 +9,12 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    setIsLogin(params.get('mode') !== 'signup');
+  }, []);
 
   const handleSubmit = async (formData: FormData) => {
     setLoading(true);
