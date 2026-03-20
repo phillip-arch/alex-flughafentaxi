@@ -104,7 +104,7 @@ export default function Home() {
             variant="default"
           >
             <Image
-              src="https://images.pexels.com/photos/9519974/pexels-photo-9519974.jpeg"
+              src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
               alt="Flughafentaxi Wien"
               fill
               priority
@@ -363,38 +363,27 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="mt-10 grid gap-x-10 gap-y-0 lg:grid-cols-2">
+          <div className="mt-8 grid gap-x-10 gap-y-0 lg:grid-cols-2">
             {[
-              'Terminal 1 -> Landstrasse-Wien Mitte',
-              'Terminal 1 -> Internationaler Busbahnhof Wien',
-              'Terminal 1 -> Stephansplatz',
-              'Terminal 1 -> Ernst-Happel-Stadion',
-              'Terminal 1 -> Bahnhof Meidling (Schedifkaplatz)',
-              'Terminal 1 -> Praterstern',
-              'Terminal 1 -> Westbahnhof',
-              'Terminal 1 -> Belvedere Palace',
-              'Terminal 1 -> Hauptbahnhof',
-              'Terminal 1 -> AKH (Wiener Allgemeines Krankenhaus)',
-              'Terminal 1 -> Schwedenplatz',
-              'Terminal 1 -> Schoenbrunn Palace',
-              'Terminal 1 -> Floridsdorf Bahnhof',
-              'Terminal 1 -> Suedtiroler Platz (Hauptbahnhof)',
-              'Terminal 3 -> Internationaler Busbahnhof Wien',
-              'Terminal 3 -> Westbahnhof',
-              'Terminal 3 -> Lugner City',
-              'Terminal 3 -> Praterstern',
-              'Terminal 3 -> Belvedere Palace',
-              'Terminal 3 -> Schwedenplatz',
-              'Terminal 3 -> Ernst-Happel-Stadion',
+              'Von Terminal 1 Vienna Airport nach Wien Hauptbahnhof',
+              'Von Stephansplatz nach Terminal 3 Vienna Airport',
+              'Von Terminal 1 Vienna Airport nach Schoenbrunn Palace',
+              'Von Wien Westbahnhof nach Terminal 3 Vienna Airport',
+              'Von Praterstern nach Terminal 3 Vienna Airport',
+              'Von Terminal 1 Vienna Airport nach Stephansplatz',
+              'Von Schwedenplatz nach Terminal 3 Vienna Airport',
+              'Von Terminal 1 Vienna Airport nach Wien Westbahnhof',
+              'Von Ernst-Happel-Stadion nach Terminal 3 Vienna Airport',
+              'Von Vienna Central Train Station nach Terminal 3 Vienna Airport',
             ].map((trip) => (
               <a
                 key={trip}
                 href="/book"
-                className="flex items-center justify-between gap-6 border-b border-[#e8edf3] py-6 text-[#2d3345] transition-colors hover:text-[#111827]"
+                className="flex items-center justify-between gap-4 border-b border-[#e8edf3] py-3 text-[#2d3345] transition-colors hover:text-[#111827]"
               >
-                <span className="text-[1.05rem] leading-[1.45] md:text-[1.1rem]">{trip}</span>
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#2e3445] text-white">
-                  <ChevronRight size={20} />
+                <span className="text-[0.78rem] leading-[1.25] md:text-[0.82rem]">{trip}</span>
+                <span className="flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-full bg-[#2e3445] text-white">
+                  <ChevronRight size={11} />
                 </span>
               </a>
             ))}
@@ -405,7 +394,7 @@ export default function Home() {
       <section className="bg-white py-14 md:py-18">
         <div className="app-container">
           <div className={homepageSectionWidthClass}>
-            <div className="rounded-[2.25rem] border border-[#d9e6fb] bg-[#f3f8ff] px-6 py-8 md:px-10 md:py-10 lg:grid lg:grid-cols-[1.1fr_0.78fr] lg:items-center lg:gap-12">
+            <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)] lg:items-center lg:gap-10">
               <div className="max-w-[44rem]">
                 <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.18em] text-[var(--color-booking-accent)] md:text-[13px]">
                   <Phone size={16} strokeWidth={2.2} />
@@ -413,18 +402,18 @@ export default function Home() {
                 </span>
                 <div className="ui-text-block-lg mt-5">
                   <h2 className="ui-heading-lg text-[#111827]">Fragen zur Buchung?</h2>
-                  <p className="ui-copy-compact max-w-[34rem] text-[#47617f]">
+                  <p className="ui-copy-compact max-w-[34rem] text-[#6a7d96]">
                     Sie koennen Ihren Flughafentransfer bequem online buchen. Falls Sie lieber direkt
                     sprechen oder schnell Hilfe brauchen, sind wir sofort erreichbar.
                   </p>
                 </div>
               </div>
 
-              <div className="mt-8 flex items-center justify-start gap-3 lg:mt-0 lg:flex-col lg:items-end">
+              <div className="mt-8 flex flex-wrap items-center gap-3 lg:mt-0 lg:justify-center lg:self-stretch lg:border-l lg:border-[#edf2f7] lg:pl-8">
                 <a
                   href="tel:+436764826069"
                   aria-label="Call"
-                  className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-booking-accent)] text-white shadow-[0_14px_32px_rgba(22,121,255,0.22)] transition-colors hover:bg-[#0f6ae8] md:h-12 md:w-12"
+                  className="ui-contact-fab ui-contact-fab-phone"
                 >
                   <Phone size={26} className="text-white md:h-[18px] md:w-[18px]" />
                 </a>
@@ -432,7 +421,7 @@ export default function Home() {
                 <a
                   href="https://wa.me/436764826069"
                   aria-label="WhatsApp"
-                  className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_14px_32px_rgba(37,211,102,0.2)] transition-colors hover:bg-[#1fb959] md:h-12 md:w-12"
+                  className="ui-contact-fab ui-contact-fab-whatsapp"
                 >
                   <WhatsAppIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
                 </a>
@@ -440,7 +429,7 @@ export default function Home() {
                 <a
                   href="viber://chat?number=%2B436764826069"
                   aria-label="Viber"
-                  className="flex h-14 w-14 items-center justify-center rounded-full bg-[#7360f2] text-white shadow-[0_14px_32px_rgba(115,96,242,0.2)] transition-colors hover:bg-[#5f4ae6] md:h-12 md:w-12"
+                  className="ui-contact-fab ui-contact-fab-viber"
                 >
                   <ViberIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
                 </a>

@@ -3,14 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Menu, User, X } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { ArrowRight, Globe, Menu, User, X } from 'lucide-react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Button from '@/components/ui/Button';
 
 const NavbarClient = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isHomePage = pathname === '/';
 
   useEffect(() => {
@@ -42,6 +43,14 @@ const NavbarClient = () => {
     : 'border-b border-white/10 bg-[rgba(0,0,0,0.94)] text-white backdrop-blur-xl';
 
   const navItemClass = 'text-white/72 hover:text-white';
+  const activeLang = searchParams.get('lang')?.toLowerCase() === 'en' ? 'en' : 'de';
+  const nextLang = activeLang === 'en' ? 'de' : 'en';
+  const buildLangHref = (lang: 'de' | 'en') => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('lang', lang);
+    const query = params.toString();
+    return query ? `${pathname}?${query}` : pathname;
+  };
 
   return (
     <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
@@ -71,6 +80,14 @@ const NavbarClient = () => {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <Link
+            href={buildLangHref(nextLang)}
+            className="inline-flex items-center gap-3 text-[15px] font-medium text-white transition-colors hover:text-white/78"
+            aria-label={`Switch language to ${nextLang.toUpperCase()}`}
+          >
+            <Globe size={20} strokeWidth={2.1} />
+            <span className="text-[15px] font-medium uppercase">{nextLang}</span>
+          </Link>
           <Button
             href="/account"
             className="border-white/12 bg-white/8 px-4 py-2 text-sm font-medium !text-white hover:bg-white/12"
@@ -100,6 +117,15 @@ const NavbarClient = () => {
 
       {isMobileMenuOpen && (
         <div className="border-t border-current/10 bg-[#000000] px-4 py-6 text-white lg:hidden">
+          <Link
+            href={buildLangHref(nextLang)}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="mb-4 inline-flex items-center gap-3 text-[15px] font-medium text-white"
+            aria-label={`Switch language to ${nextLang.toUpperCase()}`}
+          >
+            <Globe size={20} strokeWidth={2.1} />
+            <span className="text-[15px] font-medium uppercase">{nextLang}</span>
+          </Link>
           <nav className="flex flex-col gap-3">
             {navItems.map((item) => (
               <Link

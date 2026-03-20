@@ -269,6 +269,49 @@ p {
     color: var(--color-booking-accent);
   }
 
+  .ui-contact-fab {
+    display: inline-flex;
+    height: 56px;
+    width: 56px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    color: #ffffff;
+    box-shadow: 0 16px 38px rgba(17, 17, 17, 0.22);
+    transition: background-color 160ms ease;
+  }
+
+  .ui-contact-fab-phone {
+    background: #1679ff;
+  }
+
+  .ui-contact-fab-phone:hover {
+    background: #0f6ae8;
+  }
+
+  .ui-contact-fab-whatsapp {
+    background: #25d366;
+  }
+
+  .ui-contact-fab-whatsapp:hover {
+    background: #1fb959;
+  }
+
+  .ui-contact-fab-viber {
+    background: #7360f2;
+  }
+
+  .ui-contact-fab-viber:hover {
+    background: #6552dc;
+  }
+
+  @media (min-width: 768px) {
+    .ui-contact-fab {
+      height: 48px;
+      width: 48px;
+    }
+  }
+
   @media (min-width: 768px) {
     .ui-icon-badge-accent {
       height: 3.25rem;

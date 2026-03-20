@@ -13,19 +13,19 @@ const VIBER_NUMBER = encodeURIComponent(PHONE_NUMBER);
 const contactOptions = [
   {
     href: `tel:${PHONE_NUMBER}`,
-    className: 'bg-[#1679FF] text-white hover:bg-[#0f6ae8]',
+    className: 'ui-contact-fab ui-contact-fab-phone',
     icon: Phone,
     hoverLabel: PHONE_NUMBER,
   },
   {
     href: `https://wa.me/${WHATSAPP_NUMBER}`,
-    className: 'bg-[#25D366] text-white hover:bg-[#1fb959]',
+    className: 'ui-contact-fab ui-contact-fab-whatsapp',
     icon: WhatsAppIcon,
     hoverLabel: undefined,
   },
   {
     href: `viber://chat?number=${VIBER_NUMBER}`,
-    className: 'bg-[#7360f2] text-white hover:bg-[#6552dc]',
+    className: 'ui-contact-fab ui-contact-fab-viber',
     icon: ViberIcon,
     hoverLabel: undefined,
   },
@@ -81,7 +81,7 @@ export default function FloatingContactButton() {
 
                 <Link
                   href={option.href}
-                  className={`inline-flex h-[56px] w-[56px] items-center justify-center rounded-full shadow-[0_16px_38px_rgba(17,17,17,0.22)] transition-colors md:h-[48px] md:w-[48px] ${option.className}`}
+                  className={option.className}
                   onClick={() => setIsOpen(false)}
                 >
                   <Icon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
@@ -95,7 +95,7 @@ export default function FloatingContactButton() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="inline-flex h-[56px] w-[56px] items-center justify-center rounded-full bg-[#1679FF] text-white shadow-[0_16px_38px_rgba(17,17,17,0.22)] transition-colors hover:bg-[#0f6ae8] md:h-[48px] md:w-[48px]"
+        className="ui-contact-fab ui-contact-fab-phone"
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Close contact options' : 'Open contact options'}
       >
