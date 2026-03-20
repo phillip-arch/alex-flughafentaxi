@@ -52,6 +52,14 @@ const NavbarClient = () => {
     setActiveLang(params.get('lang')?.toLowerCase() === 'en' ? 'en' : 'de');
   }, []);
 
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
       <div className="app-container flex h-[66px] items-center justify-between lg:h-[72px]">
@@ -116,42 +124,47 @@ const NavbarClient = () => {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="border-t border-current/10 bg-[#000000] px-4 py-6 text-white lg:hidden">
-          <Link
-            href={buildLangHref(nextLang)}
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="mb-4 inline-flex items-center gap-3 text-[15px] font-medium text-white"
-            aria-label={`Switch language to ${nextLang.toUpperCase()}`}
-          >
-            <Globe size={20} strokeWidth={2.1} />
-            <span className="text-[15px] font-medium uppercase">{nextLang}</span>
-          </Link>
-          <nav className="flex flex-col gap-3">
+        <div className="fixed inset-x-0 bottom-0 top-[66px] bg-white text-[#111111] lg:hidden">
+          <div className="flex h-full flex-col px-11 pb-12 pt-10">
+            <nav className="flex flex-col gap-10">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="rounded-2xl border border-white/10 bg-white/6 px-4 py-4 text-lg font-semibold"
+                className="text-[2.6rem] font-semibold tracking-[-0.06em] text-[#111111]"
               >
                 {item.name}
               </Link>
             ))}
             <Link
               href="/account"
-              className="rounded-2xl border border-white/10 bg-white/6 px-4 py-4 text-lg font-semibold"
               onClick={() => setIsMobileMenuOpen(false)}
+              className="text-[2.6rem] font-semibold tracking-[-0.06em] text-[#111111]"
             >
               Konto
             </Link>
             <Link
               href="/book"
-              className="rounded-2xl bg-white px-4 py-4 text-lg font-semibold !text-[#111111]"
               onClick={() => setIsMobileMenuOpen(false)}
+              className="text-[2.6rem] font-semibold tracking-[-0.06em] text-[#111111]"
             >
               Fahrt buchen
             </Link>
-          </nav>
+            </nav>
+
+            <div className="mt-auto pt-10">
+              <Link
+                href={buildLangHref(nextLang)}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="inline-flex items-center gap-3 text-[1rem] font-medium text-[#111111]"
+                aria-label={`Switch language to ${nextLang.toUpperCase()}`}
+              >
+                <Globe size={20} strokeWidth={2.1} />
+                <span className="text-[1rem] font-medium uppercase">{nextLang}</span>
+              </Link>
+            </div>
+          </div>
         </div>
       )}
     </header>
