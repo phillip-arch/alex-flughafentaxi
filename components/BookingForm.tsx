@@ -802,7 +802,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
             <button
               type="button"
               onClick={() => handleStepIndicatorClick(step.key)}
-                className={`inline-flex shrink-0 items-center gap-0.5 rounded-full border px-[0.7rem] py-[0.4rem] text-[13px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
+                className={`inline-flex shrink-0 items-center gap-[0.35rem] rounded-full border px-[0.56rem] py-[0.32rem] text-[11px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
                 isCurrent
                   ? 'border-[#1679FF] bg-[#1679FF] text-white'
                   : isComplete
@@ -811,11 +811,11 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
               }`}
               aria-current={isCurrent ? 'step' : undefined}
             >
-                <Icon size={16} strokeWidth={2.2} className="md:h-4 md:w-4" />
-                <span className="text-[12px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
+                <Icon size={13} strokeWidth={2.2} className="md:h-4 md:w-4" />
+                <span className="text-[10px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
               </button>
               {index < stepItems.length - 1 ? (
-                <ChevronRight size={13} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
+                <ChevronRight size={11} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
               ) : null}
           </React.Fragment>
         );
