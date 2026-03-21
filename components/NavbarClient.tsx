@@ -3,13 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Globe, Menu, User, X } from 'lucide-react';
+import { ChevronDown, Globe, Menu, User, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 const NavbarClient = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeLang, setActiveLang] = useState<'de' | 'en'>('de');
+  const [activeLang, setActiveLang] = useState('de');
+  const [isDesktopLangMenuOpen, setIsDesktopLangMenuOpen] = useState(false);
+  const [isMobileLangMenuOpen, setIsMobileLangMenuOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
 
@@ -33,6 +35,15 @@ const NavbarClient = () => {
     { name: 'Flotte', href: '/#flotte' },
     { name: 'FAQ', href: '/faq' },
   ];
+  const languages = [
+    { code: 'en', label: 'English' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'fr', label: 'Français' },
+    { code: 'es', label: 'Español' },
+    { code: 'it', label: 'Italiano' },
+    { code: 'hu', label: 'Magyar' },
+    { code: 'tr', label: 'Türkçe' },
+  ];
 
   const isAdminPage = pathname.startsWith('/admin');
   if (isAdminPage) return null;
@@ -42,13 +53,12 @@ const NavbarClient = () => {
     : 'border-b border-white/10 bg-[rgba(0,0,0,0.94)] text-white backdrop-blur-xl';
 
   const navItemClass = 'text-white/72 hover:text-white';
-  const nextLang = activeLang === 'en' ? 'de' : 'en';
-  const buildLangHref = (lang: 'de' | 'en') => `${pathname}?lang=${lang}`;
+  const buildLangHref = (lang: string) => `${pathname}?lang=${lang}`;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
-    setActiveLang(params.get('lang')?.toLowerCase() === 'en' ? 'en' : 'de');
+    setActiveLang(params.get('lang')?.toLowerCase() || 'de');
   }, []);
 
   useEffect(() => {
@@ -58,6 +68,38 @@ const NavbarClient = () => {
       document.body.style.overflow = '';
     };
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (!isDesktopLangMenuOpen) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('[data-lang-menu-root="true"]')) return;
+      setIsDesktopLangMenuOpen(false);
+    };
+
+    window.addEventListener('mousedown', handlePointerDown);
+    return () => window.removeEventListener('mousedown', handlePointerDown);
+  }, [isDesktopLangMenuOpen]);
+
+  useEffect(() => {
+    if (!isMobileLangMenuOpen) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('[data-mobile-lang-menu-root="true"]')) return;
+      setIsMobileLangMenuOpen(false);
+    };
+
+    window.addEventListener('mousedown', handlePointerDown);
+    return () => window.removeEventListener('mousedown', handlePointerDown);
+  }, [isMobileLangMenuOpen]);
+
+  const handleLanguageSelect = () => {
+    setIsDesktopLangMenuOpen(false);
+    setIsMobileLangMenuOpen(false);
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
@@ -86,25 +128,66 @@ const NavbarClient = () => {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
-          <Link
-            href={buildLangHref(nextLang)}
-            className="inline-flex items-center gap-1 text-[15px] font-medium text-white transition-colors hover:text-white/78"
-            aria-label={`Switch language to ${nextLang.toUpperCase()}`}
-          >
-            <Globe size={20} strokeWidth={2.1} />
-            <span className="text-[15px] font-medium uppercase">{nextLang}</span>
-          </Link>
+        <div className="hidden h-10 items-center gap-5 lg:flex">
+          <div className="relative flex h-10 items-center" data-lang-menu-root="true">
+            <button
+              type="button"
+              onClick={() => setIsDesktopLangMenuOpen((current) => !current)}
+              className="inline-flex items-center gap-1 text-[15px] font-medium text-white transition-colors hover:text-white/78"
+              aria-haspopup="menu"
+              aria-expanded={isDesktopLangMenuOpen}
+              aria-label="Sprache waehlen"
+            >
+              <Globe size={20} strokeWidth={2.1} />
+              <span className="text-[15px] font-medium uppercase">{activeLang}</span>
+              <ChevronDown size={14} strokeWidth={2.2} />
+            </button>
+
+            {isDesktopLangMenuOpen ? (
+              <div className="absolute right-0 top-[calc(100%+12px)] w-[280px] rounded-[24px] border border-[#e8e8ed] bg-white p-3 text-[#111111] shadow-[0_22px_60px_rgba(17,17,17,0.16)]">
+                <div className="grid grid-cols-2 gap-1">
+                  {languages.map((language) => (
+                    <Link
+                      key={language.code}
+                      href={buildLangHref(language.code)}
+                      onClick={handleLanguageSelect}
+                      className={`flex items-center justify-between rounded-[16px] px-3 py-3 text-[15px] font-medium transition-colors hover:bg-[#f5f5f7] ${
+                        activeLang === language.code ? 'bg-[#f5f5f7]' : ''
+                      }`}
+                    >
+                      <span>{language.label}</span>
+                      <span className="text-[13px] font-semibold uppercase text-[#6b7280]">{language.code}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
           <Link
             href="/account"
-            className="ui-icon-button-accent"
+            className="ui-icon-button-accent -translate-y-px"
             aria-label="Zum Konto"
           >
             <User size={18} strokeWidth={2.1} className="text-[#111111]" />
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex h-10 items-center gap-2 lg:hidden">
+          <div className="relative flex h-10 items-center" data-mobile-lang-menu-root="true">
+            <button
+              type="button"
+              onClick={() => setIsMobileLangMenuOpen((current) => !current)}
+              className="inline-flex items-center gap-1 text-[0.95rem] font-medium text-white"
+              aria-haspopup="menu"
+              aria-expanded={isMobileLangMenuOpen}
+              aria-label="Sprache waehlen"
+            >
+              <Globe size={20} strokeWidth={2.1} />
+              <span className="text-[0.95rem] font-medium uppercase">{activeLang}</span>
+              <ChevronDown size={14} strokeWidth={2.2} />
+            </button>
+
+          </div>
           <Link
             href="/account"
             className="ui-icon-button-accent"
@@ -140,6 +223,20 @@ const NavbarClient = () => {
             </Link>
 
             <div className="flex items-center gap-2">
+              <div className="relative flex h-10 items-center" data-mobile-lang-menu-root="true">
+                <button
+                  type="button"
+                  onClick={() => setIsMobileLangMenuOpen((current) => !current)}
+                  className="inline-flex items-center gap-1 text-[0.95rem] font-medium text-white"
+                  aria-haspopup="menu"
+                  aria-expanded={isMobileLangMenuOpen}
+                  aria-label="Sprache waehlen"
+                >
+                  <Globe size={20} strokeWidth={2.1} />
+                  <span className="text-[0.95rem] font-medium uppercase">{activeLang}</span>
+                  <ChevronDown size={14} strokeWidth={2.2} />
+                </button>
+              </div>
               <Link
                 href="/account"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -174,21 +271,29 @@ const NavbarClient = () => {
                 </Link>
               ))}
             </nav>
-
-            <div className="pt-10">
-              <Link
-                href={buildLangHref(nextLang)}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="inline-flex items-center gap-1 text-[0.95rem] font-medium text-[#111111]"
-                aria-label={`Switch language to ${nextLang.toUpperCase()}`}
-              >
-                <Globe size={20} strokeWidth={2.1} />
-                <span className="text-[0.95rem] font-medium uppercase">{nextLang}</span>
-              </Link>
-            </div>
           </div>
         </div>
       )}
+
+      {isMobileLangMenuOpen && !isMobileMenuOpen ? (
+        <div className="fixed inset-x-0 top-[66px] bottom-0 z-[55] bg-white text-[#111111] lg:hidden">
+          <div className="px-8 pt-8">
+            <div className="flex flex-col items-start gap-8">
+              {languages.map((language) => (
+                <Link
+                  key={language.code}
+                  href={buildLangHref(language.code)}
+                  onClick={handleLanguageSelect}
+                  className="flex w-full items-center justify-between text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111]"
+                >
+                  <span>{language.label}</span>
+                  <span className="text-[0.95rem] font-semibold uppercase text-[#6b7280]">{language.code}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </header>
   );
 };
