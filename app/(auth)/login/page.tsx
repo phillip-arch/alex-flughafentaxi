@@ -1,9 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import {
+  ArrowRight,
+  Car,
+  ChevronLeft,
+  Loader2,
+  Lock,
+  Mail,
+  User,
+} from 'lucide-react';
 import { login, signup } from '../actions';
-import { Car, Mail, Lock, User, ArrowRight, Loader2, ChevronLeft } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -30,122 +40,203 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f5f5f7] p-4">
-      
-      {/* Back Button */}
-      <div className="w-full max-w-[400px] mb-6">
-        <Link 
-          href="/"
-          className="inline-flex items-center gap-2 text-[#86868b] hover:text-[#1d1d1f] transition-colors font-medium text-[15px]"
-        >
-          <ChevronLeft size={20} />
-          Zurück zur Startseite
-        </Link>
-      </div>
+    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
+      <Navbar />
 
-      <div className="w-full max-w-[400px] bg-white rounded-[24px] border border-[#d2d2d7] overflow-hidden shadow-sm">
-        {/* Header */}
-        <div className="p-8 text-center border-b border-[#d2d2d7]/50">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-[#f5f5f7] rounded-full mb-4 text-[#1d1d1f]">
-            <Car size={24} />
-          </div>
-          <h1 className="text-[28px] font-semibold text-[#1d1d1f] leading-tight mb-2 tracking-tight">
-            {isLogin ? 'Willkommen' : 'Konto erstellen'}
-          </h1>
-          <p className="text-[#86868b] text-[15px]">
-            {isLogin 
-              ? 'Melden Sie sich an, um Ihre Buchungen zu verwalten.' 
-              : 'Registrieren Sie sich für schnellere Buchungen.'}
-          </p>
-        </div>
-
-        {/* Form */}
-        <div className="p-8">
-          {error && (
-            <div className="mb-6 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8] animate-in fade-in">
-              <span className="block w-1.5 h-1.5 bg-[#d70015] rounded-full" />
-              {error}
-            </div>
-          )}
-
-          <form action={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#86868b]" size={20} />
-                <input
-                  type="text"
-                  name="fullName"
-                  placeholder="Vollständiger Name"
-                  required={!isLogin}
-                  className="w-full pl-12 p-4 rounded-xl bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[17px] outline-none placeholder:text-[#86868b] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-all"
-                />
-              </div>
-            )}
-
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#86868b]" size={20} />
-              <input
-                type="email"
-                name="email"
-                placeholder="E-Mail Adresse"
-                required
-                className="w-full pl-12 p-4 rounded-xl bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[17px] outline-none placeholder:text-[#86868b] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-all"
-              />
-            </div>
-
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#86868b]" size={20} />
-              <input
-                type="password"
-                name="password"
-                placeholder="Passwort"
-                required
-                minLength={6}
-                className="w-full pl-12 p-4 rounded-xl bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[17px] outline-none placeholder:text-[#86868b] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-all"
-              />
-            </div>
-
-            {isLogin && (
-              <div className="text-right mt-2">
-                <Link href="/forgot-password" className="text-[13px] text-[#0071e3] hover:underline">
-                  Passwort vergessen?
-                </Link>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-[17px] py-4 rounded-full flex items-center justify-center gap-2 transition-all disabled:opacity-50 mt-8"
-            >
-              {loading ? (
-                <Loader2 size={20} className="animate-spin" />
-              ) : (
-                <>
-                  {isLogin ? 'Anmelden' : 'Registrieren'}
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Toggle */}
-          <div className="mt-8 text-center">
-            <p className="text-[#86868b] text-[15px]">
-              {isLogin ? 'Noch kein Konto?' : 'Bereits ein Konto?'}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError(null);
-                }}
-                className="ml-2 font-medium text-[#0071e3] hover:text-[#0077ed] transition-colors"
+      <section className="relative overflow-hidden bg-white">
+        <div className="app-container grid gap-8 pb-10 pt-22 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-20 lg:pb-14 lg:pt-28">
+          <div className="max-w-[38rem]">
+            <div className="ui-text-block-lg mt-5 md:mt-6">
+              <Link
+                href="/"
+                className="inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
               >
-                {isLogin ? 'Jetzt registrieren' : 'Hier anmelden'}
-              </button>
-            </p>
+                <ChevronLeft size={18} />
+                Zurueck zur Startseite
+              </Link>
+
+              <div className="ui-text-block-lg">
+                <p className="ui-eyebrow w-fit border-none bg-[var(--color-booking-accent-soft)] text-[var(--color-booking-accent)]">
+                  Kundenkonto
+                </p>
+                <h1 className="ui-heading-xl max-w-[13ch] !text-[2rem] !leading-[1.02] md:!text-[3.01rem]">
+                  {isLogin ? 'Willkommen zurueck.' : 'Konto fuer schnellere Buchungen erstellen.'}
+                </h1>
+                <p className="ui-copy-compact max-w-[34rem]">
+                  {isLogin
+                    ? 'Melden Sie sich an, um Buchungen zu verwalten, Fahrtdetails schneller auszufuellen und Ihren Flughafentransfer sauber an einem Ort zu behalten.'
+                    : 'Registrieren Sie sich einmal und nutzen Sie Ihre Daten spaeter fuer schnellere Buchungen, klare Uebersicht und einen einfacheren Ablauf auf allen internen Seiten.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <div className="ui-card-surface-light px-5 py-5 md:px-6 md:py-6">
+                <span className="ui-icon-badge-accent">
+                  <Car size={20} strokeWidth={2.2} />
+                </span>
+                <div className="ui-text-block-sm mt-4">
+                  <h2 className="ui-heading-sm text-[#111827]">Schneller buchen</h2>
+                  <p className="ui-copy-sm text-[#6a7d96]">
+                    Wiederkehrende Daten lassen sich spaeter einfacher nutzen.
+                  </p>
+                </div>
+              </div>
+
+              <div className="ui-card-surface-light px-5 py-5 md:px-6 md:py-6">
+                <span className="ui-icon-badge-accent">
+                  <User size={20} strokeWidth={2.2} />
+                </span>
+                <div className="ui-text-block-sm mt-4">
+                  <h2 className="ui-heading-sm text-[#111827]">Alles an einem Ort</h2>
+                  <p className="ui-copy-sm text-[#6a7d96]">
+                    Behalten Sie Konto, Kontaktdaten und spaetere Buchungen zentral im Blick.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:mt-6">
+            <div className="ui-card-surface-light overflow-hidden">
+              <div className="relative min-h-[220px] border-b border-[#e9edf3] bg-white lg:min-h-[260px]">
+                <Image
+                  src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
+                  alt="Flughafentaxi Wien"
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 42vw, 100vw"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(17,17,17,0.16)_100%)]" />
+              </div>
+
+              <div className="px-5 py-6 md:px-8 md:py-8">
+                <div className="ui-text-block-sm">
+                  <h2 className="ui-heading-lg text-[#111827]">
+                    {isLogin ? 'Anmelden' : 'Registrieren'}
+                  </h2>
+                  <p className="ui-copy-compact text-[#6a7d96]">
+                    {isLogin
+                      ? 'Greifen Sie auf Ihr Kundenkonto zu.'
+                      : 'Erstellen Sie Ihr Konto fuer kuenftige Buchungen.'}
+                  </p>
+                </div>
+
+                {error ? (
+                  <div className="mt-6 rounded-[1rem] border border-[var(--color-danger)] bg-[var(--color-danger-soft)] px-4 py-3 text-[0.92rem] font-medium text-[var(--color-danger)]">
+                    {error}
+                  </div>
+                ) : null}
+
+                <form action={handleSubmit} className="mt-6 space-y-4">
+                  {!isLogin ? (
+                    <label className="block">
+                      <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                        Vollstaendiger Name
+                      </span>
+                      <div className="relative">
+                        <User
+                          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8a94a3]"
+                          size={18}
+                        />
+                        <input
+                          type="text"
+                          name="fullName"
+                          placeholder="Vollstaendiger Name"
+                          required={!isLogin}
+                          className="ui-input pl-11"
+                        />
+                      </div>
+                    </label>
+                  ) : null}
+
+                  <label className="block">
+                    <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                      E-Mail
+                    </span>
+                    <div className="relative">
+                      <Mail
+                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8a94a3]"
+                        size={18}
+                      />
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="E-Mail Adresse"
+                        required
+                        className="ui-input pl-11"
+                      />
+                    </div>
+                  </label>
+
+                  <label className="block">
+                    <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                      Passwort
+                    </span>
+                    <div className="relative">
+                      <Lock
+                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#8a94a3]"
+                        size={18}
+                      />
+                      <input
+                        type="password"
+                        name="password"
+                        placeholder="Passwort"
+                        required
+                        minLength={6}
+                        className="ui-input pl-11"
+                      />
+                    </div>
+                  </label>
+
+                  {isLogin ? (
+                    <div className="text-right">
+                      <Link
+                        href="/forgot-password"
+                        className="text-[0.88rem] font-medium text-[var(--color-booking-accent)] transition-colors hover:text-[#0f6ae8]"
+                      >
+                        Passwort vergessen?
+                      </Link>
+                    </div>
+                  ) : null}
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="ui-button-booking-primary mt-2 w-full disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {loading ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <>
+                        <span>{isLogin ? 'Anmelden' : 'Registrieren'}</span>
+                        <ArrowRight size={16} />
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                <div className="mt-6 border-t border-[#edf2f7] pt-5">
+                  <p className="text-[0.94rem] text-[#6a7d96]">
+                    {isLogin ? 'Noch kein Konto?' : 'Bereits ein Konto?'}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsLogin((current) => !current);
+                        setError(null);
+                      }}
+                      className="ml-2 font-semibold text-[var(--color-booking-accent)] transition-colors hover:text-[#0f6ae8]"
+                    >
+                      {isLogin ? 'Jetzt registrieren' : 'Hier anmelden'}
+                    </button>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
