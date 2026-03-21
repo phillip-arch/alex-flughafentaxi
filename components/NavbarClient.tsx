@@ -196,7 +196,7 @@ const NavbarClient = () => {
             <User size={18} strokeWidth={2.1} className="text-[#111111]" />
           </Link>
           <button
-            className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-white"
+            className="ml-2 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-white"
             aria-label={isMobileMenuOpen ? 'Menue schliessen' : 'Menue oeffnen'}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
@@ -248,7 +248,7 @@ const NavbarClient = () => {
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-white"
+                className="ml-2 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-white"
                 aria-label="Menue schliessen"
               >
                 <span className="flex h-5 w-5 items-center justify-center">
