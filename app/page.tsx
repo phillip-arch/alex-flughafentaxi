@@ -55,18 +55,33 @@ const vehicleCategories = [
     description: 'Preiswerte Option fuer Alleinreisende oder Paare',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
     specs: ['2 Personen', '2 Koffer', '2 Handgepaeck'],
+    prices: [
+      { district: '1. - 10. Bezirk', price: '42 EUR' },
+      { district: '11. Bezirk', price: '39 EUR' },
+      { district: '12. - 23. Bezirk', price: '45 EUR' },
+    ],
   },
   {
     title: 'Kombi',
     description: 'Ideal fuer Gruppen & Familien - mehr Platz fuer Gepaeck.',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
     specs: ['4 Personen', '4 Koffer', '4 Handgepaeck'],
+    prices: [
+      { district: '1. - 10. Bezirk', price: '48 EUR' },
+      { district: '11. Bezirk', price: '45 EUR' },
+      { district: '12. - 23. Bezirk', price: '51 EUR' },
+    ],
   },
   {
     title: 'Bus',
     description: 'Ideal fuer groessere Gruppen - viel Platz fuer Fahrgaeste und Gepaeck.',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
     specs: ['8 Personen', '8 Koffer', '8 Handgepaeck'],
+    prices: [
+      { district: '1. - 10. Bezirk', price: '72 EUR' },
+      { district: '11. Bezirk', price: '69 EUR' },
+      { district: '12. - 23. Bezirk', price: '75 EUR' },
+    ],
   },
 ];
 
@@ -178,50 +193,80 @@ export default function Home() {
 
       <section className="section-shell-tight-top bg-white">
         <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="ui-text-block-sm mx-auto max-w-[44rem] text-center">
+          <div className="w-full">
+            <div className="ui-text-block-sm mx-auto max-w-[46rem] text-center">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1679FF] md:text-[13px]">
+                Fahrzeugkategorien
+              </p>
               <h2 className="ui-heading-lg text-[#111827]">Fahrzeugkategorien</h2>
               <p className="ui-copy-compact text-[#6a7d96]">
-                Unsere Fahrzeuge passen zu jedem Bedarf - von Einzelpersonen bis Gruppen.
+                Unsere Fahrzeuge passen zu jedem Bedarf. Vergleichen Sie Platzangebot und
+                Fixpreise fuer Wien auf einen Blick.
               </p>
             </div>
 
-            <div className="ui-card-grid-relaxed mt-10 lg:grid-cols-3">
-              {vehicleCategories.map(({ title, description, imageSrc, specs }) => (
+            <div className="mt-10 space-y-5">
+              {vehicleCategories.map(({ title, description, imageSrc, specs, prices }) => (
                 <div
                   key={title}
-                  className="ui-card-surface-light group mx-auto w-full max-w-[26.5rem] px-5 py-5 text-[#111827] transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(17,17,17,0.08)] md:px-6 md:py-6"
+                  className="ui-card-surface-light group overflow-hidden px-5 py-5 text-[#111827] md:px-6 md:py-6"
                 >
-                  <div className="relative -mx-5 -mt-5 mb-5 h-[10.5rem] overflow-hidden rounded-t-[1.55rem] border-b border-[#e9edf3] bg-white md:-mx-6 md:-mt-6 md:mb-6">
-                    <Image
-                      src={imageSrc}
-                      alt={title}
-                      fill
-                      className="object-contain transition-transform duration-300 ease-out group-hover:scale-[1.03]"
-                      sizes="(min-width: 1024px) 18rem, 100vw"
-                    />
-                  </div>
+                  <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[16rem_minmax(0,0.95fr)_minmax(18rem,0.92fr)] lg:items-center lg:gap-8">
+                    <div className="relative h-[12rem] overflow-hidden rounded-[1.5rem] border border-[#e9edf3] bg-white md:h-[13rem] lg:h-[14rem]">
+                      <Image
+                        src={imageSrc}
+                        alt={title}
+                        fill
+                        className="object-contain"
+                        sizes="(min-width: 1024px) 16rem, 100vw"
+                      />
+                    </div>
 
-                  <div className="mt-6 flex flex-col gap-2.5">
-                    <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.72rem]">
-                      {title}
-                    </h3>
-                    <p className="ui-copy-sm text-[#6b7280]">{description}</p>
-                  </div>
-
-                  <div className="mt-7 space-y-3.5 border-t border-[#edf2f7] pt-5">
-                    {specs.map((spec, index) => (
-                      <div key={spec} className="flex items-center gap-2.5 text-[#111827]">
-                        {index === 0 ? (
-                          <Users size={17} className="ui-icon-accent" />
-                        ) : index === 1 ? (
-                          <Briefcase size={17} className="ui-icon-accent" />
-                        ) : (
-                          <ShoppingBag size={17} className="ui-icon-accent" />
-                        )}
-                        <span className="text-[0.96rem] leading-none text-[#1f2937]">{spec}</span>
+                    <div className="flex min-w-0 flex-col justify-center gap-5">
+                      <div className="ui-text-block-sm gap-1.5">
+                        <h3 className="text-[1.7rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.9rem]">
+                          {title}
+                        </h3>
+                        <p className="ui-copy-sm max-w-[34rem] text-[#6b7280]">{description}</p>
                       </div>
-                    ))}
+
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                        {specs.map((spec, index) => (
+                          <div
+                            key={spec}
+                            className="flex items-center justify-center gap-1.5 rounded-[0.9rem] border border-[#edf2f7] bg-white px-2 py-2 text-[#111827] sm:gap-2.5 sm:rounded-[1rem] sm:px-3 sm:py-3"
+                          >
+                            {index === 0 ? (
+                              <Users size={17} className="ui-icon-accent" />
+                            ) : index === 1 ? (
+                              <Briefcase size={17} className="ui-icon-accent" />
+                            ) : (
+                              <ShoppingBag size={17} className="ui-icon-accent" />
+                            )}
+                            <span className="ui-copy-sm font-semibold text-[#1f2937]">
+                              {spec.split(' ')[0]}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="rounded-[1.35rem] border border-[#e8edf3] bg-[#f8fbff] px-4 py-4 md:px-5">
+                      <p className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-[#1679FF]">
+                        Preisliste fuer Wien
+                      </p>
+                      <div className="mt-3 space-y-2.5">
+                        {prices.map(({ district, price }) => (
+                          <div
+                            key={district}
+                            className="flex items-center justify-between gap-4 border-b border-[#e6edf7] pb-2 last:border-b-0 last:pb-0"
+                          >
+                            <span className="text-[0.95rem] text-[#4b5563]">{district}</span>
+                            <span className="text-[1rem] font-semibold text-[#111827]">{price}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
