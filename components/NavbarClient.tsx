@@ -172,12 +172,12 @@ const NavbarClient = () => {
           </Link>
         </div>
 
-        <div className="flex h-10 items-center gap-2 lg:hidden">
+        <div className="flex h-10 items-center gap-4 lg:hidden">
           <div className="relative flex h-10 items-center" data-mobile-lang-menu-root="true">
             <button
               type="button"
               onClick={() => setIsMobileLangMenuOpen((current) => !current)}
-              className="inline-flex items-center gap-1 text-[0.95rem] font-medium text-white"
+              className="inline-flex min-w-[4.75rem] items-center gap-1.5 text-[0.95rem] font-medium text-white"
               aria-haspopup="menu"
               aria-expanded={isMobileLangMenuOpen}
               aria-label="Sprache waehlen"
@@ -222,12 +222,12 @@ const NavbarClient = () => {
               </span>
             </Link>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <div className="relative flex h-10 items-center" data-mobile-lang-menu-root="true">
                 <button
                   type="button"
                   onClick={() => setIsMobileLangMenuOpen((current) => !current)}
-                  className="inline-flex items-center gap-1 text-[0.95rem] font-medium text-white"
+                  className="inline-flex min-w-[4.75rem] items-center gap-1.5 text-[0.95rem] font-medium text-white"
                   aria-haspopup="menu"
                   aria-expanded={isMobileLangMenuOpen}
                   aria-label="Sprache waehlen"
