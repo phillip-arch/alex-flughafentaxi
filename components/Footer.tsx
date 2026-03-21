@@ -12,12 +12,15 @@ function TikTokIcon({ className = '' }: { className?: string }) {
 
 export default function Footer() {
   return (
-    <footer className="mt-auto bg-[#171717] py-14 text-white md:py-16">
+    <footer className="mt-auto border-t border-white/8 bg-[#000000] py-14 text-white md:py-16">
       <div className="app-container">
-        <div className="grid gap-12 lg:grid-cols-[1.25fr_0.75fr_0.75fr] lg:gap-16">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:gap-6">
           <div className="max-w-[31rem]">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1679FF] md:text-[13px]">
+              Flughafentaxi Wien
+            </p>
             <Link href="/" className="inline-flex items-center gap-4">
-              <span className="relative block h-12 w-[250px] overflow-hidden">
+              <span className="relative mt-4 block h-12 w-[250px] overflow-hidden">
                 <Image
                   src="https://web-site.website/images/aflogo.jpg"
                   alt="Flughafentaxi Alex Logo"
@@ -27,7 +30,7 @@ export default function Footer() {
                 />
               </span>
             </Link>
-            <p className="ui-copy-compact mt-8 max-w-[26rem] text-white/62">
+            <p className="ui-copy-compact mt-6 max-w-[26rem] text-white/62">
               Sicher, puenktlich und zuverlaessig zum Flughafen Wien (VIE). Ihr komfortabler
               Transfer mit Fixpreis-Garantie.
             </p>
@@ -36,56 +39,56 @@ export default function Footer() {
               <a
                 href="#"
                 aria-label="TikTok"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/14"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10"
               >
                 <TikTokIcon className="h-[18px] w-[18px]" />
               </a>
               <a
                 href="#"
                 aria-label="Instagram"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/14"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10"
               >
                 <Instagram size={18} />
               </a>
             </div>
           </div>
 
-          <div>
-            <h4 className="text-[1.95rem] font-semibold tracking-[-0.04em] text-white">
+          <div className="rounded-[1.55rem] border border-white/10 bg-white/[0.03] px-6 py-6 text-white">
+            <h4 className="text-[1.55rem] font-semibold tracking-[-0.04em] !text-white">
               Quick Links
             </h4>
-            <ul className="mt-8 space-y-6">
+            <ul className="mt-6 space-y-4">
               <li>
-                <Link href="/preise" className="text-[1.05rem] text-white/62 transition-colors hover:text-white">
+                <Link href="/preise" className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
                   Preise
                 </Link>
               </li>
               <li>
-                <Link href="/#gebiete" className="text-[1.05rem] text-white/62 transition-colors hover:text-white">
+                <Link href="/#gebiete" className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
                   Gebiete
                 </Link>
               </li>
               <li>
-                <Link href="/#flotte" className="text-[1.05rem] text-white/62 transition-colors hover:text-white">
+                <Link href="/#flotte" className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
                   Flotte
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-[1.05rem] text-white/62 transition-colors hover:text-white">
+                <Link href="/faq" className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
                   FAQ
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div>
-            <h4 className="text-[1.95rem] font-semibold tracking-[-0.04em] text-white">
+          <div className="rounded-[1.55rem] border border-white/10 bg-white/[0.03] px-6 py-6 text-white">
+            <h4 className="text-[1.55rem] font-semibold tracking-[-0.04em] !text-white">
               Rechtliches
             </h4>
-            <ul className="mt-8 space-y-6">
-              <li className="text-[1.05rem] text-white/62">Impressum</li>
-              <li className="text-[1.05rem] text-white/62">Datenschutz</li>
-              <li className="text-[1.05rem] text-white/62">AGB</li>
+            <ul className="mt-6 space-y-4">
+              <li className="text-[1rem] !text-white/62">Impressum</li>
+              <li className="text-[1rem] !text-white/62">Datenschutz</li>
+              <li className="text-[1rem] !text-white/62">AGB</li>
             </ul>
           </div>
         </div>
