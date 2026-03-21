@@ -105,12 +105,12 @@ const NavbarClient = () => {
     <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
       <div className="app-container flex h-[66px] items-center justify-between lg:h-[72px]">
         <Link href="/" className="flex items-center">
-          <span className="relative block h-11 w-[220px] overflow-hidden lg:h-12">
+          <span className="relative block h-11 w-[120px] overflow-hidden lg:h-12 lg:w-[220px]">
             <Image
               src="https://web-site.website/images/aflogo.jpg"
               alt="Flughafentaxi Alex Logo"
               fill
-              sizes="220px"
+              sizes="(max-width: 1023px) 120px, 220px"
               className="object-contain object-left"
             />
           </span>
@@ -211,12 +211,12 @@ const NavbarClient = () => {
         <div className="fixed inset-0 bg-white text-[#111111] lg:hidden">
           <div className="app-container flex h-[66px] items-center justify-between bg-[#000000] text-white">
             <Link href="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
-              <span className="relative block h-11 w-[220px] overflow-hidden">
+              <span className="relative block h-11 w-[120px] overflow-hidden">
                 <Image
                   src="https://web-site.website/images/aflogo.jpg"
                   alt="Flughafentaxi Alex Logo"
                   fill
-                  sizes="220px"
+                  sizes="120px"
                   className="object-contain object-left"
                 />
               </span>
