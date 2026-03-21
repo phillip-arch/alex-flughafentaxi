@@ -18,6 +18,53 @@ const FavoriteSchema = z.object({
   house_number: z.string().trim().min(1).max(20),
 });
 
+export async function loadFavoriteAddresses() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Unauthorized' };
+
+  const { data, error } = await supabase
+    .from('saved_addresses')
+    .select('id, name, city, zip, street, house_number')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('loadFavoriteAddresses failed:', error);
+    return { error: 'Favoriten konnten nicht geladen werden.' };
+  }
+
+  return { favorites: (data || []) as any[] };
+}
+
+export async function loadAccountBookings() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Unauthorized' };
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .select(
+      'id, booking_reference, pickup_at, pickup, destination, status, price, driver_id, confirm_token, full_name, phone, email, passengers, luggage, vehicle_type, notes',
+    )
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) {
+    console.error('loadAccountBookings failed:', error);
+    return { error: 'Buchungsverlauf konnte nicht geladen werden.' };
+  }
+
+  return { bookings: (data || []) as any[] };
+}
+
 export async function updateAccountProfile(formData: FormData) {
   const supabase = await createClient();
   const {

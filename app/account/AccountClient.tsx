@@ -1,7 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import {
   BookOpen,
   Briefcase,
@@ -31,7 +30,14 @@ import {
   RIDE_PILL_SMALL_CLASS,
 } from '@/components/ui/sharedStyles';
 import { parseBookingNotes } from '@/lib/booking/notes';
-import { addFavoriteAddress, cancelOwnBooking, deleteFavoriteAddress, updateAccountProfile } from './actions';
+import {
+  addFavoriteAddress,
+  cancelOwnBooking,
+  deleteFavoriteAddress,
+  loadAccountBookings,
+  loadFavoriteAddresses,
+  updateAccountProfile,
+} from './actions';
 
 type AccountTab = 'buchen' | 'profil' | 'favoriten' | 'buchungsverlauf';
 
@@ -71,15 +77,19 @@ export default function AccountClient({
   initialPhone,
   initialFavorites,
   initialBookings,
+  initialRequestedTab,
+  initialFavoritesLoaded,
+  initialBookingsLoaded,
 }: {
   userEmail: string;
   initialName: string;
   initialPhone: string;
   initialFavorites: Favorite[];
   initialBookings: Booking[];
+  initialRequestedTab: AccountTab;
+  initialFavoritesLoaded: boolean;
+  initialBookingsLoaded: boolean;
 }) {
-  const searchParams = useSearchParams();
-  const requestedTab = searchParams.get('tab');
   const [name, setName] = useState(initialName || '');
   const [phone, setPhone] = useState(initialPhone || '');
   const [favorites, setFavorites] = useState<Favorite[]>(initialFavorites || []);
@@ -94,16 +104,13 @@ export default function AccountClient({
   const [bookingNotice, setBookingNotice] = useState<string | null>(null);
   const [cancelingBookingId, setCancelingBookingId] = useState<string | null>(null);
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('upcoming');
-  const [activeTab, setActiveTab] = useState<AccountTab>(
-    requestedTab === 'profil' ||
-      requestedTab === 'favoriten' ||
-      requestedTab === 'buchungsverlauf' ||
-      requestedTab === 'buchen'
-      ? requestedTab
-      : 'buchen',
-  );
+  const [activeTab, setActiveTab] = useState<AccountTab>(initialRequestedTab);
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [favoritesLoaded, setFavoritesLoaded] = useState(initialFavoritesLoaded);
+  const [bookingsLoaded, setBookingsLoaded] = useState(initialBookingsLoaded);
+  const [favoritesLoading, setFavoritesLoading] = useState(false);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
 
   const accountShellClass = 'mx-auto max-w-[57.5rem]';
   const sectionCardClass = 'ui-card-surface-light px-6 py-7 md:px-8 md:py-8';
@@ -208,6 +215,36 @@ export default function AccountClient({
       const bTime = new Date(b.pickup_at).getTime();
       return bookingFilter === 'upcoming' ? aTime - bTime : bTime - aTime;
     });
+
+  useEffect(() => {
+    if (activeTab === 'favoriten' && !favoritesLoaded && !favoritesLoading) {
+      setFavoritesLoading(true);
+      void loadFavoriteAddresses().then((res) => {
+        if ((res as { error?: string }).error) {
+          setError((res as { error: string }).error);
+        } else {
+          setFavorites(((res as { favorites?: Favorite[] }).favorites || []) as Favorite[]);
+          setFavoritesLoaded(true);
+        }
+        setFavoritesLoading(false);
+      });
+    }
+  }, [activeTab, favoritesLoaded, favoritesLoading]);
+
+  useEffect(() => {
+    if (activeTab === 'buchungsverlauf' && !bookingsLoaded && !bookingsLoading) {
+      setBookingsLoading(true);
+      void loadAccountBookings().then((res) => {
+        if ((res as { error?: string }).error) {
+          setBookingError((res as { error: string }).error);
+        } else {
+          setBookings(((res as { bookings?: Booking[] }).bookings || []) as Booking[]);
+          setBookingsLoaded(true);
+        }
+        setBookingsLoading(false);
+      });
+    }
+  }, [activeTab, bookingsLoaded, bookingsLoading]);
 
   return (
     <div suppressHydrationWarning className="bg-white pb-14 pt-24 lg:pt-28">
@@ -426,6 +463,9 @@ export default function AccountClient({
               </form>
 
               <div className="flex flex-wrap gap-2">
+                {favoritesLoading ? (
+                  <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
+                ) : null}
                 {favorites.map((fav) => (
                   <div
                     key={fav.id}
@@ -490,6 +530,9 @@ export default function AccountClient({
               </div>
 
               <div className="space-y-3">
+                {bookingsLoading ? (
+                  <p className="text-[#6a7d96]">Buchungsverlauf wird geladen...</p>
+                ) : null}
                 {filteredBookings.map((b) => (
                   <div
                     key={b.id}

@@ -19,14 +19,6 @@ const navItems = [
   { name: 'FAQ', href: '/faq' },
 ];
 
-const accountNavItems = [
-  { name: 'Home', href: '/' },
-  { name: 'Buchen', href: '/account?tab=buchen' },
-  { name: 'Profil', href: '/account?tab=profil' },
-  { name: 'Favoriten', href: '/account?tab=favoriten' },
-  { name: 'Verlauf', href: '/account?tab=buchungsverlauf' },
-];
-
 const languages: LanguageOption[] = [
   { code: 'en', label: 'English' },
   { code: 'de', label: 'Deutsch' },
@@ -47,7 +39,6 @@ export default function NavbarClient() {
   const [urlHash, setUrlHash] = useState('');
   const pathname = usePathname();
   const isHomePage = pathname === '/';
-  const isAccountPage = pathname.startsWith('/account');
 
   useEffect(() => {
     let ticking = false;
@@ -115,7 +106,6 @@ export default function NavbarClient() {
     : 'border-b border-white/10 bg-[rgba(0,0,0,0.94)] text-white backdrop-blur-xl';
 
   const navItemClass = 'text-sm font-medium text-white/72 transition-colors hover:text-white';
-  const visibleNavItems = isAccountPage ? accountNavItems : navItems;
 
   const buildLangHref = (lang: string) => {
     const params = new URLSearchParams(urlSearch);
@@ -163,8 +153,9 @@ export default function NavbarClient() {
     ));
 
   return (
-    <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
-      <div className="app-container flex h-[66px] items-center justify-between lg:h-[72px]">
+    <>
+      <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
+        <div className="app-container flex h-[66px] items-center justify-between lg:h-[72px]">
         <Link href="/" className="flex items-center">
           <span className="relative block h-11 w-[120px] overflow-hidden lg:h-12 lg:w-[220px]">
             <Image
@@ -178,7 +169,7 @@ export default function NavbarClient() {
         </Link>
 
         <nav className="hidden items-center gap-8 lg:flex">
-          {visibleNavItems.map((item) => (
+          {navItems.map((item) => (
             <Link key={item.name} href={item.href} className={navItemClass}>
               {item.name}
             </Link>
@@ -247,10 +238,11 @@ export default function NavbarClient() {
             </span>
           </button>
         </div>
-      </div>
+        </div>
+      </header>
 
       {isMobileMenuOpen ? (
-        <div className="fixed inset-0 bg-white text-[#111111] lg:hidden">
+        <div className="fixed inset-0 z-[80] bg-white text-[#111111] lg:hidden">
           <div className="app-container flex h-[66px] items-center justify-between bg-[#000000] text-white">
             <Link href="/" className="flex items-center" onClick={closeMobileMenu}>
               <span className="relative block h-11 w-[120px] overflow-hidden">
@@ -280,7 +272,12 @@ export default function NavbarClient() {
                 </button>
               </div>
 
-              <Link href="/account" onClick={closeMobileMenu} className="ui-icon-button-accent" aria-label="Zum Konto">
+              <Link
+                href="/account"
+                onClick={closeMobileMenu}
+                className="ui-icon-button-accent"
+                aria-label="Zum Konto"
+              >
                 <User size={18} strokeWidth={2.1} className="text-[#111111]" />
               </Link>
 
@@ -299,7 +296,7 @@ export default function NavbarClient() {
 
           <div className="flex min-h-[calc(100vh-66px)] flex-col px-8 pb-10 pt-8">
             <nav className="flex flex-col items-start gap-8">
-              {visibleNavItems.map((item) => (
+              {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
@@ -315,7 +312,7 @@ export default function NavbarClient() {
       ) : null}
 
       {isMobileLangMenuOpen ? (
-        <div className="fixed inset-x-0 top-[66px] bottom-0 z-[55] bg-white text-[#111111] lg:hidden">
+        <div className="fixed inset-x-0 top-[66px] bottom-0 z-[75] bg-white text-[#111111] lg:hidden">
           <div className="px-8 pt-8">
             <div className="flex flex-col items-start gap-8">
               {renderLanguageItems(
@@ -326,6 +323,6 @@ export default function NavbarClient() {
           </div>
         </div>
       ) : null}
-    </header>
+    </>
   );
 }

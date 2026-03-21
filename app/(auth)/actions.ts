@@ -160,25 +160,31 @@ export async function login(formData: FormData) {
 
     const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
 
-    if (ip !== 'unknown') {
-      const { count: ipCount } = await supabaseAdmin
-        .from('auth_rate_limits')
-        .select('*', { count: 'exact', head: true })
-        .eq('ip_address', ip)
-        .eq('action', 'user_login')
-        .gte('created_at', fifteenMinsAgo);
+    const ipCountPromise =
+      ip !== 'unknown'
+        ? supabaseAdmin
+            .from('auth_rate_limits')
+            .select('*', { count: 'exact', head: true })
+            .eq('ip_address', ip)
+            .eq('action', 'user_login')
+            .gte('created_at', fifteenMinsAgo)
+        : Promise.resolve({ count: 0 } as { count: number | null });
 
-      if (ipCount && ipCount >= 8) {
-        return { error: 'Zu viele Login-Versuche. Bitte warten Sie 15 Minuten.' };
-      }
-    }
-
-    const { count: emailCount } = await supabaseAdmin
+    const emailCountPromise = supabaseAdmin
       .from('auth_rate_limits')
       .select('*', { count: 'exact', head: true })
       .eq('email', email)
       .eq('action', 'user_login')
       .gte('created_at', fifteenMinsAgo);
+
+    const [{ count: ipCount }, { count: emailCount }] = await Promise.all([
+      ipCountPromise,
+      emailCountPromise,
+    ]);
+
+    if (ipCount && ipCount >= 8) {
+      return { error: 'Zu viele Login-Versuche. Bitte warten Sie 15 Minuten.' };
+    }
 
     if (emailCount && emailCount >= 8) {
       return { error: 'Zu viele Login-Versuche. Bitte warten Sie 15 Minuten.' };
