@@ -1,32 +1,29 @@
 'use client';
 
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import {
+  BookOpen,
+  Briefcase,
   Car,
-  Menu,
-  User,
+  ChevronDown,
+  CreditCard,
   Heart,
   History,
-  BookOpen,
-  XCircle,
+  Mail,
+  MapPin,
+  Menu,
+  Phone,
   PlaneLanding,
   PlaneTakeoff,
-  ChevronDown,
-  MapPin,
-  Phone,
-  Mail,
+  User,
   Users,
-  Briefcase,
-  CreditCard,
+  XCircle,
 } from 'lucide-react';
 import { logout } from '@/app/(auth)/actions';
 import BookingForm from '@/components/BookingForm';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
 import {
-  APP_HEADER_CLASS,
-  APP_PAGE_BG_CLASS,
   RIDE_CARD_BASE_CLASS,
   RIDE_CARD_CANCELLED_CLASS,
   RIDE_CONTENT_CANCELLED_CLASS,
@@ -108,15 +105,8 @@ export default function AccountClient({
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const fmtDate = (value: string) =>
-    new Intl.DateTimeFormat('de-AT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).format(new Date(value));
+  const accountShellClass = 'mx-auto max-w-[57.5rem]';
+  const sectionCardClass = 'ui-card-surface-light px-6 py-7 md:px-8 md:py-8';
 
   const fmtDateOnly = (value: string) =>
     new Intl.DateTimeFormat('de-AT', {
@@ -140,10 +130,16 @@ export default function AccountClient({
 
   const getPaymentMeta = (booking: Booking) => {
     const paymentRaw = String(parseBookingNotes(booking.notes).paymentLabel || '').toLowerCase();
-    const isCard = paymentRaw.includes('kredit') || paymentRaw.includes('card') || paymentRaw.includes('karte');
+    const isCard =
+      paymentRaw.includes('kredit') || paymentRaw.includes('card') || paymentRaw.includes('karte');
     const isCash = paymentRaw.includes('bar') || paymentRaw.includes('cash');
     if (isCard) return { label: 'KARTE', className: 'bg-[#e8f2ff] text-[#0071e3]' };
-    if (isCash) return { label: 'BAR', className: 'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]' };
+    if (isCash)
+      return {
+        label: 'BAR',
+        className:
+          'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]',
+      };
     return { label: '-', className: 'bg-[#e7ebf3] text-[#1d1d1f]' };
   };
 
@@ -154,8 +150,7 @@ export default function AccountClient({
 
   const canCancel = (booking: Booking) => {
     if (booking.driver_id) return false;
-    const status = booking.status;
-    const normalized = String(status || '').toLowerCase();
+    const normalized = String(booking.status || '').toLowerCase();
     return normalized !== 'completed' && normalized !== 'canceled' && normalized !== 'cancelled';
   };
 
@@ -179,12 +174,15 @@ export default function AccountClient({
     return pickupDate.getTime() < cutoff;
   };
 
-  const isToAirport = (booking: Booking) => String(booking.destination || '').toLowerCase().includes('flughafen');
-  const isFromAirport = (booking: Booking) => String(booking.pickup || '').toLowerCase().includes('flughafen');
+  const isToAirport = (booking: Booking) =>
+    String(booking.destination || '').toLowerCase().includes('flughafen');
+  const isFromAirport = (booking: Booking) =>
+    String(booking.pickup || '').toLowerCase().includes('flughafen');
   const isUpcoming = (booking: Booking) => new Date(String(booking.pickup_at || '')).getTime() >= Date.now();
   const isPrevious = (booking: Booking) => new Date(String(booking.pickup_at || '')).getTime() < Date.now();
   const isAirportLocation = (value: string) => /flughafen\s+wien/i.test(String(value || ''));
-  const getGoogleMapsUrl = (value: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(value || '')}`;
+  const getGoogleMapsUrl = (value: string) =>
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(value || '')}`;
 
   const filteredBookings = bookings
     .filter((booking) => {
@@ -212,126 +210,102 @@ export default function AccountClient({
     });
 
   return (
-    <main suppressHydrationWarning className={`${APP_PAGE_BG_CLASS} pb-12`}>
-      <header className={APP_HEADER_CLASS}>
-        <div className="mx-auto flex h-16 w-full max-w-[980px] items-center justify-between px-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-[#1d1d1f]">
-            <Car size={18} />
-            <span className="text-[15px] font-semibold">Alex Flughafentaxi</span>
-          </Link>
-
-          <div className="flex items-center gap-3 relative ml-auto">
-            <div className="md:hidden">
-              <button
-                type="button"
-                onClick={() => setMobileTabsOpen((prev) => !prev)}
-                className="inline-flex items-center justify-center w-11 h-11 rounded-[12px] border border-[#d2d2d7] bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
-                aria-label="Kontomenue oeffnen"
-              >
-                <Menu size={17} />
-              </button>
-              {mobileTabsOpen ? (
-                <div className="absolute right-0 top-[52px] z-20 w-60 rounded-[14px] border border-[#d2d2d7] bg-white shadow-lg overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('buchen');
-                      setMobileTabsOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
-                      activeTab === 'buchen' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
-                    }`}
-                  >
-                    <BookOpen size={16} /> Buchen
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('profil');
-                      setMobileTabsOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
-                      activeTab === 'profil' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
-                    }`}
-                  >
-                    <User size={16} /> Profil
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('favoriten');
-                      setMobileTabsOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
-                      activeTab === 'favoriten' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
-                    }`}
-                  >
-                    <Heart size={16} /> Favoriten
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('buchungsverlauf');
-                      setMobileTabsOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
-                      activeTab === 'buchungsverlauf' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
-                    }`}
-                  >
-                    <History size={16} /> Buchungsverlauf
-                  </button>
-                  <form action={logout}>
-                    <button
-                      type="submit"
-                      className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left text-[#1d1d1f] hover:bg-[#f5f5f7]"
-                    >
-                      <XCircle size={16} /> Abmelden
-                    </button>
-                  </form>
+    <div suppressHydrationWarning className="bg-white pb-14 pt-24 lg:pt-28">
+      <div className="app-container">
+        <div className={`${accountShellClass} space-y-6`}>
+          <section className={sectionCardClass}>
+            <div className="flex flex-col gap-5 md:gap-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className="ui-text-block-sm">
+                  <h1 className="ui-heading-lg text-[#111827]">Mein Konto</h1>
+                  <p className="ui-copy-compact text-[#6a7d96]">
+                    Verwalten Sie Ihr Profil, Favoriten und Buchungsverlauf im gleichen
+                    Designsystem wie auf der Startseite.
+                  </p>
                 </div>
-              ) : null}
+
+                <div className="relative md:hidden">
+                  <button
+                    type="button"
+                    onClick={() => setMobileTabsOpen((prev) => !prev)}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-[12px] border border-[#e9edf3] bg-white text-[#111111] transition-colors hover:bg-[#f5f5f7]"
+                    aria-label="Kontomenue oeffnen"
+                  >
+                    <Menu size={17} />
+                  </button>
+                  {mobileTabsOpen ? (
+                    <div className="absolute right-0 top-[52px] z-20 w-64 overflow-hidden rounded-[1.1rem] border border-[#e9edf3] bg-white shadow-[0_16px_40px_rgba(17,17,17,0.08)]">
+                      {[
+                        { id: 'buchen', label: 'Buchen', icon: BookOpen },
+                        { id: 'profil', label: 'Profil', icon: User },
+                        { id: 'favoriten', label: 'Favoriten', icon: Heart },
+                        { id: 'buchungsverlauf', label: 'Buchungsverlauf', icon: History },
+                      ].map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => {
+                              setActiveTab(item.id as AccountTab);
+                              setMobileTabsOpen(false);
+                            }}
+                            className={`flex w-full items-center gap-3 px-4 py-3 text-left text-[15px] ${
+                              activeTab === item.id
+                                ? 'bg-[#edf4ff] text-[#1679ff]'
+                                : 'text-[#111111] hover:bg-[#f5f5f7]'
+                            }`}
+                          >
+                            <Icon size={16} />
+                            {item.label}
+                          </button>
+                        );
+                      })}
+                      <form action={logout}>
+                        <button
+                          type="submit"
+                          className="flex w-full items-center gap-3 px-4 py-3 text-left text-[15px] text-[#111111] hover:bg-[#f5f5f7]"
+                        >
+                          <XCircle size={16} />
+                          Abmelden
+                        </button>
+                      </form>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-4 border-t border-[#edf2f7] pt-4">
+                <UnderlineTabNav
+                  className="hidden items-center md:flex"
+                  items={[
+                    { id: 'buchen', label: 'Buchen' },
+                    { id: 'profil', label: 'Profil' },
+                    { id: 'favoriten', label: 'Favoriten' },
+                    { id: 'buchungsverlauf', label: 'Buchungsverlauf' },
+                  ]}
+                  activeTab={activeTab}
+                  onChange={setActiveTab}
+                />
+                <form action={logout} className="hidden md:block">
+                  <button type="submit" className="ui-button-secondary px-4 py-2 text-[0.82rem]">
+                    Abmelden
+                  </button>
+                </form>
+              </div>
             </div>
-
-            <UnderlineTabNav
-              className="hidden md:flex items-center"
-              items={[
-                { id: 'buchen', label: 'Buchen' },
-                { id: 'profil', label: 'Profil' },
-                { id: 'favoriten', label: 'Favoriten' },
-                { id: 'buchungsverlauf', label: 'Buchungsverlauf' },
-              ]}
-              activeTab={activeTab}
-              onChange={setActiveTab}
-            />
-            <form action={logout} className="hidden md:block">
-              <button
-                type="submit"
-                className="rounded-full border border-[#d2d2d7] px-3 py-1.5 text-[13px] font-medium text-[#1d1d1f] hover:bg-[#f5f5f7]"
-              >
-                Abmelden
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
-
-      <div className="px-4 pt-8">
-        <div className="mx-auto max-w-[980px] space-y-6">
-          <section className="rounded-[24px] border border-[#d2d2d7] bg-white p-6 md:p-8">
-            <h1 className="text-[34px] font-semibold tracking-tight text-[#1d1d1f]">Mein Konto</h1>
-            <p className="mt-1 text-[#86868b]">Verwalten Sie Ihr Profil, Favoriten und Buchungsverlauf.</p>
           </section>
 
           {activeTab === 'buchen' ? (
-            <section className="rounded-[24px] border border-[#d2d2d7] bg-white p-4 md:p-6">
-              <h2 className="mb-4 text-[24px] font-semibold text-[#1d1d1f]">Buchen</h2>
+            <section className={sectionCardClass}>
+              <h2 className="ui-heading-lg mb-4 text-[#111827]">Buchen</h2>
               <BookingForm />
             </section>
           ) : null}
 
           {activeTab === 'profil' ? (
-            <section className="rounded-[24px] border border-[#d2d2d7] bg-white p-6 md:p-8">
-              <h2 className="mb-4 text-[24px] font-semibold text-[#1d1d1f]">Profil</h2>
+            <section className={sectionCardClass}>
+              <h2 className="ui-heading-lg mb-5 text-[#111827]">Profil</h2>
               <form
                 action={(formData) => {
                   setError(null);
@@ -339,7 +313,6 @@ export default function AccountClient({
                     const res = await updateAccountProfile(formData);
                     if ((res as { error?: string })?.error) {
                       setError((res as { error: string }).error);
-                      return;
                     }
                   });
                 }}
@@ -349,7 +322,7 @@ export default function AccountClient({
                   name="full_name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-xl border border-[#d2d2d7] p-3"
+                  className="ui-input"
                   placeholder="Name"
                   required
                 />
@@ -357,16 +330,16 @@ export default function AccountClient({
                   name="phone"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-xl border border-[#d2d2d7] p-3"
+                  className="ui-input"
                   placeholder="Telefon"
                   required
                 />
-                <input value={userEmail} readOnly className="w-full rounded-xl border border-[#e5e5ea] bg-[#f5f5f7] p-3" />
+                <input value={userEmail} readOnly className="ui-input" />
                 <div className="md:col-span-3">
                   <button
                     type="submit"
                     disabled={isPending}
-                    className="rounded-full bg-[#0071e3] px-6 py-3 font-medium text-white hover:bg-[#0077ed]"
+                    className="ui-button-booking-primary md:w-auto"
                   >
                     {isPending ? 'Speichern...' : 'Profil speichern'}
                   </button>
@@ -377,8 +350,8 @@ export default function AccountClient({
           ) : null}
 
           {activeTab === 'favoriten' ? (
-            <section className="rounded-[24px] border border-[#d2d2d7] bg-white p-6 md:p-8">
-              <h2 className="mb-4 text-[24px] font-semibold text-[#1d1d1f]">Favoriten</h2>
+            <section className={sectionCardClass}>
+              <h2 className="ui-heading-lg mb-5 text-[#111827]">Favoriten</h2>
               <form
                 action={(formData) => {
                   setError(null);
@@ -399,13 +372,13 @@ export default function AccountClient({
                     setFavHouseNumber('');
                   });
                 }}
-                className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-[170px_150px_120px_1fr_130px_auto]"
+                className="mb-5 grid grid-cols-1 gap-3 md:grid-cols-[170px_150px_120px_1fr_130px_auto]"
               >
                 <input
                   name="name"
                   value={favName}
                   onChange={(e) => setFavName(e.target.value)}
-                  className="w-full rounded-xl border border-[#d2d2d7] p-3"
+                  className="ui-input"
                   placeholder="Name (z.B. Home)"
                   required
                 />
@@ -413,7 +386,7 @@ export default function AccountClient({
                   name="city"
                   value={favCity}
                   onChange={(e) => setFavCity(e.target.value)}
-                  className="w-full rounded-xl border border-[#d2d2d7] p-3"
+                  className="ui-input"
                   required
                 >
                   <option value="Wien">Wien</option>
@@ -423,7 +396,7 @@ export default function AccountClient({
                   name="zip"
                   value={favZip}
                   onChange={(e) => setFavZip(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  className="w-full rounded-xl border border-[#d2d2d7] p-3"
+                  className="ui-input"
                   placeholder="PLZ"
                   required
                 />
@@ -431,22 +404,22 @@ export default function AccountClient({
                   name="street"
                   value={favStreet}
                   onChange={(e) => setFavStreet(e.target.value)}
-                  className="w-full rounded-xl border border-[#d2d2d7] p-3"
-                  placeholder="Straße"
+                  className="ui-input"
+                  placeholder="Strasse"
                   required
                 />
                 <input
                   name="house_number"
                   value={favHouseNumber}
                   onChange={(e) => setFavHouseNumber(e.target.value)}
-                  className="w-full rounded-xl border border-[#d2d2d7] p-3"
+                  className="ui-input"
                   placeholder="Nr."
                   required
                 />
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="rounded-full bg-[#1d1d1f] px-5 py-3 font-medium text-white hover:bg-black"
+                  className="ui-button-booking-primary md:w-auto"
                 >
                   Speichern
                 </button>
@@ -456,17 +429,17 @@ export default function AccountClient({
                 {favorites.map((fav) => (
                   <div
                     key={fav.id}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#e5e5ea] bg-[#f5f5f7] px-3 py-2"
+                    className="inline-flex items-center gap-2 rounded-full border border-[#e9edf3] bg-[#f5f5f7] px-3 py-2"
                   >
-                    <span className="text-sm font-semibold text-[#1d1d1f]">{fav.name}:</span>
-                    <span className="text-sm text-[#86868b]">
+                    <span className="text-sm font-semibold text-[#111111]">{fav.name}:</span>
+                    <span className="text-sm text-[#6a7d96]">
                       {fav.street} {fav.house_number}, {fav.zip} {fav.city}
                     </span>
                     <button
                       type="button"
                       onClick={() =>
                         startTransition(async () => {
-                          if (!confirm('Möchten Sie diesen Favoriten löschen?')) return;
+                          if (!confirm('Moechten Sie diesen Favoriten loeschen?')) return;
                           const res = await deleteFavoriteAddress(fav.id);
                           if ((res as { error?: string })?.error) {
                             setError((res as { error: string }).error);
@@ -481,15 +454,17 @@ export default function AccountClient({
                     </button>
                   </div>
                 ))}
-                {favorites.length === 0 ? <p className="text-sm text-[#86868b]">Keine Favoriten gespeichert.</p> : null}
+                {favorites.length === 0 ? (
+                  <p className="text-sm text-[#6a7d96]">Keine Favoriten gespeichert.</p>
+                ) : null}
               </div>
               {error ? <p className="mt-3 text-sm text-[#d70015]">{error}</p> : null}
             </section>
           ) : null}
 
           {activeTab === 'buchungsverlauf' ? (
-            <section className="rounded-[24px] border border-[#d2d2d7] bg-white p-6 md:p-8">
-              <h2 className="mb-4 text-[24px] font-semibold text-[#1d1d1f]">Buchungsverlauf</h2>
+            <section className={sectionCardClass}>
+              <h2 className="ui-heading-lg mb-5 text-[#111827]">Buchungsverlauf</h2>
               <div className="mb-4 flex flex-wrap gap-2">
                 {[
                   { id: 'all', label: 'Alle' },
@@ -505,19 +480,22 @@ export default function AccountClient({
                     onClick={() => setBookingFilter(item.id as BookingFilter)}
                     className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                       bookingFilter === item.id
-                        ? 'border-[#0071e3] bg-[#e8f2ff] text-[#0071e3]'
-                        : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                        ? 'border-[#1679ff] bg-[#edf4ff] text-[#1679ff]'
+                        : 'border-[#e9edf3] bg-white text-[#111111] hover:bg-[#f5f5f7]'
                     }`}
                   >
                     {item.label}
                   </button>
                 ))}
               </div>
+
               <div className="space-y-3">
                 {filteredBookings.map((b) => (
                   <div
                     key={b.id}
-                    className={`${RIDE_CARD_BASE_CLASS} ${isCanceled(b.status) ? RIDE_CARD_CANCELLED_CLASS : ''}`}
+                    className={`${RIDE_CARD_BASE_CLASS} ${
+                      isCanceled(b.status) ? RIDE_CARD_CANCELLED_CLASS : ''
+                    }`}
                   >
                     <div
                       className={`grid grid-cols-1 gap-4 lg:grid-cols-[1.15fr_0.95fr_0.8fr] ${
@@ -526,21 +504,21 @@ export default function AccountClient({
                     >
                       <div>
                         <div className="mb-3 flex flex-wrap items-center gap-2">
-                          <span className={RIDE_PILL_CLASS}>
-                            {fmtDateOnly(b.pickup_at)}
-                          </span>
-                          <span className={RIDE_PILL_CLASS}>
-                            {fmtTime(b.pickup_at)}
-                          </span>
+                          <span className={RIDE_PILL_CLASS}>{fmtDateOnly(b.pickup_at)}</span>
+                          <span className={RIDE_PILL_CLASS}>{fmtTime(b.pickup_at)}</span>
                           <span className={RIDE_PILL_CLASS}>
                             {isToAirport(b) ? <PlaneTakeoff size={13} /> : <PlaneLanding size={13} />}
                             {isToAirport(b) ? 'ZUM' : 'VOM'}
                           </span>
-                          <span className={RIDE_PILL_CLASS}>{(b.vehicle_type || '-').toUpperCase()}</span>
+                          <span className={RIDE_PILL_CLASS}>
+                            {(b.vehicle_type || '-').toUpperCase()}
+                          </span>
                           {(() => {
                             const payment = getPaymentMeta(b);
                             return (
-                              <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold ${payment.className}`}>
+                              <span
+                                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold ${payment.className}`}
+                              >
                                 <CreditCard size={13} />
                                 {payment.label}
                               </span>
@@ -552,35 +530,42 @@ export default function AccountClient({
                         </div>
 
                         <div className="flex items-stretch gap-2.5">
-                          <div className="pt-1 flex flex-col items-center text-[#000000] shrink-0" aria-hidden="true">
+                          <div
+                            className="flex shrink-0 flex-col items-center pt-1 text-[#000000]"
+                            aria-hidden="true"
+                          >
                             <span className="h-2.5 w-2.5 rounded-full bg-[#000000]" />
                             <span className="my-1 w-px flex-1 bg-[#000000]" />
                             <ChevronDown size={14} />
                           </div>
                           <div className="min-w-0 flex-1 space-y-2.5">
                             <div className="flex items-start gap-2">
-                              <p className="text-[22px] font-semibold text-[#081a42] leading-snug line-clamp-2">{b.pickup}</p>
+                              <p className="line-clamp-2 text-[22px] font-semibold leading-snug text-[#081a42]">
+                                {b.pickup}
+                              </p>
                               {!isAirportLocation(b.pickup) ? (
                                 <a
                                   href={getGoogleMapsUrl(b.pickup)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                            aria-label="Abholort in Google Maps oeffnen"
-                                  className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
+                                  aria-label="Abholort in Google Maps oeffnen"
+                                  className="mt-1 shrink-0 text-[#000000] transition-colors hover:text-[#000000]"
                                 >
                                   <MapPin size={20} />
                                 </a>
                               ) : null}
                             </div>
                             <div className="flex items-start gap-2">
-                              <p className="text-[22px] font-semibold text-[#000000] leading-snug line-clamp-2">{b.destination}</p>
+                              <p className="line-clamp-2 text-[22px] font-semibold leading-snug text-[#000000]">
+                                {b.destination}
+                              </p>
                               {!isAirportLocation(b.destination) ? (
                                 <a
                                   href={getGoogleMapsUrl(b.destination)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                            aria-label="Ziel in Google Maps oeffnen"
-                                  className="mt-1 text-[#000000] hover:text-[#000000] transition-colors shrink-0"
+                                  aria-label="Ziel in Google Maps oeffnen"
+                                  className="mt-1 shrink-0 text-[#000000] transition-colors hover:text-[#000000]"
                                 >
                                   <MapPin size={20} />
                                 </a>
@@ -588,26 +573,33 @@ export default function AccountClient({
                             </div>
                           </div>
                         </div>
+
                         {(() => {
                           const displayNotes = parseBookingNotes(b.notes).cleanedNotes;
                           if (!displayNotes) return null;
                           return (
-                            <div className="rounded-[11px] border border-[#d2d2d7] bg-white px-3 py-2 mt-2 max-w-[620px]">
-                              <p className="text-[10px] uppercase tracking-wide text-[#86868b] font-semibold mb-0.5">Anmerkung</p>
-                              <p className="text-[15px] text-[#1d1d1f] leading-snug line-clamp-3">{displayNotes}</p>
+                            <div className="mt-2 max-w-[620px] rounded-[11px] border border-[#d2d2d7] bg-white px-3 py-2">
+                              <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#86868b]">
+                                Anmerkung
+                              </p>
+                              <p className="line-clamp-3 text-[15px] leading-snug text-[#1d1d1f]">
+                                {displayNotes}
+                              </p>
                             </div>
                           );
                         })()}
                       </div>
 
                       <div className="space-y-3 lg:pl-6">
-                        <h3 className="font-semibold text-[#000000] text-[19px]">{b.full_name || '-'}</h3>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[#000000] text-[14px]">
-                          <div className="flex items-center gap-2 min-w-0">
+                        <h3 className="text-[19px] font-semibold text-[#000000]">
+                          {b.full_name || '-'}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-[#000000]">
+                          <div className="flex min-w-0 items-center gap-2">
                             <Phone size={18} />
                             <span className="truncate">{b.phone || '-'}</span>
                           </div>
-                          <div className="flex items-center gap-2 min-w-0">
+                          <div className="flex min-w-0 items-center gap-2">
                             <Mail size={18} />
                             <span className="truncate">{b.email || '-'}</span>
                           </div>
@@ -621,7 +613,8 @@ export default function AccountClient({
                               <Briefcase size={11} /> {Number(b.luggage || 0)} KOFFER
                             </span>
                             <span className={RIDE_PILL_SMALL_CLASS}>
-                              <Briefcase size={11} /> {parseBookingNotes(b.notes).handLuggageCount || 0} HANDG.
+                              <Briefcase size={11} />{' '}
+                              {parseBookingNotes(b.notes).handLuggageCount || 0} HANDG.
                             </span>
                           </div>
                           {(() => {
@@ -630,18 +623,14 @@ export default function AccountClient({
                             return (
                               <div className="flex flex-wrap gap-2">
                                 {seats.baby > 0 ? (
-                                  <span className={RIDE_PILL_SMALL_CLASS}>
-                                    {seats.baby} BABYSCHALE
-                                  </span>
+                                  <span className={RIDE_PILL_SMALL_CLASS}>{seats.baby} BABYSCHALE</span>
                                 ) : null}
                                 {seats.child > 0 ? (
-                                  <span className={RIDE_PILL_SMALL_CLASS}>
-                                    {seats.child} KINDERSITZ
-                                  </span>
+                                  <span className={RIDE_PILL_SMALL_CLASS}>{seats.child} KINDERSITZ</span>
                                 ) : null}
                                 {seats.booster > 0 ? (
                                   <span className={RIDE_PILL_SMALL_CLASS}>
-                                    {seats.booster} Sitzerhöhung
+                                    {seats.booster} Sitzerhoehung
                                   </span>
                                 ) : null}
                               </div>
@@ -651,9 +640,12 @@ export default function AccountClient({
                       </div>
 
                       <div className="flex h-full flex-col items-start justify-between gap-3">
-                        <span className="self-end text-right text-[34px] font-semibold leading-none text-[#081a42]">{fmtPrice(b.price)}</span>
+                        <span className="self-end text-right text-[34px] font-semibold leading-none text-[#081a42]">
+                          {fmtPrice(b.price)}
+                        </span>
                       </div>
                     </div>
+
                     {!isCanceled(b.status) && !isCancelWindowExpired(b) ? (
                       <div className="mt-3 flex justify-end">
                         <button
@@ -682,7 +674,8 @@ export default function AccountClient({
                                     ? {
                                         ...item,
                                         status:
-                                          (res as { status?: string }).status || (isCanceled(item.status) ? item.status : 'canceled'),
+                                          (res as { status?: string }).status ||
+                                          (isCanceled(item.status) ? item.status : 'canceled'),
                                       }
                                     : item,
                                 ),
@@ -691,15 +684,22 @@ export default function AccountClient({
                           }
                           className="rounded-full border border-[#d2d2d7] px-3 py-1.5 text-xs font-medium text-[#d70015] disabled:cursor-not-allowed disabled:opacity-40"
                         >
-                          {cancelingBookingId === b.id ? 'Storniere...' : canCancel(b) ? 'Stornieren' : 'Nicht verfuegbar'}
+                          {cancelingBookingId === b.id
+                            ? 'Storniere...'
+                            : canCancel(b)
+                              ? 'Stornieren'
+                              : 'Nicht verfuegbar'}
                         </button>
                       </div>
                     ) : null}
                   </div>
                 ))}
+
                 {filteredBookings.length === 0 ? (
-                  <p className="text-[#86868b]">
-                    {bookings.length === 0 ? 'Noch keine Buchungen vorhanden.' : 'Keine Buchungen fuer diesen Filter.'}
+                  <p className="text-[#6a7d96]">
+                    {bookings.length === 0
+                      ? 'Noch keine Buchungen vorhanden.'
+                      : 'Keine Buchungen fuer diesen Filter.'}
                   </p>
                 ) : null}
                 {bookingNotice ? <p className="text-sm text-[#0a63ff]">{bookingNotice}</p> : null}
@@ -709,6 +709,6 @@ export default function AccountClient({
           ) : null}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

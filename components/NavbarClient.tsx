@@ -12,10 +12,19 @@ type LanguageOption = {
 };
 
 const navItems = [
+  { name: 'Home', href: '/' },
   { name: 'Preise', href: '/preise' },
   { name: 'Gebiete', href: '/#gebiete' },
   { name: 'Flotte', href: '/#flotte' },
   { name: 'FAQ', href: '/faq' },
+];
+
+const accountNavItems = [
+  { name: 'Home', href: '/' },
+  { name: 'Buchen', href: '/account?tab=buchen' },
+  { name: 'Profil', href: '/account?tab=profil' },
+  { name: 'Favoriten', href: '/account?tab=favoriten' },
+  { name: 'Verlauf', href: '/account?tab=buchungsverlauf' },
 ];
 
 const languages: LanguageOption[] = [
@@ -38,6 +47,7 @@ export default function NavbarClient() {
   const [urlHash, setUrlHash] = useState('');
   const pathname = usePathname();
   const isHomePage = pathname === '/';
+  const isAccountPage = pathname.startsWith('/account');
 
   useEffect(() => {
     let ticking = false;
@@ -105,6 +115,7 @@ export default function NavbarClient() {
     : 'border-b border-white/10 bg-[rgba(0,0,0,0.94)] text-white backdrop-blur-xl';
 
   const navItemClass = 'text-sm font-medium text-white/72 transition-colors hover:text-white';
+  const visibleNavItems = isAccountPage ? accountNavItems : navItems;
 
   const buildLangHref = (lang: string) => {
     const params = new URLSearchParams(urlSearch);
@@ -167,7 +178,7 @@ export default function NavbarClient() {
         </Link>
 
         <nav className="hidden items-center gap-8 lg:flex">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <Link key={item.name} href={item.href} className={navItemClass}>
               {item.name}
             </Link>
@@ -288,7 +299,7 @@ export default function NavbarClient() {
 
           <div className="flex min-h-[calc(100vh-66px)] flex-col px-8 pb-10 pt-8">
             <nav className="flex flex-col items-start gap-8">
-              {navItems.map((item) => (
+              {visibleNavItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}

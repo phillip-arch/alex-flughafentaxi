@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { claimGuestBookingsForUser } from '@/lib/bookings/claimGuestBookings';
+import Navbar from '@/components/Navbar';
 import AccountClient from './AccountClient';
 
 export const metadata: Metadata = {
@@ -45,12 +46,15 @@ export default async function AccountPage() {
   ]);
 
   return (
-    <AccountClient
-      userEmail={user.email || ''}
-      initialName={profile?.full_name || ''}
-      initialPhone={profile?.phone || ''}
-      initialFavorites={(favorites || []) as any}
-      initialBookings={(bookings || []) as any}
-    />
+    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
+      <Navbar />
+      <AccountClient
+        userEmail={user.email || ''}
+        initialName={profile?.full_name || ''}
+        initialPhone={profile?.phone || ''}
+        initialFavorites={(favorites || []) as any}
+        initialBookings={(bookings || []) as any}
+      />
+    </main>
   );
 }
