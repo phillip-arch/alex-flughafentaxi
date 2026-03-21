@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const initialIsLogin = params?.mode !== 'signup';
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
+    <main className="min-h-screen bg-white text-[var(--color-text)]">
       <Navbar />
       <LoginPageClient initialIsLogin={initialIsLogin} />
     </main>

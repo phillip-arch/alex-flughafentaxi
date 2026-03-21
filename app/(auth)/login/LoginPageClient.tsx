@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import {
   ArrowRight,
-  Car,
   ChevronLeft,
   Loader2,
   Lock,
@@ -37,61 +36,17 @@ export default function LoginPageClient({ initialIsLogin }: LoginPageClientProps
 
   return (
     <section className="relative overflow-hidden bg-white">
-      <div className="app-container grid gap-8 pb-10 pt-22 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-20 lg:pb-14 lg:pt-28">
-        <div className="max-w-[38rem]">
-          <div className="ui-text-block-lg mt-5 md:mt-6">
+      <div className="app-container flex justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
+        <div className="w-full max-w-[34rem]">
+          <div className="ui-card-surface-light px-5 py-6 md:px-8 md:py-8">
             <Link
               href="/"
-              className="inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
+              className="mb-6 inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
             >
               <ChevronLeft size={18} />
               Zurueck zur Startseite
             </Link>
 
-            <div className="ui-text-block-lg">
-              <p className="ui-eyebrow w-fit border-none bg-[var(--color-booking-accent-soft)] text-[var(--color-booking-accent)]">
-                Kundenkonto
-              </p>
-              <h1 className="ui-heading-xl max-w-[13ch] !text-[2rem] !leading-[1.02] md:!text-[3.01rem]">
-                {isLogin ? 'Willkommen zurueck.' : 'Konto fuer schnellere Buchungen erstellen.'}
-              </h1>
-              <p className="ui-copy-compact max-w-[34rem]">
-                {isLogin
-                  ? 'Melden Sie sich an, um Buchungen zu verwalten, Fahrtdetails schneller auszufuellen und Ihren Flughafentransfer sauber an einem Ort zu behalten.'
-                  : 'Registrieren Sie sich einmal und nutzen Sie Ihre Daten spaeter fuer schnellere Buchungen, klare Uebersicht und einen einfacheren Ablauf auf allen internen Seiten.'}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="ui-card-surface-light px-5 py-5 md:px-6 md:py-6">
-              <span className="ui-icon-badge-accent">
-                <Car size={20} strokeWidth={2.2} />
-              </span>
-              <div className="ui-text-block-sm mt-4">
-                <h2 className="ui-heading-sm text-[#111827]">Schneller buchen</h2>
-                <p className="ui-copy-sm text-[#6a7d96]">
-                  Wiederkehrende Daten lassen sich spaeter einfacher nutzen.
-                </p>
-              </div>
-            </div>
-
-            <div className="ui-card-surface-light px-5 py-5 md:px-6 md:py-6">
-              <span className="ui-icon-badge-accent">
-                <User size={20} strokeWidth={2.2} />
-              </span>
-              <div className="ui-text-block-sm mt-4">
-                <h2 className="ui-heading-sm text-[#111827]">Alles an einem Ort</h2>
-                <p className="ui-copy-sm text-[#6a7d96]">
-                  Behalten Sie Konto, Kontaktdaten und spaetere Buchungen zentral im Blick.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-6 lg:mt-6">
-          <div className="ui-card-surface-light px-5 py-6 md:px-8 md:py-8">
             <div className="ui-text-block-sm">
               <h2 className="ui-heading-lg text-[#111827]">
                 {isLogin ? 'Anmelden' : 'Registrieren'}
