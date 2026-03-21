@@ -65,89 +65,108 @@ export default function LoginPageClient({ initialIsLogin }: LoginPageClientProps
             ) : null}
 
             <form action={handleSubmit} className="mt-6 space-y-4">
-              {!isLogin ? (
+              <fieldset
+                disabled={loading}
+                className={`space-y-4 transition-opacity duration-200 ${
+                  loading ? 'pointer-events-none opacity-70' : ''
+                }`}
+              >
+                {!isLogin ? (
+                  <label className="block">
+                    <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                      Vollstaendiger Name
+                    </span>
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                        <User size={15} />
+                      </span>
+                      <input
+                        type="text"
+                        name="fullName"
+                        placeholder="Vollstaendiger Name"
+                        required={!isLogin}
+                        className="ui-input !pl-[3.2rem]"
+                      />
+                    </div>
+                  </label>
+                ) : null}
+
                 <label className="block">
                   <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
-                    Vollstaendiger Name
+                    E-Mail
                   </span>
                   <div className="relative">
                     <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
-                      <User size={15} />
+                      <Mail size={15} />
                     </span>
                     <input
-                      type="text"
-                      name="fullName"
-                      placeholder="Vollstaendiger Name"
-                      required={!isLogin}
+                      type="email"
+                      name="email"
+                      placeholder="E-Mail Adresse"
+                      required
                       className="ui-input !pl-[3.2rem]"
                     />
                   </div>
                 </label>
-              ) : null}
 
-              <label className="block">
-                <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
-                  E-Mail
-                </span>
-                <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
-                    <Mail size={15} />
+                <label className="block">
+                  <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                    Passwort
                   </span>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="E-Mail Adresse"
-                    required
-                    className="ui-input !pl-[3.2rem]"
-                  />
-                </div>
-              </label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                      <Lock size={15} />
+                    </span>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Passwort"
+                      required
+                      minLength={6}
+                      className="ui-input !pl-[3.2rem]"
+                    />
+                  </div>
+                </label>
 
-              <label className="block">
-                <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
-                  Passwort
-                </span>
-                <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
-                    <Lock size={15} />
-                  </span>
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Passwort"
-                    required
-                    minLength={6}
-                    className="ui-input !pl-[3.2rem]"
-                  />
-                </div>
-              </label>
+                {isLogin ? (
+                  <div className="text-right">
+                    <Link
+                      href="/forgot-password"
+                      className="text-[0.88rem] font-medium text-[var(--color-booking-accent)] transition-colors hover:text-[#0f6ae8]"
+                    >
+                      Passwort vergessen?
+                    </Link>
+                  </div>
+                ) : null}
 
-              {isLogin ? (
-                <div className="text-right">
-                  <Link
-                    href="/forgot-password"
-                    className="text-[0.88rem] font-medium text-[var(--color-booking-accent)] transition-colors hover:text-[#0f6ae8]"
-                  >
-                    Passwort vergessen?
-                  </Link>
-                </div>
-              ) : null}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="ui-button-booking-primary mt-2 w-full disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {loading ? (
-                  <Loader2 size={18} className="animate-spin" />
-                ) : (
-                  <>
-                    <span>{isLogin ? 'Anmelden' : 'Registrieren'}</span>
-                    <ArrowRight size={16} />
-                  </>
-                )}
-              </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  aria-busy={loading}
+                  className="ui-button-booking-primary mt-2 w-full disabled:cursor-wait disabled:opacity-80"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>{isLogin ? 'Anmelden...' : 'Registrieren...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{isLogin ? 'Anmelden' : 'Registrieren'}</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </fieldset>
             </form>
+
+            {loading ? (
+              <p className="mt-3 text-[0.88rem] font-medium text-[#6a7d96]">
+                {isLogin
+                  ? 'Anmeldung wird verarbeitet...'
+                  : 'Registrierung wird verarbeitet...'}
+              </p>
+            ) : null}
 
             <div className="mt-6 border-t border-[#edf2f7] pt-5">
               <p className="text-[0.94rem] text-[#6a7d96]">
