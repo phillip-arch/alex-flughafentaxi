@@ -84,6 +84,7 @@ export default function AccountClient({
   const [phone, setPhone] = useState(initialPhone || '');
   const [favorites, setFavorites] = useState<Favorite[]>(initialFavorites || []);
   const [bookings, setBookings] = useState<Booking[]>(initialBookings || []);
+  const [favLabel, setFavLabel] = useState('');
   const [favAddress, setFavAddress] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
@@ -421,7 +422,7 @@ export default function AccountClient({
                     }
 
                     const formData = new FormData();
-                    formData.set('name', parsedAddress.name);
+                    formData.set('name', favLabel.trim());
                     formData.set('city', parsedAddress.city);
                     formData.set('zip', parsedAddress.zip);
                     formData.set('street', parsedAddress.street);
@@ -436,11 +437,19 @@ export default function AccountClient({
                     if (inserted?.id) {
                       setFavorites((prev) => [...prev, inserted]);
                     }
+                    setFavLabel('');
                     setFavAddress('');
                   });
                 }}
-                className="mb-5 grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto]"
+                className="mb-5 grid grid-cols-1 gap-3 md:grid-cols-[180px_minmax(0,1fr)_auto]"
               >
+                <input
+                  value={favLabel}
+                  onChange={(e) => setFavLabel(e.target.value)}
+                  className="ui-input"
+                  placeholder="Label, z.B. Home"
+                  required
+                />
                 <input
                   value={favAddress}
                   onChange={(e) => setFavAddress(e.target.value)}
@@ -466,6 +475,7 @@ export default function AccountClient({
                     key={fav.id}
                     className="inline-flex items-center gap-2 rounded-full border border-[#e9edf3] bg-[#f5f5f7] px-3 py-2"
                   >
+                    <span className="text-sm font-semibold text-[#111111]">{fav.name}:</span>
                     <span className="text-sm text-[#6a7d96]">
                       {fav.street} {fav.house_number}, {fav.zip} {fav.city}
                     </span>
