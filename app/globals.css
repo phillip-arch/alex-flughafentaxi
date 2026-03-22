@@ -4,7 +4,7 @@
 :root {
   --font-sans: "Inter", "Segoe UI", Arial, sans-serif;
   --font-display: "Archivo", "Inter", "Segoe UI", Arial, sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --font-mono: "SFMono-Regular", Consolas, monospace;
 
   --color-bg: #f3f3ee;
   --color-surface: #ffffff;

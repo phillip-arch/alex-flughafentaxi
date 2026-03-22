@@ -1,8 +1,8 @@
-import { Archivo, Inter, JetBrains_Mono } from 'next/font/google';
+import { Archivo, Inter } from 'next/font/google';
 import './globals.css';
 import { Metadata } from 'next';
 import FooterGate from '@/components/FooterGate';
-import FloatingContactButton from '@/components/FloatingContactButton';
+import GlobalChromeClient from '@/components/GlobalChromeClient';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -12,11 +12,6 @@ const inter = Inter({
 const archivo = Archivo({
   subsets: ['latin'],
   variable: '--font-display',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
 });
 
 export const metadata: Metadata = {
@@ -46,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="de" className={`${inter.variable} ${archivo.variable} ${jetbrainsMono.variable}`}>
+    <html lang="de" className={`${inter.variable} ${archivo.variable}`}>
       <head>
         <link
           rel="preconnect"
@@ -60,7 +55,7 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning className="app-shell font-sans antialiased">
         {children}
-        <FloatingContactButton />
+        <GlobalChromeClient />
         <FooterGate />
       </body>
     </html>
