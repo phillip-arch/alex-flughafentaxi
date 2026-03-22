@@ -3,32 +3,19 @@
 import { useEffect, useState, useTransition } from 'react';
 import {
   BookOpen,
-  Briefcase,
   Car,
   ChevronDown,
-  CreditCard,
   Heart,
   History,
-  Mail,
   MapPin,
   Menu,
-  Phone,
-  PlaneLanding,
-  PlaneTakeoff,
+  Star,
   User,
-  Users,
   XCircle,
 } from 'lucide-react';
 import { logout } from '@/app/(auth)/actions';
 import BookingForm from '@/components/BookingForm';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
-import {
-  RIDE_CARD_BASE_CLASS,
-  RIDE_CARD_CANCELLED_CLASS,
-  RIDE_CONTENT_CANCELLED_CLASS,
-  RIDE_PILL_CLASS,
-  RIDE_PILL_SMALL_CLASS,
-} from '@/components/ui/sharedStyles';
 import { parseBookingNotes } from '@/lib/booking/notes';
 import {
   addFavoriteAddress,
@@ -36,6 +23,7 @@ import {
   deleteFavoriteAddress,
   loadAccountBookings,
   loadFavoriteAddresses,
+  submitBookingReview,
   updateAccountProfile,
 } from './actions';
 
@@ -67,6 +55,8 @@ type Booking = {
   luggage?: number | null;
   vehicle_type?: string | null;
   notes?: string | null;
+  review_rating?: number | null;
+  review_comment?: string | null;
 };
 
 type BookingFilter = 'all' | 'upcoming' | 'previous' | 'canceled' | 'to_airport' | 'from_airport';
@@ -94,15 +84,14 @@ export default function AccountClient({
   const [phone, setPhone] = useState(initialPhone || '');
   const [favorites, setFavorites] = useState<Favorite[]>(initialFavorites || []);
   const [bookings, setBookings] = useState<Booking[]>(initialBookings || []);
-  const [favName, setFavName] = useState('');
-  const [favCity, setFavCity] = useState('Wien');
-  const [favZip, setFavZip] = useState('');
-  const [favStreet, setFavStreet] = useState('');
-  const [favHouseNumber, setFavHouseNumber] = useState('');
+  const [favAddress, setFavAddress] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [bookingNotice, setBookingNotice] = useState<string | null>(null);
   const [cancelingBookingId, setCancelingBookingId] = useState<string | null>(null);
+  const [expandedBookingId, setExpandedBookingId] = useState<string | null>(null);
+  const [reviewDrafts, setReviewDrafts] = useState<Record<string, { rating: number; comment: string }>>({});
+  const [reviewSavingId, setReviewSavingId] = useState<string | null>(null);
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('upcoming');
   const [activeTab, setActiveTab] = useState<AccountTab>(initialRequestedTab);
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
@@ -115,45 +104,35 @@ export default function AccountClient({
   const accountShellClass = 'mx-auto max-w-[57.5rem]';
   const sectionCardClass = 'ui-card-surface-light px-6 py-7 md:px-8 md:py-8';
 
-  const fmtDateOnly = (value: string) =>
-    new Intl.DateTimeFormat('de-AT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(new Date(value));
-
-  const fmtTime = (value: string) =>
-    new Intl.DateTimeFormat('de-AT', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).format(new Date(value));
-
   const fmtPrice = (value: number | null | undefined) =>
     `${new Intl.NumberFormat('de-AT', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(Number(value || 0))} \u20ac`;
 
-  const getPaymentMeta = (booking: Booking) => {
-    const paymentRaw = String(parseBookingNotes(booking.notes).paymentLabel || '').toLowerCase();
-    const isCard =
-      paymentRaw.includes('kredit') || paymentRaw.includes('card') || paymentRaw.includes('karte');
-    const isCash = paymentRaw.includes('bar') || paymentRaw.includes('cash');
-    if (isCard) return { label: 'KARTE', className: 'bg-[#e8f2ff] text-[#0071e3]' };
-    if (isCash)
-      return {
-        label: 'BAR',
-        className:
-          'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]',
-      };
-    return { label: '-', className: 'bg-[#e7ebf3] text-[#1d1d1f]' };
-  };
+  const fmtMonthYear = (value: string) =>
+    new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(value));
+
+  const fmtRideMeta = (value: string) =>
+    new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    })
+      .format(new Date(value))
+      .replace(',', ' ·');
 
   const isCanceled = (status: string) => {
     const normalized = String(status || '').toLowerCase();
     return normalized === 'canceled' || normalized === 'cancelled';
   };
+
+  const isCompleted = (status: string) => String(status || '').toLowerCase() === 'completed';
 
   const canCancel = (booking: Booking) => {
     if (booking.driver_id) return false;
@@ -191,6 +170,35 @@ export default function AccountClient({
   const getGoogleMapsUrl = (value: string) =>
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(value || '')}`;
 
+  const parseFavoriteAddressInput = (value: string) => {
+    const raw = value.trim().replace(/\s+/g, ' ');
+    const zipCityMatch = raw.match(/(\d{4})\s+([A-Za-zÄÖÜäöüß\-\s]+)$/);
+
+    if (!zipCityMatch) {
+      return null;
+    }
+
+    const zip = zipCityMatch[1];
+    const city = zipCityMatch[2].trim();
+    const beforeZipCity = raw.slice(0, zipCityMatch.index).replace(/,\s*$/, '').trim();
+    const houseNumberMatch = beforeZipCity.match(/(.+?)\s+(\d+[A-Za-z0-9\/-]*)$/);
+
+    if (!houseNumberMatch) {
+      return null;
+    }
+
+    const street = houseNumberMatch[1].trim();
+    const houseNumber = houseNumberMatch[2].trim();
+
+    return {
+      name: street,
+      city,
+      zip,
+      street,
+      house_number: houseNumber,
+    };
+  };
+
   const filteredBookings = bookings
     .filter((booking) => {
       switch (bookingFilter) {
@@ -199,7 +207,7 @@ export default function AccountClient({
         case 'upcoming':
           return !isCanceled(booking.status) && isUpcoming(booking);
         case 'previous':
-          return !isCanceled(booking.status) && isPrevious(booking);
+          return isPrevious(booking) || isCanceled(booking.status);
         case 'canceled':
           return isCanceled(booking.status);
         case 'to_airport':
@@ -215,6 +223,19 @@ export default function AccountClient({
       const bTime = new Date(b.pickup_at).getTime();
       return bookingFilter === 'upcoming' ? aTime - bTime : bTime - aTime;
     });
+
+  const groupedBookings = filteredBookings.reduce<
+    { month: string; items: Booking[] }[]
+  >((groups, booking) => {
+    const month = fmtMonthYear(booking.pickup_at);
+    const lastGroup = groups[groups.length - 1];
+    if (!lastGroup || lastGroup.month !== month) {
+      groups.push({ month, items: [booking] });
+      return groups;
+    }
+    lastGroup.items.push(booking);
+    return groups;
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'favoriten' && !favoritesLoaded && !favoritesLoading) {
@@ -390,9 +411,22 @@ export default function AccountClient({
             <section className={sectionCardClass}>
               <h2 className="ui-heading-lg mb-5 text-[#111827]">Favoriten</h2>
               <form
-                action={(formData) => {
+                action={() => {
                   setError(null);
                   startTransition(async () => {
+                    const parsedAddress = parseFavoriteAddressInput(favAddress);
+                    if (!parsedAddress) {
+                      setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
+                      return;
+                    }
+
+                    const formData = new FormData();
+                    formData.set('name', parsedAddress.name);
+                    formData.set('city', parsedAddress.city);
+                    formData.set('zip', parsedAddress.zip);
+                    formData.set('street', parsedAddress.street);
+                    formData.set('house_number', parsedAddress.house_number);
+
                     const res = await addFavoriteAddress(formData);
                     if ((res as { error?: string })?.error) {
                       setError((res as { error: string }).error);
@@ -402,55 +436,16 @@ export default function AccountClient({
                     if (inserted?.id) {
                       setFavorites((prev) => [...prev, inserted]);
                     }
-                    setFavName('');
-                    setFavCity('Wien');
-                    setFavZip('');
-                    setFavStreet('');
-                    setFavHouseNumber('');
+                    setFavAddress('');
                   });
                 }}
-                className="mb-5 grid grid-cols-1 gap-3 md:grid-cols-[170px_150px_120px_1fr_130px_auto]"
+                className="mb-5 grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto]"
               >
                 <input
-                  name="name"
-                  value={favName}
-                  onChange={(e) => setFavName(e.target.value)}
+                  value={favAddress}
+                  onChange={(e) => setFavAddress(e.target.value)}
                   className="ui-input"
-                  placeholder="Name (z.B. Home)"
-                  required
-                />
-                <select
-                  name="city"
-                  value={favCity}
-                  onChange={(e) => setFavCity(e.target.value)}
-                  className="ui-input"
-                  required
-                >
-                  <option value="Wien">Wien</option>
-                  <option value="Schwechat">Schwechat</option>
-                </select>
-                <input
-                  name="zip"
-                  value={favZip}
-                  onChange={(e) => setFavZip(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  className="ui-input"
-                  placeholder="PLZ"
-                  required
-                />
-                <input
-                  name="street"
-                  value={favStreet}
-                  onChange={(e) => setFavStreet(e.target.value)}
-                  className="ui-input"
-                  placeholder="Strasse"
-                  required
-                />
-                <input
-                  name="house_number"
-                  value={favHouseNumber}
-                  onChange={(e) => setFavHouseNumber(e.target.value)}
-                  className="ui-input"
-                  placeholder="Nr."
+                  placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
                   required
                 />
                 <button
@@ -471,7 +466,6 @@ export default function AccountClient({
                     key={fav.id}
                     className="inline-flex items-center gap-2 rounded-full border border-[#e9edf3] bg-[#f5f5f7] px-3 py-2"
                   >
-                    <span className="text-sm font-semibold text-[#111111]">{fav.name}:</span>
                     <span className="text-sm text-[#6a7d96]">
                       {fav.street} {fav.house_number}, {fav.zip} {fav.city}
                     </span>
@@ -504,241 +498,310 @@ export default function AccountClient({
 
           {activeTab === 'buchungsverlauf' ? (
             <section className={sectionCardClass}>
-              <h2 className="ui-heading-lg mb-5 text-[#111827]">Buchungsverlauf</h2>
-              <div className="mb-4 flex flex-wrap gap-2">
-                {[
-                  { id: 'all', label: 'Alle' },
-                  { id: 'upcoming', label: 'Kommende Fahrten' },
-                  { id: 'previous', label: 'Vergangene Fahrten' },
-                  { id: 'canceled', label: 'Storniert' },
-                  { id: 'to_airport', label: 'Zum Flughafen' },
-                  { id: 'from_airport', label: 'Vom Flughafen' },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setBookingFilter(item.id as BookingFilter)}
-                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                      bookingFilter === item.id
-                        ? 'border-[#1679ff] bg-[#edf4ff] text-[#1679ff]'
-                        : 'border-[#e9edf3] bg-white text-[#111111] hover:bg-[#f5f5f7]'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                  <div className="ui-text-block-sm gap-2">
+                    <h2 className="ui-heading-lg text-[#111827]">Fahrten</h2>
+                    <p className="ui-copy-compact text-[#6a7d96]">
+                      Ihre kommenden und vergangenen Fahrten in einer klaren Uebersicht.
+                    </p>
+                  </div>
+                  <UnderlineTabNav
+                    items={[
+                      { id: 'previous', label: 'Vergangen' },
+                      { id: 'upcoming', label: 'Kommend' },
+                    ]}
+                    activeTab={bookingFilter === 'upcoming' ? 'upcoming' : 'previous'}
+                    onChange={(tab) => setBookingFilter(tab as BookingFilter)}
+                    className="flex flex-wrap gap-6"
+                  />
+                </div>
 
-              <div className="space-y-3">
                 {bookingsLoading ? (
                   <p className="text-[#6a7d96]">Buchungsverlauf wird geladen...</p>
                 ) : null}
-                {filteredBookings.map((b) => (
-                  <div
-                    key={b.id}
-                    className={`${RIDE_CARD_BASE_CLASS} ${
-                      isCanceled(b.status) ? RIDE_CARD_CANCELLED_CLASS : ''
-                    }`}
-                  >
-                    <div
-                      className={`grid grid-cols-1 gap-4 lg:grid-cols-[1.15fr_0.95fr_0.8fr] ${
-                        isCanceled(b.status) ? RIDE_CONTENT_CANCELLED_CLASS : ''
-                      }`}
-                    >
-                      <div>
-                        <div className="mb-3 flex flex-wrap items-center gap-2">
-                          <span className={RIDE_PILL_CLASS}>{fmtDateOnly(b.pickup_at)}</span>
-                          <span className={RIDE_PILL_CLASS}>{fmtTime(b.pickup_at)}</span>
-                          <span className={RIDE_PILL_CLASS}>
-                            {isToAirport(b) ? <PlaneTakeoff size={13} /> : <PlaneLanding size={13} />}
-                            {isToAirport(b) ? 'ZUM' : 'VOM'}
-                          </span>
-                          <span className={RIDE_PILL_CLASS}>
-                            {(b.vehicle_type || '-').toUpperCase()}
-                          </span>
-                          {(() => {
-                            const payment = getPaymentMeta(b);
-                            return (
-                              <span
-                                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold ${payment.className}`}
-                              >
-                                <CreditCard size={13} />
-                                {payment.label}
-                              </span>
-                            );
-                          })()}
-                          <span className={RIDE_PILL_CLASS}>
-                            {b.booking_reference || b.id.slice(0, 8)}
-                          </span>
-                        </div>
 
-                        <div className="flex items-stretch gap-2.5">
-                          <div
-                            className="flex shrink-0 flex-col items-center pt-1 text-[#000000]"
-                            aria-hidden="true"
-                          >
-                            <span className="h-2.5 w-2.5 rounded-full bg-[#000000]" />
-                            <span className="my-1 w-px flex-1 bg-[#000000]" />
-                            <ChevronDown size={14} />
-                          </div>
-                          <div className="min-w-0 flex-1 space-y-2.5">
-                            <div className="flex items-start gap-2">
-                              <p className="line-clamp-2 text-[22px] font-semibold leading-snug text-[#081a42]">
-                                {b.pickup}
-                              </p>
-                              {!isAirportLocation(b.pickup) ? (
-                                <a
-                                  href={getGoogleMapsUrl(b.pickup)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  aria-label="Abholort in Google Maps oeffnen"
-                                  className="mt-1 shrink-0 text-[#000000] transition-colors hover:text-[#000000]"
-                                >
-                                  <MapPin size={20} />
-                                </a>
-                              ) : null}
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <p className="line-clamp-2 text-[22px] font-semibold leading-snug text-[#000000]">
-                                {b.destination}
-                              </p>
-                              {!isAirportLocation(b.destination) ? (
-                                <a
-                                  href={getGoogleMapsUrl(b.destination)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  aria-label="Ziel in Google Maps oeffnen"
-                                  className="mt-1 shrink-0 text-[#000000] transition-colors hover:text-[#000000]"
-                                >
-                                  <MapPin size={20} />
-                                </a>
-                              ) : null}
-                            </div>
-                          </div>
-                        </div>
+                <div className="space-y-8">
+                  {groupedBookings.map((group) => (
+                    <div key={group.month} className="space-y-4">
+                      <h3 className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827]">
+                        {group.month}
+                      </h3>
 
-                        {(() => {
-                          const displayNotes = parseBookingNotes(b.notes).cleanedNotes;
-                          if (!displayNotes) return null;
+                      <div className="space-y-2">
+                        {group.items.map((b) => {
+                          const primaryLocation = isToAirport(b) ? b.pickup : b.destination;
+                          const secondaryLocation = isToAirport(b)
+                            ? 'Zum Flughafen Wien'
+                            : 'Ab Flughafen Wien';
+                          const hasMapLink = !isAirportLocation(primaryLocation);
+                          const parsedNotes = parseBookingNotes(b.notes);
+                          const seats = parsedNotes.childSeatCounts;
+                          const reviewDraft = reviewDrafts[b.id] || {
+                            rating: Number(b.review_rating || 0),
+                            comment: b.review_comment || '',
+                          };
+                          const showCancelAction =
+                            bookingFilter === 'upcoming' &&
+                            !isCanceled(b.status) &&
+                            !isCancelWindowExpired(b);
+                          const isExpanded = expandedBookingId === b.id;
+
                           return (
-                            <div className="mt-2 max-w-[620px] rounded-[11px] border border-[#d2d2d7] bg-white px-3 py-2">
-                              <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#86868b]">
-                                Anmerkung
-                              </p>
-                              <p className="line-clamp-3 text-[15px] leading-snug text-[#1d1d1f]">
-                                {displayNotes}
-                              </p>
+                            <div
+                              key={b.id}
+                              className={`rounded-[1.4rem] border border-[#e8edf3] bg-white px-4 py-4 md:px-5 ${
+                                isCanceled(b.status) ? 'opacity-70' : ''
+                              }`}
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF]">
+                                  <Car size={21} />
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setExpandedBookingId((prev) => (prev === b.id ? null : b.id))
+                                  }
+                                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                                  aria-expanded={isExpanded}
+                                >
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-[0.95rem] text-[#7b8798]">{fmtRideMeta(b.pickup_at)}</p>
+                                    <p className="mt-1 line-clamp-2 text-[1.55rem] font-semibold leading-[1.2] tracking-[-0.04em] text-[#111827]">
+                                      {primaryLocation}
+                                    </p>
+                                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                                      <p className="text-[0.95rem] text-[#6a7d96]">{secondaryLocation}</p>
+                                      {isCanceled(b.status) ? (
+                                        <span className="rounded-full border border-[#f1d1d6] bg-[#fff4f6] px-2.5 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#d70015]">
+                                          Storniert
+                                        </span>
+                                      ) : null}
+                                    </div>
+                                    <p className="mt-2 text-[1.05rem] font-semibold text-[#111827]">
+                                      {fmtPrice(b.price)}
+                                    </p>
+                                  </div>
+                                  <ChevronDown
+                                    size={18}
+                                    className={`shrink-0 text-[#7b8798] transition-transform ${
+                                      isExpanded ? 'rotate-180' : ''
+                                    }`}
+                                  />
+                                </button>
+
+                                <div className="shrink-0">
+                                {showCancelAction ? (
+                                  <button
+                                    type="button"
+                                    disabled={!canCancel(b) || cancelingBookingId === b.id}
+                                    onClick={() =>
+                                      startTransition(async () => {
+                                        setBookingError(null);
+                                        setBookingNotice(null);
+                                        if (!confirm('Moechten Sie diese Fahrt stornieren?')) return;
+                                        setCancelingBookingId(b.id);
+                                        const res = await cancelOwnBooking(b.id);
+                                        setCancelingBookingId(null);
+                                        if ((res as { error?: string })?.error) {
+                                          setBookingError((res as { error: string }).error);
+                                          return;
+                                        }
+                                        if ((res as { info?: string }).info === 'already_canceled') {
+                                          setBookingNotice('Diese Buchung wurde bereits storniert.');
+                                        } else {
+                                          setBookingNotice('Buchung wurde storniert.');
+                                        }
+                                        setBookings((prev) =>
+                                          prev.map((item) =>
+                                            item.id === b.id
+                                              ? {
+                                                  ...item,
+                                                  status:
+                                                    (res as { status?: string }).status ||
+                                                    (isCanceled(item.status) ? item.status : 'canceled'),
+                                                }
+                                              : item,
+                                          ),
+                                        );
+                                      })
+                                    }
+                                    className="flex h-12 w-12 items-center justify-center rounded-full border border-[#f1d1d6] bg-[#fff4f6] text-[#d70015] transition-colors hover:bg-[#ffecef] disabled:cursor-not-allowed disabled:opacity-40"
+                                    aria-label="Fahrt stornieren"
+                                  >
+                                    <XCircle size={21} />
+                                  </button>
+                                ) : hasMapLink ? (
+                                  <a
+                                    href={getGoogleMapsUrl(primaryLocation)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label="Ort in Google Maps oeffnen"
+                                    className="flex h-12 w-12 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] transition-colors hover:bg-[#eef5ff]"
+                                  >
+                                    <MapPin size={20} />
+                                  </a>
+                                ) : null}
+                                </div>
+                              </div>
+
+                              {isExpanded ? (
+                                <div className="mt-4 grid gap-3 border-t border-[#edf2f7] pt-4 md:grid-cols-2">
+                                  <div className="rounded-[1rem] border border-[#edf2f7] bg-[#f8fbff] px-4 py-3">
+                                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
+                                      Route
+                                    </p>
+                                    <div className="mt-2 space-y-2 text-[0.95rem] text-[#111827]">
+                                      <p><span className="font-semibold">Abholung:</span> {b.pickup}</p>
+                                      <p><span className="font-semibold">Ziel:</span> {b.destination}</p>
+                                      <p><span className="font-semibold">Referenz:</span> {b.booking_reference || b.id.slice(0, 8)}</p>
+                                    </div>
+                                  </div>
+
+                                  <div className="rounded-[1rem] border border-[#edf2f7] bg-[#f8fbff] px-4 py-3">
+                                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
+                                      Buchung
+                                    </p>
+                                    <div className="mt-2 space-y-2 text-[0.95rem] text-[#111827]">
+                                      <p><span className="font-semibold">Name:</span> {b.full_name || '-'}</p>
+                                      <p><span className="font-semibold">Telefon:</span> {b.phone || '-'}</p>
+                                      <p><span className="font-semibold">E-Mail:</span> {b.email || '-'}</p>
+                                      <p><span className="font-semibold">Fahrzeug:</span> {(b.vehicle_type || '-').toUpperCase()}</p>
+                                      <p><span className="font-semibold">Personen:</span> {Number(b.passengers || 0)}</p>
+                                      <p><span className="font-semibold">Koffer:</span> {Number(b.luggage || 0)}</p>
+                                      <p><span className="font-semibold">Handgepaeck:</span> {parsedNotes.handLuggageCount || 0}</p>
+                                    </div>
+                                  </div>
+
+                                  {(seats.baby > 0 || seats.child > 0 || seats.booster > 0 || parsedNotes.cleanedNotes) ? (
+                                    <div className="rounded-[1rem] border border-[#edf2f7] bg-white px-4 py-3 md:col-span-2">
+                                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
+                                        Zusatzinfos
+                                      </p>
+                                      <div className="mt-2 space-y-2 text-[0.95rem] text-[#111827]">
+                                        {seats.baby > 0 ? <p><span className="font-semibold">Babyschale:</span> {seats.baby}</p> : null}
+                                        {seats.child > 0 ? <p><span className="font-semibold">Kindersitz:</span> {seats.child}</p> : null}
+                                        {seats.booster > 0 ? <p><span className="font-semibold">Sitzerhoehung:</span> {seats.booster}</p> : null}
+                                        {parsedNotes.cleanedNotes ? (
+                                          <p><span className="font-semibold">Anmerkung:</span> {parsedNotes.cleanedNotes}</p>
+                                        ) : null}
+                                      </div>
+                                    </div>
+                                  ) : null}
+
+                                  {isCompleted(b.status) ? (
+                                    <div className="rounded-[1rem] border border-[#edf2f7] bg-white px-4 py-3 md:col-span-2">
+                                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
+                                        Fahrer bewerten
+                                      </p>
+                                      <p className="mt-2 text-[0.95rem] text-[#6a7d96]">
+                                        Wie war Ihre Erfahrung mit dieser Fahrt?
+                                      </p>
+                                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                          <button
+                                            key={star}
+                                            type="button"
+                                            onClick={() =>
+                                              setReviewDrafts((prev) => ({
+                                                ...prev,
+                                                [b.id]: {
+                                                  rating: star,
+                                                  comment: reviewDraft.comment,
+                                                },
+                                              }))
+                                            }
+                                            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] transition-colors hover:bg-[#eef5ff]"
+                                            aria-label={`${star} Sterne`}
+                                          >
+                                            <Star
+                                              size={18}
+                                              className={star <= reviewDraft.rating ? 'fill-current' : ''}
+                                            />
+                                          </button>
+                                        ))}
+                                      </div>
+                                      <textarea
+                                        value={reviewDraft.comment}
+                                        onChange={(e) =>
+                                          setReviewDrafts((prev) => ({
+                                            ...prev,
+                                            [b.id]: {
+                                              rating: reviewDraft.rating,
+                                              comment: e.target.value,
+                                            },
+                                          }))
+                                        }
+                                        placeholder="Optionaler Kommentar zu Fahrer und Fahrt"
+                                        className="mt-3 min-h-[110px] w-full rounded-[1rem] border border-[#e8edf3] bg-[#f8fbff] px-4 py-3 text-[0.95rem] text-[#111827] outline-none transition-colors focus:border-[#1679FF]"
+                                      />
+                                      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                                        <p className="text-[0.85rem] text-[#6a7d96]">
+                                          {b.review_rating
+                                            ? 'Ihre Bewertung kann aktualisiert werden.'
+                                            : 'Noch keine Bewertung gespeichert.'}
+                                        </p>
+                                        <button
+                                          type="button"
+                                          disabled={reviewDraft.rating < 1 || reviewSavingId === b.id}
+                                          onClick={() =>
+                                            startTransition(async () => {
+                                              setBookingError(null);
+                                              setBookingNotice(null);
+                                              setReviewSavingId(b.id);
+                                              const res = await submitBookingReview({
+                                                bookingId: b.id,
+                                                rating: reviewDraft.rating,
+                                                comment: reviewDraft.comment,
+                                              });
+                                              setReviewSavingId(null);
+                                              if ((res as { error?: string }).error) {
+                                                setBookingError((res as { error: string }).error);
+                                                return;
+                                              }
+                                              const savedReview = (res as {
+                                                review?: { rating: number; comment: string };
+                                              }).review;
+                                              setBookings((prev) =>
+                                                prev.map((item) =>
+                                                  item.id === b.id
+                                                    ? {
+                                                        ...item,
+                                                        review_rating:
+                                                          savedReview?.rating ?? reviewDraft.rating,
+                                                        review_comment:
+                                                          savedReview?.comment ?? reviewDraft.comment,
+                                                      }
+                                                    : item,
+                                                ),
+                                              );
+                                              setBookingNotice('Bewertung wurde gespeichert.');
+                                            })
+                                          }
+                                          className="ui-button-booking-primary disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                          {reviewSavingId === b.id
+                                            ? 'Speichert...'
+                                            : b.review_rating
+                                              ? 'Bewertung aktualisieren'
+                                              : 'Bewertung senden'}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : null}
+                                </div>
+                              ) : null}
                             </div>
                           );
-                        })()}
-                      </div>
-
-                      <div className="space-y-3 lg:pl-6">
-                        <h3 className="text-[19px] font-semibold text-[#000000]">
-                          {b.full_name || '-'}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-[#000000]">
-                          <div className="flex min-w-0 items-center gap-2">
-                            <Phone size={18} />
-                            <span className="truncate">{b.phone || '-'}</span>
-                          </div>
-                          <div className="flex min-w-0 items-center gap-2">
-                            <Mail size={18} />
-                            <span className="truncate">{b.email || '-'}</span>
-                          </div>
-                        </div>
-                        <div className="mt-3 space-y-2">
-                          <div className="flex flex-wrap gap-2">
-                            <span className={RIDE_PILL_SMALL_CLASS}>
-                              <Users size={11} /> {Number(b.passengers || 0)} PERS.
-                            </span>
-                            <span className={RIDE_PILL_SMALL_CLASS}>
-                              <Briefcase size={11} /> {Number(b.luggage || 0)} KOFFER
-                            </span>
-                            <span className={RIDE_PILL_SMALL_CLASS}>
-                              <Briefcase size={11} />{' '}
-                              {parseBookingNotes(b.notes).handLuggageCount || 0} HANDG.
-                            </span>
-                          </div>
-                          {(() => {
-                            const seats = parseBookingNotes(b.notes).childSeatCounts;
-                            if (seats.baby <= 0 && seats.child <= 0 && seats.booster <= 0) return null;
-                            return (
-                              <div className="flex flex-wrap gap-2">
-                                {seats.baby > 0 ? (
-                                  <span className={RIDE_PILL_SMALL_CLASS}>{seats.baby} BABYSCHALE</span>
-                                ) : null}
-                                {seats.child > 0 ? (
-                                  <span className={RIDE_PILL_SMALL_CLASS}>{seats.child} KINDERSITZ</span>
-                                ) : null}
-                                {seats.booster > 0 ? (
-                                  <span className={RIDE_PILL_SMALL_CLASS}>
-                                    {seats.booster} Sitzerhoehung
-                                  </span>
-                                ) : null}
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </div>
-
-                      <div className="flex h-full flex-col items-start justify-between gap-3">
-                        <span className="self-end text-right text-[34px] font-semibold leading-none text-[#081a42]">
-                          {fmtPrice(b.price)}
-                        </span>
+                        })}
                       </div>
                     </div>
+                  ))}
+                </div>
 
-                    {!isCanceled(b.status) && !isCancelWindowExpired(b) ? (
-                      <div className="mt-3 flex justify-end">
-                        <button
-                          type="button"
-                          disabled={!canCancel(b) || cancelingBookingId === b.id}
-                          onClick={() =>
-                            startTransition(async () => {
-                              setBookingError(null);
-                              setBookingNotice(null);
-                              if (!confirm('Moechten Sie diese Fahrt stornieren?')) return;
-                              setCancelingBookingId(b.id);
-                              const res = await cancelOwnBooking(b.id);
-                              setCancelingBookingId(null);
-                              if ((res as { error?: string })?.error) {
-                                setBookingError((res as { error: string }).error);
-                                return;
-                              }
-                              if ((res as { info?: string }).info === 'already_canceled') {
-                                setBookingNotice('Diese Buchung wurde bereits storniert.');
-                              } else {
-                                setBookingNotice('Buchung wurde storniert.');
-                              }
-                              setBookings((prev) =>
-                                prev.map((item) =>
-                                  item.id === b.id
-                                    ? {
-                                        ...item,
-                                        status:
-                                          (res as { status?: string }).status ||
-                                          (isCanceled(item.status) ? item.status : 'canceled'),
-                                      }
-                                    : item,
-                                ),
-                              );
-                            })
-                          }
-                          className="rounded-full border border-[#d2d2d7] px-3 py-1.5 text-xs font-medium text-[#d70015] disabled:cursor-not-allowed disabled:opacity-40"
-                        >
-                          {cancelingBookingId === b.id
-                            ? 'Storniere...'
-                            : canCancel(b)
-                              ? 'Stornieren'
-                              : 'Nicht verfuegbar'}
-                        </button>
-                      </div>
-                    ) : null}
-                  </div>
-                ))}
-
-                {filteredBookings.length === 0 ? (
+                {groupedBookings.length === 0 ? (
                   <p className="text-[#6a7d96]">
                     {bookings.length === 0
                       ? 'Noch keine Buchungen vorhanden.'

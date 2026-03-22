@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { ReviewSchema } from '@/lib/validation/schemas';
 
 const ProfileSchema = z.object({
   full_name: z.string().trim().min(2).max(120),
@@ -62,7 +63,40 @@ export async function loadAccountBookings() {
     return { error: 'Buchungsverlauf konnte nicht geladen werden.' };
   }
 
-  return { bookings: (data || []) as any[] };
+  const bookings = (data || []) as any[];
+  const bookingIds = bookings.map((booking) => booking.id).filter(Boolean);
+
+  if (bookingIds.length === 0) {
+    return { bookings };
+  }
+
+  const { data: reviews, error: reviewsError } = await supabaseAdmin
+    .from('reviews')
+    .select('booking_id, rating, comment, user_id')
+    .eq('user_id', user.id)
+    .in('booking_id', bookingIds);
+
+  if (reviewsError) {
+    console.error('loadAccountBookings reviews failed:', reviewsError);
+    return { bookings };
+  }
+
+  const reviewMap = new Map(
+    ((reviews || []) as Array<{ booking_id: string; rating: number; comment: string | null }>).map(
+      (review) => [review.booking_id, review],
+    ),
+  );
+
+  return {
+    bookings: bookings.map((booking) => {
+      const review = reviewMap.get(booking.id);
+      return {
+        ...booking,
+        review_rating: review?.rating ?? null,
+        review_comment: review?.comment ?? null,
+      };
+    }),
+  };
 }
 
 export async function updateAccountProfile(formData: FormData) {
@@ -293,4 +327,93 @@ export async function cancelOwnBooking(bookingId: string) {
 
   revalidatePath('/account');
   return { success: true, status: finalStatus };
+}
+
+export async function submitBookingReview(input: {
+  bookingId: string;
+  rating: number;
+  comment?: string;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Unauthorized' };
+
+  const parsed = ReviewSchema.safeParse({
+    bookingId: input.bookingId,
+    rating: input.rating,
+    comment: input.comment?.trim() || undefined,
+  });
+
+  if (!parsed.success) {
+    return { error: 'Bitte geben Sie eine gueltige Bewertung ein.' };
+  }
+
+  const { data: booking, error: bookingError } = await supabase
+    .from('bookings')
+    .select('id, driver_id')
+    .eq('id', parsed.data.bookingId)
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (bookingError) {
+    console.error('submitBookingReview booking lookup failed:', bookingError);
+    return { error: 'Buchung konnte nicht gefunden werden.' };
+  }
+
+  if (!booking) {
+    return { error: 'Buchung nicht gefunden.' };
+  }
+
+  const { data: existingReview, error: existingReviewError } = await supabaseAdmin
+    .from('reviews')
+    .select('id')
+    .eq('booking_id', parsed.data.bookingId)
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (existingReviewError) {
+    console.error('submitBookingReview existing review lookup failed:', existingReviewError);
+    return { error: 'Bewertung konnte nicht gespeichert werden.' };
+  }
+
+  if (existingReview?.id) {
+    const { error: updateError } = await supabaseAdmin
+      .from('reviews')
+      .update({
+        rating: parsed.data.rating,
+        comment: parsed.data.comment || null,
+        driver_id: booking.driver_id || null,
+      })
+      .eq('id', existingReview.id);
+
+    if (updateError) {
+      console.error('submitBookingReview update failed:', updateError);
+      return { error: 'Bewertung konnte nicht aktualisiert werden.' };
+    }
+  } else {
+    const { error: insertError } = await supabaseAdmin.from('reviews').insert({
+      booking_id: parsed.data.bookingId,
+      user_id: user.id,
+      driver_id: booking.driver_id || null,
+      rating: parsed.data.rating,
+      comment: parsed.data.comment || null,
+    });
+
+    if (insertError) {
+      console.error('submitBookingReview insert failed:', insertError);
+      return { error: 'Bewertung konnte nicht gespeichert werden.' };
+    }
+  }
+
+  revalidatePath('/account');
+  return {
+    success: true,
+    review: {
+      rating: parsed.data.rating,
+      comment: parsed.data.comment || '',
+    },
+  };
 }

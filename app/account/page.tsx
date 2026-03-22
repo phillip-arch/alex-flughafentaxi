@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import Navbar from '@/components/Navbar';
 import AccountClient from './AccountClient';
 
@@ -67,6 +68,33 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
     bookingsPromise,
   ]);
 
+  const bookingRows = (bookings || []) as any[];
+  const bookingIds = bookingRows.map((booking) => booking.id).filter(Boolean);
+  let bookingsWithReviews = bookingRows;
+
+  if (bookingIds.length > 0) {
+    const { data: reviews } = await supabaseAdmin
+      .from('reviews')
+      .select('booking_id, rating, comment, user_id')
+      .eq('user_id', user.id)
+      .in('booking_id', bookingIds);
+
+    const reviewMap = new Map(
+      ((reviews || []) as Array<{ booking_id: string; rating: number; comment: string | null }>).map(
+        (review) => [review.booking_id, review],
+      ),
+    );
+
+    bookingsWithReviews = bookingRows.map((booking) => {
+      const review = reviewMap.get(booking.id);
+      return {
+        ...booking,
+        review_rating: review?.rating ?? null,
+        review_comment: review?.comment ?? null,
+      };
+    });
+  }
+
   return (
     <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <Navbar />
@@ -75,7 +103,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         initialName={profile?.full_name || ''}
         initialPhone={profile?.phone || ''}
         initialFavorites={(favorites || []) as any}
-        initialBookings={(bookings || []) as any}
+        initialBookings={bookingsWithReviews as any}
         initialRequestedTab={requestedTab}
         initialFavoritesLoaded={requestedTab === 'favoriten'}
         initialBookingsLoaded={requestedTab === 'buchungsverlauf'}
