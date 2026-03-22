@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { requestPasswordReset } from '@/app/(auth)/actions';
-import { ArrowRight, Loader2, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
+import { ArrowRight, CheckCircle, ChevronLeft, Loader2, Mail } from 'lucide-react';
+import { requestPasswordReset } from '@/app/(auth)/actions';
 
 export default function ForgotPasswordPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -20,77 +20,106 @@ export default function ForgotPasswordPage() {
     if (result.error) {
       setMessage(result.error);
       setStatus('error');
-    } else if (result.success) {
+      return;
+    }
+
+    if (result.success) {
       setMessage(result.success);
       setStatus('success');
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center p-4">
-      <div className="bg-white rounded-[24px] p-8 max-w-md w-full shadow-sm border border-[#d2d2d7]">
-        <h1 className="text-[24px] font-semibold text-[#1d1d1f] mb-2 tracking-tight text-center">Passwort vergessen</h1>
-        
-        {status === 'success' ? (
-          <div className="text-center mt-6 animate-in fade-in zoom-in duration-300">
-            <div className="w-16 h-16 bg-[#f2fcfc] rounded-full flex items-center justify-center mx-auto mb-6 text-[#0071e3]">
-              <CheckCircle size={32} />
-            </div>
-            <p className="text-[#86868b] text-[15px] mb-8 leading-relaxed">
-              {message}
-            </p>
+    <section className="relative overflow-hidden bg-white">
+      <div className="app-container flex justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
+        <div className="w-full max-w-[34rem]">
+          <div className="ui-card-surface-light px-5 py-6 md:px-8 md:py-8">
             <Link
               href="/login"
-              className="inline-flex items-center justify-center gap-2 w-full bg-[#1d1d1f] hover:bg-black text-white font-medium text-[17px] py-4 rounded-full transition-all"
+              className="mb-6 inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
             >
-              Zurück zum Login
+              <ChevronLeft size={18} />
+              Zurueck zum Login
             </Link>
-          </div>
-        ) : (
-          <>
-            <p className="text-[#86868b] text-[15px] mb-8 text-center">
-              Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts.
-            </p>
 
-            {status === 'error' && (
-              <div className="mb-6 p-4 bg-[#fff2f4] text-[#d70015] text-[14px] rounded-xl border border-[#ffd1d9]">
+            <div className="ui-text-block-sm">
+              <h1 className="ui-heading-lg text-[#111827]">Passwort vergessen</h1>
+              <p className="ui-copy-compact text-[#6a7d96]">
+                Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zuruecksetzen Ihres Passworts.
+              </p>
+            </div>
+
+            {status === 'error' ? (
+              <div className="mt-6 rounded-[1rem] border border-[var(--color-danger)] bg-[var(--color-danger-soft)] px-4 py-3 text-[0.92rem] font-medium text-[var(--color-danger)]">
                 {message}
               </div>
-            )}
+            ) : null}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label htmlFor="email" className="block text-[13px] font-medium text-[#1d1d1f] mb-2">
-                  E-Mail Adresse
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  className="w-full bg-[#f5f5f7] border-none rounded-xl px-4 py-3.5 text-[15px] text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3] transition-all"
-                  placeholder="name@beispiel.at"
-                />
+            {status === 'success' ? (
+              <div className="mt-6 space-y-6">
+                <div className="rounded-[1rem] border border-[#dbe7f8] bg-[#eef5ff] px-4 py-4">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#1679ff]">
+                      <CheckCircle size={20} />
+                    </span>
+                    <p className="text-[0.95rem] leading-6 text-[#0a63ff]">{message}</p>
+                  </div>
+                </div>
+
+                <Link href="/login" className="ui-button-booking-primary w-full">
+                  Zurueck zum Login
+                </Link>
               </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                <fieldset
+                  disabled={status === 'loading'}
+                  className={`space-y-4 transition-opacity duration-200 ${
+                    status === 'loading' ? 'pointer-events-none opacity-70' : ''
+                  }`}
+                >
+                  <label className="block">
+                    <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                      E-Mail
+                    </span>
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                        <Mail size={15} />
+                      </span>
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="E-Mail Adresse"
+                        required
+                        className="ui-input !pl-[3.2rem]"
+                      />
+                    </div>
+                  </label>
 
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="inline-flex items-center justify-center gap-2 w-full bg-[#1d1d1f] hover:bg-black disabled:opacity-50 text-white font-medium text-[17px] py-4 rounded-full transition-all mt-4"
-              >
-                {status === 'loading' ? <Loader2 className="animate-spin" size={20} /> : 'Link senden'}
-                {!status && <ArrowRight size={20} />}
-              </button>
-            </form>
-
-            <div className="mt-8 text-center">
-              <Link href="/login" className="text-[#0071e3] hover:underline text-[15px]">
-                Zurück zum Login
-              </Link>
-            </div>
-          </>
-        )}
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    aria-busy={status === 'loading'}
+                    className="ui-button-booking-primary mt-2 w-full disabled:cursor-wait disabled:opacity-80"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" />
+                        <span>Link wird gesendet...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Link senden</span>
+                        <ArrowRight size={16} />
+                      </>
+                    )}
+                  </button>
+                </fieldset>
+              </form>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

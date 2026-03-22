@@ -28,12 +28,11 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
   if (!user) redirect('/login');
   const params = searchParams ? await searchParams : undefined;
   const requestedTab =
-    params?.tab === 'profil' ||
-    params?.tab === 'favoriten' ||
     params?.tab === 'buchungsverlauf' ||
-    params?.tab === 'buchen'
+    params?.tab === 'profil' ||
+    params?.tab === 'favoriten'
       ? params.tab
-      : 'buchen';
+      : 'buchungsverlauf';
 
   const profilePromise = supabase
     .from('profiles')
@@ -96,7 +95,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
+    <main className="min-h-screen bg-white text-[var(--color-text)]">
       <Navbar />
       <AccountClient
         userEmail={user.email || ''}

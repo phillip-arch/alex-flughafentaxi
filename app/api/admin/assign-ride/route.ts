@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin } from '@/lib/auth/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { requireSameOrigin } from '@/lib/security/origin';
 
 export async function POST(req: NextRequest) {
+  await requireSameOrigin();
   const { authorized, error, user } = await verifyAdmin();
   if (!authorized) {
     return NextResponse.json({ error }, { status: 401 });

@@ -187,7 +187,9 @@ export default function NavbarClient() {
               aria-label="Sprache waehlen"
             >
               <Globe size={20} strokeWidth={2.1} />
-              <span className="text-[15px] font-medium uppercase">{activeLang}</span>
+              <span className="inline-flex w-[2.1rem] justify-center text-[15px] font-medium uppercase">
+                {activeLang}
+              </span>
               <ChevronDown size={14} strokeWidth={2.2} />
             </button>
 
@@ -203,7 +205,7 @@ export default function NavbarClient() {
             ) : null}
           </div>
 
-          <Link href="/account" className="ui-icon-button-accent -translate-y-px" aria-label="Zum Konto">
+          <Link href="/account?tab=buchungsverlauf" className="ui-icon-button-accent -translate-y-px" aria-label="Zum Konto">
             <User size={18} strokeWidth={2.1} className="text-[#111111]" />
           </Link>
         </div>
@@ -219,12 +221,14 @@ export default function NavbarClient() {
               aria-label="Sprache waehlen"
             >
               <Globe size={20} strokeWidth={2.1} />
-              <span className="text-[0.95rem] font-medium uppercase">{activeLang}</span>
+              <span className="inline-flex w-[2.1rem] justify-center text-[0.95rem] font-medium uppercase">
+                {activeLang}
+              </span>
               <ChevronDown size={14} strokeWidth={2.2} />
             </button>
           </div>
 
-          <Link href="/account" className="ui-icon-button-accent" aria-label="Zum Konto">
+          <Link href="/account?tab=buchungsverlauf" className="ui-icon-button-accent" aria-label="Zum Konto">
             <User size={18} strokeWidth={2.1} className="text-[#111111]" />
           </Link>
 
@@ -267,13 +271,15 @@ export default function NavbarClient() {
                   aria-label="Sprache waehlen"
                 >
                   <Globe size={20} strokeWidth={2.1} />
-                  <span className="text-[0.95rem] font-medium uppercase">{activeLang}</span>
+                  <span className="inline-flex w-[2.1rem] justify-center text-[0.95rem] font-medium uppercase">
+                    {activeLang}
+                  </span>
                   <ChevronDown size={14} strokeWidth={2.2} />
                 </button>
               </div>
 
               <Link
-                href="/account"
+                href="/account?tab=buchungsverlauf"
                 onClick={closeMobileMenu}
                 className="ui-icon-button-accent"
                 aria-label="Zum Konto"

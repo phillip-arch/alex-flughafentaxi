@@ -8,12 +8,15 @@ import {
   PlaneLanding, 
   PlaneTakeoff, 
   MapPin, 
+  House,
   ChevronRight, 
   ChevronLeft, 
   Check, 
   Calendar,
   Clock,
   Car,
+  Building2,
+  GraduationCap,
   Users,
   Briefcase,
   ShoppingBag,
@@ -497,21 +500,63 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   const renderFavoriteAddressButtons = () => {
     if (!isLoggedIn || favoriteAddresses.length === 0) return null;
 
+    const getFavoriteIcon = (label: string) => {
+      const normalized = String(label || '').toLowerCase();
+      if (normalized === 'house' || normalized === 'home') return House;
+      if (normalized === 'office' || normalized === 'work') return Building2;
+      if (normalized === 'school') return GraduationCap;
+      return MapPin;
+    };
+
     return (
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-start gap-2">
         {favoriteAddresses.map((favorite) => (
-          <button
-            key={favorite.id}
-            type="button"
-            onClick={() => applyFavoriteAddress(favorite)}
-            className="inline-flex items-center gap-2 rounded-[1rem] border border-[#e3dfd3] bg-white px-3 py-2 text-[11px] font-medium text-[#111111] shadow-[0_8px_20px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8f6f0] md:rounded-[1.1rem] md:px-3.5"
-          >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
-              <MapPin size={11} strokeWidth={2.2} />
-            </span>
-            <span className="leading-none">{favorite.name}</span>
-          </button>
+          (() => {
+            const Icon = getFavoriteIcon(favorite.name);
+
+            return (
+              <button
+                key={favorite.id}
+                type="button"
+                onClick={() => applyFavoriteAddress(favorite)}
+                title={`${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`}
+                aria-label={`${favorite.name}: ${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`}
+                className="group flex cursor-pointer items-center justify-center rounded-full border border-transparent bg-transparent p-0 text-center text-[11px] font-medium text-[#111111] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff] transition-all duration-150 group-hover:scale-105 group-hover:bg-[#dfeeff] group-active:scale-[0.97]">
+                  <Icon size={15} strokeWidth={2.2} />
+                </span>
+              </button>
+          );
+        })()
         ))}
+      </div>
+    );
+  };
+
+  const renderExtraStopPanel = () => {
+    if (!formData.extraStop) return null;
+
+    return (
+      <div className="animate-in fade-in slide-in-from-top-2 rounded-[1.35rem] border border-[#dbe7f8] bg-white p-3.5 shadow-[0_10px_28px_rgba(17,17,17,0.04)] duration-300">
+        <div className="mb-3 flex flex-col gap-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1679ff]">
+            Zusatzstopp
+          </p>
+          <p className="text-[12px] text-[#6a7d96]">
+            +10 EUR Aufpreis fuer eine weitere Adresse.
+          </p>
+        </div>
+
+        <input
+          type="text"
+          name="extraStopStreet"
+          value={formData.extraStopStreet}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder="Zusatzadresse eingeben"
+          className={getInputClassName('extraStopStreet')}
+        />
       </div>
     );
   };
@@ -696,7 +741,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
         );
       }
 
-      router.push(isLoggedIn ? '/account?tab=buchen' : '/book');
+      router.push('/book');
       return;
     }
 
@@ -811,6 +856,8 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   ] as const;
   const actionRowClass = 'mt-4 flex items-center gap-3';
   const primaryActionButtonClass = 'ui-button-booking-primary';
+  const secondaryBackButtonClass =
+    'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
 
   const StepIndicator = () => (
     <div className="mt-2 mb-8 flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:mt-0 md:mb-10 md:gap-1 md:overflow-visible md:pb-0">
@@ -897,24 +944,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                             placeholder="Adresse eingeben"
                             className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
                           />
-                          {formData.extraStop ? (
-                            <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                              <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Zusatzstopp</p>
-                                <p className="mt-1 text-[12px] text-[#6d7075]">+10 EUR Aufpreis fuer eine weitere Adresse.</p>
-                              </div>
-
-                              <input
-                                type="text"
-                                name="extraStopStreet"
-                                value={formData.extraStopStreet}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                placeholder="Zusatzadresse eingeben"
-                                className={getInputClassName('extraStopStreet')}
-                              />
-                            </div>
-                          ) : null}
+                          {renderExtraStopPanel()}
                         </div>
                       ) : null}
                     </div>
@@ -933,24 +963,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                             placeholder="Adresse eingeben"
                             className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
                           />
-                          {formData.extraStop ? (
-                            <div className="space-y-3 rounded-[1.5rem] border border-[#ddd8cd] bg-[#f6f3ec] p-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                              <div>
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Zusatzstopp</p>
-                                <p className="mt-1 text-[12px] text-[#6d7075]">+10 EUR Aufpreis fuer eine weitere Adresse.</p>
-                              </div>
-
-                              <input
-                                type="text"
-                                name="extraStopStreet"
-                                value={formData.extraStopStreet}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                placeholder="Zusatzadresse eingeben"
-                                className={getInputClassName('extraStopStreet')}
-                              />
-                            </div>
-                          ) : null}
+                          {renderExtraStopPanel()}
                         </div>
                       ) : (
                         <div className="mt-1 flex min-h-[3.5rem] items-start pt-[0.45rem]">
@@ -1136,7 +1149,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-field)] bg-[#ece7dd] text-[#111111] transition-colors hover:bg-[#e2dccf] md:h-[2.8rem] md:w-[2.8rem]"
+                  className={secondaryBackButtonClass}
                 >
                   <ChevronLeft size={24} />
                 </button>
@@ -1371,7 +1384,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-field)] bg-[#ece7dd] text-[#111111] transition-colors hover:bg-[#e2dccf] md:h-[2.8rem] md:w-[2.8rem]"
+                  className={secondaryBackButtonClass}
                 >
                   <ChevronLeft size={24} />
                 </button>

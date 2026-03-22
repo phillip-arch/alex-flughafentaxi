@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { adminLogin } from '@/app/(auth)/actions'; // Reuse the login action
-import { ShieldCheck, Lock, Mail, Loader2, ChevronLeft } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronLeft, Loader2, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { adminLogin } from '@/app/(auth)/actions';
 
 export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
@@ -22,79 +22,103 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f5f5f7] p-4">
-      
-      {/* Back Button */}
-      <div className="w-full max-w-[400px] mb-6">
-        <Link 
-          href="/"
-          className="inline-flex items-center gap-2 text-[#86868b] hover:text-[#1d1d1f] transition-colors font-medium text-[15px]"
-        >
-          <ChevronLeft size={20} />
-          Zur Startseite
-        </Link>
-      </div>
-
-      <div className="w-full max-w-[400px] bg-white rounded-[24px] border border-[#d2d2d7] overflow-hidden shadow-sm animate-in fade-in zoom-in duration-500">
-        {/* Header */}
-        <div className="p-8 text-center border-b border-[#d2d2d7]/50">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-[#f5f5f7] rounded-full mb-4 text-[#1d1d1f]">
-            <ShieldCheck size={24} />
-          </div>
-          <h1 className="text-[28px] font-semibold text-[#1d1d1f] leading-tight mb-2 tracking-tight">
-            Admin-Portal
-          </h1>
-          <p className="text-[#86868b] text-[15px]">
-            Melden Sie sich an, um Buchungen und Fahrer zu verwalten.
-          </p>
-        </div>
-
-        {/* Form */}
-        <div className="p-8">
-          {error && (
-            <div className="mb-6 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8] animate-in fade-in">
-              <span className="block w-1.5 h-1.5 bg-[#d70015] rounded-full" />
-              {error}
-            </div>
-          )}
-
-          <form action={handleSubmit} className="space-y-4">
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#86868b]" size={20} />
-              <input
-                type="email"
-                name="email"
-                placeholder="Admin-E-Mail"
-                required
-                className="w-full pl-12 p-4 rounded-xl bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[17px] outline-none placeholder:text-[#86868b] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-all"
-              />
-            </div>
-
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#86868b]" size={20} />
-              <input
-                type="password"
-                name="password"
-                placeholder="Passwort"
-                required
-                className="w-full pl-12 p-4 rounded-xl bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[17px] outline-none placeholder:text-[#86868b] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-all"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-[17px] py-4 rounded-full flex items-center justify-center gap-2 transition-all disabled:opacity-50 mt-8"
+    <section className="relative overflow-hidden bg-white">
+      <div className="app-container flex justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
+        <div className="w-full max-w-[34rem]">
+          <div className="ui-card-surface-light px-5 py-6 md:px-8 md:py-8">
+            <Link
+              href="/"
+              className="mb-6 inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
             >
-              {loading ? (
-                <Loader2 size={20} className="animate-spin" />
-              ) : (
-                'Anmelden'
-              )}
-            </button>
-          </form>
+              <ChevronLeft size={18} />
+              Zurueck zur Startseite
+            </Link>
+
+            <div className="ui-text-block-sm">
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff]">
+                <ShieldCheck size={20} />
+              </div>
+              <h1 className="ui-heading-lg text-[#111827]">Admin-Portal</h1>
+              <p className="ui-copy-compact text-[#6a7d96]">
+                Melden Sie sich an, um Buchungen und Fahrer zu verwalten.
+              </p>
+            </div>
+
+            {error ? (
+              <div className="mt-6 rounded-[1rem] border border-[var(--color-danger)] bg-[var(--color-danger-soft)] px-4 py-3 text-[0.92rem] font-medium text-[var(--color-danger)]">
+                {error}
+              </div>
+            ) : null}
+
+            <form action={handleSubmit} className="mt-6 space-y-4">
+              <fieldset
+                disabled={loading}
+                className={`space-y-4 transition-opacity duration-200 ${
+                  loading ? 'pointer-events-none opacity-70' : ''
+                }`}
+              >
+                <label className="block">
+                  <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                    Admin-E-Mail
+                  </span>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                      <Mail size={15} />
+                    </span>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Admin-E-Mail"
+                      required
+                      className="ui-input !pl-[3.2rem]"
+                    />
+                  </div>
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                    Passwort
+                  </span>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                      <Lock size={15} />
+                    </span>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Passwort"
+                      required
+                      className="ui-input !pl-[3.2rem]"
+                    />
+                  </div>
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  aria-busy={loading}
+                  className="ui-button-booking-primary mt-2 w-full disabled:cursor-wait disabled:opacity-80"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>Anmelden...</span>
+                    </>
+                  ) : (
+                    <span>Anmelden</span>
+                  )}
+                </button>
+              </fieldset>
+            </form>
+
+            {loading ? (
+              <p className="mt-3 text-[0.88rem] font-medium text-[#6a7d96]">
+                Anmeldung wird verarbeitet...
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

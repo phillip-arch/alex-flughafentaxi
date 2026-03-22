@@ -1,5 +1,6 @@
 'use server';
 
+import { Resend } from 'resend';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
@@ -327,6 +328,97 @@ export async function cancelOwnBooking(bookingId: string) {
 
   revalidatePath('/account');
   return { success: true, status: finalStatus };
+}
+
+export async function deleteOwnAccount() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Unauthorized' };
+
+  if (process.env.RESEND_API_KEY && user.email) {
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const from = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+      const { error: emailError } = await resend.emails.send({
+        from,
+        to: user.email,
+        subject: 'Ihr Konto wurde geloescht',
+        html: `
+          <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1d1d1f;">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
+              <tr>
+                <td style="padding:28px;">
+                  <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
+                  <h1 style="margin:0 0 12px 0;font-size:28px;line-height:1.2;font-weight:700;color:#1d1d1f;">Ihr Konto wurde geloescht</h1>
+                  <p style="margin:0 0 12px 0;font-size:16px;line-height:1.6;color:#5f6368;">
+                    Ihr Login, Profil und Ihre Favoriten wurden entfernt.
+                  </p>
+                  <p style="margin:0 0 12px 0;font-size:16px;line-height:1.6;color:#5f6368;">
+                    Vorhandene Buchungen bleiben fuer interne und buchhalterische Zwecke erhalten, aber E-Mail-Adresse und Telefonnummer wurden daraus entfernt.
+                  </p>
+                  <p style="margin:0;font-size:16px;line-height:1.6;color:#5f6368;">
+                    Falls Sie diese Loeschung nicht selbst ausgeloest haben, kontaktieren Sie uns bitte umgehend.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </div>
+        `,
+      });
+
+      if (emailError) {
+        console.error('deleteOwnAccount email failed:', emailError);
+      }
+    } catch (error) {
+      console.error('deleteOwnAccount email exception:', error);
+    }
+  }
+
+  const { error: anonymizeBookingsError } = await supabaseAdmin
+    .from('bookings')
+    .update({
+      email: null,
+      phone: null,
+    })
+    .eq('user_id', user.id);
+
+  if (anonymizeBookingsError) {
+    console.error('deleteOwnAccount anonymize bookings failed:', anonymizeBookingsError);
+    return {
+      error:
+        'Konto konnte nicht geloescht werden. Bitte zuerst die Supabase-SQL fuer nullable booking email/phone ausfuehren.',
+    };
+  }
+
+  const { error: auditError } = await supabaseAdmin.from('audit_logs').insert({
+    actor_user_id: user.id,
+    action: 'DELETE_ACCOUNT',
+    entity: 'profiles',
+    entity_id: user.id,
+    meta: {
+      retained_booking_name: true,
+      cleared_booking_email: true,
+      cleared_booking_phone: true,
+    },
+  });
+
+  if (auditError) {
+    console.error('deleteOwnAccount audit log failed:', auditError);
+  }
+
+  const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
+  if (deleteUserError) {
+    console.error('deleteOwnAccount delete user failed:', deleteUserError);
+    return { error: 'Konto konnte nicht geloescht werden.' };
+  }
+
+  revalidatePath('/');
+  revalidatePath('/account');
+  revalidatePath('/book');
+  return { success: true };
 }
 
 export async function submitBookingReview(input: {

@@ -70,7 +70,7 @@ export function composeBookingNotes(input: {
   flightNumber?: string;
   intermediateStop?: string;
   childSeatCounts?: Partial<ChildSeatCounts>;
-  paymentMethod?: 'cash' | 'card' | null;
+  paymentMethod?: 'cash' | 'card' | 'voucher' | 'free' | null;
   handLuggageCount?: number;
 }) {
   const baseParsed = parseBookingNotes(input.baseNotes || '');
@@ -94,7 +94,17 @@ export function composeBookingNotes(input: {
     input.flightNumber?.trim() ? `(Flugnummer: ${input.flightNumber.trim()})` : '',
     input.intermediateStop?.trim() ? `(Zwischenstopp: ${input.intermediateStop.trim()})` : '',
     childSeatLabel ? `(Kindersitze: ${childSeatLabel})` : '',
-    input.paymentMethod ? `(Zahlung: ${input.paymentMethod === 'cash' ? 'Barzahlung' : 'Kreditkarte'})` : '',
+    input.paymentMethod
+      ? `(Zahlung: ${
+          input.paymentMethod === 'cash'
+            ? 'Barzahlung'
+            : input.paymentMethod === 'card'
+              ? 'Kreditkarte'
+              : input.paymentMethod === 'voucher'
+                ? 'Lieferschein'
+                : 'Gratis'
+        })`
+      : '',
     Number(input.handLuggageCount || 0) > 0 ? `(Handgepäck: ${Number(input.handLuggageCount)})` : '',
   ]
     .filter(Boolean)
@@ -102,4 +112,3 @@ export function composeBookingNotes(input: {
     .replace(/\s{2,}/g, ' ')
     .trim();
 }
-

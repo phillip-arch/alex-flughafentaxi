@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin } from '@/lib/auth/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { DriverSchema } from '@/lib/validation/schemas';
+import { requireSameOrigin } from '@/lib/security/origin';
 
 export async function POST(req: NextRequest) {
+  await requireSameOrigin();
   // 1. Verify Admin (Server-Side Check)
   const { authorized, error } = await verifyAdmin();
   if (!authorized) {

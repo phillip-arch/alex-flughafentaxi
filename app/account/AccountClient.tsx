@@ -1,25 +1,32 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
+import Link from 'next/link';
 import {
-  BookOpen,
+  Briefcase,
+  Building2,
   Car,
   ChevronDown,
+  ChevronRight,
+  Edit,
+  LogOut,
+  GraduationCap,
   Heart,
   History,
+  House,
   MapPin,
-  Menu,
   Star,
   User,
+  X,
   XCircle,
 } from 'lucide-react';
 import { logout } from '@/app/(auth)/actions';
-import BookingForm from '@/components/BookingForm';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
 import { parseBookingNotes } from '@/lib/booking/notes';
 import {
   addFavoriteAddress,
   cancelOwnBooking,
+  deleteOwnAccount,
   deleteFavoriteAddress,
   loadAccountBookings,
   loadFavoriteAddresses,
@@ -27,7 +34,7 @@ import {
   updateAccountProfile,
 } from './actions';
 
-type AccountTab = 'buchen' | 'profil' | 'favoriten' | 'buchungsverlauf';
+type AccountTab = 'profil' | 'favoriten' | 'buchungsverlauf';
 
 type Favorite = {
   id: string;
@@ -60,6 +67,7 @@ type Booking = {
 };
 
 type BookingFilter = 'all' | 'upcoming' | 'previous' | 'canceled' | 'to_airport' | 'from_airport';
+type FavoritePreset = 'House' | 'Office' | 'School';
 
 export default function AccountClient({
   userEmail,
@@ -95,7 +103,8 @@ export default function AccountClient({
   const [reviewSavingId, setReviewSavingId] = useState<string | null>(null);
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('upcoming');
   const [activeTab, setActiveTab] = useState<AccountTab>(initialRequestedTab);
-  const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isDeletingAccount, startDeleteTransition] = useTransition();
   const [isPending, startTransition] = useTransition();
   const [favoritesLoaded, setFavoritesLoaded] = useState(initialFavoritesLoaded);
   const [bookingsLoaded, setBookingsLoaded] = useState(initialBookingsLoaded);
@@ -103,7 +112,31 @@ export default function AccountClient({
   const [bookingsLoading, setBookingsLoading] = useState(false);
 
   const accountShellClass = 'mx-auto max-w-[57.5rem]';
-  const sectionCardClass = 'ui-card-surface-light px-6 py-7 md:px-8 md:py-8';
+  const contentSectionClass = 'pt-2';
+  const accountSectionTitleClass = 'ui-heading-lg mb-6 text-[#111827]';
+  const accountSectionIntroClass = 'ui-text-block-sm gap-6';
+  const accountSectionStackClass = 'flex flex-col gap-6';
+  const bookingsMonthGroupClass = 'space-y-3';
+  const bookingsMonthTitleClass =
+    'text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.8rem]';
+  const accountSecondaryButtonClass =
+    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#dbe7f8] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]';
+  const accountDangerButtonClass =
+    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#f1d1d6] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#d70015] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#fff4f6]';
+  const hasReachedFavoriteLimit = favorites.length >= 3;
+  const favoritePresetItems: { label: FavoritePreset; icon: typeof House }[] = [
+    { label: 'House', icon: House },
+    { label: 'Office', icon: Building2 },
+    { label: 'School', icon: GraduationCap },
+  ];
+
+  const getFavoriteIcon = (label: string) => {
+    const normalized = String(label || '').toLowerCase();
+    if (normalized === 'house' || normalized === 'home') return House;
+    if (normalized === 'office' || normalized === 'work') return Building2;
+    if (normalized === 'school') return GraduationCap;
+    return MapPin;
+  };
 
   const fmtPrice = (value: number | null | undefined) =>
     `${new Intl.NumberFormat('de-AT', {
@@ -272,249 +305,319 @@ export default function AccountClient({
     <div suppressHydrationWarning className="bg-white pb-14 pt-24 lg:pt-28">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
-          <section className={sectionCardClass}>
-            <div className="flex flex-col gap-5 md:gap-6">
+          <section className="space-y-5">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="flex items-start justify-between gap-4">
-                <div className="ui-text-block-sm">
-                  <h1 className="ui-heading-lg text-[#111827]">Mein Konto</h1>
-                  <p className="ui-copy-compact text-[#6a7d96]">
-                    Verwalten Sie Ihr Profil, Favoriten und Buchungsverlauf im gleichen
-                    Designsystem wie auf der Startseite.
-                  </p>
-                </div>
-
-                <div className="relative md:hidden">
+                <h1 className="ui-heading-lg text-[#111827]">Mein Konto</h1>
+                <form action={logout} className="md:hidden">
                   <button
-                    type="button"
-                    onClick={() => setMobileTabsOpen((prev) => !prev)}
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-[12px] border border-[#e9edf3] bg-white text-[#111111] transition-colors hover:bg-[#f5f5f7]"
-                    aria-label="Kontomenue oeffnen"
+                    type="submit"
+                    className="inline-flex items-center gap-2 text-[0.95rem] font-medium leading-none text-[#1679ff] transition-colors hover:text-[#0a63ff]"
                   >
-                    <Menu size={17} />
-                  </button>
-                  {mobileTabsOpen ? (
-                    <div className="absolute right-0 top-[52px] z-20 w-64 overflow-hidden rounded-[1.1rem] border border-[#e9edf3] bg-white shadow-[0_16px_40px_rgba(17,17,17,0.08)]">
-                      {[
-                        { id: 'buchen', label: 'Buchen', icon: BookOpen },
-                        { id: 'profil', label: 'Profil', icon: User },
-                        { id: 'favoriten', label: 'Favoriten', icon: Heart },
-                        { id: 'buchungsverlauf', label: 'Buchungsverlauf', icon: History },
-                      ].map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <button
-                            key={item.id}
-                            type="button"
-                            onClick={() => {
-                              setActiveTab(item.id as AccountTab);
-                              setMobileTabsOpen(false);
-                            }}
-                            className={`flex w-full items-center gap-3 px-4 py-3 text-left text-[15px] ${
-                              activeTab === item.id
-                                ? 'bg-[#edf4ff] text-[#1679ff]'
-                                : 'text-[#111111] hover:bg-[#f5f5f7]'
-                            }`}
-                          >
-                            <Icon size={16} />
-                            {item.label}
-                          </button>
-                        );
-                      })}
-                      <form action={logout}>
-                        <button
-                          type="submit"
-                          className="flex w-full items-center gap-3 px-4 py-3 text-left text-[15px] text-[#111111] hover:bg-[#f5f5f7]"
-                        >
-                          <XCircle size={16} />
-                          Abmelden
-                        </button>
-                      </form>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between gap-4 border-t border-[#edf2f7] pt-4">
-                <UnderlineTabNav
-                  className="hidden items-center md:flex"
-                  items={[
-                    { id: 'buchen', label: 'Buchen' },
-                    { id: 'profil', label: 'Profil' },
-                    { id: 'favoriten', label: 'Favoriten' },
-                    { id: 'buchungsverlauf', label: 'Buchungsverlauf' },
-                  ]}
-                  activeTab={activeTab}
-                  onChange={setActiveTab}
-                />
-                <form action={logout} className="hidden md:block">
-                  <button type="submit" className="ui-button-secondary px-4 py-2 text-[0.82rem]">
+                    <LogOut size={15} />
                     Abmelden
                   </button>
                 </form>
               </div>
+              <form action={logout} className="hidden md:block">
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-2 text-[0.95rem] font-medium text-[#1679ff] transition-colors hover:text-[#0a63ff]"
+                >
+                  <LogOut size={16} />
+                  Abmelden
+                </button>
+              </form>
             </div>
+
+            <UnderlineTabNav
+              className="flex flex-wrap items-center gap-6 border-b border-[#e9edf3] pb-2"
+              items={[
+                { id: 'buchungsverlauf', label: '', icon: <History size={16} /> },
+                { id: 'favoriten', label: '', icon: <Heart size={16} /> },
+                { id: 'profil', label: '', icon: <User size={16} /> },
+              ]}
+              activeTab={activeTab}
+              onChange={(tab) => setActiveTab(tab as AccountTab)}
+            />
           </section>
 
-          {activeTab === 'buchen' ? (
-            <section className={sectionCardClass}>
-              <h2 className="ui-heading-lg mb-4 text-[#111827]">Buchen</h2>
-              <BookingForm />
-            </section>
-          ) : null}
-
           {activeTab === 'profil' ? (
-            <section className={sectionCardClass}>
-              <h2 className="ui-heading-lg mb-5 text-[#111827]">Profil</h2>
-              <form
-                action={(formData) => {
-                  setError(null);
-                  startTransition(async () => {
-                    const res = await updateAccountProfile(formData);
-                    if ((res as { error?: string })?.error) {
-                      setError((res as { error: string }).error);
-                    }
-                  });
-                }}
-                className="grid grid-cols-1 gap-4 md:grid-cols-3"
-              >
-                <input
-                  name="full_name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="ui-input"
-                  placeholder="Name"
-                  required
-                />
-                <input
-                  name="phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="ui-input"
-                  placeholder="Telefon"
-                  required
-                />
-                <input value={userEmail} readOnly className="ui-input" />
-                <div className="md:col-span-3">
-                  <button
-                    type="submit"
-                    disabled={isPending}
-                    className="ui-button-booking-primary md:w-auto"
+            <section className={`${contentSectionClass} max-w-[44rem]`}>
+              <div className={accountSectionStackClass}>
+                <h2 className={accountSectionTitleClass}>Profil</h2>
+                {!isEditingProfile ? (
+                  <div className="rounded-[1.35rem] border border-[#e9edf3] bg-white px-4 py-4 shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-2">
+                        <p className="text-[1.15rem] font-semibold tracking-[-0.03em] text-[#111827]">
+                          {name || 'Kein Name hinterlegt'}
+                        </p>
+                        <p className="text-[0.95rem] text-[#6a7d96]">{userEmail}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setError(null);
+                          setIsEditingProfile(true);
+                        }}
+                        aria-label="Profil bearbeiten"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#eef5ff] hover:text-[#0a63ff]"
+                      >
+                        <Edit size={16} />
+                      </button>
+                    </div>
+                    <div className="mt-5 border-t border-[#edf2f7] pt-5">
+                      <p className="text-[0.82rem] font-semibold uppercase tracking-[0.14em] text-[#d70015]">
+                        Konto loeschen
+                      </p>
+                      <p className="mt-2 max-w-[32rem] text-[0.95rem] text-[#6a7d96]">
+                        Ihr Login, Profil und Ihre Favoriten werden entfernt. Buchungen bleiben fuer
+                        interne Nachvollziehbarkeit erhalten, aber E-Mail und Telefonnummer werden
+                        daraus entfernt.
+                      </p>
+                      <button
+                        type="button"
+                        disabled={isDeletingAccount}
+                        onClick={() => {
+                          if (
+                            !confirm(
+                              'Moechten Sie Ihr Konto wirklich loeschen? Ihr Login und Ihre Favoriten werden entfernt.',
+                            )
+                          ) {
+                            return;
+                          }
+                          setError(null);
+                          startDeleteTransition(async () => {
+                            const res = await deleteOwnAccount();
+                            if ((res as { error?: string })?.error) {
+                              setError((res as { error: string }).error);
+                              return;
+                            }
+                            window.location.assign('/login?account_deleted=1');
+                          });
+                        }}
+                        className={`${accountDangerButtonClass} mt-4 disabled:cursor-not-allowed disabled:opacity-60`}
+                      >
+                        {isDeletingAccount ? 'Konto wird geloescht...' : 'Konto loeschen'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <form
+                    action={(formData) => {
+                      setError(null);
+                      startTransition(async () => {
+                        const res = await updateAccountProfile(formData);
+                        if ((res as { error?: string })?.error) {
+                          setError((res as { error: string }).error);
+                          return;
+                        }
+                        setIsEditingProfile(false);
+                      });
+                    }}
+                    className="grid grid-cols-1 gap-3"
                   >
-                    {isPending ? 'Speichern...' : 'Profil speichern'}
-                  </button>
-                </div>
-              </form>
+                    <input
+                      name="full_name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="ui-input"
+                      placeholder="Name"
+                      required
+                    />
+                    <input
+                      name="phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="ui-input"
+                      placeholder="Telefon"
+                      required
+                    />
+                    <input
+                      value={userEmail}
+                      readOnly
+                      aria-label="E-Mail kann nicht geaendert werden"
+                      className="ui-input cursor-not-allowed border-[#e5e7eb] bg-[#f3f4f6] text-[#8b95a7]"
+                    />
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="submit"
+                        disabled={isPending}
+                        className="ui-button-booking-primary"
+                      >
+                        {isPending ? 'Speichern...' : 'Profil speichern'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setError(null);
+                          setIsEditingProfile(false);
+                        }}
+                        className={accountSecondaryButtonClass}
+                      >
+                        Abbrechen
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
               {error ? <p className="mt-3 text-sm text-[#d70015]">{error}</p> : null}
             </section>
           ) : null}
 
           {activeTab === 'favoriten' ? (
-            <section className={sectionCardClass}>
-              <h2 className="ui-heading-lg mb-5 text-[#111827]">Favoriten</h2>
-              <form
-                action={() => {
-                  setError(null);
-                  startTransition(async () => {
-                    const parsedAddress = parseFavoriteAddressInput(favAddress);
-                    if (!parsedAddress) {
-                      setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
-                      return;
-                    }
-
-                    const formData = new FormData();
-                    formData.set('name', favLabel.trim());
-                    formData.set('city', parsedAddress.city);
-                    formData.set('zip', parsedAddress.zip);
-                    formData.set('street', parsedAddress.street);
-                    formData.set('house_number', parsedAddress.house_number);
-
-                    const res = await addFavoriteAddress(formData);
-                    if ((res as { error?: string })?.error) {
-                      setError((res as { error: string }).error);
-                      return;
-                    }
-                    const inserted = (res as { favorite?: Favorite }).favorite;
-                    if (inserted?.id) {
-                      setFavorites((prev) => [...prev, inserted]);
-                    }
-                    setFavLabel('');
-                    setFavAddress('');
-                  });
-                }}
-                className="mb-5 grid grid-cols-1 gap-3 md:grid-cols-[180px_minmax(0,1fr)_auto]"
-              >
-                <input
-                  value={favLabel}
-                  onChange={(e) => setFavLabel(e.target.value)}
-                  className="ui-input"
-                  placeholder="Label, z.B. Home"
-                  required
-                />
-                <input
-                  value={favAddress}
-                  onChange={(e) => setFavAddress(e.target.value)}
-                  className="ui-input"
-                  placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="ui-button-booking-primary md:w-auto"
-                >
-                  Speichern
-                </button>
-              </form>
-
-              <div className="flex flex-wrap gap-2">
-                {favoritesLoading ? (
-                  <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
-                ) : null}
-                {favorites.map((fav) => (
-                  <div
-                    key={fav.id}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#e9edf3] bg-[#f5f5f7] px-3 py-2"
-                  >
-                    <span className="text-sm font-semibold text-[#111111]">{fav.name}:</span>
-                    <span className="text-sm text-[#6a7d96]">
-                      {fav.street} {fav.house_number}, {fav.zip} {fav.city}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        startTransition(async () => {
-                          if (!confirm('Moechten Sie diesen Favoriten loeschen?')) return;
-                          const res = await deleteFavoriteAddress(fav.id);
-                          if ((res as { error?: string })?.error) {
-                            setError((res as { error: string }).error);
-                            return;
-                          }
-                          setFavorites((prev) => prev.filter((f) => f.id !== fav.id));
-                        })
-                      }
-                      className="text-sm text-[#d70015]"
+            <section className={`${contentSectionClass} max-w-[44rem]`}>
+              <div className={accountSectionStackClass}>
+                <h2 className={accountSectionTitleClass}>Favoriten</h2>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {favoritesLoading ? (
+                    <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
+                  ) : null}
+                  {favorites.map((fav) => (
+                    <div
+                      key={fav.id}
+                      className="relative rounded-[1rem] border border-[#e9edf3] bg-white px-3 py-3 text-center shadow-[0_8px_20px_rgba(17,17,17,0.04)]"
                     >
-                      X
-                    </button>
+                      <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
+                        {(() => {
+                          const Icon = getFavoriteIcon(fav.name);
+                          return <Icon size={15} />;
+                        })()}
+                      </span>
+                      <span className="mt-2 block text-sm leading-5 text-[#6a7d96]">
+                        {fav.street} {fav.house_number}, {fav.zip} {fav.city}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          startTransition(async () => {
+                            if (!confirm('Moechten Sie diesen Favoriten loeschen?')) return;
+                            const res = await deleteFavoriteAddress(fav.id);
+                            if ((res as { error?: string })?.error) {
+                              setError((res as { error: string }).error);
+                              return;
+                            }
+                            setFavorites((prev) => prev.filter((f) => f.id !== fav.id));
+                          })
+                        }
+                        aria-label="Favorit loeschen"
+                        className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]"
+                      >
+                        <X size={12} strokeWidth={2.25} />
+                      </button>
+                    </div>
+                  ))}
+                  {favorites.length === 0 ? (
+                    <p className="text-sm text-[#1679ff]">Keine Favoriten gespeichert.</p>
+                  ) : null}
+                </div>
+
+                <p className="text-sm text-[#6a7d96]">
+                  {hasReachedFavoriteLimit
+                    ? 'Maximal 3 Favoriten gespeichert.'
+                    : `${favorites.length}/3 Favoriten gespeichert.`}
+                </p>
+
+                <form
+                  action={() => {
+                    setError(null);
+                    startTransition(async () => {
+                      if (favorites.length >= 3) {
+                        setError('Maximal 3 Favoriten sind moeglich.');
+                        return;
+                      }
+
+                      const parsedAddress = parseFavoriteAddressInput(favAddress);
+                      if (!parsedAddress) {
+                        setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
+                        return;
+                      }
+
+                      if (!favLabel.trim()) {
+                        setError('Bitte waehlen Sie House, Office oder School.');
+                        return;
+                      }
+
+                      const formData = new FormData();
+                      formData.set('name', favLabel.trim());
+                      formData.set('city', parsedAddress.city);
+                      formData.set('zip', parsedAddress.zip);
+                      formData.set('street', parsedAddress.street);
+                      formData.set('house_number', parsedAddress.house_number);
+
+                      const res = await addFavoriteAddress(formData);
+                      if ((res as { error?: string })?.error) {
+                        setError((res as { error: string }).error);
+                        return;
+                      }
+                      const inserted = (res as { favorite?: Favorite }).favorite;
+                      if (inserted?.id) {
+                        setFavorites((prev) => [...prev, inserted]);
+                      }
+                      setFavLabel('');
+                      setFavAddress('');
+                    });
+                  }}
+                  className="grid grid-cols-1 gap-3"
+                >
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-[10.75rem_minmax(0,1fr)]">
+                    <div className="relative">
+                      <select
+                        value={favLabel}
+                        onChange={(e) => setFavLabel(e.target.value)}
+                        className="ui-input appearance-none pr-10"
+                        disabled={isPending || hasReachedFavoriteLimit}
+                        required
+                      >
+                        <option value="">Label</option>
+                        {favoritePresetItems.map((item) => (
+                          <option key={item.label} value={item.label}>
+                            {item.label}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">
+                        <ChevronDown size={16} />
+                      </div>
+                    </div>
+                    <input
+                      value={favAddress}
+                      onChange={(e) => setFavAddress(e.target.value)}
+                      className="ui-input"
+                      placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                      disabled={isPending || hasReachedFavoriteLimit}
+                      required
+                    />
                   </div>
-                ))}
-                {favorites.length === 0 ? (
-                  <p className="text-sm text-[#6a7d96]">Keine Favoriten gespeichert.</p>
-                ) : null}
+                  <button
+                    type="submit"
+                    disabled={isPending || hasReachedFavoriteLimit}
+                    className="ui-button-booking-primary w-full sm:w-auto sm:min-w-[220px] sm:justify-self-start"
+                  >
+                    {isPending ? 'Speichert...' : 'Speichern'}
+                  </button>
+                </form>
               </div>
               {error ? <p className="mt-3 text-sm text-[#d70015]">{error}</p> : null}
             </section>
           ) : null}
 
           {activeTab === 'buchungsverlauf' ? (
-            <section className={sectionCardClass}>
+            <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                  <div className="ui-text-block-sm gap-2">
+                  <div className={accountSectionIntroClass}>
                     <h2 className="ui-heading-lg text-[#111827]">Fahrten</h2>
                     <p className="ui-copy-compact text-[#6a7d96]">
                       Ihre kommenden und vergangenen Fahrten in einer klaren Uebersicht.
                     </p>
+                    <Link
+                      href="/book"
+                      className="ui-button-booking-primary w-full self-start sm:w-auto sm:min-w-[220px]"
+                    >
+                      Fahrt buchen
+                    </Link>
                   </div>
                   <UnderlineTabNav
                     items={[
@@ -533,12 +636,12 @@ export default function AccountClient({
 
                 <div className="space-y-8">
                   {groupedBookings.map((group) => (
-                    <div key={group.month} className="space-y-4">
-                      <h3 className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827]">
+                    <div key={group.month} className={bookingsMonthGroupClass}>
+                      <h3 className={bookingsMonthTitleClass}>
                         {group.month}
                       </h3>
 
-                      <div className="space-y-2">
+                      <div className="mt-6 space-y-2 md:mt-7">
                         {group.items.map((b) => {
                           const primaryLocation = isToAirport(b) ? b.pickup : b.destination;
                           const secondaryLocation = isToAirport(b)
@@ -564,9 +667,9 @@ export default function AccountClient({
                                 isCanceled(b.status) ? 'opacity-70' : ''
                               }`}
                             >
-                              <div className="flex items-center gap-4">
-                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF]">
-                                  <Car size={21} />
+                              <div className="flex items-center gap-3 md:gap-3.5">
+                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] md:h-10 md:w-10">
+                                  <Car size={18} className="md:h-[19px] md:w-[19px]" />
                                 </div>
 
                                 <button
@@ -578,25 +681,25 @@ export default function AccountClient({
                                   aria-expanded={isExpanded}
                                 >
                                   <div className="min-w-0 flex-1">
-                                    <p className="text-[0.95rem] text-[#7b8798]">{fmtRideMeta(b.pickup_at)}</p>
-                                    <p className="mt-1 line-clamp-2 text-[1.55rem] font-semibold leading-[1.2] tracking-[-0.04em] text-[#111827]">
+                                    <p className="text-[0.82rem] text-[#7b8798] md:text-[0.88rem]">{fmtRideMeta(b.pickup_at)}</p>
+                                    <p className="mt-1 line-clamp-2 text-[1.02rem] font-semibold leading-[1.28] tracking-[-0.03em] text-[#111827] md:text-[1.22rem] md:leading-[1.24] md:tracking-[-0.035em]">
                                       {primaryLocation}
                                     </p>
                                     <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                                      <p className="text-[0.95rem] text-[#6a7d96]">{secondaryLocation}</p>
+                                      <p className="text-[0.82rem] text-[#6a7d96] md:text-[0.88rem]">{secondaryLocation}</p>
                                       {isCanceled(b.status) ? (
                                         <span className="rounded-full border border-[#f1d1d6] bg-[#fff4f6] px-2.5 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#d70015]">
                                           Storniert
                                         </span>
                                       ) : null}
                                     </div>
-                                    <p className="mt-2 text-[1.05rem] font-semibold text-[#111827]">
+                                    <p className="mt-1.5 text-[0.92rem] font-semibold text-[#111827] md:mt-1.5 md:text-[0.96rem]">
                                       {fmtPrice(b.price)}
                                     </p>
                                   </div>
                                   <ChevronDown
-                                    size={18}
-                                    className={`shrink-0 text-[#7b8798] transition-transform ${
+                                    size={16}
+                                    className={`shrink-0 text-[#7b8798] transition-transform md:h-4 md:w-4 ${
                                       isExpanded ? 'rotate-180' : ''
                                     }`}
                                   />
@@ -638,10 +741,10 @@ export default function AccountClient({
                                         );
                                       })
                                     }
-                                    className="flex h-12 w-12 items-center justify-center rounded-full border border-[#f1d1d6] bg-[#fff4f6] text-[#d70015] transition-colors hover:bg-[#ffecef] disabled:cursor-not-allowed disabled:opacity-40"
+                                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1d1d6] bg-[#fff4f6] text-[#d70015] transition-colors hover:bg-[#ffecef] disabled:cursor-not-allowed disabled:opacity-40 md:h-11 md:w-11"
                                     aria-label="Fahrt stornieren"
                                   >
-                                    <XCircle size={21} />
+                                    <XCircle size={18} className="md:h-[19px] md:w-[19px]" />
                                   </button>
                                 ) : hasMapLink ? (
                                   <a
@@ -649,9 +752,9 @@ export default function AccountClient({
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label="Ort in Google Maps oeffnen"
-                                    className="flex h-12 w-12 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] transition-colors hover:bg-[#eef5ff]"
+                                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] transition-colors hover:bg-[#eef5ff] md:h-11 md:w-11"
                                   >
-                                    <MapPin size={20} />
+                                    <MapPin size={17} className="md:h-[18px] md:w-[18px]" />
                                   </a>
                                 ) : null}
                                 </div>
@@ -701,7 +804,7 @@ export default function AccountClient({
                                     </div>
                                   ) : null}
 
-                                  {isCompleted(b.status) ? (
+                                  {isPrevious(b) && !isCanceled(b.status) ? (
                                     <div className="rounded-[1rem] border border-[#edf2f7] bg-white px-4 py-3 md:col-span-2">
                                       <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
                                         Fahrer bewerten

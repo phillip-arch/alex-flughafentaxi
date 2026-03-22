@@ -5,8 +5,9 @@ import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import {
   Car, Users, BarChart3, Calendar, Search,
   MapPin, Clock, CreditCard, ChevronDown, ChevronLeft, ChevronRight,
-  Edit, Trash2, CheckCircle, XCircle, X, Star, Plus, Menu,
-  PlaneTakeoff, PlaneLanding, Briefcase, Phone, Mail, Send, Plane, FileText
+  Edit, Trash2, CheckCircle, XCircle, X, Star, Plus, Menu, LogOut,
+  PlaneTakeoff, PlaneLanding, Briefcase, Phone, Mail, Send, Plane, FileText,
+  LayoutGrid, Rows3
 } from 'lucide-react';
 import DatePicker from '@/components/DatePicker';
 import TimePicker from '@/components/TimePicker';
@@ -25,6 +26,26 @@ import { APP_HEADER_CLASS, APP_PAGE_BG_CLASS } from '@/components/ui/sharedStyle
 
 export default function AdminDashboardClient({ userEmail }: { userEmail: string }) {
   const AIRPORT_LABEL = 'Flughafen Wien (VIE)';
+  const adminPrimaryButtonClass =
+    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#000000] px-4 py-3 text-[0.95rem] font-medium text-white transition-colors hover:bg-[#232325] disabled:cursor-not-allowed disabled:opacity-50';
+  const adminSecondaryButtonClass =
+    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#dbe7f8] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]';
+  const adminDangerButtonClass =
+    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#f1d1d6] bg-white px-4 py-3 text-[0.95rem] font-medium text-[#d70015] transition-colors hover:bg-[#fff4f6]';
+  const adminEditMetaCardClass =
+    'rounded-[1.35rem] border border-[#e9edf3] bg-[#f8fbff] px-4 py-4';
+  const adminEditSectionLabelClass =
+    'ml-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]';
+  const adminEditChoiceCardBaseClass =
+    'flex flex-col items-center justify-center gap-3 rounded-[1.35rem] border bg-white py-6 transition-colors';
+  const adminEditSelectClass =
+    'ui-input appearance-none bg-white pr-10';
+  const adminEditMetricCardClass =
+    'rounded-[1.35rem] border border-[#e9edf3] bg-[#f8fbff] px-4 py-4';
+  const adminEditMetricSelectClass =
+    'w-full appearance-none bg-transparent text-center text-[1.5rem] font-semibold text-[#111827] outline-none';
+  const adminIconCloseButtonClass =
+    'inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]';
   const [currentTab, setCurrentTab] = useState<'rides' | 'drivers' | 'stats'>('rides');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
@@ -40,24 +61,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const [statsCache, setStatsCache] = useState<Record<string, any[]>>({});
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [editDirection, setEditDirection] = useState<'to_airport' | 'from_airport' | null>(null);
-  const [editAddress, setEditAddress] = useState<{ city: string; zip: string; street: string; houseNumber: string }>({
-    city: 'Wien',
-    zip: '',
-    street: '',
-    houseNumber: '',
-  });
+  const [editAddress, setEditAddress] = useState('');
   const [editExtraStop, setEditExtraStop] = useState(false);
-  const [editExtraStopAddress, setEditExtraStopAddress] = useState<{ city: string; zip: string; street: string; houseNumber: string }>({
-    city: 'Wien',
-    zip: '',
-    street: '',
-    houseNumber: '',
-  });
+  const [editExtraStopAddress, setEditExtraStopAddress] = useState('');
   const [editChildSeat, setEditChildSeat] = useState(false);
   const [editBabySeats, setEditBabySeats] = useState(0);
   const [editChildSeats, setEditChildSeats] = useState(0);
   const [editBoosterSeats, setEditBoosterSeats] = useState(0);
-  const [editPaymentMethod, setEditPaymentMethod] = useState<'cash' | 'card' | null>(null);
+  const [editPaymentMethod, setEditPaymentMethod] = useState<'cash' | 'card' | 'voucher' | 'free' | null>(null);
   const [editFlightNumber, setEditFlightNumber] = useState('');
   const [isEditDatePickerOpen, setIsEditDatePickerOpen] = useState(false);
   const [isEditTimePickerOpen, setIsEditTimePickerOpen] = useState(false);
@@ -122,6 +133,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
     const isCard = source.includes('kredit') || source.includes('card') || source.includes('karte');
     const isCash = source.includes('bar') || source.includes('cash');
+    const isVoucher = source.includes('lieferschein') || source.includes('voucher');
+    const isFree = source.includes('gratis') || source.includes('free');
 
     if (isCard) {
       return {
@@ -133,6 +146,18 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       return {
         label: 'BAR',
         className: 'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]',
+      };
+    }
+    if (isVoucher) {
+      return {
+        label: 'LIEFERSCHEIN',
+        className: 'bg-[#f3f7ff] text-[#2759b8]',
+      };
+    }
+    if (isFree) {
+      return {
+        label: 'GRATIS',
+        className: 'bg-[#edf8f0] text-[#1f7a38]',
       };
     }
     return {
@@ -462,40 +487,6 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
   };
 
-  const parseAddress = (input: string) => {
-    const raw = String(input || '').trim();
-    if (!raw) return { city: 'Wien', zip: '', street: '', houseNumber: '' };
-
-    const [streetPartRaw, locationPartRaw] = raw.split(',').map((p) => p.trim());
-    const streetPart = streetPartRaw || raw;
-    const locationPart = locationPartRaw || '';
-
-    let street = streetPart;
-    let houseNumber = '';
-    const streetMatch = streetPart.match(/^(.*\S)\s+([0-9]+[A-Za-z/-]*)$/);
-    if (streetMatch) {
-      street = streetMatch[1].trim();
-      houseNumber = streetMatch[2].trim();
-    }
-
-    let zip = '';
-    let city = 'Wien';
-    const locationMatch = locationPart.match(/^(\d{3,6})\s+(.+)$/);
-    if (locationMatch) {
-      zip = locationMatch[1].trim();
-      city = locationMatch[2].trim();
-    }
-
-    return { city, zip, street: street.trim(), houseNumber };
-  };
-
-  const formatAddress = (address: { city: string; zip: string; street: string; houseNumber: string }) => {
-    const left = [address.street, address.houseNumber].filter(Boolean).join(' ').trim();
-    const right = [address.zip, address.city].filter(Boolean).join(' ').trim();
-    if (left && right) return `${left}, ${right}`;
-    return left || right;
-  };
-
   const clampToRange = (value: number, min: number, max: number) => {
     if (Number.isNaN(value)) return min;
     return Math.max(min, Math.min(max, value));
@@ -518,7 +509,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
           : null;
     setEditDirection(inferredDirection);
     const editableAddressRaw = inferredDirection === 'from_airport' ? destinationText : pickupText;
-    setEditAddress(parseAddress(editableAddressRaw));
+    setEditAddress(editableAddressRaw);
     const notesParsed = parseBookingNotes(booking.notes);
     const extractedExtraStop = notesParsed.intermediateStopInfo;
     const extractedHandLuggage = notesParsed.handLuggageCount;
@@ -528,7 +519,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     const childSeats = clampToRange(Number(notesParsed.childSeatCounts.child || 0), 0, 3);
     const boosterSeats = clampToRange(Number(notesParsed.childSeatCounts.booster || 0), 0, 3);
     setEditExtraStop(Boolean(extractedExtraStop));
-    setEditExtraStopAddress(extractedExtraStop ? parseAddress(extractedExtraStop) : { city: 'Wien', zip: '', street: '', houseNumber: '' });
+    setEditExtraStopAddress(extractedExtraStop || '');
     setEditHandLuggage(clampToRange(extractedHandLuggage, 0, 8));
     setEditChildSeat(Boolean(notesParsed.childSeatInfo) || babySeats > 0 || childSeats > 0 || boosterSeats > 0);
     setEditBabySeats(babySeats);
@@ -540,7 +531,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         ? 'card'
         : String(booking.payment_method || '').toLowerCase().includes('cash') || paymentLabel.includes('bar')
           ? 'cash'
-          : null
+          : String(booking.payment_method || '').toLowerCase().includes('lieferschein') || paymentLabel.includes('lieferschein')
+            ? 'voucher'
+            : String(booking.payment_method || '').toLowerCase().includes('gratis') || paymentLabel.includes('gratis')
+              ? 'free'
+              : null
     );
     const cleanedNotes = notesParsed.cleanedNotes;
     setEditForm({
@@ -568,18 +563,17 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     if (direction === 'to_airport') {
       const nextPickup = String(prev.pickup || '').includes(AIRPORT_LABEL) ? '' : prev.pickup;
       setEditForm({ ...prev, pickup: nextPickup, destination: AIRPORT_LABEL });
-      setEditAddress(parseAddress(nextPickup));
+      setEditAddress(nextPickup);
       return;
     }
     const nextDestination = String(prev.destination || '').includes(AIRPORT_LABEL) ? '' : prev.destination;
     setEditForm({ ...prev, pickup: AIRPORT_LABEL, destination: nextDestination });
-    setEditAddress(parseAddress(nextDestination));
+    setEditAddress(nextDestination);
   };
 
-  const handleEditAddressChange = (field: 'city' | 'zip' | 'street' | 'houseNumber', value: string) => {
-    const nextAddress = { ...editAddress, [field]: value };
-    setEditAddress(nextAddress);
-    const formatted = formatAddress(nextAddress);
+  const handleEditAddressChange = (value: string) => {
+    const formatted = value;
+    setEditAddress(formatted);
     setEditForm((prev: any) =>
       editDirection === 'from_airport'
         ? { ...prev, destination: formatted }
@@ -587,15 +581,15 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     );
   };
 
-  const handleExtraStopAddressChange = (field: 'city' | 'zip' | 'street' | 'houseNumber', value: string) => {
-    setEditExtraStopAddress((prev) => ({ ...prev, [field]: value }));
+  const handleExtraStopAddressChange = (value: string) => {
+    setEditExtraStopAddress(value);
   };
 
   const handleSaveBookingEdit = async (e?: React.FormEvent, sendPassengerEmail = true) => {
     if (e) e.preventDefault();
     setSavingEdit(true);
     try {
-      const extraStopValue = formatAddress(editExtraStopAddress);
+      const extraStopValue = String(editExtraStopAddress || '').trim();
       const notesComposed = composeBookingNotes({
         baseNotes: editForm.notes,
         flightNumber: editDirection === 'from_airport' ? editFlightNumber : '',
@@ -635,7 +629,16 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             ? {
                 ...b,
                 ...payload,
-                payment_method: editPaymentMethod === 'cash' ? 'Bar' : editPaymentMethod === 'card' ? 'Kreditkarte' : b.payment_method,
+                payment_method:
+                  editPaymentMethod === 'cash'
+                    ? 'Bar'
+                    : editPaymentMethod === 'card'
+                      ? 'Kreditkarte'
+                      : editPaymentMethod === 'voucher'
+                        ? 'Lieferschein'
+                        : editPaymentMethod === 'free'
+                          ? 'Gratis'
+                          : b.payment_method,
               }
             : b
         )
@@ -653,9 +656,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     <UnderlineTabNav
       className="hidden md:flex items-center"
       items={[
-        { id: 'rides', label: 'Fahrten', icon: <Car size={18} /> },
-        { id: 'drivers', label: 'Fahrer', icon: <Users size={18} /> },
-        { id: 'stats', label: 'Statistik', icon: <BarChart3 size={18} /> },
+        { id: 'rides', label: '', icon: <Car size={18} /> },
+        { id: 'drivers', label: '', icon: <Users size={18} /> },
+        { id: 'stats', label: '', icon: <BarChart3 size={18} /> },
       ]}
       activeTab={currentTab}
       onChange={handleTabChange}
@@ -696,15 +699,19 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     <div className="flex items-center gap-2 bg-[#f5f5f7] p-1 rounded-[12px] shrink-0">
       <button
         onClick={() => setViewMode('grid')}
-        className={`px-3 py-1.5 text-[13px] font-medium rounded-[8px] transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b]'}`}
+        aria-label="Kacheln Ansicht"
+        title="Kacheln"
+        className={`inline-flex h-9 w-9 items-center justify-center rounded-[8px] transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b]'}`}
       >
-        Kacheln
+        <LayoutGrid size={16} />
       </button>
       <button
         onClick={() => setViewMode('table')}
-        className={`px-3 py-1.5 text-[13px] font-medium rounded-[8px] transition-all ${viewMode === 'table' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b]'}`}
+        aria-label="Tabellen Ansicht"
+        title="Tabelle"
+        className={`inline-flex h-9 w-9 items-center justify-center rounded-[8px] transition-all ${viewMode === 'table' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b]'}`}
       >
-        Tabelle
+        <Rows3 size={16} />
       </button>
     </div>
   );
@@ -768,7 +775,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     </div>
                     <div className="min-w-0 flex-1 space-y-2.5">
                       <div className="flex items-start gap-2">
-                        <p className="text-[22px] font-semibold text-[#081a42] leading-snug line-clamp-2">
+                        <p className="text-[18px] font-semibold text-[#081a42] leading-snug line-clamp-2 md:text-[19px]">
                           {formatRideLocation(booking, booking.pickup, 'pickup')}
                         </p>
                         {!isAirportLocation(booking.pickup) ? (
@@ -784,7 +791,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         ) : null}
                       </div>
                       <div className="flex items-start gap-2">
-                        <p className="text-[22px] font-semibold text-[#000000] leading-snug line-clamp-2">
+                        <p className="text-[18px] font-semibold text-[#000000] leading-snug line-clamp-2 md:text-[19px]">
                           {formatRideLocation(booking, booking.destination, 'destination')}
                         </p>
                         {!isAirportLocation(booking.destination) ? (
@@ -812,12 +819,12 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   })()}
                 </div>
 
-                <div className={`space-y-3 lg:pl-8 lg:-mt-3 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
+                <div className={`space-y-4 lg:pl-8 lg:-mt-3 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                   <h3 className="font-semibold text-[#000000] text-[19px] flex items-center gap-2">
                     {booking.full_name}
                     {passengerCounts[booking.email] >= 5 && <Star size={15} className="text-yellow-400 fill-yellow-400" />}
                   </h3>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[#000000] text-[14px]">
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-[#000000] text-[14px]">
                     <div className="flex items-center gap-2 min-w-0">
                       <a
                         href={getTelHref(booking.phone)}
@@ -874,15 +881,15 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                   </div>
                 </div>
 
-                <div className="flex h-full flex-col gap-3">
+                <div className="flex h-full flex-col gap-4">
                   <div className={`flex flex-col items-end gap-2 w-full sm:flex-row sm:items-center sm:justify-end ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                     <button
                       type="button"
                       onClick={() => openEditBooking(booking)}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[12px] font-medium hover:bg-[#f5f5f7] transition-colors lg:absolute lg:top-5 lg:right-5 z-10"
+                      aria-label="Buchung bearbeiten"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#eef5ff] hover:text-[#0a63ff] lg:absolute lg:top-5 lg:right-5 z-10"
                     >
-                      <Edit size={12} />
-                      Bearbeiten
+                      <Edit size={16} />
                     </button>
                     <div className="text-right text-[30px] font-semibold text-[#081a42] leading-none sm:ml-auto">
                       {formatPriceDisplay(booking.price)}
@@ -901,7 +908,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       <option key={d.id} value={d.id}>{d.name}</option>
                     ))}
                   </select>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="mt-1 grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={async () => {
@@ -911,7 +918,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                         await confirmAndSendToDriver(booking.id, driverId);
                       }}
                       disabled={!getSelectedDriverId(booking) || isCancelledBooking(booking.status)}
-                      className={`w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[#0b1a44] text-white font-medium text-[12px] hover:bg-[#14265d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}
+                      className={`w-full ${adminPrimaryButtonClass} px-3 py-2 text-[0.85rem] ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}
                     >
                       <Send size={12} />
                       Senden
@@ -924,7 +931,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           handleStatusChange(booking.id, 'pending');
                         }
                       }}
-                      className="w-full inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-full bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff] font-medium text-[12px] hover:bg-[linear-gradient(135deg,rgba(10,99,255,0.16)_0%,rgba(36,144,255,0.22)_100%)] transition-colors"
+                      className={`w-full ${adminSecondaryButtonClass} px-3 py-2 text-[0.85rem] shadow-none`}
                     >
                       <CheckCircle size={12} />
                       Aktivieren
@@ -933,11 +940,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       <button
                         type="button"
                         onClick={() => {
-                          if (confirm('Diese Fahrt jetzt stornieren?')) {
-                            handleStatusChange(booking.id, 'cancelled');
-                          }
-                        }}
-                        className="w-full px-2.5 py-1.5 rounded-full bg-[#f2e9eb] text-[#d70015] font-medium text-[12px] hover:bg-[#ecdee1] transition-colors"
+                        if (confirm('Diese Fahrt jetzt stornieren?')) {
+                          handleStatusChange(booking.id, 'cancelled');
+                        }
+                      }}
+                        className={`w-full ${adminDangerButtonClass} px-3 py-2 text-[0.85rem]`}
                       >
                         Stornieren
                       </button>
@@ -1220,7 +1227,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               <label className="block text-[13px] font-medium text-[#1d1d1f] mb-2">Telefonnummer</label>
               <input type="tel" name="phone" className="w-full p-3 border border-[#d2d2d7] rounded-[12px] text-[15px] focus:ring-2 focus:ring-[#0071e3] outline-none text-[#1d1d1f] transition-all" placeholder="+43 664 1234567" />
             </div>
-            <button type="submit" className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium py-3 rounded-full transition-all text-[15px] mt-4 shadow-sm hover:shadow-md active:scale-[0.98]">
+            <button type="submit" className={`mt-4 w-full ${adminPrimaryButtonClass}`}>
               Fahrer speichern
             </button>
           </form>
@@ -1284,13 +1291,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center bg-white p-4 rounded-[18px] border border-[#d2d2d7] shadow-sm">
+        <div className="bg-white p-4 rounded-[18px] border border-[#d2d2d7] shadow-sm">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h2 className="font-semibold text-[#1d1d1f] text-[17px]">Leistungsübersicht</h2>
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:flex lg:items-center">
             <select
               value={statsDriverFilter}
               onChange={(e) => setStatsDriverFilter(e.target.value)}
-              className="border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3]"
+              className="w-full border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3]"
             >
               <option value="all">Alle Fahrer</option>
               {availableDriverNames.map((name) => (
@@ -1300,7 +1308,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             <select 
               value={statsPaymentFilter}
               onChange={(e) => setStatsPaymentFilter(e.target.value as 'all' | 'cash' | 'card')}
-              className="border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3]"
+              className="w-full border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3]"
             >
               <option value="all">Alle Zahlungen</option>
               <option value="cash">Nur Bar</option>
@@ -1309,13 +1317,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             <select 
               value={statsRange}
               onChange={(e) => setStatsRange(e.target.value)}
-              className="border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3]"
+              className="w-full border border-[#d2d2d7] rounded-[12px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0071e3] sm:col-span-2 lg:col-span-1"
             >
               <option value="today">Heute</option>
               <option value="7">Letzte 7 Tage</option>
               <option value="30">Letzte 30 Tage</option>
               <option value="90">Letzte 90 Tage</option>
             </select>
+          </div>
           </div>
         </div>
 
@@ -1399,55 +1408,69 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 <button
                   type="button"
                   onClick={() => setMobileTabsOpen((prev) => !prev)}
-                  className="inline-flex items-center justify-center w-11 h-11 rounded-[12px] border border-[#d2d2d7] bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+                  className="inline-flex items-center justify-center w-11 h-11 rounded-[14px] border border-[#dbe7f8] bg-white text-[#1d1d1f] shadow-[0_10px_24px_rgba(17,17,17,0.04)] hover:bg-[#f8fbff] transition-colors"
                   aria-label="Navigationsmenü öffnen"
                 >
                   <Menu size={17} />
                 </button>
                 {mobileTabsOpen ? (
-                  <div className="absolute right-0 top-[52px] z-20 w-60 rounded-[14px] border border-[#d2d2d7] bg-white shadow-lg overflow-hidden">
+                  <div className="absolute right-0 top-[56px] z-20 w-64 overflow-hidden rounded-[1.4rem] border border-[#dbe7f8] bg-white shadow-[0_18px_45px_rgba(17,17,17,0.10)]">
+                    <div className="p-2">
                     <button
                       type="button"
                       onClick={() => handleTabChange('rides')}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
-                        currentTab === 'rides' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                      className={`w-full flex items-center justify-center rounded-[1rem] px-4 py-3 text-[15px] font-medium transition-colors ${
+                        currentTab === 'rides'
+                          ? 'bg-[#eef5ff] text-[#1679ff]'
+                          : 'text-[#1d1d1f] hover:bg-[#f8fbff]'
                       }`}
+                      aria-label="Fahrten"
                     >
-                      <Car size={16} /> Fahrten
+                      <Car size={16} />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleTabChange('drivers')}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
-                        currentTab === 'drivers' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                      className={`mt-1 w-full flex items-center justify-center rounded-[1rem] px-4 py-3 text-[15px] font-medium transition-colors ${
+                        currentTab === 'drivers'
+                          ? 'bg-[#eef5ff] text-[#1679ff]'
+                          : 'text-[#1d1d1f] hover:bg-[#f8fbff]'
                       }`}
+                      aria-label="Fahrer"
                     >
-                      <Users size={16} /> Fahrer
+                      <Users size={16} />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleTabChange('stats')}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left ${
-                        currentTab === 'stats' ? 'bg-[#e8f2ff] text-[#0071e3]' : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                      className={`mt-1 w-full flex items-center justify-center rounded-[1rem] px-4 py-3 text-[15px] font-medium transition-colors ${
+                        currentTab === 'stats'
+                          ? 'bg-[#eef5ff] text-[#1679ff]'
+                          : 'text-[#1d1d1f] hover:bg-[#f8fbff]'
                       }`}
+                      aria-label="Statistik"
                     >
-                      <BarChart3 size={16} /> Statistik
+                      <BarChart3 size={16} />
                     </button>
+                    </div>
+                    <div className="border-t border-[#edf2f7] p-2">
                     <form action="/auth/logout" method="post">
                       <button
                         type="submit"
-                        className="w-full flex items-center gap-3 px-4 py-3 text-[15px] text-left text-[#1d1d1f] hover:bg-[#f5f5f7]"
+                        className="w-full justify-start text-left inline-flex items-center gap-2 px-4 py-3 text-[0.95rem] font-medium text-[#1679ff] transition-colors hover:text-[#0a63ff]"
                       >
-                        <XCircle size={16} /> Abmelden
+                        <LogOut size={16} /> Abmelden
                       </button>
                     </form>
+                    </div>
                   </div>
                 ) : null}
               </div>
               {renderDesktopTabs()}
               <span className="text-[13px] text-[#86868b] hidden sm:block">{userEmail}</span>
               <form action="/auth/logout" method="post" className="hidden md:block">
-                <button className="text-[13px] font-medium text-[#1d1d1f] hover:text-[#0071e3] px-3 py-2 rounded-[8px] hover:bg-[#f5f5f7] transition-colors">
+                <button className="inline-flex items-center gap-2 text-[0.95rem] font-medium text-[#1679ff] transition-colors hover:text-[#0a63ff]">
+                  <LogOut size={16} />
                   Abmelden
                 </button>
               </form>
@@ -1470,55 +1493,56 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             onSubmit={(e) => handleSaveBookingEdit(e, true)}
             className={`w-full max-w-[700px] ${BOOKING_FORM_CARD_CLASS} shadow-xl relative overflow-hidden max-h-[90vh] overflow-y-auto`}
           >
-            <div className="p-2 md:p-8 space-y-8">
+            <div className="rounded-[1.9rem] border border-[#e9edf3] bg-white p-4 md:p-8 space-y-8 shadow-[0_18px_54px_rgba(17,17,17,0.12)]">
               <div className="text-center mb-4">
-                <h2 className="text-[32px] font-semibold text-[#1d1d1f] leading-tight mb-2">Fahrt bearbeiten</h2>
-                <p className="text-[17px] text-[#86868b]">Bitte prüfen und aktualisieren Sie die Buchungsdaten.</p>
+                <h2 className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] leading-tight mb-2">Fahrt bearbeiten</h2>
+                <p className="text-[1rem] text-[#6a7d96]">Bitte pruefen und aktualisieren Sie die Buchungsdaten.</p>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-[#f5f5f7] rounded-xl">
-                <div className="text-[#1d1d1f]">
-                  <p className="text-[12px] font-medium uppercase tracking-wide text-[#86868b]">Buchung</p>
-                  <p className="text-[15px] font-semibold">{editForm.id?.slice(0, 8)}</p>
+              <div className={`flex items-center justify-between ${adminEditMetaCardClass}`}>
+                <div className="text-[#111827]">
+                  <p className={adminEditSectionLabelClass}>Buchung</p>
+                  <p className="mt-2 text-[0.98rem] font-semibold">{editForm.id?.slice(0, 8)}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setEditingBooking(null)}
-                  className="w-10 h-10 rounded-full bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[13px] font-medium hover:bg-[#f5f5f7] transition-colors"
+                  className={adminIconCloseButtonClass}
+                  aria-label="Bearbeitungsfenster schliessen"
                 >
-                  X
+                  <X size={14} strokeWidth={2.25} className="translate-y-[1px]" />
                 </button>
               </div>
 
               <div className="space-y-4">
-                <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1">Fahrt</p>
+                <p className={adminEditSectionLabelClass}>Fahrt</p>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       type="button"
                       onClick={() => handleEditDirectionChange('to_airport')}
-                      className={`flex flex-col items-center justify-center gap-3 py-6 rounded-2xl border transition-all duration-200 ${
+                      className={`${adminEditChoiceCardBaseClass} ${
                         editDirection === 'to_airport'
-                          ? 'border-[#0071e3] ring-1 ring-[#0071e3] bg-[#f2fcfc]'
-                          : 'border-[#d2d2d7] hover:border-[#86868b] bg-white'
+                          ? 'border-[#1679ff] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)]'
+                          : 'border-[#e9edf3] text-[#111827] hover:border-[#cfd7e3]'
                       }`}
                     >
-                      <PlaneTakeoff size={24} className={editDirection === 'to_airport' ? 'text-[#0071e3]' : 'text-[#86868b]'} />
-                      <span className={`text-[14px] font-medium ${editDirection === 'to_airport' ? 'text-[#0071e3]' : 'text-[#1d1d1f]'}`}>
+                      <PlaneTakeoff size={24} className={editDirection === 'to_airport' ? 'text-[#1679ff]' : 'text-[#7b8798]'} />
+                      <span className={`text-[0.95rem] font-medium ${editDirection === 'to_airport' ? 'text-[#1679ff]' : 'text-[#111827]'}`}>
                         Zum Flughafen
                       </span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleEditDirectionChange('from_airport')}
-                      className={`flex flex-col items-center justify-center gap-3 py-6 rounded-2xl border transition-all duration-200 ${
+                      className={`${adminEditChoiceCardBaseClass} ${
                         editDirection === 'from_airport'
-                          ? 'border-[#0071e3] ring-1 ring-[#0071e3] bg-[#f2fcfc]'
-                          : 'border-[#d2d2d7] hover:border-[#86868b] bg-white'
+                          ? 'border-[#1679ff] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)]'
+                          : 'border-[#e9edf3] text-[#111827] hover:border-[#cfd7e3]'
                       }`}
                     >
-                      <PlaneLanding size={24} className={editDirection === 'from_airport' ? 'text-[#0071e3]' : 'text-[#86868b]'} />
-                      <span className={`text-[14px] font-medium ${editDirection === 'from_airport' ? 'text-[#0071e3]' : 'text-[#1d1d1f]'}`}>
+                      <PlaneLanding size={24} className={editDirection === 'from_airport' ? 'text-[#1679ff]' : 'text-[#7b8798]'} />
+                      <span className={`text-[0.95rem] font-medium ${editDirection === 'from_airport' ? 'text-[#1679ff]' : 'text-[#111827]'}`}>
                         Vom Flughafen
                       </span>
                     </button>
@@ -1533,44 +1557,13 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                           onChange={(e) => setEditFlightNumber(e.target.value)}
                         />
                       )}
-                      <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1">ADRESSE</p>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="col-span-2 relative">
-                          <select
-                            className="w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none appearance-none transition-all border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]"
-                            value={editAddress.city}
-                            onChange={(e) => handleEditAddressChange('city', e.target.value)}
-                          >
-                            <option value="Wien">Wien</option>
-                            <option value="Schwechat">Schwechat</option>
-                          </select>
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#86868b]">
-                            <ChevronDown size={16} />
-                          </div>
-                        </div>
-                        <input
-                          className={BOOKING_FORM_INPUT_CLASS}
-                          placeholder="PLZ"
-                          value={editAddress.zip}
-                          onChange={(e) => handleEditAddressChange('zip', e.target.value)}
-                        />
-                      </div>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="col-span-2">
-                          <input
-                            className={BOOKING_FORM_INPUT_CLASS}
-                            placeholder="Straße"
-                            value={editAddress.street}
-                            onChange={(e) => handleEditAddressChange('street', e.target.value)}
-                          />
-                        </div>
-                        <input
-                          className={BOOKING_FORM_INPUT_CLASS}
-                          placeholder="Nr."
-                          value={editAddress.houseNumber}
-                          onChange={(e) => handleEditAddressChange('houseNumber', e.target.value)}
-                        />
-                      </div>
+                      <p className={adminEditSectionLabelClass}>Adresse</p>
+                      <input
+                        className={BOOKING_FORM_INPUT_CLASS}
+                        placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                        value={editAddress}
+                        onChange={(e) => handleEditAddressChange(e.target.value)}
+                      />
                     </div>
                   ) : (
                     <>
@@ -1579,10 +1572,10 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     </>
                   )}
 
-                  <div className="flex items-center justify-between p-4 bg-[#f5f5f7] rounded-xl">
-                    <div className="text-[#1d1d1f]">
-                      <p className="font-medium text-[15px]">Zusätzlicher Stopp?</p>
-                      <p className="text-[13px] text-[#86868b]">+10 € Aufpreis</p>
+                  <div className={`flex items-center justify-between ${adminEditMetaCardClass}`}>
+                    <div className="text-[#111827]">
+                      <p className="text-[0.98rem] font-medium">Zusaetzlicher Stopp?</p>
+                      <p className="text-[0.85rem] text-[#6a7d96]">+10 EUR Aufpreis</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -1597,50 +1590,19 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
                   {editExtraStop && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1">ADRESSE ZWISCHENSTOPP</p>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="col-span-2 relative">
-                          <select
-                            className="w-full p-3 rounded-xl bg-white border text-[#1d1d1f] text-[17px] outline-none appearance-none transition-all border-[#d2d2d7] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]"
-                            value={editExtraStopAddress.city}
-                            onChange={(e) => handleExtraStopAddressChange('city', e.target.value)}
-                          >
-                            <option value="Wien">Wien</option>
-                            <option value="Schwechat">Schwechat</option>
-                          </select>
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#86868b]">
-                            <ChevronDown size={16} />
-                          </div>
-                        </div>
-                        <input
-                          className={BOOKING_FORM_INPUT_CLASS}
-                          placeholder="PLZ"
-                          value={editExtraStopAddress.zip}
-                          onChange={(e) => handleExtraStopAddressChange('zip', e.target.value)}
-                        />
-                      </div>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="col-span-2">
-                          <input
-                            className={BOOKING_FORM_INPUT_CLASS}
-                            placeholder="Straße"
-                            value={editExtraStopAddress.street}
-                            onChange={(e) => handleExtraStopAddressChange('street', e.target.value)}
-                          />
-                        </div>
-                        <input
-                          className={BOOKING_FORM_INPUT_CLASS}
-                          placeholder="Nr."
-                          value={editExtraStopAddress.houseNumber}
-                          onChange={(e) => handleExtraStopAddressChange('houseNumber', e.target.value)}
-                        />
-                      </div>
+                      <p className={adminEditSectionLabelClass}>Adresse Zwischenstopp</p>
+                      <input
+                        className={BOOKING_FORM_INPUT_CLASS}
+                        placeholder="Zusatzadresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                        value={editExtraStopAddress}
+                        onChange={(e) => handleExtraStopAddressChange(e.target.value)}
+                      />
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[12px] font-medium uppercase tracking-wide text-[#86868b] mb-2 ml-1">DATUM</label>
+                      <label className={`block mb-2 ${adminEditSectionLabelClass}`}>Datum</label>
                       <div className="relative" onClick={() => setIsEditDatePickerOpen(true)}>
                         <input
                           type="text"
@@ -1653,7 +1615,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[12px] font-medium uppercase tracking-wide text-[#86868b] mb-2 ml-1">ZEIT</label>
+                      <label className={`block mb-2 ${adminEditSectionLabelClass}`}>Zeit</label>
                       <div className="relative" onClick={() => setIsEditTimePickerOpen(true)}>
                         <input
                           type="text"
@@ -1683,7 +1645,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <select
-                      className={`${BOOKING_FORM_INPUT_CLASS} appearance-none`}
+                      className={adminEditSelectClass}
                       value={editForm.vehicle_type || 'Limo'}
                       onChange={(e) => setEditForm((p: any) => ({ ...p, vehicle_type: e.target.value }))}
                     >
@@ -1697,10 +1659,10 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               </div>
 
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-[#f5f5f7] p-5 rounded-2xl flex flex-col items-center justify-center gap-2">
-                  <span className="text-[13px] font-medium text-[#86868b] uppercase">Personen</span>
+                <div className={`${adminEditMetricCardClass} flex flex-col items-center justify-center gap-2`}>
+                  <span className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">Personen</span>
                   <select
-                    className="w-full bg-transparent font-semibold text-[24px] text-[#1d1d1f] outline-none text-center appearance-none"
+                    className={adminEditMetricSelectClass}
                     value={editForm.passengers}
                     onChange={(e) => setEditForm((p: any) => ({ ...p, passengers: Number(e.target.value) }))}
                   >
@@ -1709,10 +1671,10 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     ))}
                   </select>
                 </div>
-                <div className="bg-[#f5f5f7] p-5 rounded-2xl flex flex-col items-center justify-center gap-2">
-                  <span className="text-[13px] font-medium text-[#86868b] uppercase">Koffer</span>
+                <div className={`${adminEditMetricCardClass} flex flex-col items-center justify-center gap-2`}>
+                  <span className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">Koffer</span>
                   <select
-                    className="w-full bg-transparent font-semibold text-[24px] text-[#1d1d1f] outline-none text-center appearance-none"
+                    className={adminEditMetricSelectClass}
                     value={editForm.luggage}
                     onChange={(e) => setEditForm((p: any) => ({ ...p, luggage: Number(e.target.value) }))}
                   >
@@ -1721,10 +1683,10 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     ))}
                   </select>
                 </div>
-                <div className="bg-[#f5f5f7] p-5 rounded-2xl flex flex-col items-center justify-center gap-2">
-                  <span className="text-[13px] font-medium text-[#86868b] uppercase">Handgepäck</span>
+                <div className={`${adminEditMetricCardClass} flex flex-col items-center justify-center gap-2`}>
+                  <span className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">Handgepaeck</span>
                   <select
-                    className="w-full bg-transparent font-semibold text-[24px] text-[#1d1d1f] outline-none text-center appearance-none"
+                    className={adminEditMetricSelectClass}
                     value={editHandLuggage}
                     onChange={(e) => setEditHandLuggage(Number(e.target.value))}
                   >
@@ -1735,11 +1697,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4 p-5 bg-[#f5f5f7] rounded-xl">
+              <div className={`flex flex-col gap-4 ${adminEditMetaCardClass}`}>
                 <div className="flex items-center justify-between">
-                  <div className="text-[#1d1d1f]">
-                    <p className="font-medium text-[15px]">Kindersitz benötigt?</p>
-                    <p className="text-[13px] text-[#86868b]">Kostenlos inklusive</p>
+                  <div className="text-[#111827]">
+                    <p className="text-[0.98rem] font-medium">Kindersitz benoetigt?</p>
+                    <p className="text-[0.85rem] text-[#6a7d96]">Kostenlos inklusive</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -1753,14 +1715,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 </div>
 
                 {editChildSeat && (
-                  <div className="grid grid-cols-3 gap-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#d2d2d7]/30">
+                  <div className="grid grid-cols-3 gap-3 pt-3 animate-in fade-in slide-in-from-top-2 duration-300 border-t border-[#dbe7f8]">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-medium text-[#86868b] uppercase">Babyschale</label>
+                      <label className="text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-[#1679ff]">Babyschale</label>
                       <div className="relative">
                         <select
                           value={editBabySeats}
                           onChange={(e) => setEditBabySeats(Number(e.target.value))}
-                          className="w-full p-2 rounded-lg bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[15px] outline-none appearance-none"
+                          className="ui-input appearance-none py-2 pr-8"
                         >
                           {[0, 1, 2, 3].map((n) => (
                             <option key={n} value={n}>{n}</option>
@@ -1772,12 +1734,12 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       </div>
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-medium text-[#86868b] uppercase">Kindersitz</label>
+                      <label className="text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-[#1679ff]">Kindersitz</label>
                       <div className="relative">
                         <select
                           value={editChildSeats}
                           onChange={(e) => setEditChildSeats(Number(e.target.value))}
-                          className="w-full p-2 rounded-lg bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[15px] outline-none appearance-none"
+                          className="ui-input appearance-none py-2 pr-8"
                         >
                           {[0, 1, 2, 3].map((n) => (
                             <option key={n} value={n}>{n}</option>
@@ -1789,12 +1751,12 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       </div>
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-medium text-[#86868b] uppercase">Sitzerhöhung</label>
+                      <label className="text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-[#1679ff]">Sitzerhoehung</label>
                       <div className="relative">
                         <select
                           value={editBoosterSeats}
                           onChange={(e) => setEditBoosterSeats(Number(e.target.value))}
-                          className="w-full p-2 rounded-lg bg-white border border-[#d2d2d7] text-[#1d1d1f] text-[15px] outline-none appearance-none"
+                          className="ui-input appearance-none py-2 pr-8"
                         >
                           {[0, 1, 2, 3].map((n) => (
                             <option key={n} value={n}>{n}</option>
@@ -1810,7 +1772,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               </div>
 
               <div className="space-y-4">
-                <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1">Kunde</p>
+                <p className={adminEditSectionLabelClass}>Kunde</p>
                 <div className="space-y-4">
                   <input className={BOOKING_FORM_INPUT_CLASS} placeholder="Vollständiger Name" value={editForm.full_name} onChange={(e) => setEditForm((p: any) => ({ ...p, full_name: e.target.value }))} />
                   <input className={BOOKING_FORM_INPUT_CLASS} placeholder="Telefonnummer" value={editForm.phone} onChange={(e) => setEditForm((p: any) => ({ ...p, phone: e.target.value }))} />
@@ -1819,35 +1781,31 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               </div>
 
               <div className="space-y-3">
-                <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1">ZAHLUNG</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setEditPaymentMethod('cash')}
-                    className={`w-full py-4 rounded-2xl border text-[16px] font-medium transition-all ${
-                      editPaymentMethod === 'cash'
-                        ? 'border-[#0a63ff] ring-1 ring-[#0a63ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]'
-                        : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
-                    }`}
+                <p className={adminEditSectionLabelClass}>Zahlung</p>
+                <div className="relative">
+                  <select
+                    value={editPaymentMethod || ''}
+                    onChange={(e) =>
+                      setEditPaymentMethod(
+                        e.target.value ? (e.target.value as 'cash' | 'card' | 'voucher' | 'free') : null,
+                      )
+                    }
+                    className={adminEditSelectClass}
                   >
-                    Barzahlung
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditPaymentMethod('card')}
-                    className={`w-full py-4 rounded-2xl border text-[16px] font-medium transition-all ${
-                      editPaymentMethod === 'card'
-                        ? 'border-[#0071e3] ring-1 ring-[#0071e3] bg-[#f2fcfc] text-[#0071e3]'
-                        : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
-                    }`}
-                  >
-                    Kreditkarte
-                  </button>
+                    <option value="">Zahlungsart waehlen</option>
+                    <option value="cash">Barzahlung</option>
+                    <option value="card">Kreditkarte</option>
+                    <option value="voucher">Lieferschein</option>
+                    <option value="free">Gratis</option>
+                  </select>
+                  <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">
+                    <ChevronDown size={16} />
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide ml-1">Notiz</p>
+                <p className={adminEditSectionLabelClass}>Notiz</p>
                 <textarea className={`${BOOKING_FORM_INPUT_CLASS} min-h-[90px]`} placeholder="Notizen" value={editForm.notes} onChange={(e) => setEditForm((p: any) => ({ ...p, notes: e.target.value }))} />
               </div>
 
@@ -1855,22 +1813,23 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                 <button
                   type="button"
                   onClick={() => setEditingBooking(null)}
-                  className="w-14 h-14 rounded-full bg-[#f5f5f7] flex items-center justify-center text-[#1d1d1f] hover:bg-[#e8e8ed] transition-colors"
+                  className={adminIconCloseButtonClass}
+                  aria-label="Bearbeiten schliessen"
                 >
-                  X
+                  <X size={14} strokeWidth={2.25} className="translate-y-[1px]" />
                 </button>
                 <button
                   type="button"
                   disabled={savingEdit}
                   onClick={() => handleSaveBookingEdit(undefined, false)}
-                  className="flex-1 bg-white border border-[#d2d2d7] hover:bg-[#f5f5f7] text-[#1d1d1f] font-medium text-[15px] py-2.5 rounded-[14px] flex items-center justify-center transition-all disabled:opacity-50"
+                  className={`flex-1 ${adminSecondaryButtonClass}`}
                 >
                   {savingEdit ? 'Speichern...' : 'Nur speichern'}
                 </button>
                 <button
                   type="submit"
                   disabled={savingEdit}
-                  className="flex-1 bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-[15px] py-2.5 rounded-[14px] flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                  className={`flex-1 ${adminPrimaryButtonClass}`}
                 >
                   {savingEdit ? 'Speichern...' : 'Speichern & senden'}
                 </button>

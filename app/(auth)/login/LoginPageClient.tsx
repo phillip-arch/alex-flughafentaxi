@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import {
   ArrowRight,
   ChevronLeft,
@@ -13,18 +13,33 @@ import {
 import { login, signup } from '../actions';
 
 type LoginPageClientProps = {
+  accountDeleted: boolean;
   initialIsLogin: boolean;
 };
 
-export default function LoginPageClient({ initialIsLogin }: LoginPageClientProps) {
+export default function LoginPageClient({ initialIsLogin, accountDeleted }: LoginPageClientProps) {
   const [isLogin, setIsLogin] = useState(initialIsLogin);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAccountDeletedNotice, setShowAccountDeletedNotice] = useState(accountDeleted);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = async (formData: FormData) => {
+  const passwordsMismatch =
+    !isLogin && confirmPassword.length > 0 && password !== confirmPassword;
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setLoading(true);
     setError(null);
 
+    if (!isLogin && password !== confirmPassword) {
+      setError('Die Passwoerter stimmen nicht ueberein.');
+      setLoading(false);
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
     const action = isLogin ? login : signup;
     const result = await action(formData);
 
@@ -64,7 +79,13 @@ export default function LoginPageClient({ initialIsLogin }: LoginPageClientProps
               </div>
             ) : null}
 
-            <form action={handleSubmit} className="mt-6 space-y-4">
+            {isLogin && showAccountDeletedNotice ? (
+              <div className="mt-6 rounded-[1rem] border border-[#dbe7f8] bg-[#eef5ff] px-4 py-3 text-[0.92rem] font-medium text-[#0a63ff]">
+                Ihr Konto wurde geloescht. Ihre Anmeldedaten und Favoriten wurden entfernt.
+              </div>
+            ) : null}
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <fieldset
                 disabled={loading}
                 className={`space-y-4 transition-opacity duration-200 ${
@@ -117,16 +138,50 @@ export default function LoginPageClient({ initialIsLogin }: LoginPageClientProps
                     <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
                       <Lock size={15} />
                     </span>
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Passwort"
-                      required
-                      minLength={6}
-                      className="ui-input !pl-[3.2rem]"
-                    />
-                  </div>
-                </label>
+                      <input
+                        type="password"
+                        name="password"
+                        placeholder="Passwort"
+                        required
+                        minLength={6}
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        className="ui-input !pl-[3.2rem]"
+                      />
+                    </div>
+                  </label>
+
+                {!isLogin ? (
+                  <label className="block">
+                    <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                      Passwort bestaetigen
+                    </span>
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                        <Lock size={15} />
+                      </span>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Passwort bestaetigen"
+                        required={!isLogin}
+                        minLength={6}
+                        value={confirmPassword}
+                        onChange={(event) => setConfirmPassword(event.target.value)}
+                        className={`ui-input !pl-[3.2rem] ${
+                          passwordsMismatch
+                            ? '!border-[var(--color-danger)] !bg-[var(--color-danger-soft)]'
+                            : ''
+                        }`}
+                      />
+                    </div>
+                    {passwordsMismatch ? (
+                      <p className="mt-2 text-[0.82rem] font-medium text-[var(--color-danger)]">
+                        Die Passwoerter stimmen nicht ueberein.
+                      </p>
+                    ) : null}
+                  </label>
+                ) : null}
 
                 {isLogin ? (
                   <div className="text-right">
@@ -176,6 +231,9 @@ export default function LoginPageClient({ initialIsLogin }: LoginPageClientProps
                   onClick={() => {
                     setIsLogin((current) => !current);
                     setError(null);
+                    setShowAccountDeletedNotice(false);
+                    setPassword('');
+                    setConfirmPassword('');
                   }}
                   className="ml-2 font-semibold text-[var(--color-booking-accent)] transition-colors hover:text-[#0f6ae8]"
                 >

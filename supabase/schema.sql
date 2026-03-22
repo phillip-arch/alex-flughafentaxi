@@ -27,9 +27,10 @@ create table public.drivers (
 create table public.bookings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete set null, -- Nullable for guest bookings
+  booking_reference text unique,
   full_name text not null,
-  email text not null,
-  phone text not null,
+  email text,
+  phone text,
   pickup text not null,
   destination text not null,
   flight_number text,
@@ -39,6 +40,8 @@ create table public.bookings (
   confirm_token uuid, -- Secure random token for driver confirmation
   confirm_token_used_at timestamptz,
   confirm_token_expires_at timestamptz,
+  payment_method text,
+  ip_address text,
   notes text,
   price numeric, -- Added price field
   vehicle_type text, -- Added vehicle type
@@ -81,6 +84,24 @@ create table public.audit_logs (
   meta jsonb,
   created_at timestamptz default now()
 );
+
+-- AUTH RATE LIMITS (Service role only)
+create table public.auth_rate_limits (
+  id uuid primary key default gen_random_uuid(),
+  ip_address text,
+  email text,
+  action text not null,
+  created_at timestamptz not null default now()
+);
+
+create index auth_rate_limits_action_created_at_idx
+  on public.auth_rate_limits (action, created_at desc);
+
+create index auth_rate_limits_ip_action_created_at_idx
+  on public.auth_rate_limits (ip_address, action, created_at desc);
+
+create index auth_rate_limits_email_action_created_at_idx
+  on public.auth_rate_limits (email, action, created_at desc);
 
 -- 3. Triggers & Functions
 
@@ -135,6 +156,7 @@ alter table public.drivers enable row level security;
 alter table public.reviews enable row level security;
 alter table public.saved_addresses enable row level security;
 alter table public.audit_logs enable row level security;
+alter table public.auth_rate_limits enable row level security;
 
 -- PROFILES Policies
 create policy "read own profile"
@@ -190,5 +212,9 @@ to authenticated
 using (auth.uid() = user_id);
 
 -- DRIVERS & AUDIT LOGS
--- No public/authenticated policies. 
+-- No public/authenticated policies.
 -- These tables are accessible ONLY via the Service Role (Server Actions/API Routes).
+
+-- AUTH RATE LIMITS
+-- No public/authenticated policies.
+-- This table is accessible ONLY via the Service Role.

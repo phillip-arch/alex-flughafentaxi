@@ -77,14 +77,13 @@ async function checkAdmin() {
 
 export async function fetchBookings(date: string) {
   const admin = await checkAdmin();
-  if (admin.error || !admin.supabase) return [];
-  const { supabase } = admin;
+  if (admin.error) return [];
 
   // Date is expected to be YYYY-MM-DD
   const startOfDay = new Date(`${date}T00:00:00.000Z`);
   const endOfDay = new Date(`${date}T23:59:59.999Z`);
 
-  const { data, error: fetchError } = await supabase
+  const { data, error: fetchError } = await supabaseAdmin
     .from('bookings')
     .select(`
       *,
@@ -103,10 +102,9 @@ export async function fetchBookings(date: string) {
 
 export async function fetchDrivers() {
   const admin = await checkAdmin();
-  if (admin.error || !admin.supabase) return [];
-  const { supabase } = admin;
+  if (admin.error) return [];
 
-  const { data, error: fetchError } = await supabase
+  const { data, error: fetchError } = await supabaseAdmin
     .from('drivers')
     .select('*')
     .order('name', { ascending: true });
@@ -121,14 +119,13 @@ export async function fetchDrivers() {
 export async function addDriver(formData: FormData) {
   await requireSameOrigin();
   const admin = await checkAdmin();
-  if (admin.error || !admin.supabase) return { error: admin.error || 'Unauthorized' };
-  const { supabase } = admin;
+  if (admin.error) return { error: admin.error || 'Unauthorized' };
 
   const name = formData.get('name') as string;
   const email = formData.get('email') as string;
   const phone = formData.get('phone') as string;
 
-  const { error: insertError } = await supabase
+  const { error: insertError } = await supabaseAdmin
     .from('drivers')
     .insert([{ name, email, phone }]);
 
@@ -146,10 +143,9 @@ export async function addDriver(formData: FormData) {
 export async function deleteDriver(id: string) {
   await requireSameOrigin();
   const admin = await checkAdmin();
-  if (admin.error || !admin.supabase) return { error: admin.error || 'Unauthorized' };
-  const { supabase } = admin;
+  if (admin.error) return { error: admin.error || 'Unauthorized' };
 
-  const { error: deleteError } = await supabase
+  const { error: deleteError } = await supabaseAdmin
     .from('drivers')
     .delete()
     .eq('id', id);
@@ -558,14 +554,13 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
   try {
     await requireSameOrigin();
     const admin = await checkAdmin();
-    if (admin.error || !admin.supabase) return { error: admin.error || 'Nicht autorisiert' };
-    const { supabase } = admin;
+    if (admin.error) return { error: admin.error || 'Nicht autorisiert' };
 
     if (!bookingId || !driverId) {
       return { error: 'bookingId oder driverId fehlt' };
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from('bookings')
       .update({
         driver_id: driverId,
@@ -767,10 +762,9 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
 
 export async function fetchStats(startDate: string, endDate: string) {
   const admin = await checkAdmin();
-  if (admin.error || !admin.supabase) return [];
-  const { supabase } = admin;
+  if (admin.error) return [];
   
-  const { data, error: fetchError } = await supabase
+  const { data, error: fetchError } = await supabaseAdmin
     .from('bookings')
     .select('*, driver:driver_id(name)')
     .gte('pickup_at', startDate)
@@ -786,10 +780,9 @@ export async function fetchStats(startDate: string, endDate: string) {
 
 export async function fetchPassengerCounts(email: string) {
   const admin = await checkAdmin();
-  if (admin.error || !admin.supabase) return 0;
-  const { supabase } = admin;
+  if (admin.error) return 0;
 
-  const { count, error: countError } = await supabase
+  const { count, error: countError } = await supabaseAdmin
     .from('bookings')
     .select('*', { count: 'exact', head: true })
     .eq('email', email)
@@ -803,13 +796,12 @@ export async function fetchPassengerCounts(email: string) {
 
 export async function fetchPassengerCountsBatch(emails: string[]) {
   const admin = await checkAdmin();
-  if (admin.error || !admin.supabase) return {};
-  const { supabase } = admin;
+  if (admin.error) return {};
 
   const uniqueEmails = Array.from(new Set((emails || []).filter(Boolean)));
   if (uniqueEmails.length === 0) return {};
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('bookings')
     .select('email')
     .in('email', uniqueEmails)

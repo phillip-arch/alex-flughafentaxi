@@ -15,6 +15,15 @@ const AuthSchema = z.object({
   password: z.string().min(6, 'Passwort muss mindestens 6 Zeichen lang sein'),
 });
 
+const SignupSchema = z.object({
+  email: z.string().email('UngÃ¼ltige E-Mail Adresse'),
+  password: z.string().min(6, 'Passwort muss mindestens 6 Zeichen lang sein'),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Die Passwoerter stimmen nicht ueberein.',
+  path: ['confirmPassword'],
+});
+
 const ResetSchema = z.object({
   email: z.string().email('Ungültige E-Mail Adresse'),
 });
@@ -228,16 +237,36 @@ export async function signup(formData: FormData) {
   const rawData = {
     email: formData.get('email'),
     password: formData.get('password'),
+    confirmPassword: formData.get('confirmPassword'),
   };
   const fullName = formData.get('fullName') as string;
 
   // 1. Validate Input
-  const validated = AuthSchema.safeParse(rawData);
+  const validated = SignupSchema.safeParse(rawData);
   if (!validated.success) {
     return { error: validated.error.issues[0]?.message || 'Ungültige Anmeldedaten' };
   }
 
-  const { email, password } = validated.data;
+  const email = validated.data.email.trim().toLowerCase();
+  const { password } = validated.data;
+
+  const { data: existingProfile, error: existingProfileError } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle();
+
+  if (existingProfileError) {
+    console.error('Signup existing profile lookup failed:', existingProfileError);
+    return { error: 'Registrierung konnte gerade nicht geprueft werden. Bitte spaeter erneut versuchen.' };
+  }
+
+  if (existingProfile?.id) {
+    return {
+      error:
+        'Fuer diese E-Mail-Adresse existiert bereits ein Konto. Bitte melden Sie sich an oder nutzen Sie "Passwort vergessen?".',
+    };
+  }
 
   const { data: signUpData, error } = await supabase.auth.signUp({
     email,
@@ -251,7 +280,21 @@ export async function signup(formData: FormData) {
 
   if (error) {
     console.error('Signup error:', error);
+    if (String(error.message || '').toLowerCase().includes('already')) {
+      return {
+        error:
+          'Fuer diese E-Mail-Adresse existiert bereits ein Konto. Bitte melden Sie sich an oder nutzen Sie "Passwort vergessen?".',
+      };
+    }
     return { error: 'Registrierung fehlgeschlagen. Bitte pruefen Sie Ihre Eingaben oder versuchen Sie es spaeter erneut.' };
+  }
+
+  const createdIdentities = ((signUpData?.user as any)?.identities || []) as unknown[];
+  if (signUpData?.user && createdIdentities.length === 0) {
+    return {
+      error:
+        'Fuer diese E-Mail-Adresse existiert bereits ein Konto. Bitte melden Sie sich an oder nutzen Sie "Passwort vergessen?".',
+    };
   }
 
   if (signUpData?.user) {
