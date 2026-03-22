@@ -47,6 +47,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de" className={`${inter.variable} ${archivo.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <link
+          rel="preconnect"
+          href="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com"
+          crossOrigin=""
+        />
+        <link
+          rel="dns-prefetch"
+          href="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com"
+        />
+      </head>
       <body suppressHydrationWarning className="app-shell font-sans antialiased">
         {children}
         <FloatingContactButton />

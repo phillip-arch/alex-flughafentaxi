@@ -54,9 +54,9 @@ export default function Footer() {
           </div>
 
           <div className="rounded-[1.55rem] border border-white/10 bg-white/[0.03] px-6 py-6 text-white">
-            <h4 className="text-[1.55rem] font-semibold tracking-[-0.04em] !text-white">
+            <h3 className="text-[1.55rem] font-semibold tracking-[-0.04em] !text-white">
               Quick Links
-            </h4>
+            </h3>
             <ul className="mt-6 space-y-4">
               <li>
                 <Link href="/preise" className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
@@ -82,9 +82,9 @@ export default function Footer() {
           </div>
 
           <div className="rounded-[1.55rem] border border-white/10 bg-white/[0.03] px-6 py-6 text-white">
-            <h4 className="text-[1.55rem] font-semibold tracking-[-0.04em] !text-white">
+            <h3 className="text-[1.55rem] font-semibold tracking-[-0.04em] !text-white">
               Rechtliches
-            </h4>
+            </h3>
             <ul className="mt-6 space-y-4">
               <li className="text-[1rem] !text-white/62">Impressum</li>
               <li className="text-[1rem] !text-white/62">Datenschutz</li>

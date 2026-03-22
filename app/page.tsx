@@ -244,6 +244,7 @@ export default function Home() {
               alt="Flughafentaxi Wien"
               fill
               priority
+              fetchPriority="high"
               className="object-cover"
               sizes="(min-width: 1024px) 50vw, 100vw"
             />
@@ -542,6 +543,7 @@ export default function Home() {
               <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-[#e9edf3] bg-white">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1331.7548403878466!2d16.56207266809108!3d48.11969249664487!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476c54530fff4bc5%3A0xf4c32d1659fb4805!2sVIE%20Terminal%203%2C%201300%20Schwechat!5e0!3m2!1sen!2sat!4v1774133487794!5m2!1sen!2sat"
+                  title="Google Maps Karte fuer den Abholpunkt am Flughafen Wien"
                   width="600"
                   height="450"
                   style={{ border: 0 }}
