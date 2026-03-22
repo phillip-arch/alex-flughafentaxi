@@ -43,6 +43,7 @@ type AdminRidesPanelProps = {
   getSelectedDriverId: (booking: any) => string;
   getDriverSelectTone: (booking: any) => string;
   confirmAndSendToDriver: (bookingId: string, driverId: string) => Promise<void>;
+  handleUnassignDriver: (bookingId: string) => Promise<boolean>;
   setDriverSelection: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   openEditBooking: (booking: any) => void;
   handleStatusChange: (bookingId: string, status: string) => Promise<void>;
@@ -75,6 +76,7 @@ export default function AdminRidesPanel({
   getSelectedDriverId,
   getDriverSelectTone,
   confirmAndSendToDriver,
+  handleUnassignDriver,
   setDriverSelection,
   openEditBooking,
   handleStatusChange,
@@ -284,7 +286,7 @@ export default function AdminRidesPanel({
                             <CheckCircle size={12} />
                             Aktivieren
                           </button>
-                        ) : (
+                        ) : booking.driver_id ? (
                           <button
                             type="button"
                             onClick={() => {
@@ -295,6 +297,18 @@ export default function AdminRidesPanel({
                             className={`w-full px-3 py-2 text-[0.85rem] ${adminDangerButtonClass}`}
                           >
                             Stornieren
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (confirm('Moechten Sie diese Buchung wieder von allen Fahrern loesen?')) {
+                                await handleUnassignDriver(booking.id);
+                              }
+                            }}
+                            className={`w-full px-3 py-2 text-[0.85rem] ${adminSecondaryButtonClass}`}
+                          >
+                            Entfernen
                           </button>
                         )}
                       </div>

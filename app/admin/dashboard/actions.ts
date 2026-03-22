@@ -760,6 +760,44 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
   }
 }
 
+export async function unassignDriver(bookingId: string) {
+  try {
+    await requireSameOrigin();
+    const admin = await checkAdmin();
+    if (admin.error) return { error: admin.error || 'Nicht autorisiert' };
+    if (!bookingId) return { error: 'bookingId fehlt' };
+
+    const { data, error } = await supabaseAdmin
+      .from('bookings')
+      .update({
+        driver_id: null,
+        confirm_token: null,
+        status: 'pending',
+      })
+      .eq('id', bookingId)
+      .select('id, status')
+      .maybeSingle();
+
+    if (error) {
+      return safeActionError(
+        'Fahrerzuweisung konnte nicht entfernt werden. Bitte erneut versuchen.',
+        'unassignDriver update failed',
+        error,
+      );
+    }
+
+    if (!data) {
+      return { error: 'Buchung nicht gefunden.' };
+    }
+
+    revalidatePath('/admin/dashboard');
+    return { success: true, status: data.status };
+  } catch (error) {
+    console.error('unassignDriver failed:', error);
+    return { error: 'Fahrerzuweisung konnte nicht entfernt werden.' };
+  }
+}
+
 export async function fetchStats(startDate: string, endDate: string) {
   const admin = await checkAdmin();
   if (admin.error) return [];

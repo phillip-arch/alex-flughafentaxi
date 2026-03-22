@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { 
   fetchBookings, fetchDrivers, addDriver, deleteDriver, 
-  updateBookingStatus, updateBookingDetails, assignDriver, fetchStats, fetchPassengerCountsBatch 
+  updateBookingStatus, updateBookingDetails, assignDriver, unassignDriver, fetchStats, fetchPassengerCountsBatch 
 } from './actions';
 import { composeBookingNotes, parseBookingNotes } from '@/lib/booking/notes';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
@@ -400,6 +400,61 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       if (success) {
         alert('Buchung wurde erfolgreich an den Fahrer gesendet.');
       }
+    }
+  };
+
+  const handleUnassignDriver = async (bookingId: string) => {
+    try {
+      const res = await unassignDriver(bookingId);
+      if ((res as any)?.error) {
+        alert(`Fahrerzuweisung konnte nicht entfernt werden: ${(res as any).error}`);
+        return false;
+      }
+
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === bookingId
+            ? {
+                ...b,
+                driver_id: null,
+                confirm_token: null,
+                status: (res as any)?.status || 'pending',
+              }
+            : b,
+        ),
+      );
+      setRidesCache((prev) => {
+        const cached = prev[date];
+        if (!cached) return prev;
+        return {
+          ...prev,
+          [date]: {
+            ...cached,
+            bookings: cached.bookings.map((b) =>
+              b.id === bookingId
+                ? {
+                    ...b,
+                    driver_id: null,
+                    confirm_token: null,
+                    status: (res as any)?.status || 'pending',
+                  }
+                : b,
+            ),
+          },
+        };
+      });
+      setStatsCache({});
+      setDriverSelection((prev) => {
+        if (!(bookingId in prev)) return prev;
+        const next = { ...prev };
+        delete next[bookingId];
+        return next;
+      });
+      return true;
+    } catch (error) {
+      console.error('handleUnassignDriver failed:', error);
+      alert('Fahrerzuweisung konnte nicht entfernt werden: Serverfehler. Bitte erneut versuchen.');
+      return false;
     }
   };
 
@@ -839,6 +894,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               getSelectedDriverId={getSelectedDriverId}
               getDriverSelectTone={getDriverSelectTone}
               confirmAndSendToDriver={confirmAndSendToDriver}
+              handleUnassignDriver={handleUnassignDriver}
               setDriverSelection={setDriverSelection}
               openEditBooking={openEditBooking}
               handleStatusChange={handleStatusChange}

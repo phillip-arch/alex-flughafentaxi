@@ -3,6 +3,7 @@
 import { Calendar, ChevronDown, Clock, PlaneLanding, PlaneTakeoff, X } from 'lucide-react';
 import DatePicker from '@/components/DatePicker';
 import TimePicker from '@/components/TimePicker';
+import SectionIntro from '@/components/ui/SectionIntro';
 import { BOOKING_FORM_CARD_CLASS, BOOKING_FORM_INPUT_CLASS } from '@/lib/ui/bookingFormStyles';
 
 type AdminBookingEditModalProps = {
@@ -108,10 +109,24 @@ export default function AdminBookingEditModal({
         onSubmit={(e) => handleSaveBookingEdit(e, true)}
         className={`relative max-h-[90vh] w-full max-w-[700px] overflow-y-auto ${BOOKING_FORM_CARD_CLASS} overflow-hidden shadow-xl`}
       >
-        <div className="space-y-8 rounded-[1.9rem] border border-[#e9edf3] bg-white p-4 shadow-[0_18px_54px_rgba(17,17,17,0.12)] md:p-8">
-          <div className="mb-4 text-center">
-            <h2 className="mb-2 text-[2rem] font-semibold leading-tight tracking-[-0.05em] text-[#111827]">Fahrt bearbeiten</h2>
-            <p className="text-[1rem] text-[#6a7d96]">Bitte pruefen und aktualisieren Sie die Buchungsdaten.</p>
+        <div className="space-y-6 rounded-[1.9rem] border border-[#e9edf3] bg-white p-4 shadow-[0_18px_54px_rgba(17,17,17,0.12)] md:p-6">
+          <div className="rounded-[1.5rem] border border-[#e9edf3] bg-[#f8fbff] px-4 py-4 md:px-5">
+            <div className="flex items-start justify-between gap-4">
+              <SectionIntro
+                eyebrow="Bearbeiten"
+                title="Fahrt bearbeiten"
+                description="Bitte pruefen und aktualisieren Sie die Buchungsdaten."
+                className="max-w-[28rem] text-left"
+              />
+              <button
+                type="button"
+                onClick={() => setEditingBooking(null)}
+                className={`${adminIconCloseButtonClass} shrink-0 self-start`}
+                aria-label="Bearbeitungsfenster schliessen"
+              >
+                <X size={14} strokeWidth={2.25} className="translate-y-[1px]" />
+              </button>
+            </div>
           </div>
 
           <div className={`flex items-center justify-between ${adminEditMetaCardClass}`}>
@@ -119,9 +134,9 @@ export default function AdminBookingEditModal({
               <p className={adminEditSectionLabelClass}>Buchung</p>
               <p className="mt-2 text-[0.98rem] font-semibold">{editForm.id?.slice(0, 8)}</p>
             </div>
-            <button type="button" onClick={() => setEditingBooking(null)} className={adminIconCloseButtonClass} aria-label="Bearbeitungsfenster schliessen">
-              <X size={14} strokeWidth={2.25} className="translate-y-[1px]" />
-            </button>
+            <span className="rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.82rem] font-semibold text-[#1679ff]">
+              Admin
+            </span>
           </div>
 
           <div className="space-y-4">

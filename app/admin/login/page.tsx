@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
     <section className="relative overflow-hidden bg-white">
       <div className="app-container flex justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
         <div className="w-full max-w-[34rem]">
-          <div className="ui-card-surface-light px-5 py-6 md:px-8 md:py-8">
+          <div className="ui-card-surface-light bg-white px-5 py-6 md:px-8 md:py-8">
             <Link
               href="/"
               className="mb-6 inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
