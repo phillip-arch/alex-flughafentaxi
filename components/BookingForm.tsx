@@ -494,6 +494,28 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
     );
   };
 
+  const renderFavoriteAddressButtons = () => {
+    if (!isLoggedIn || favoriteAddresses.length === 0) return null;
+
+    return (
+      <div className="flex flex-wrap items-center gap-2">
+        {favoriteAddresses.map((favorite) => (
+          <button
+            key={favorite.id}
+            type="button"
+            onClick={() => applyFavoriteAddress(favorite)}
+            className="inline-flex items-center gap-2 rounded-[1rem] border border-[#e3dfd3] bg-white px-3 py-2 text-[11px] font-medium text-[#111111] shadow-[0_8px_20px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8f6f0] md:rounded-[1.1rem] md:px-3.5"
+          >
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
+              <MapPin size={11} strokeWidth={2.2} />
+            </span>
+            <span className="leading-none">{favorite.name}</span>
+          </button>
+        ))}
+      </div>
+    );
+  };
+
   const isMissingField = (field: keyof ExtendedBookingInput) => {
     const value = formData[field];
 
@@ -865,20 +887,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem] space-y-2">
-                          {isLoggedIn && favoriteAddresses.length > 0 ? (
-                            <div className="flex flex-wrap items-center gap-2">
-                              {favoriteAddresses.map((favorite) => (
-                                <button
-                                  key={favorite.id}
-                                  type="button"
-                                  onClick={() => applyFavoriteAddress(favorite)}
-                                  className="rounded-full border border-[#d9d4c8] bg-[#f8f6f0] px-3 py-1.5 text-[11px] font-medium text-[#111111] transition-colors hover:bg-white"
-                                >
-                                  {favorite.name}
-                                </button>
-                              ))}
-                            </div>
-                          ) : null}
+                          {renderFavoriteAddressButtons()}
                           <input
                             type="text"
                             name="street"
@@ -914,20 +923,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                       <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem] space-y-2">
-                          {isLoggedIn && favoriteAddresses.length > 0 ? (
-                            <div className="flex flex-wrap items-center gap-2">
-                              {favoriteAddresses.map((favorite) => (
-                                <button
-                                  key={favorite.id}
-                                  type="button"
-                                  onClick={() => applyFavoriteAddress(favorite)}
-                                  className="rounded-full border border-[#d9d4c8] bg-[#f8f6f0] px-3 py-1.5 text-[11px] font-medium text-[#111111] transition-colors hover:bg-white"
-                                >
-                                  {favorite.name}
-                                </button>
-                              ))}
-                            </div>
-                          ) : null}
+                          {renderFavoriteAddressButtons()}
                           <input
                             type="text"
                             name="street"
