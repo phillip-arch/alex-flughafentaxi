@@ -1,5 +1,6 @@
 ﻿'use client';
 
+import dynamic from 'next/dynamic';
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
@@ -25,12 +26,15 @@ import {
   Minus,
   LucideIcon,
 } from 'lucide-react';
-import DatePicker from './DatePicker';
-import TimePicker from './TimePicker';
 import { determineVehicle, calculateVehiclePrice } from '@/lib/pricing';
 import { BOOKING_FORM_CARD_CLASS, BOOKING_FORM_INPUT_CLASS, BOOKING_FORM_INPUT_INVALID_CLASS } from '@/lib/ui/bookingFormStyles';
 
 import { createBooking } from '@/app/(booking)/actions';
+
+const DatePicker = dynamic(() => import('./DatePicker'));
+const TimePicker = dynamic(() => import('./TimePicker'));
+const BookingStepTwo = dynamic(() => import('./BookingStepTwo'));
+const BookingStepThree = dynamic(() => import('./BookingStepThree'));
 
 // Types
 type Direction = 'to_airport' | 'from_airport' | null;
@@ -222,6 +226,8 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
 
   useEffect(() => {
     let isMounted = true;
+    let idleHandle: number | null = null;
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
     const loadAccountData = async () => {
       const {
@@ -264,10 +270,24 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
       }));
     };
 
-    void loadAccountData();
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      idleHandle = (window as any).requestIdleCallback(() => {
+        void loadAccountData();
+      });
+    } else {
+      timeoutHandle = globalThis.setTimeout(() => {
+        void loadAccountData();
+      }, 0);
+    }
 
     return () => {
       isMounted = false;
+      if (typeof window !== 'undefined' && idleHandle !== null && 'cancelIdleCallback' in window) {
+        (window as any).cancelIdleCallback(idleHandle);
+      }
+      if (timeoutHandle !== null) {
+        window.clearTimeout(timeoutHandle);
+      }
     };
   }, [supabase]);
 
@@ -1014,389 +1034,53 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
             </div>
           )}
 
-          {/* STEP 2: DETAILS */}
           {currentStep === 2 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-              <div className="text-center mb-8">
-                <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Wann?</h2>
-                <p className="text-[12px] text-[#6d7075]">Datum und Uhrzeit waehlen.</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">Datum</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="date"
-                      value={formData.date}
-                      readOnly
-                      placeholder="TT.MM.JJJJ"
-                      onClick={() => setIsDatePickerOpen(true)}
-                      className={`ui-field-surface h-12 w-full rounded-[var(--radius-field)] border px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] ${
-                        isFieldInvalid('date') 
-                          ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
-                          : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
-                      }`}
-                    />
-                    <Calendar
-                      onClick={() => setIsDatePickerOpen(true)}
-                      className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
-                      size={20}
-                    />
-                    <DatePicker 
-                      isOpen={isDatePickerOpen}
-                      onClose={() => setIsDatePickerOpen(false)}
-                      onSelect={handleDateSelect}
-                      selectedDate={formData.date}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">
-                    {formData.direction === 'from_airport' ? 'Landezeit' : 'Zeit'}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="time"
-                      value={formData.time}
-                      readOnly
-                      placeholder="--:--"
-                      onClick={() => setIsTimePickerOpen(true)}
-                      className={`ui-field-surface h-12 w-full rounded-[var(--radius-field)] border px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] ${
-                        isFieldInvalid('time') 
-                          ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60' 
-                          : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
-                      }`}
-                    />
-                    <Clock
-                      onClick={() => setIsTimePickerOpen(true)}
-                      className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
-                      size={20}
-                    />
-                    <TimePicker 
-                      isOpen={isTimePickerOpen}
-                      onClose={() => setIsTimePickerOpen(false)}
-                      onSelect={handleTimeSelect}
-                      selectedTime={formData.time}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {formData.direction === 'from_airport' && (
-                <div>
-                  <p className="mb-3 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Flugdetails</p>
-                  <input
-                    type="text"
-                    name="flightNumber"
-                    value={formData.flightNumber}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    placeholder="Flugnummer (z.B. OS123)"
-                    className={getInputClassName('flightNumber')}
-                  />
-                </div>
-              )}
-
-              <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                {renderInlineSelect('passengers', 'Personen', [1, 2, 3, 4, 5, 6, 7, 8], formData.passengers, Users)}
-                {renderInlineSelect('luggage', 'Koffer', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.luggage, Briefcase)}
-                {renderInlineSelect('handLuggage', 'Handgepaeck', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.handLuggage, ShoppingBag)}
-              </div>
-
-              {/* Child Seat Toggle */}
-              <div className="flex flex-col gap-4 rounded-[var(--radius-field)] bg-[#f5f5f7] p-4 md:p-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="text-[#1d1d1f]">
-                      <p className="font-medium text-[15px]">Kindersitz benoetigt?</p>
-                      <p className="text-[13px] text-[#86868b]">Kostenlos inklusive</p>
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      name="childSeat"
-                      checked={formData.childSeat}
-                      onChange={handleChange}
-                      className="sr-only peer" 
-                    />
-                    <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
-                  </label>
-                </div>
-
-                {formData.childSeat && (
-                  <>
-                  <div className="grid grid-cols-3 gap-3 border-t border-[#d2d2d7]/30 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                    {renderInlineSelect('babySeats', 'Babyschale', [0, 1, 2, 3], formData.babySeats)}
-                    {renderInlineSelect('childSeats', 'Kindersitz', [0, 1, 2, 3], formData.childSeats)}
-                    {renderInlineSelect('boosterSeats', 'Sitzerhoehung', [0, 1, 2, 3], formData.boosterSeats)}
-                  </div>
-                  </>
-                )}
-              </div>
-
-              {error && (
-                <div className="mt-4 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8]">
-                  <span className="block w-1.5 h-1.5 bg-[#d70015] rounded-full" />
-                  {error}
-                </div>
-              )}
-
-              <div className={actionRowClass}>
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className={secondaryBackButtonClass}
-                >
-                  <ChevronLeft size={24} />
-                </button>
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className={primaryActionButtonClass}
-                  >
-                  Weiter
-                </button>
-              </div>
-            </div>
+            <BookingStepTwo
+              formData={formData}
+              error={error}
+              isDatePickerOpen={isDatePickerOpen}
+              isTimePickerOpen={isTimePickerOpen}
+              setIsDatePickerOpen={setIsDatePickerOpen}
+              setIsTimePickerOpen={setIsTimePickerOpen}
+              handleDateSelect={handleDateSelect}
+              handleTimeSelect={handleTimeSelect}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              getInputClassName={getInputClassName}
+              isFieldInvalid={isFieldInvalid}
+              renderInlineSelect={renderInlineSelect}
+              prevStep={prevStep}
+              nextStep={nextStep}
+              actionRowClass={actionRowClass}
+              primaryActionButtonClass={primaryActionButtonClass}
+              secondaryBackButtonClass={secondaryBackButtonClass}
+              DatePickerComponent={DatePicker}
+              TimePickerComponent={TimePicker}
+            />
           )}
 
-          {/* STEP 3: CONFIRM */}
           {currentStep === 3 && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-              <div className="text-center mb-4">
-                <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Uebersicht</h2>
-                <p className="text-[12px] text-[#6d7075]">Bitte ueberpruefen Sie Ihre Daten.</p>
-              </div>
-
-                <div className="rounded-[22px] border border-[#d8d4ca] bg-[#fbfaf8] p-4 text-left shadow-[0_10px_28px_rgba(17,17,17,0.05)] md:p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">Gesamtpreis</p>
-                      <p className="mt-1 text-[46px] font-semibold leading-none tracking-[-0.05em] text-[#0a63ff] md:text-[52px]">
-                        {totalPrice} EUR
-                      </p>
-                    </div>
-                    <span className="inline-flex items-center rounded-full bg-[#1679FF] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
-                      Fixpreis
-                    </span>
-                  </div>
-
-                  <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#d6e5ff] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1d1d1f]">
-                    <MapPin size={14} className="text-[#0a63ff]" />
-                    <span>{routeSummary}</span>
-                  </div>
-
-                  <div className="mt-4 rounded-[18px] border border-[#e3dfd5] bg-white px-4 py-4">
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <div className="flex items-start gap-2.5">
-                        <Calendar size={15} className="mt-0.5 text-[#0a63ff]" />
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Datum</p>
-                          <p className="mt-0.5 text-[14px] font-medium text-[#1d1d1f]">{dateSummary}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2.5">
-                        <MapPin size={15} className="mt-0.5 text-[#0a63ff]" />
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Strasse</p>
-                          <p className="mt-0.5 text-[14px] font-medium text-[#1d1d1f]">{streetSummary}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2.5">
-                        <Users size={15} className="mt-0.5 text-[#0a63ff]" />
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Personen</p>
-                          <p className="mt-0.5 text-[14px] font-medium text-[#1d1d1f]">{formData.passengers || 0} Personen</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2.5">
-                        <Car size={15} className="mt-0.5 text-[#0a63ff]" />
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">Fahrzeug</p>
-                          <p className="mt-0.5 text-[14px] font-medium leading-[1.35] text-[#1d1d1f]">
-                            {vehicleType} | {formData.luggage || 0} Koffer | {formData.handLuggage || 0} Handgepaeck
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              {/* Personal Details */}
-              {isLoggedIn ? (
-                <div className="flex flex-col gap-4 p-5 bg-[#f5f5f7] rounded-xl">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="text-[#1d1d1f]">
-                        <p className="font-medium text-[15px]">Buchung fuer mich</p>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.bookingForMyself}
-                        onChange={(e) => handleBookingForMyselfToggle(e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-[51px] h-[31px] bg-[#e9e9ea] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:shadow-sm after:transition-all peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)]"></div>
-                    </label>
-                  </div>
-                </div>
-              ) : null}
-
-              {/* Personal Details */}
-              <div className="space-y-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    placeholder="Name"
-                    className={getInputClassName('fullName')}
-                  />
-                </div>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    placeholder="Telefonnummer"
-                    className={getInputClassName('phone')}
-                  />
-                </div>
-                <div className="relative">
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    placeholder="E-Mail"
-                    className={getInputClassName('email')}
-                  />
-                </div>
-              </div>
-
-              {/* Payment Method */}
-              <div>
-                <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide mb-3 ml-1">Zahlung</p>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => handlePaymentChange('cash')}
-                    className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
-                      formData.paymentMethod === 'cash' 
-                        ? 'border-[#1f9d55] bg-[#1f9d55] text-white' 
-                        : touched['paymentMethod'] && !formData.paymentMethod
-                          ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
-                          : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
-                    }`}
-                  >
-                    <span className="text-[14px] font-medium md:text-[12px]">Barzahlung</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handlePaymentChange('card')}
-                    className={`flex-1 flex flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
-                      formData.paymentMethod === 'card' 
-                        ? 'border-[#1679FF] bg-[#1679FF] text-white' 
-                        : touched['paymentMethod'] && !formData.paymentMethod
-                          ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
-                          : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
-                    }`}
-                  >
-                    <span className="text-[14px] font-medium md:text-[12px]">Kreditkarte</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div className="relative">
-                <textarea
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  rows={3}
-                  placeholder="Anmerkungen (optional)"
-                  className="ui-field-surface w-full rounded-[var(--radius-field)] border border-[#d2d2d7] p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none resize-none transition-all focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] md:p-[0.8rem]"
-                />
-              </div>
-
-              <div className="hidden rounded-[24px] border border-[#d8d4ca] bg-[linear-gradient(180deg,#faf8f4_0%,#f5f5f7_100%)] p-6 shadow-[0_20px_50px_rgba(17,17,17,0.06)] md:p-8">
-                <p className="text-[12px] font-semibold uppercase tracking-wide text-[#86868b] mb-2">Gesamtpreis</p>
-                <p className="text-[48px] font-semibold text-[#1d1d1f] leading-none mb-4 tracking-tight">{totalPrice} {'\u20AC'}</p>
-                
-                <div className="flex items-center justify-center gap-2 text-[14px] font-medium text-[#1d1d1f] mb-6">
-                  {formData.direction === 'to_airport' ? (
-                    <>
-                      <span>{formData.zip} {formData.city}</span>
-                      <ChevronRight size={14} className="text-[#86868b]" />
-                      <span>Flughafen VIE</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Flughafen VIE</span>
-                      <ChevronRight size={14} className="text-[#86868b]" />
-                      <span>{formData.zip} {formData.city}</span>
-                    </>
-                  )}
-                </div>
-
-                <div className="bg-white rounded-[16px] p-4 border border-[#d2d2d7]/50 shadow-sm max-w-[320px] mx-auto">
-                    <div className="flex items-center gap-1.5" title="Handgepaeck">
-                    <Car size={18} className="text-[#0071e3]" />
-                    <span>Fahrzeug: {vehicleType}</span>
-                  </div>
-                  
-                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px] text-[#86868b] font-medium">
-                    <div className="flex items-center gap-1.5" title="Personen">
-                      <Users size={16} />
-                      <span>{formData.passengers || 0}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5" title="Koffer">
-                      <Briefcase size={16} />
-                      <span>{formData.luggage || 0}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5" title="Handgepaeck">
-                      <Briefcase size={14} className="opacity-70" />
-                      <span>{formData.handLuggage || 0}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {error && (
-                <div className="mt-4 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8]">
-                  <span className="block w-1.5 h-1.5 bg-[#d70015] rounded-full" />
-                  {error}
-                </div>
-              )}
-
-              <div className={actionRowClass}>
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className={secondaryBackButtonClass}
-                >
-                  <ChevronLeft size={24} />
-                </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className={`${primaryActionButtonClass} disabled:opacity-50`}
-                  >
-                  {loading ? 'Wird gebucht...' : 'Jetzt buchen'}
-                </button>
-              </div>
-            </div>
+            <BookingStepThree
+              formData={formData}
+              totalPrice={totalPrice}
+              routeSummary={routeSummary}
+              streetSummary={streetSummary}
+              dateSummary={dateSummary}
+              vehicleType={vehicleType}
+              isLoggedIn={isLoggedIn}
+              error={error}
+              loading={loading}
+              handleBookingForMyselfToggle={handleBookingForMyselfToggle}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              getInputClassName={getInputClassName}
+              handlePaymentChange={handlePaymentChange}
+              touched={touched}
+              prevStep={prevStep}
+              actionRowClass={actionRowClass}
+              secondaryBackButtonClass={secondaryBackButtonClass}
+              primaryActionButtonClass={primaryActionButtonClass}
+            />
           )}
         </form>
       </div>
