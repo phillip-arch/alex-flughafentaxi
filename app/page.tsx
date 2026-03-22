@@ -530,8 +530,8 @@ export default function Home() {
           <div className={homepageSectionWidthClass}>
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
               <SectionIntro
-                eyebrow="Terminal 1"
-                title="Terminal 1 map"
+                eyebrow="Terminal 3"
+                title="Terminal 3 map"
                 description="Orientierung fuer die Abholung am Flughafen Wien."
                 className="max-w-[42rem]"
               />
