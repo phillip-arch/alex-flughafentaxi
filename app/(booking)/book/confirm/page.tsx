@@ -1,7 +1,8 @@
 import { XCircle } from 'lucide-react';
 import Link from 'next/link';
-import ConfirmClient from './ConfirmClient';
 import type { Metadata } from 'next';
+import NavbarClient from '@/components/NavbarClient';
+import ConfirmClient from './ConfirmClient';
 
 export const metadata: Metadata = {
   robots: {
@@ -23,29 +24,56 @@ export default async function ConfirmBookingPage({
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center p-4">
-        <div className="w-full max-w-[560px] bg-white rounded-[24px] px-7 py-8 sm:px-10 sm:py-10 text-center shadow-sm border border-[#d2d2d7]">
-          <div className="w-16 h-16 bg-[#fff2f4] rounded-full flex items-center justify-center mx-auto mb-5 text-[#d70015]">
-            <XCircle size={32} />
-          </div>
-          <h1 className="text-[24px] font-semibold text-[#1d1d1f] mb-2 tracking-tight">Fehler</h1>
-          <p className="text-[#86868b] text-[15px] mb-8">
-            Ungültiger oder fehlender Bestätigungslink.
-          </p>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center gap-2 w-full h-14 bg-[#1d1d1f] hover:bg-black text-white font-medium text-[17px] rounded-full transition-all"
-          >
-            Zur Startseite
-          </Link>
-        </div>
-      </div>
+      <>
+        <NavbarClient />
+        <main className="bg-white">
+          <section className="app-container pb-24 pt-28 md:pb-28 md:pt-32">
+            <div className="mx-auto max-w-[57.5rem]">
+              <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
+                <div className="mx-auto flex max-w-[42rem] flex-col items-center text-center">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#f1d1d6] bg-[#fff4f6] text-[#d70015]">
+                    <XCircle size={38} />
+                  </div>
+                  <div className="mt-14 flex flex-col items-center gap-6">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#d70015]">
+                      Fehler
+                    </p>
+                    <h1 className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[2.6rem]">
+                      Link ungueltig
+                    </h1>
+                    <p className="max-w-[34rem] text-[1rem] leading-8 text-[#5d6b7c] md:text-[1.06rem]">
+                      Der Bestaetigungslink ist ungueltig oder fehlt. Bitte oeffnen Sie den Link aus
+                      Ihrer E-Mail erneut oder kehren Sie zur Startseite zurueck.
+                    </p>
+                  </div>
+
+                  <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
+                    <Link
+                      href="/"
+                      className="inline-flex items-center justify-center rounded-[var(--radius-field)] bg-[#000000] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#232325] hover:text-white visited:text-white"
+                    >
+                      <span className="text-white">Zur Startseite</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center p-4">
-      <ConfirmClient token={token} driverId={driver} />
-    </div>
+    <>
+      <NavbarClient />
+      <main className="bg-white">
+        <section className="app-container pb-24 pt-28 md:pb-28 md:pt-32">
+          <div className="mx-auto max-w-[57.5rem]">
+            <ConfirmClient token={token} driverId={driver} />
+          </div>
+        </section>
+      </main>
+    </>
   );
 }
