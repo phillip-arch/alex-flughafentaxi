@@ -9,7 +9,8 @@ export default function FooterGate() {
     pathname?.startsWith('/admin') ||
     pathname === '/login' ||
     pathname === '/forgot-password' ||
-    pathname === '/update-password'
+    pathname === '/update-password' ||
+    pathname === '/driver/confirm'
   ) {
     return null;
   }

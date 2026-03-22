@@ -85,6 +85,8 @@ export default function AdminRidesPanel({
   getChildSeatCountsFromNotes,
   getHandLuggageCountFromNotes,
 }: AdminRidesPanelProps) {
+  const ridesActionButtonClass = '!h-[42px] !min-h-[42px] !min-w-[136px] !px-3 !py-2 !text-[0.85rem]';
+
   return (
     <div className="space-y-2">
       {loading ? (
@@ -264,11 +266,16 @@ export default function AdminRidesPanel({
                           onClick={async () => {
                             if (isCancelledBooking(booking.status)) return;
                             const driverId = getSelectedDriverId(booking);
-                            if (!driverId) return;
+                            if (!driverId) {
+                              if (booking.driver_id && confirm('Moechten Sie diese Buchung wieder von allen Fahrern loesen?')) {
+                                await handleUnassignDriver(booking.id);
+                              }
+                              return;
+                            }
                             await confirmAndSendToDriver(booking.id, driverId);
                           }}
-                          disabled={!getSelectedDriverId(booking) || isCancelledBooking(booking.status)}
-                          className={`w-full px-3 py-2 text-[0.85rem] ${adminPrimaryButtonClass} ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}
+                          disabled={(!getSelectedDriverId(booking) && !booking.driver_id) || isCancelledBooking(booking.status)}
+                          className={`w-full ${adminPrimaryButtonClass} ${ridesActionButtonClass} ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}
                         >
                           <Send size={12} />
                           Senden
@@ -281,12 +288,12 @@ export default function AdminRidesPanel({
                                 handleStatusChange(booking.id, 'pending');
                               }
                             }}
-                            className={`w-full px-3 py-2 text-[0.85rem] shadow-none ${adminSecondaryButtonClass}`}
+                            className={`w-full shadow-none ${adminSecondaryButtonClass} ${ridesActionButtonClass}`}
                           >
                             <CheckCircle size={12} />
                             Aktivieren
                           </button>
-                        ) : booking.driver_id ? (
+                        ) : (
                           <button
                             type="button"
                             onClick={() => {
@@ -294,21 +301,9 @@ export default function AdminRidesPanel({
                                 handleStatusChange(booking.id, 'cancelled');
                               }
                             }}
-                            className={`w-full px-3 py-2 text-[0.85rem] ${adminDangerButtonClass}`}
+                            className={`w-full ${adminDangerButtonClass} ${ridesActionButtonClass}`}
                           >
                             Stornieren
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              if (confirm('Moechten Sie diese Buchung wieder von allen Fahrern loesen?')) {
-                                await handleUnassignDriver(booking.id);
-                              }
-                            }}
-                            className={`w-full px-3 py-2 text-[0.85rem] ${adminSecondaryButtonClass}`}
-                          >
-                            Entfernen
                           </button>
                         )}
                       </div>
@@ -362,7 +357,13 @@ export default function AdminRidesPanel({
                               onChange={async (e) => {
                                 const nextDriverId = e.target.value;
                                 setDriverSelection((prev) => ({ ...prev, [booking.id]: nextDriverId }));
-                                if (!nextDriverId || isCancelled) return;
+                                if (isCancelled) return;
+                                if (!nextDriverId) {
+                                  if (booking.driver_id && confirm('Moechten Sie diese Buchung wieder von allen Fahrern loesen?')) {
+                                    await handleUnassignDriver(booking.id);
+                                  }
+                                  return;
+                                }
                                 await confirmAndSendToDriver(booking.id, nextDriverId);
                               }}
                             >

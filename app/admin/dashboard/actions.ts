@@ -198,114 +198,156 @@ export async function updateBookingStatus(id: string, status: string) {
       return { error: 'Buchung nicht gefunden oder Aktualisierung nicht erlaubt' };
     }
 
-    if ((finalStatus === 'cancelled' || finalStatus === 'canceled') && data.driver_id) {
+    if (finalStatus === 'cancelled' || finalStatus === 'canceled') {
       if (process.env.RESEND_API_KEY) {
-        const { data: driver, error: driverError } = await supabaseAdmin
-          .from('drivers')
-          .select('id, name, email')
-          .eq('id', data.driver_id)
-          .maybeSingle();
+        const pickupRaw = String(data.pickup || '').toLowerCase();
+        const destinationRaw = String(data.destination || '').toLowerCase();
+        const isFromAirport = pickupRaw.includes('flughafen');
+        const isToAirport = destinationRaw.includes('flughafen');
+        const directionLabel = isFromAirport ? 'Vom Flughafen' : isToAirport ? 'Zum Flughafen' : 'Transfer';
+        const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
 
-        if (!driverError && driver?.email) {
-          const pickupRaw = String(data.pickup || '').toLowerCase();
-          const destinationRaw = String(data.destination || '').toLowerCase();
-          const isFromAirport = pickupRaw.includes('flughafen');
-          const isToAirport = destinationRaw.includes('flughafen');
-          const directionLabel = isFromAirport ? 'Vom Flughafen' : isToAirport ? 'Zum Flughafen' : 'Transfer';
-          const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
+        const parsedNotes = parseBookingNotes(data.notes);
+        const paymentInNotes = String(parsedNotes.paymentLabel || '').toLowerCase();
+        const flightNumberInfo = parsedNotes.flightNumberInfo;
+        const isCardPayment =
+          paymentInNotes.includes('kredit') || paymentInNotes.includes('card') || paymentInNotes.includes('karte');
+        const isCashPayment = paymentInNotes.includes('bar') || paymentInNotes.includes('cash');
+        const paymentLabel = isCardPayment ? 'Kreditkarte' : isCashPayment ? 'Barzahlung' : '-';
+        const paymentStyle = isCardPayment
+          ? 'background:#e8f2ff;color:#0071e3;'
+          : isCashPayment
+            ? 'background:linear-gradient(135deg,rgba(10,99,255,0.12) 0%,rgba(36,144,255,0.18) 100%);color:#0a63ff;'
+            : 'background:#f5f5f7;color:#86868b;';
 
-          const parsedNotes = parseBookingNotes(data.notes);
-          const paymentInNotes = String(parsedNotes.paymentLabel || '').toLowerCase();
-          const flightNumberInfo = parsedNotes.flightNumberInfo;
-          const isCardPayment =
-            paymentInNotes.includes('kredit') || paymentInNotes.includes('card') || paymentInNotes.includes('karte');
-          const isCashPayment = paymentInNotes.includes('bar') || paymentInNotes.includes('cash');
-          const paymentLabel = isCardPayment ? 'Kreditkarte' : isCashPayment ? 'Barzahlung' : '-';
-          const paymentStyle = isCardPayment
-            ? 'background:#e8f2ff;color:#0071e3;'
-            : isCashPayment
-              ? 'background:linear-gradient(135deg,rgba(10,99,255,0.12) 0%,rgba(36,144,255,0.18) 100%);color:#0a63ff;'
-              : 'background:#f5f5f7;color:#86868b;';
+        const safePassengerName = escapeHtml(String(data.full_name || ''));
+        const pickupRawValue = String(data.pickup || '');
+        const destinationRawValue = String(data.destination || '');
+        const safePickup = escapeHtml(pickupRawValue);
+        const safeDestination = escapeHtml(destinationRawValue);
+        const pickupMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pickupRawValue)}`;
+        const destinationMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationRawValue)}`;
+        const pickupIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(pickupRawValue);
+        const destinationIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(destinationRawValue);
+        const safeVehicle = escapeHtml(String(data.vehicle_type || '-'));
+        const safePayment = escapeHtml(paymentLabel);
+        const safeFlightNumberInfo = escapeHtml(flightNumberInfo || '');
+        const { date: pickupDate, time: pickupTime } = formatDateTimeForEmail(String(data.pickup_at));
+        const safeDate = escapeHtml(pickupDate);
+        const safeTime = escapeHtml(pickupTime);
+        const safeDirectionLabel = escapeHtml(directionLabel);
+        const safePrice = escapeHtml(
+          new Intl.NumberFormat('de-AT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+            Number(data.price ?? 0),
+          ),
+        );
 
-          const safeDriverName = escapeHtml(String(driver.name || 'Fahrer'));
-          const safePassengerName = escapeHtml(String(data.full_name || ''));
-          const pickupRawValue = String(data.pickup || '');
-          const destinationRawValue = String(data.destination || '');
-          const safePickup = escapeHtml(pickupRawValue);
-          const safeDestination = escapeHtml(destinationRawValue);
-          const pickupMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pickupRawValue)}`;
-          const destinationMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationRawValue)}`;
-          const pickupIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(pickupRawValue);
-          const destinationIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(destinationRawValue);
-          const safeVehicle = escapeHtml(String(data.vehicle_type || '-'));
-          const safePayment = escapeHtml(paymentLabel);
-          const safeFlightNumberInfo = escapeHtml(flightNumberInfo || '');
-          const { date: pickupDate, time: pickupTime } = formatDateTimeForEmail(String(data.pickup_at));
-          const safeDate = escapeHtml(pickupDate);
-          const safeTime = escapeHtml(pickupTime);
-          const safeDirectionLabel = escapeHtml(directionLabel);
-          const safePrice = escapeHtml(
-            new Intl.NumberFormat('de-AT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-              Number(data.price ?? 0),
-            ),
-          );
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const fromCandidates = Array.from(
+          new Set([process.env.RESEND_FROM_EMAIL, 'onboarding@resend.dev'].filter(Boolean) as string[]),
+        );
 
-          const resend = new Resend(process.env.RESEND_API_KEY);
-          const fromCandidates = Array.from(
-            new Set([process.env.RESEND_FROM_EMAIL, 'onboarding@resend.dev'].filter(Boolean) as string[]),
-          );
+        const sharedBody = `
+          <tr>
+            <td style="padding:20px 28px 8px 28px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
+                <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
+                <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safePassengerName}</td></tr>
+              </table>
+              <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
+                <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
+                <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Abholung:</strong> ${pickupIsAirport ? safePickup : `<a href="${pickupMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safePickup}</a>`}</td></tr>
+                ${safeFlightNumberInfo ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Flugnummer:</strong> ${safeFlightNumberInfo}</td></tr>` : ''}
+                <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Ziel:</strong> ${destinationIsAirport ? safeDestination : `<a href="${destinationMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safeDestination}</a>`}</td></tr>
+                <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Datum:</strong> ${safeDate}</td></tr>
+                <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Uhrzeit:</strong> ${safeTime}</td></tr>
+                <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Fahrzeug:</strong> ${safeVehicle}</td></tr>
+              </table>
+              <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#ffffff;border:1px solid #e5e5ea;border-radius:16px;">
+                <tr>
+                  <td style="padding:18px 14px 16px 18px;text-align:center;width:62%;border-right:1px solid #e5e5ea;">
+                    <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Gesamtpreis</div>
+                    <div style="font-size:42px;line-height:1.05;color:#1d1d1f;font-weight:700;letter-spacing:-0.02em;">${safePrice} &euro;</div>
+                    <span style="display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;text-transform:uppercase;${paymentStyle}">${safePayment}</span>
+                  </td>
+                  <td style="padding:18px 14px 16px 14px;text-align:center;width:38%;">
+                    <div style="font-size:30px;line-height:1;margin-bottom:8px;">${directionIcon}</div>
+                    <div style="font-size:20px;line-height:1;color:#8b8b90;margin-bottom:8px;">____</div>
+                    <div style="font-size:14px;color:#1d1d1f;font-weight:700;line-height:1.3;">${safeDirectionLabel}</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        `;
 
+        if (data.email) {
+          const safePassengerEmail = escapeHtml(String(data.email || ''));
           for (const from of fromCandidates) {
             const { error } = await resend.emails.send({
               from,
-              to: driver.email,
-              subject: `Fahrtstornierung (${directionLabel})`.trim(),
+              to: data.email,
+              subject: `Ihre Fahrt wurde storniert (${directionLabel})`.trim(),
               html: `
-              <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
-                <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
-                  <tr>
-                    <td style="padding:28px 28px 8px 28px;text-align:center;">
-                      <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
-                      <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:700;color:#1d1d1f;">Fahrt storniert</h1>
-                      <p style="margin:12px 0 0 0;font-size:16px;line-height:1.5;color:#86868b;">Hallo ${safeDriverName}, diese zugewiesene Fahrt wurde storniert.</p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding:20px 28px 8px 28px;">
-                      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:12px;background:#ffffff;border:1px solid #e5e5ea;border-radius:16px;">
-                        <tr>
-                          <td style="padding:18px 14px 16px 18px;text-align:center;width:62%;border-right:1px solid #e5e5ea;">
-                            <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Gesamtpreis</div>
-                            <div style="font-size:42px;line-height:1.05;color:#1d1d1f;font-weight:700;letter-spacing:-0.02em;">${safePrice} &euro;</div>
-                            <span style="display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;text-transform:uppercase;${paymentStyle}">${safePayment}</span>
-                          </td>
-                          <td style="padding:18px 14px 16px 14px;text-align:center;width:38%;">
-                            <div style="font-size:30px;line-height:1;margin-bottom:8px;">${directionIcon}</div>
-                            <div style="font-size:20px;line-height:1;color:#8b8b90;margin-bottom:8px;">____</div>
-                            <div style="font-size:14px;color:#1d1d1f;font-weight:700;line-height:1.3;">${safeDirectionLabel}</div>
-                          </td>
-                        </tr>
-                      </table>
-                      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                        <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
-                        <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safePassengerName}</td></tr>
-                      </table>
-                      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                        <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
-                        <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Abholung:</strong> ${pickupIsAirport ? safePickup : `<a href="${pickupMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safePickup}</a>`}</td></tr>
-                        ${safeFlightNumberInfo ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Flugnummer:</strong> ${safeFlightNumberInfo}</td></tr>` : ''}
-                        <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Ziel:</strong> ${destinationIsAirport ? safeDestination : `<a href="${destinationMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safeDestination}</a>`}</td></tr>
-                        <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Datum:</strong> ${safeDate}</td></tr>
-                        <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Uhrzeit:</strong> ${safeTime}</td></tr>
-                        <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Fahrzeug:</strong> ${safeVehicle}</td></tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            `,
+                <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
+                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
+                    <tr>
+                      <td style="padding:28px 28px 8px 28px;text-align:center;">
+                        <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
+                        <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:700;color:#1d1d1f;">Fahrt storniert</h1>
+                        <p style="margin:12px 0 0 0;font-size:16px;line-height:1.5;color:#86868b;">Hallo ${safePassengerName}, Ihre Fahrt wurde storniert. Bei Fragen erreichen Sie uns per Telefon, WhatsApp oder Viber.</p>
+                      </td>
+                    </tr>
+                    ${sharedBody}
+                    <tr>
+                      <td style="padding:0 28px 28px 28px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
+                          <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Kontakt</td></tr>
+                          <tr><td style="padding:0 18px 8px 18px;font-size:14px;color:#1d1d1f;"><strong>E-Mail:</strong> ${safePassengerEmail}</td></tr>
+                          <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;">Falls Sie eine Ersatzfahrt benötigen, buchen Sie bitte erneut oder kontaktieren Sie unser Team direkt.</td></tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              `,
             });
             if (!error) break;
+          }
+        }
+
+        if (data.driver_id) {
+          const { data: driver, error: driverError } = await supabaseAdmin
+            .from('drivers')
+            .select('id, name, email')
+            .eq('id', data.driver_id)
+            .maybeSingle();
+
+          if (!driverError && driver?.email) {
+            const safeDriverName = escapeHtml(String(driver.name || 'Fahrer'));
+
+            for (const from of fromCandidates) {
+              const { error } = await resend.emails.send({
+                from,
+                to: driver.email,
+                subject: `Fahrtstornierung (${directionLabel})`.trim(),
+                html: `
+                <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
+                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
+                    <tr>
+                      <td style="padding:28px 28px 8px 28px;text-align:center;">
+                        <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
+                        <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:700;color:#1d1d1f;">Fahrt storniert</h1>
+                        <p style="margin:12px 0 0 0;font-size:16px;line-height:1.5;color:#86868b;">Hallo ${safeDriverName}, diese zugewiesene Fahrt wurde storniert.</p>
+                      </td>
+                    </tr>
+                    ${sharedBody}
+                  </table>
+                </div>
+              `,
+              });
+              if (!error) break;
+            }
           }
         }
       } else {
@@ -771,11 +813,10 @@ export async function unassignDriver(bookingId: string) {
       .from('bookings')
       .update({
         driver_id: null,
-        confirm_token: null,
         status: 'pending',
       })
       .eq('id', bookingId)
-      .select('id, status')
+      .select('id, status, driver_id')
       .maybeSingle();
 
     if (error) {
@@ -788,6 +829,38 @@ export async function unassignDriver(bookingId: string) {
 
     if (!data) {
       return { error: 'Buchung nicht gefunden.' };
+    }
+
+    if (data.driver_id) {
+      return { error: 'Fahrerzuweisung konnte nicht entfernt werden.' };
+    }
+
+    // Best-effort token invalidation. The critical admin action is removing the
+    // driver assignment; token columns may differ across older DB variants.
+    const invalidatedToken = crypto.randomUUID();
+    const cleanupPayloads = [
+      {
+        confirm_token: invalidatedToken,
+        confirm_token_used_at: null,
+        confirm_token_expires_at: null,
+      },
+      {
+        confirm_token: invalidatedToken,
+        confirm_token_used_at: null,
+      },
+      {
+        confirm_token: invalidatedToken,
+      },
+    ];
+
+    for (const payload of cleanupPayloads) {
+      const { error: cleanupError } = await supabaseAdmin
+        .from('bookings')
+        .update(payload)
+        .eq('id', bookingId);
+
+      if (!cleanupError) break;
+      console.warn('unassignDriver cleanup skipped:', cleanupError);
     }
 
     revalidatePath('/admin/dashboard');

@@ -22,8 +22,8 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-white">
-      <div className="app-container flex justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
+    <section className="relative min-h-screen overflow-hidden bg-white">
+      <div className="app-container flex min-h-screen justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
         <div className="w-full max-w-[34rem]">
           <div className="ui-card-surface-light bg-white px-5 py-6 md:px-8 md:py-8">
             <Link
@@ -70,7 +70,7 @@ export default function AdminLoginPage() {
                       name="email"
                       placeholder="Admin-E-Mail"
                       required
-                      className="ui-input !pl-[3.2rem]"
+                      className="ui-input !bg-white !pl-[3.2rem] focus:!bg-white"
                     />
                   </div>
                 </label>
@@ -88,7 +88,7 @@ export default function AdminLoginPage() {
                       name="password"
                       placeholder="Passwort"
                       required
-                      className="ui-input !pl-[3.2rem]"
+                      className="ui-input !bg-white !pl-[3.2rem] focus:!bg-white"
                     />
                   </div>
                 </label>
