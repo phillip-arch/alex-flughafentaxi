@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
-import Card from '@/components/ui/Card';
 import { ViberIcon, WhatsAppIcon } from '@/components/ui/ContactIcons';
 import SectionIntro from '@/components/ui/SectionIntro';
 
@@ -235,10 +234,7 @@ export default function Home() {
             </div>
           </div>
 
-          <Card
-            className="relative w-full min-h-[360px] overflow-hidden rounded-none bg-[var(--color-bg)] lg:mt-6 lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end"
-            variant="default"
-          >
+          <div className="relative w-full min-h-[360px] overflow-hidden rounded-none bg-[var(--color-bg)] lg:mt-6 lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end">
             <Image
               src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
               alt="Flughafentaxi Wien"
@@ -249,7 +245,7 @@ export default function Home() {
               sizes="(min-width: 1024px) 50vw, 100vw"
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08)_0%,rgba(17,17,17,0.18)_100%)]" />
-          </Card>
+          </div>
         </div>
       </section>
 

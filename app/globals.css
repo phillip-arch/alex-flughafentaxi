@@ -125,10 +125,6 @@ p {
     padding-inline: 1rem;
   }
 
-  .section-shell {
-    padding-block: var(--space-12);
-  }
-
   .section-shell-tight-top {
     padding-top: 1.5rem;
     padding-bottom: 3.5rem;
@@ -343,34 +339,6 @@ p {
 
   .ui-button-secondary:hover {
     background: #f4f4ef;
-  }
-
-  .ui-card {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .ui-card-muted {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface-muted);
-    box-shadow: var(--shadow-md);
-  }
-
-  .ui-card-dark {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface-dark);
-    color: var(--color-text-inverse);
-  }
-
-  .ui-section-card {
-    border: 1px solid var(--color-border);
-    border-radius: 1.75rem;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-sm);
   }
 
   .ui-input {
