@@ -537,38 +537,17 @@ export default function Home() {
               />
 
               <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-[#e9edf3] bg-white">
-                <div className="relative h-[360px] w-full md:h-[450px]">
-                  <Image
-                    src="https://images.pexels.com/photos/358220/pexels-photo-358220.jpeg?auto=compress&cs=tinysrgb&w=1400"
-                    alt="Terminal 3 Orientierung am Flughafen Wien"
-                    fill
-                    className="object-cover"
-                    sizes="100vw"
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(17,17,17,0.08)_0%,rgba(17,17,17,0.48)_100%)]" />
-                  <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-5 md:p-6">
-                    <div className="max-w-[32rem] rounded-[1.2rem] bg-white/92 px-4 py-3 backdrop-blur-sm">
-                      <p className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#1679FF]">
-                        Terminal 3
-                      </p>
-                      <p className="mt-2 text-[0.95rem] text-[#42566f]">
-                        Orientierung fuer den Abholpunkt am Flughafen Wien mit direktem Link zur
-                        Live-Karte.
-                      </p>
-                    </div>
-                    <div>
-                      <a
-                        href="https://maps.app.goo.gl/Yzv6rhxJBWNjLLMP7"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-[999px] bg-[#111111] px-4 py-2.5 text-[0.9rem] font-medium text-white transition-colors hover:bg-[#232325]"
-                      >
-                        <MapPin size={16} />
-                        Open in Google Maps
-                      </a>
-                    </div>
-                  </div>
-                </div>
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1331.7548403878466!2d16.56207266809108!3d48.11969249664487!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476c54530fff4bc5%3A0xf4c32d1659fb4805!2sVIE%20Terminal%203%2C%201300%20Schwechat!5e0!3m2!1sen!2sat!4v1774133487794!5m2!1sen!2sat"
+                  title="Google Maps Karte fuer den Abholpunkt am Flughafen Wien"
+                  width="600"
+                  height="450"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="h-[360px] w-full md:h-[450px]"
+                />
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-2">
