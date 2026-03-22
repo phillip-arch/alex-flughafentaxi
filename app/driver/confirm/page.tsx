@@ -1,7 +1,28 @@
 import { XCircle } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import DriverConfirmClient from './DriverConfirmClient';
+
+function formatDriverConfirmDateTime(value?: string | null) {
+  const parsed = value ? new Date(value) : null;
+  if (!parsed || Number.isNaN(parsed.getTime())) {
+    return { date: '-', time: '-' };
+  }
+
+  return {
+    date: new Intl.DateTimeFormat('de-AT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(parsed),
+    time: new Intl.DateTimeFormat('de-AT', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(parsed),
+  };
+}
 
 export const metadata: Metadata = {
   robots: {
@@ -60,11 +81,46 @@ export default async function DriverConfirmPage({
     );
   }
 
+  let bookingSummary:
+    | {
+        pickup: string;
+        destination: string;
+        date: string;
+        time: string;
+        vehicle: string;
+      }
+    | undefined;
+
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (uuidRegex.test(token) && (!driver || uuidRegex.test(driver))) {
+    let query = supabaseAdmin
+      .from('bookings')
+      .select('pickup, destination, pickup_at, vehicle_type')
+      .eq('confirm_token', token);
+
+    if (driver) {
+      query = query.eq('driver_id', driver);
+    }
+
+    const { data: booking } = await query.maybeSingle();
+    if (booking) {
+      const { date, time } = formatDriverConfirmDateTime(booking.pickup_at);
+      bookingSummary = {
+        pickup: String(booking.pickup || '-'),
+        destination: String(booking.destination || '-'),
+        date,
+        time,
+        vehicle: String(booking.vehicle_type || '-'),
+      };
+    }
+  }
+
   return (
     <main className="min-h-screen bg-white">
       <section className="app-container min-h-screen pb-20 pt-10 md:pt-14">
         <div className="mx-auto max-w-[57.5rem]">
-          <DriverConfirmClient token={token} driverId={driver} />
+          <DriverConfirmClient token={token} driverId={driver} bookingSummary={bookingSummary} />
         </div>
       </section>
     </main>

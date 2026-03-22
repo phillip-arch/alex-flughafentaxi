@@ -4,7 +4,21 @@ import { useState } from 'react';
 import { ArrowRight, CheckCircle2, Loader2, ShieldCheck, XCircle } from 'lucide-react';
 import { confirmBooking } from '@/app/(booking)/actions';
 
-export default function DriverConfirmClient({ token, driverId }: { token: string; driverId?: string }) {
+export default function DriverConfirmClient({
+  token,
+  driverId,
+  bookingSummary,
+}: {
+  token: string;
+  driverId?: string;
+  bookingSummary?: {
+    pickup: string;
+    destination: string;
+    date: string;
+    time: string;
+    vehicle: string;
+  };
+}) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [alreadyConfirmed, setAlreadyConfirmed] = useState(false);
@@ -99,17 +113,23 @@ export default function DriverConfirmClient({ token, driverId }: { token: string
           </p>
         </div>
 
-        <div className="mt-8 grid w-full gap-4 md:grid-cols-2">
-          <div className="rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5 text-left md:col-span-2">
+        {bookingSummary ? (
+          <div className="mt-8 w-full rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5 text-left">
             <div className="flex items-center gap-2 text-[#1679FF]">
               <ShieldCheck size={18} />
-              <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">Hinweis</p>
+              <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">
+                Fahrtinformationen
+              </p>
             </div>
-            <p className="mt-3 text-[0.98rem] leading-7 text-[#42566f]">
-              Mit Ihrer Bestaetigung wird die Fahrt verbindlich fuer die weitere Planung freigegeben.
-            </p>
+            <div className="mt-3 space-y-2 text-[0.98rem] leading-7 text-[#42566f]">
+              <p><strong className="text-[#111827]">Abholung:</strong> {bookingSummary.pickup}</p>
+              <p><strong className="text-[#111827]">Ziel:</strong> {bookingSummary.destination}</p>
+              <p><strong className="text-[#111827]">Datum:</strong> {bookingSummary.date}</p>
+              <p><strong className="text-[#111827]">Uhrzeit:</strong> {bookingSummary.time}</p>
+              <p><strong className="text-[#111827]">Fahrzeug:</strong> {bookingSummary.vehicle}</p>
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <button
