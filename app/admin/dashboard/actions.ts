@@ -256,6 +256,7 @@ export async function updateBookingStatus(id: string, status: string) {
               </table>
               <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
                 <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
+                ${data.booking_reference ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Buchungsnummer:</strong> ${escapeHtml(String(data.booking_reference || ''))}</td></tr>` : ''}
                 <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Abholung:</strong> ${pickupIsAirport ? safePickup : `<a href="${pickupMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safePickup}</a>`}</td></tr>
                 ${safeFlightNumberInfo ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Flugnummer:</strong> ${safeFlightNumberInfo}</td></tr>` : ''}
                 <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Ziel:</strong> ${destinationIsAirport ? safeDestination : `<a href="${destinationMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safeDestination}</a>`}</td></tr>
@@ -290,7 +291,7 @@ export async function updateBookingStatus(id: string, status: string) {
               subject: `Ihre Fahrt wurde storniert (${directionLabel})`.trim(),
               html: `
                 <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
+                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;">
                     <tr>
                       <td style="padding:28px 28px 8px 28px;text-align:center;">
                         <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
@@ -333,7 +334,7 @@ export async function updateBookingStatus(id: string, status: string) {
                 subject: `Fahrtstornierung (${directionLabel})`.trim(),
                 html: `
                 <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
+                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;">
                     <tr>
                       <td style="padding:28px 28px 8px 28px;text-align:center;">
                         <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>

@@ -248,7 +248,7 @@ export async function cancelOwnBooking(bookingId: string) {
 
   const { data: existing, error: existingError } = await supabase
     .from('bookings')
-    .select('id, status, driver_id, pickup_at, full_name, email, pickup, destination, vehicle_type, price')
+    .select('id, status, driver_id, booking_reference, pickup_at, full_name, email, pickup, destination, vehicle_type, price')
     .eq('id', id)
     .eq('user_id', user.id)
     .maybeSingle();
@@ -356,7 +356,7 @@ export async function cancelOwnBooking(bookingId: string) {
         subject: 'Ihre Fahrt wurde storniert',
         html: `
           <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1d1d1f;">
-            <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;">
               <tr>
                 <td style="padding:28px;">
                   <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
@@ -366,6 +366,7 @@ export async function cancelOwnBooking(bookingId: string) {
                   </p>
                   <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
                     <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
+                    ${existing.booking_reference ? `<tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Buchungsnummer:</strong> ${String(existing.booking_reference || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td></tr>` : ''}
                     <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Abholung:</strong> ${String(existing.pickup || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td></tr>
                     <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Ziel:</strong> ${String(existing.destination || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td></tr>
                     <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Datum:</strong> ${formattedDate}</td></tr>
