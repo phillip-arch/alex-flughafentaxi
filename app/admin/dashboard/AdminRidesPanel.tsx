@@ -88,7 +88,7 @@ export default function AdminRidesPanel({
   const ridesActionButtonClass = '!h-[42px] !min-h-[42px] !min-w-[136px] !px-3 !py-2 !text-[0.85rem]';
   const tableColumnClass = {
     time: 'w-[92px] min-w-[92px]',
-    driver: 'w-[88px] min-w-[88px]',
+    driver: 'w-[96px] min-w-[96px]',
     vehicle: 'w-[74px] min-w-[74px]',
     route: 'w-[230px] min-w-[230px]',
     passenger: 'w-[160px] min-w-[160px]',
@@ -101,7 +101,7 @@ export default function AdminRidesPanel({
 
   return (
     <div className="space-y-2">
-      {loading ? (
+      {loading && bookings.length === 0 ? (
         <div className="py-12 text-center text-[#86868b]">Fahrten werden geladen...</div>
       ) : bookings.length === 0 ? (
         <div className="rounded-[24px] border border-[#d2d2d7] bg-white py-12 text-center text-[#86868b]">

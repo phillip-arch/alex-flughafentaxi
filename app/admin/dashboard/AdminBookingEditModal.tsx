@@ -1,6 +1,6 @@
 'use client';
 
-import { Briefcase, Calendar, ChevronDown, Clock, ShoppingBag, PlaneLanding, PlaneTakeoff, Users, X } from 'lucide-react';
+import { ArrowUpDown, Briefcase, Calendar, Check, ChevronDown, Clock, MapPin, PlaneLanding, ShoppingBag, Users, X } from 'lucide-react';
 import DatePicker from '@/components/DatePicker';
 import TimePicker from '@/components/TimePicker';
 import SectionIntro from '@/components/ui/SectionIntro';
@@ -142,51 +142,76 @@ export default function AdminBookingEditModal({
           <div className="space-y-4">
             <p className={adminEditSectionLabelClass}>Fahrt</p>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => handleEditDirectionChange('to_airport')}
-                  className={`${adminEditChoiceCardBaseClass} ${
-                    editDirection === 'to_airport'
-                      ? 'border-[#1679ff] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)]'
-                      : 'border-[#e9edf3] text-[#111827] hover:border-[#cfd7e3]'
-                  }`}
-                >
-                  <PlaneTakeoff size={24} className={editDirection === 'to_airport' ? 'text-[#1679ff]' : 'text-[#7b8798]'} />
-                  <span className={`text-[0.95rem] font-medium ${editDirection === 'to_airport' ? 'text-[#1679ff]' : 'text-[#111827]'}`}>Zum Flughafen</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleEditDirectionChange('from_airport')}
-                  className={`${adminEditChoiceCardBaseClass} ${
-                    editDirection === 'from_airport'
-                      ? 'border-[#1679ff] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)]'
-                      : 'border-[#e9edf3] text-[#111827] hover:border-[#cfd7e3]'
-                  }`}
-                >
-                  <PlaneLanding size={24} className={editDirection === 'from_airport' ? 'text-[#1679ff]' : 'text-[#7b8798]'} />
-                  <span className={`text-[0.95rem] font-medium ${editDirection === 'from_airport' ? 'text-[#1679ff]' : 'text-[#111827]'}`}>Vom Flughafen</span>
-                </button>
-              </div>
-              {editDirection ? (
-                <div className="space-y-4">
-                  {editDirection === 'from_airport' ? (
-                    <input className={BOOKING_FORM_INPUT_CLASS} placeholder="Flugnummer (z.B. OS123)" value={editFlightNumber} onChange={(e) => setEditFlightNumber(e.target.value)} />
-                  ) : null}
-                  <p className={adminEditSectionLabelClass}>Adresse</p>
-                  <input
-                    className={BOOKING_FORM_INPUT_CLASS}
-                    placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
-                    value={editAddress}
-                    onChange={(e) => handleEditAddressChange(e.target.value)}
-                  />
+              <div className="-ml-2 rounded-[2rem] bg-transparent py-2 pl-2 pr-0 md:-mr-2 md:pr-0">
+                <div className="flex gap-4">
+                  <div className="flex w-[2.1rem] shrink-0 flex-col items-center pt-[1.25rem]">
+                    <div className="flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[#111111] text-white">
+                      {editDirection === 'from_airport' ? <PlaneLanding size={13} /> : <MapPin size={13} />}
+                    </div>
+                    <div className="h-[3.4rem] w-px bg-[#111111]" />
+                    <div className="-mt-0.5 flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white">
+                      <Check size={13} />
+                    </div>
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="min-h-[4.5rem]">
+                      <p className="text-[11px] font-medium text-[#5f6975]">Abholung</p>
+                      {editDirection === 'from_airport' ? (
+                        <div className="mt-1 flex min-h-[3.25rem] items-start pt-[0.35rem]">
+                          <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
+                            Flughafen Wien (VIE)
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="mt-1 min-h-[3.25rem] space-y-2">
+                          <input
+                            className={BOOKING_FORM_INPUT_CLASS}
+                            placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                            value={editAddress}
+                            onChange={(e) => handleEditAddressChange(e.target.value)}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-3 min-h-[4.5rem]">
+                      <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
+                      {editDirection === 'from_airport' ? (
+                        <div className="mt-1 min-h-[3.25rem] space-y-2">
+                          <input
+                            className={BOOKING_FORM_INPUT_CLASS}
+                            placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                            value={editAddress}
+                            onChange={(e) => handleEditAddressChange(e.target.value)}
+                          />
+                        </div>
+                      ) : (
+                        <div className="mt-1 flex min-h-[3.25rem] items-start pt-[0.35rem]">
+                          <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
+                            Flughafen Wien (VIE)
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="-mr-1 flex shrink-0 flex-col justify-start pt-[3.75rem] md:-mr-2">
+                    <button
+                      type="button"
+                      onClick={() => handleEditDirectionChange(editDirection === 'from_airport' ? 'to_airport' : 'from_airport')}
+                      className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
+                      aria-label="Abholung und Ziel tauschen"
+                    >
+                      <ArrowUpDown size={16} className="-translate-x-[2px]" />
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <>
-                  <input className={BOOKING_FORM_INPUT_CLASS} placeholder="Abholung" value={editForm.pickup} onChange={(e) => setEditForm((p: any) => ({ ...p, pickup: e.target.value }))} />
-                  <input className={BOOKING_FORM_INPUT_CLASS} placeholder="Ziel" value={editForm.destination} onChange={(e) => setEditForm((p: any) => ({ ...p, destination: e.target.value }))} />
-                </>
-              )}
+              </div>
+
+              {editDirection === 'from_airport' ? (
+                <input className={BOOKING_FORM_INPUT_CLASS} placeholder="Flugnummer (z.B. OS123)" value={editFlightNumber} onChange={(e) => setEditFlightNumber(e.target.value)} />
+              ) : null}
 
               <div className={`flex items-center justify-between ${adminEditMetaCardClass}`}>
                 <div className="text-[#111827]">

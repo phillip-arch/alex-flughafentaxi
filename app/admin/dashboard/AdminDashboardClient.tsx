@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { addDays, format, subDays, startOfDay, endOfDay } from 'date-fns';
 import {
   Car, Users, BarChart3, Calendar,
   ChevronLeft, ChevronRight,
@@ -103,12 +103,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const [statsPaymentFilter, setStatsPaymentFilter] = useState<'all' | 'cash' | 'card'>('all');
   const [statsDriverFilter, setStatsDriverFilter] = useState('all');
 
+  const getShiftedDate = (baseDate: string, dayOffset: number) => {
+    const parsed = new Date(`${baseDate}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return baseDate;
+    return format(addDays(parsed, dayOffset), 'yyyy-MM-dd');
+  };
+
   const shiftRidesDate = (dayOffset: number) => {
-    const parsed = new Date(`${date}T00:00:00`);
-    if (Number.isNaN(parsed.getTime())) return;
-    parsed.setDate(parsed.getDate() + dayOffset);
-    const nextDate = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
-    setDate(nextDate);
+    setDate(getShiftedDate(date, dayOffset));
   };
 
   const isCancelledBooking = (status?: string) => status === 'cancelled' || status === 'canceled';
@@ -273,6 +275,24 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
+  async function prefetchRidesForDate(targetDate: string) {
+    if (!targetDate) return;
+    if (ridesCache[targetDate]) return;
+
+    const data = await fetchBookings(targetDate);
+    const nextBookings = data || [];
+    const uniqueEmails = Array.from(new Set(nextBookings.map((b: any) => b.email).filter(Boolean)));
+    const counts = await fetchPassengerCountsBatch(uniqueEmails);
+
+    setRidesCache((prev) => {
+      if (prev[targetDate]) return prev;
+      return {
+        ...prev,
+        [targetDate]: { bookings: nextBookings, passengerCounts: counts },
+      };
+    });
+  }
+
   async function loadData() {
     try {
       if (currentTab === 'rides') {
@@ -280,8 +300,13 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         if (cachedRides) {
           setBookings(cachedRides.bookings);
           setPassengerCounts(cachedRides.passengerCounts);
+          if (!driversLoaded) {
+            const driversData = await fetchDrivers();
+            setDrivers(driversData || []);
+            setDriversLoaded(true);
+          }
         } else {
-          setLoading(true);
+          setLoading(bookings.length === 0);
           const dataPromise = fetchBookings(date);
           const driversPromise = !driversLoaded ? fetchDrivers() : Promise.resolve(drivers);
           const [data, driversData] = await Promise.all([dataPromise, driversPromise]);
@@ -301,6 +326,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             [date]: { bookings: data || [], passengerCounts: counts },
           }));
         }
+
+        void prefetchRidesForDate(getShiftedDate(date, -1));
+        void prefetchRidesForDate(getShiftedDate(date, 1));
       } else if (currentTab === 'drivers') {
         if (!driversLoaded) {
           setLoading(true);
@@ -619,13 +647,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const handleEditDirectionChange = (direction: 'to_airport' | 'from_airport') => {
     setEditDirection(direction);
     const prev = editForm;
+    const currentAddress = String(editAddress || '').trim();
     if (direction === 'to_airport') {
-      const nextPickup = String(prev.pickup || '').includes(AIRPORT_LABEL) ? '' : prev.pickup;
+      const nextPickup = currentAddress || (String(prev.pickup || '').includes(AIRPORT_LABEL) ? '' : prev.pickup);
       setEditForm({ ...prev, pickup: nextPickup, destination: AIRPORT_LABEL });
       setEditAddress(nextPickup);
       return;
     }
-    const nextDestination = String(prev.destination || '').includes(AIRPORT_LABEL) ? '' : prev.destination;
+    const nextDestination = currentAddress || (String(prev.destination || '').includes(AIRPORT_LABEL) ? '' : prev.destination);
     setEditForm({ ...prev, pickup: AIRPORT_LABEL, destination: nextDestination });
     setEditAddress(nextDestination);
   };
