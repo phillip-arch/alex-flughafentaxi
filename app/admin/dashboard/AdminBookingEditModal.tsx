@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, ChevronDown, Clock, PlaneLanding, PlaneTakeoff, X } from 'lucide-react';
+import { Briefcase, Calendar, ChevronDown, Clock, ShoppingBag, PlaneLanding, PlaneTakeoff, Users, X } from 'lucide-react';
 import DatePicker from '@/components/DatePicker';
 import TimePicker from '@/components/TimePicker';
 import SectionIntro from '@/components/ui/SectionIntro';
@@ -242,25 +242,61 @@ export default function AdminBookingEditModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className={`${adminEditMetricCardClass} flex flex-col items-center justify-center gap-2`}>
-              <span className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">Personen</span>
-              <select className={adminEditMetricSelectClass} value={editForm.passengers} onChange={(e) => setEditForm((p: any) => ({ ...p, passengers: Number(e.target.value) }))}>
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </div>
-            <div className={`${adminEditMetricCardClass} flex flex-col items-center justify-center gap-2`}>
-              <span className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">Koffer</span>
-              <select className={adminEditMetricSelectClass} value={editForm.luggage} onChange={(e) => setEditForm((p: any) => ({ ...p, luggage: Number(e.target.value) }))}>
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </div>
-            <div className={`${adminEditMetricCardClass} flex flex-col items-center justify-center gap-2`}>
-              <span className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">Handgepaeck</span>
-              <select className={adminEditMetricSelectClass} value={editHandLuggage} onChange={(e) => setEditHandLuggage(Number(e.target.value))}>
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{n}</option>)}
-              </select>
-            </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <label className="space-y-2">
+              <span className={adminEditSectionLabelClass}>Personen</span>
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                  <Users size={18} />
+                </span>
+                <select
+                  className={`${BOOKING_FORM_INPUT_CLASS} appearance-none !pl-[3.35rem] !pr-12`}
+                  value={editForm.passengers}
+                  onChange={(e) => setEditForm((p: any) => ({ ...p, passengers: Number(e.target.value) }))}
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{n}</option>)}
+                </select>
+                <span className="pointer-events-none absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                  <ChevronDown size={18} />
+                </span>
+              </div>
+            </label>
+            <label className="space-y-2">
+              <span className={adminEditSectionLabelClass}>Koffer</span>
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                  <Briefcase size={18} />
+                </span>
+                <select
+                  className={`${BOOKING_FORM_INPUT_CLASS} appearance-none !pl-[3.35rem] !pr-12`}
+                  value={editForm.luggage}
+                  onChange={(e) => setEditForm((p: any) => ({ ...p, luggage: Number(e.target.value) }))}
+                >
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{n}</option>)}
+                </select>
+                <span className="pointer-events-none absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                  <ChevronDown size={18} />
+                </span>
+              </div>
+            </label>
+            <label className="space-y-2">
+              <span className={adminEditSectionLabelClass}>Handgepaeck</span>
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                  <ShoppingBag size={18} />
+                </span>
+                <select
+                  className={`${BOOKING_FORM_INPUT_CLASS} appearance-none !pl-[3.35rem] !pr-12`}
+                  value={editHandLuggage}
+                  onChange={(e) => setEditHandLuggage(Number(e.target.value))}
+                >
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{n}</option>)}
+                </select>
+                <span className="pointer-events-none absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                  <ChevronDown size={18} />
+                </span>
+              </div>
+            </label>
           </div>
 
           <div className={`flex flex-col gap-4 ${adminEditMetaCardClass}`}>
