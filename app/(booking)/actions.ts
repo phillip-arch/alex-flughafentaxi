@@ -401,22 +401,7 @@ export async function createBooking(payload: any) {
     }
 
     if (emailError) {
-      // Avoid creating bookings that the user cannot confirm by email.
-      const { error: cleanupError } = await supabaseAdmin
-        .from('bookings')
-        .delete()
-        .eq('id', data.id);
-      if (cleanupError) {
-        console.error('Booking cleanup after email failure failed:', cleanupError);
-      }
-      const details =
-        typeof emailError === 'object' && emailError && 'message' in emailError
-          ? String((emailError as any).message)
-          : String(emailError || '');
-      if (process.env.NODE_ENV !== 'production' && details) {
-        return { error: `Buchung konnte nicht bestaetigt werden: ${details}` };
-      }
-      return { error: 'Buchung konnte nicht bestaetigt werden: E-Mail Versand fehlgeschlagen. Bitte erneut versuchen.' };
+      console.error('Booking confirmation email failed after booking creation:', emailError);
     }
   }
   return { success: true, reference: normalizeBookingReference(data.booking_reference) };
