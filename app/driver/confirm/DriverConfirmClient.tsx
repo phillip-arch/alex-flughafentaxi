@@ -106,24 +106,6 @@ export default function DriverConfirmClient({
           </p>
         </div>
 
-        {bookingSummary ? (
-          <div className="mt-8 w-full rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5 text-left">
-            <div className="flex items-center gap-2 text-[#1679FF]">
-              <ShieldCheck size={18} />
-              <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">
-                Fahrtinformationen
-              </p>
-            </div>
-            <div className="mt-3 space-y-2 text-[0.98rem] leading-7 text-[#42566f]">
-              <p><strong className="text-[#111827]">Abholung:</strong> {bookingSummary.pickup}</p>
-              <p><strong className="text-[#111827]">Ziel:</strong> {bookingSummary.destination}</p>
-              <p><strong className="text-[#111827]">Datum:</strong> {bookingSummary.date}</p>
-              <p><strong className="text-[#111827]">Uhrzeit:</strong> {bookingSummary.time}</p>
-              <p><strong className="text-[#111827]">Fahrzeug:</strong> {bookingSummary.vehicle}</p>
-            </div>
-          </div>
-        ) : null}
-
         <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <button
             onClick={handleConfirm}
@@ -143,6 +125,24 @@ export default function DriverConfirmClient({
             )}
           </button>
         </div>
+
+        {bookingSummary ? (
+          <div className="mt-8 w-full rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5 text-left">
+            <div className="flex items-center gap-2 text-[#1679FF]">
+              <ShieldCheck size={18} />
+              <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">
+                Fahrtinformationen
+              </p>
+            </div>
+            <div className="mt-3 space-y-2 text-[0.98rem] leading-7 text-[#42566f]">
+              <p><strong className="text-[#111827]">Abholung:</strong> {bookingSummary.pickup}</p>
+              <p><strong className="text-[#111827]">Ziel:</strong> {bookingSummary.destination}</p>
+              <p><strong className="text-[#111827]">Datum:</strong> {bookingSummary.date}</p>
+              <p><strong className="text-[#111827]">Uhrzeit:</strong> {bookingSummary.time}</p>
+              <p><strong className="text-[#111827]">Fahrzeug:</strong> {bookingSummary.vehicle}</p>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

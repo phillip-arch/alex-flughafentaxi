@@ -729,6 +729,11 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
         <div style="margin:0;padding:8px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
           <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:none;margin:0;background:#ffffff;border:none;border-radius:24px;overflow:hidden;">
             <tr>
+              <td style="padding:18px 10px 0 10px;text-align:center;">
+                <a href="${confirmLink}" style="display:inline-block;background:#0071e3;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;padding:12px 24px;border-radius:9999px;">Bestaetigen Sie die Fahrt hier</a>
+              </td>
+            </tr>
+            <tr>
               <td style="padding:12px 10px 8px 10px;">
                 <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
                   <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
@@ -769,11 +774,6 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
                     </td>
                   </tr>
                 </table>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:18px 10px 22px 10px;text-align:center;">
-                <a href="${confirmLink}" style="display:inline-block;background:#0071e3;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;padding:12px 24px;border-radius:9999px;">Bestaetigen Sie die Fahrt hier</a>
               </td>
             </tr>
           </table>
