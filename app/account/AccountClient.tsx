@@ -316,7 +316,6 @@ export default function AccountClient({
         window.matchMedia('(max-width: 1024px)').matches;
       const hasInstallPrompt = Boolean(window.__aftDeferredInstallPrompt);
       const isInstalled =
-        window.localStorage.getItem('aft_app_installed') === '1' ||
         window.matchMedia('(display-mode: standalone)').matches ||
         Boolean(window.navigator.standalone);
 

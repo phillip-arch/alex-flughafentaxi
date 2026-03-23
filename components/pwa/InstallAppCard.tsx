@@ -20,8 +20,6 @@ declare global {
 
 const SHOWN_COUNT_KEY = 'aft_install_banner_shown_count';
 const DISMISSED_UNTIL_KEY = 'aft_install_banner_dismissed_until';
-const INSTALLED_KEY = 'aft_app_installed';
-
 type InstallState = 'hidden' | 'available' | 'installed' | 'unavailable';
 
 export default function InstallAppCard() {
@@ -34,12 +32,10 @@ export default function InstallAppCard() {
       if (typeof window === 'undefined') return;
 
       const isInstalled =
-        window.localStorage.getItem(INSTALLED_KEY) === '1' ||
         window.matchMedia('(display-mode: standalone)').matches ||
         Boolean(window.navigator.standalone);
 
       if (isInstalled) {
-        window.localStorage.setItem(INSTALLED_KEY, '1');
         setInstallState('installed');
         return;
       }
@@ -68,10 +64,7 @@ export default function InstallAppCard() {
     evaluateState();
 
     const handleAvailable = () => evaluateState();
-    const handleInstalled = () => {
-      window.localStorage.setItem(INSTALLED_KEY, '1');
-      setInstallState('installed');
-    };
+    const handleInstalled = () => setInstallState('installed');
 
     window.addEventListener('aft-install-available', handleAvailable);
     window.addEventListener('aft-install-installed', handleInstalled);
@@ -103,7 +96,6 @@ export default function InstallAppCard() {
       const choice = await promptEvent.userChoice;
 
       if (choice.outcome === 'accepted') {
-        window.localStorage.setItem(INSTALLED_KEY, '1');
         setInstallState('installed');
       } else {
         window.localStorage.setItem(

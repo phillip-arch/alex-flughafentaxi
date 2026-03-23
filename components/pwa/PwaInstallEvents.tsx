@@ -24,7 +24,6 @@ export default function PwaInstallEvents() {
 
     const handleInstalled = () => {
       window.__aftDeferredInstallPrompt = null;
-      window.localStorage.setItem('aft_app_installed', '1');
       window.dispatchEvent(new CustomEvent('aft-install-installed'));
     };
 
