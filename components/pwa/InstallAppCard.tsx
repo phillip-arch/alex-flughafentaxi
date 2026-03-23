@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CheckCircle2, Download, MapPinned, Rocket, Smartphone } from 'lucide-react';
 
 declare global {
@@ -18,14 +18,11 @@ declare global {
   }
 }
 
-const SHOWN_COUNT_KEY = 'aft_install_banner_shown_count';
-const DISMISSED_UNTIL_KEY = 'aft_install_banner_dismissed_until';
 type InstallState = 'hidden' | 'available' | 'installed' | 'unavailable';
 
 export default function InstallAppCard() {
   const [installState, setInstallState] = useState<InstallState>('hidden');
   const [isInstalling, setIsInstalling] = useState(false);
-  const hasCountedDisplay = useRef(false);
 
   useEffect(() => {
     const evaluateState = () => {
@@ -40,20 +37,9 @@ export default function InstallAppCard() {
         return;
       }
 
-      const dismissedUntil = Number(window.localStorage.getItem(DISMISSED_UNTIL_KEY) || '0');
-      if (dismissedUntil > Date.now()) {
-        setInstallState('unavailable');
-        return;
-      }
-
-      const shownCount = Number(window.localStorage.getItem(SHOWN_COUNT_KEY) || '0');
       const hasPrompt = Boolean(window.__aftDeferredInstallPrompt);
 
-      if (hasPrompt && shownCount < 2) {
-        if (!hasCountedDisplay.current) {
-          window.localStorage.setItem(SHOWN_COUNT_KEY, String(shownCount + 1));
-          hasCountedDisplay.current = true;
-        }
+      if (hasPrompt) {
         setInstallState('available');
         return;
       }
@@ -75,14 +61,6 @@ export default function InstallAppCard() {
     };
   }, []);
 
-  const handleDismiss = () => {
-    window.localStorage.setItem(
-      DISMISSED_UNTIL_KEY,
-      String(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    );
-    setInstallState('unavailable');
-  };
-
   const handleInstall = async () => {
     const promptEvent = window.__aftDeferredInstallPrompt;
     if (!promptEvent) {
@@ -98,10 +76,6 @@ export default function InstallAppCard() {
       if (choice.outcome === 'accepted') {
         setInstallState('installed');
       } else {
-        window.localStorage.setItem(
-          DISMISSED_UNTIL_KEY,
-          String(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        );
         setInstallState('unavailable');
       }
     } finally {
@@ -190,13 +164,6 @@ export default function InstallAppCard() {
           className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#000000] px-6 py-4 text-[1.0625rem] font-medium leading-none text-white transition-colors hover:bg-[#232325] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <span>{isInstalling ? 'Installiert...' : 'Install App'}</span>
-        </button>
-        <button
-          type="button"
-          onClick={handleDismiss}
-          className="inline-flex items-center justify-center rounded-[var(--radius-field)] border border-[#dbe7f8] bg-white px-6 py-4 text-[1.0625rem] font-medium leading-none text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]"
-        >
-          Not now
         </button>
       </div>
     </div>
