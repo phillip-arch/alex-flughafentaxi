@@ -355,7 +355,7 @@ export default function AdminRidesPanel({
                             <div className="flex min-h-[42px] flex-col items-center justify-between">
                               <div className="font-semibold text-[#1d1d1f]">{format(new Date(booking.pickup_at), 'HH:mm')}</div>
                               <div className="text-[16px] text-[#86868b]">{format(new Date(booking.pickup_at), 'dd/MM/yyyy')}</div>
-                              <div className="text-[13px] font-semibold tracking-wide text-[#1d1d1f]">{directionLabel}</div>
+                              <div className="text-[16px] font-semibold tracking-wide text-[#1d1d1f]">{directionLabel}</div>
                             </div>
                           </td>
                           <td className={`${tableColumnClass.driver} px-0 py-1 align-middle ${isCancelled ? 'opacity-35' : ''}`}>
