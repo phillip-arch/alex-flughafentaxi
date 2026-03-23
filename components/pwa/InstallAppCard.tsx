@@ -101,7 +101,8 @@ export default function InstallAppCard() {
               Die App ist bereits auf diesem Geraet verfuegbar
             </h3>
             <p className="text-[0.96rem] leading-7 text-[#42566f]">
-              Fuer schnelleren Zugriff koennen Sie die App direkt vom Homescreen aus oeffnen.
+              Fuer schnelleren Zugriff finden Sie Alex Flughafentaxi jetzt auf Ihrem Homescreen oder
+              in Ihrer App-Liste.
             </p>
           </div>
         </div>
