@@ -87,8 +87,7 @@ export default function AdminRidesPanel({
 }: AdminRidesPanelProps) {
   const ridesActionButtonClass = '!h-[42px] !min-h-[42px] !min-w-[136px] !px-3 !py-2 !text-[0.85rem]';
   const tableColumnClass = {
-    time: 'w-[88px] min-w-[88px]',
-    direction: 'w-[54px] min-w-[54px]',
+    time: 'w-[92px] min-w-[92px]',
     driver: 'w-[88px] min-w-[88px]',
     vehicle: 'w-[74px] min-w-[74px]',
     route: 'w-[230px] min-w-[230px]',
@@ -330,7 +329,6 @@ export default function AdminRidesPanel({
                   <thead className="border-b border-[#d2d2d7] bg-[#f5f5f7] text-[10px] uppercase tracking-wide text-[#86868b]">
                     <tr>
                       <th className={`${tableColumnClass.time} px-1.5 py-1.5 text-center font-medium`}>Zeit / Datum</th>
-                      <th className={`${tableColumnClass.direction} px-0 py-1.5 text-center font-medium`}>Zum/Vom</th>
                       <th className={`${tableColumnClass.driver} px-0 py-1.5 text-center font-medium`}>Fahrer</th>
                       <th className={`${tableColumnClass.vehicle} px-0 py-1.5 text-center font-medium`}>Auto</th>
                       <th className={`${tableColumnClass.route} px-0 py-1.5 text-center font-medium`}>Route</th>
@@ -357,10 +355,8 @@ export default function AdminRidesPanel({
                             <div className="flex min-h-[42px] flex-col items-center justify-between">
                               <div className="font-semibold text-[#1d1d1f]">{format(new Date(booking.pickup_at), 'HH:mm')}</div>
                               <div className="text-[16px] text-[#86868b]">{format(new Date(booking.pickup_at), 'dd/MM/yyyy')}</div>
+                              <div className="text-[13px] font-semibold tracking-wide text-[#1d1d1f]">{directionLabel}</div>
                             </div>
-                          </td>
-                          <td className={`${tableColumnClass.direction} px-1.5 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
-                            <span className="inline-flex items-center text-[16px] font-semibold text-[#1d1d1f]">{directionLabel}</span>
                           </td>
                           <td className={`${tableColumnClass.driver} px-0 py-1 align-middle ${isCancelled ? 'opacity-35' : ''}`}>
                             <select
