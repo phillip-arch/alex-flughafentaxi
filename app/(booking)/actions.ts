@@ -455,7 +455,7 @@ export async function confirmBooking(token: string, driverId?: string) {
     .single();
 
   if (data) {
-    revalidatePath('/admin/dashboard');
+    revalidatePath('/dispatch/dashboard');
     return { success: true, reference: normalizeBookingReference(data.booking_reference) };
   }
 

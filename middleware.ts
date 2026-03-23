@@ -3,6 +3,12 @@ import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  const applyRouteHeaders = (nextResponse: NextResponse) => {
+    if (path.startsWith('/dispatch')) {
+      nextResponse.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+    }
+    return nextResponse;
+  };
 
   // Fallback for Supabase recovery links that incorrectly land on "/?code=..." or "/?token_hash=...".
   // Route them through our callback handler to complete recovery safely.
@@ -23,11 +29,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  let response = NextResponse.next({
+  let response = applyRouteHeaders(NextResponse.next({
     request: {
       headers: request.headers,
     },
-  });
+  }));
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -41,11 +47,11 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value);
           });
-          response = NextResponse.next({
+          response = applyRouteHeaders(NextResponse.next({
             request: {
               headers: request.headers,
             },
-          });
+          }));
           
           // Environment-based cookie security
           const vercelEnv = process.env.VERCEL_ENV; // 'production' | 'preview' | 'development' | undefined
@@ -84,22 +90,22 @@ export async function middleware(request: NextRequest) {
 
   // Protected Routes Logic
   // 1. Protect Admin Routes
-  if (path.startsWith('/admin')) {
+  if (path.startsWith('/dispatch')) {
     // Allow access to login page
-    if (path === '/admin/login') {
+    if (path === '/dispatch/login') {
       if (user) {
-        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+        return NextResponse.redirect(new URL('/dispatch/dashboard', request.url));
       }
       return response;
     }
 
-    // For all other /admin routes
+    // For all other /dispatch routes
     if (!user) {
       // Skip redirect for Server Actions (they handle their own auth)
       if (request.headers.get('next-action')) {
         return response;
       }
-      return NextResponse.redirect(new URL('/admin/login', request.url));
+      return NextResponse.redirect(new URL('/dispatch/login', request.url));
     }
   }
 
@@ -123,7 +129,7 @@ export const config = {
     // Include "/" to catch password-reset links that fallback to homepage.
     '/',
     // Run auth/session middleware on routes that need auth protection.
-    '/admin/:path*',
+    '/dispatch/:path*',
     '/account/:path*',
     '/login',
   ],

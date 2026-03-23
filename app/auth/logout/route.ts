@@ -12,11 +12,10 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   await supabase.auth.signOut();
 
-  return NextResponse.redirect(new URL('/admin/login', request.url), { status: 303 });
+  return NextResponse.redirect(new URL('/dispatch/login', request.url), { status: 303 });
 }
 
 // UX fallback: opening /auth/logout directly should not show 405.
 export async function GET(request: NextRequest) {
-  return NextResponse.redirect(new URL('/admin/login', request.url), { status: 303 });
+  return NextResponse.redirect(new URL('/dispatch/login', request.url), { status: 303 });
 }
-

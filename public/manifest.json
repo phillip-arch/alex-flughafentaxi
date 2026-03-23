@@ -1,0 +1,25 @@
+{
+  "name": "FlughafenTaxi Wien",
+  "short_name": "FlughafenTaxi",
+  "description": "Flughafentransfer in Wien mit schneller Buchung und direktem Zugriff auf Ihre Fahrten.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "lang": "de-AT",
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

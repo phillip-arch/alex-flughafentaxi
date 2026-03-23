@@ -98,7 +98,7 @@ export default function NavbarClient() {
     return () => window.removeEventListener('mousedown', handlePointerDown);
   }, [isMobileLangMenuOpen]);
 
-  const isAdminPage = pathname.startsWith('/admin');
+  const isAdminPage = pathname.startsWith('/dispatch');
   if (isAdminPage) return null;
 
   const headerClass = isHomePage && !isScrolled

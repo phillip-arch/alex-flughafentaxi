@@ -60,7 +60,7 @@ export default function FloatingContactButton() {
     };
   }, [isOpen]);
 
-  if (pathname.startsWith('/admin')) {
+  if (pathname.startsWith('/dispatch')) {
     return null;
   }
 

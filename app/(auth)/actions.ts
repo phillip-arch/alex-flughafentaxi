@@ -7,6 +7,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { claimGuestBookingsForUser } from '@/lib/bookings/claimGuestBookings';
 import { cookies, headers } from 'next/headers';
 import { isIP } from 'net';
+import { Resend } from 'resend';
 
 import { z } from 'zod';
 
@@ -35,6 +36,92 @@ const UpdatePasswordSchema = z.object({
   message: "Die Passwörter stimmen nicht überein",
   path: ["confirmPassword"],
 });
+
+async function getRequestIpAddress() {
+  const headersList = await headers();
+  const forwardedFor = headersList.get('x-forwarded-for');
+  const rawIp = forwardedFor ? forwardedFor.split(',')[0].trim() : headersList.get('x-real-ip');
+  let ip = rawIp && isIP(rawIp) ? rawIp : 'unknown';
+
+  if (ip.startsWith('::ffff:')) {
+    ip = ip.replace('::ffff:', '');
+  }
+
+  return ip;
+}
+
+async function logAuthRateLimitEvent(payload: { ip: string; email: string; action: string }) {
+  const { error } = await supabaseAdmin.from('auth_rate_limits').insert({
+    ip_address: payload.ip,
+    email: payload.email,
+    action: payload.action,
+  });
+
+  if (error) {
+    console.error('Auth rate limit logging failed:', error);
+  }
+}
+
+async function sendAdminLoginFailureAlert(payload: { email: string; ip: string; reason: string }) {
+  const alertRecipient =
+    process.env.ADMIN_LOGIN_ALERT_EMAIL ||
+    process.env.RESEND_FROM_EMAIL ||
+    '';
+
+  if (!process.env.RESEND_API_KEY || !alertRecipient) return;
+
+  try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const from = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+    const attemptedAt = new Intl.DateTimeFormat('de-AT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Europe/Vienna',
+    }).format(new Date());
+
+    const safeEmail = String(payload.email || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeIp = String(payload.ip || 'unknown').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeReason = String(payload.reason || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    const { error } = await resend.emails.send({
+      from,
+      to: alertRecipient,
+      subject: `Dispatch Login fehlgeschlagen (${safeEmail || 'unbekannt'})`,
+      html: `
+        <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1d1d1f;">
+          <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;">
+            <tr>
+              <td style="padding:28px;">
+                <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Sicherheitswarnung</div>
+                <h1 style="margin:0 0 12px 0;font-size:28px;line-height:1.2;font-weight:700;color:#1d1d1f;">Fehlgeschlagener Dispatch-Login</h1>
+                <p style="margin:0 0 18px 0;font-size:16px;line-height:1.6;color:#5f6368;">
+                  Es wurde ein fehlgeschlagener Login-Versuch auf die Dispatch-Anmeldung erkannt.
+                </p>
+                <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
+                  <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Details</td></tr>
+                  <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>E-Mail:</strong> ${safeEmail || '-'}</td></tr>
+                  <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>IP-Adresse:</strong> ${safeIp}</td></tr>
+                  <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Zeit:</strong> ${attemptedAt}</td></tr>
+                  <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Grund:</strong> ${safeReason}</td></tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `,
+    });
+
+    if (error) {
+      console.error('Admin login alert email failed:', error);
+    }
+  } catch (error) {
+    console.error('Admin login alert email exception:', error);
+  }
+}
 
 export async function requestPasswordReset(formData: FormData) {
   const supabase = await createClient();
@@ -154,7 +241,8 @@ export async function login(formData: FormData) {
     return { error: validated.error.issues[0]?.message || 'Ungültige Anmeldedaten' };
   }
 
-  const { email, password } = validated.data;
+  const email = validated.data.email.trim().toLowerCase();
+  const password = validated.data.password;
 
   // Brute-force protection for user login (IP + email).
   try {
@@ -329,43 +417,49 @@ export async function adminLogin(formData: FormData) {
 
   // 1.5 Rate Limiting (Brute Force Protection)
   try {
-    const headersList = await headers();
-    const forwardedFor = headersList.get('x-forwarded-for');
-    const rawIp = forwardedFor ? forwardedFor.split(',')[0].trim() : headersList.get('x-real-ip');
-    let ip = rawIp && isIP(rawIp) ? rawIp : 'unknown';
-    
-    if (ip.startsWith('::ffff:')) {
-      ip = ip.replace('::ffff:', '');
-    }
-
+    const ip = await getRequestIpAddress();
     const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
 
-    // Check IP Limit
+    // Stricter IP limit for dispatch login
     if (ip !== 'unknown') {
       const { count: ipCount, error: countError } = await supabaseAdmin
         .from('auth_rate_limits')
         .select('*', { count: 'exact', head: true })
         .eq('ip_address', ip)
-        .eq('action', 'admin_login')
+        .in('action', ['admin_login', 'admin_login_failed'])
         .gte('created_at', fifteenMinsAgo);
 
       if (countError) {
         console.error('Rate limit check failed:', countError);
-      } else if (ipCount && ipCount >= 5) {
+      } else if (ipCount && ipCount >= 4) {
+        await sendAdminLoginFailureAlert({
+          email,
+          ip,
+          reason: 'Rate limit ausgelÃ¶st (IP)',
+        });
         return { error: 'Zu viele Login-Versuche. Bitte warten Sie 15 Minuten.' };
       }
     }
 
-    // Log the attempt (before checking credentials to count failures)
-    const { error: insertError } = await supabaseAdmin.from('auth_rate_limits').insert({
-      ip_address: ip,
-      email: email,
-      action: 'admin_login'
-    });
+    const { count: emailCount, error: emailCountError } = await supabaseAdmin
+      .from('auth_rate_limits')
+      .select('*', { count: 'exact', head: true })
+      .eq('email', email)
+      .in('action', ['admin_login', 'admin_login_failed'])
+      .gte('created_at', fifteenMinsAgo);
 
-    if (insertError) {
-      console.error('Rate limit logging failed:', insertError);
+    if (emailCountError) {
+      console.error('Email rate limit check failed:', emailCountError);
+    } else if (emailCount && emailCount >= 3) {
+      await sendAdminLoginFailureAlert({
+        email,
+        ip,
+        reason: 'Rate limit ausgelÃ¶st (E-Mail)',
+      });
+      return { error: 'Zu viele Login-Versuche. Bitte warten Sie 15 Minuten.' };
     }
+
+    await logAuthRateLimitEvent({ ip, email, action: 'admin_login' });
   } catch (error) {
     console.error('Rate limiting error:', error);
     // Continue with login even if rate limiting fails
@@ -378,6 +472,13 @@ export async function adminLogin(formData: FormData) {
   });
 
   if (authError || !authData.user) {
+    const ip = await getRequestIpAddress();
+    await logAuthRateLimitEvent({ ip, email, action: 'admin_login_failed' });
+    await sendAdminLoginFailureAlert({
+      email,
+      ip,
+      reason: 'Falsche Anmeldedaten oder Benutzer nicht gefunden',
+    });
     // Artificial delay to prevent timing attacks
     await new Promise(resolve => setTimeout(resolve, 1000));
     return { error: 'Ungültige Anmeldedaten' };
@@ -392,13 +493,20 @@ export async function adminLogin(formData: FormData) {
 
   if (profileError || profile?.role !== 'admin') {
     // Not an admin: sign them out immediately
+    const ip = await getRequestIpAddress();
+    await logAuthRateLimitEvent({ ip, email, action: 'admin_login_failed' });
+    await sendAdminLoginFailureAlert({
+      email,
+      ip,
+      reason: 'Login erfolgreich, aber ohne Admin-Rolle',
+    });
     await supabase.auth.signOut();
     await new Promise(resolve => setTimeout(resolve, 1000));
     return { error: 'Zugriff verweigert: Unbefugtes Konto' };
   }
 
   revalidatePath('/', 'layout');
-  redirect('/admin/dashboard');
+  redirect('/dispatch/dashboard');
 }
 
 export async function logout() {

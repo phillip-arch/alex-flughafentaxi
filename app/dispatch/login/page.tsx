@@ -1,0 +1,127 @@
+'use client';
+
+import Link from 'next/link';
+import { useState } from 'react';
+import { ArrowRight, ChevronLeft, Loader2, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { adminLogin } from '@/app/(auth)/actions';
+
+export default function AdminLoginPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (formData: FormData) => {
+    setLoading(true);
+    setError(null);
+
+    const result = await adminLogin(formData);
+
+    if (result?.error) {
+      setError(result.error);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <section className="relative min-h-screen overflow-hidden bg-white">
+      <div className="app-container flex min-h-screen justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
+        <div className="w-full max-w-[34rem]">
+          <div className="ui-card-surface-light bg-white px-5 py-6 md:px-8 md:py-8">
+            <Link
+              href="/"
+              className="mb-6 inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
+            >
+              <ChevronLeft size={18} />
+              Zurueck zur Startseite
+            </Link>
+
+            <div className="ui-text-block-sm">
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff]">
+                <ShieldCheck size={20} />
+              </div>
+              <h1 className="ui-heading-lg text-[#111827]">Admin-Portal</h1>
+              <p className="ui-copy-compact text-[#6a7d96]">
+                Melden Sie sich an, um Buchungen und Fahrer zu verwalten.
+              </p>
+            </div>
+
+            {error ? (
+              <div className="mt-6 rounded-[1rem] border border-[var(--color-danger)] bg-[var(--color-danger-soft)] px-4 py-3 text-[0.92rem] font-medium text-[var(--color-danger)]">
+                {error}
+              </div>
+            ) : null}
+
+            <form action={handleSubmit} className="mt-6 space-y-4">
+              <fieldset
+                disabled={loading}
+                className={`space-y-4 transition-opacity duration-200 ${
+                  loading ? 'pointer-events-none opacity-70' : ''
+                }`}
+              >
+                <label className="block">
+                  <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                    Admin-E-Mail
+                  </span>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                      <Mail size={15} />
+                    </span>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Admin-E-Mail"
+                      required
+                      className="ui-input !bg-white !pl-[3.2rem] focus:!bg-white"
+                    />
+                  </div>
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                    Passwort
+                  </span>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                      <Lock size={15} />
+                    </span>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Passwort"
+                      required
+                      className="ui-input !bg-white !pl-[3.2rem] focus:!bg-white"
+                    />
+                  </div>
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  aria-busy={loading}
+                  className="ui-button-booking-primary mt-2 w-full disabled:cursor-wait disabled:opacity-80"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>Anmelden...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Anmelden</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </fieldset>
+            </form>
+
+            {loading ? (
+              <p className="mt-3 text-[0.88rem] font-medium text-[#6a7d96]">
+                Anmeldung wird verarbeitet...
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

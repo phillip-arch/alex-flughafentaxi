@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 export default function FooterGate() {
   const pathname = usePathname();
   if (
-    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/dispatch') ||
     pathname === '/login' ||
     pathname === '/forgot-password' ||
     pathname === '/update-password' ||
