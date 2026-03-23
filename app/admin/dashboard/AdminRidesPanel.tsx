@@ -86,6 +86,19 @@ export default function AdminRidesPanel({
   getHandLuggageCountFromNotes,
 }: AdminRidesPanelProps) {
   const ridesActionButtonClass = '!h-[42px] !min-h-[42px] !min-w-[136px] !px-3 !py-2 !text-[0.85rem]';
+  const tableColumnClass = {
+    time: 'w-[88px] min-w-[88px]',
+    direction: 'w-[64px] min-w-[64px]',
+    driver: 'w-[100px] min-w-[100px]',
+    vehicle: 'w-[92px] min-w-[92px]',
+    route: 'w-[230px] min-w-[230px]',
+    passenger: 'w-[160px] min-w-[160px]',
+    customer: 'w-[160px] min-w-[160px]',
+    payment: 'w-[80px] min-w-[80px]',
+    note: 'w-[56px] min-w-[56px]',
+    edit: 'w-[56px] min-w-[56px]',
+    status: 'w-[56px] min-w-[56px]',
+  } as const;
 
   return (
     <div className="space-y-2">
@@ -316,17 +329,17 @@ export default function AdminRidesPanel({
                 <table className="w-full min-w-[930px] text-left text-[16px]">
                   <thead className="border-b border-[#d2d2d7] bg-[#f5f5f7] text-[10px] uppercase tracking-wide text-[#86868b]">
                     <tr>
-                      <th className="px-1.5 py-1.5 text-center font-medium">Zeit / Datum</th>
-                      <th className="px-0 py-1.5 text-center font-medium">Zum/Vom</th>
-                      <th className="px-0 py-1.5 text-center font-medium">Fahrer</th>
-                      <th className="px-0 py-1.5 text-center font-medium">Auto</th>
-                      <th className="px-0 py-1.5 text-center font-medium">Route</th>
+                      <th className={`${tableColumnClass.time} px-1.5 py-1.5 text-center font-medium`}>Zeit / Datum</th>
+                      <th className={`${tableColumnClass.direction} px-0 py-1.5 text-center font-medium`}>Zum/Vom</th>
+                      <th className={`${tableColumnClass.driver} px-0 py-1.5 text-center font-medium`}>Fahrer</th>
+                      <th className={`${tableColumnClass.vehicle} px-0 py-1.5 text-center font-medium`}>Auto</th>
+                      <th className={`${tableColumnClass.route} px-0 py-1.5 text-center font-medium`}>Route</th>
                       <th className="px-2 py-1.5 text-center font-medium">Fahrgast, Gepäck</th>
-                      <th className="px-2 py-1.5 text-center font-medium">Kunde</th>
-                      <th className="w-[80px] px-0 py-1.5 text-center font-medium">Zahlung</th>
-                      <th className="w-[120px] px-2 py-1.5 text-center font-medium md:w-[56px] md:px-1.5">Notiz</th>
-                      <th className="w-[120px] px-2 py-1.5 text-center font-medium md:w-[56px] md:px-1.5">Bearbeiten</th>
-                      <th className="w-[120px] px-2 py-1.5 text-center font-medium md:w-[56px] md:px-1.5">X</th>
+                      <th className={`${tableColumnClass.customer} px-2 py-1.5 text-center font-medium`}>Kunde</th>
+                      <th className={`${tableColumnClass.payment} px-0 py-1.5 text-center font-medium`}>Zahlung</th>
+                      <th className={`${tableColumnClass.note} px-1.5 py-1.5 text-center font-medium`}>Notiz</th>
+                      <th className={`${tableColumnClass.edit} px-1.5 py-1.5 text-center font-medium`}>Bearbeiten</th>
+                      <th className={`${tableColumnClass.status} px-1.5 py-1.5 text-center font-medium`}>X</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -340,16 +353,16 @@ export default function AdminRidesPanel({
                       const isCancelled = isCancelledBooking(booking.status);
                       return (
                         <tr key={booking.id} className={`border-b border-[#f0f0f2] transition-all ${isCancelled ? 'bg-[#e5e7eb]' : 'hover:bg-[#f5f5f7]/60'}`}>
-                          <td className={`px-1.5 py-1 align-top text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.time} px-1.5 py-1 align-top text-center ${isCancelled ? 'opacity-35' : ''}`}>
                             <div className="flex min-h-[42px] flex-col items-center justify-between">
                               <div className="font-semibold text-[#1d1d1f]">{format(new Date(booking.pickup_at), 'HH:mm')}</div>
                               <div className="text-[16px] text-[#86868b]">{format(new Date(booking.pickup_at), 'dd/MM/yyyy')}</div>
                             </div>
                           </td>
-                          <td className={`px-1.5 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.direction} px-1.5 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
                             <span className="inline-flex items-center text-[16px] font-semibold text-[#1d1d1f]">{directionLabel}</span>
                           </td>
-                          <td className={`px-0 py-1 align-middle ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.driver} px-0 py-1 align-middle ${isCancelled ? 'opacity-35' : ''}`}>
                             <select
                               className={`w-22 rounded-[8px] border px-1 py-1 text-[16px] outline-none focus:border-[#0071e3] ${getDriverSelectTone(booking)}`}
                               value={getSelectedDriverId(booking)}
@@ -375,10 +388,10 @@ export default function AdminRidesPanel({
                               ))}
                             </select>
                           </td>
-                          <td className={`px-1.5 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.vehicle} px-1.5 py-1 align-middle text-center ${isCancelled ? 'opacity-35' : ''}`}>
                             <span className="inline-flex items-center text-[16px] font-semibold uppercase text-[#1d1d1f]">{booking.vehicle_type || 'LIMO'}</span>
                           </td>
-                          <td className={`min-w-[145px] px-0 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.route} px-0 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
                             <div className="flex items-stretch gap-1.5">
                               <div className="flex shrink-0 flex-col items-center pt-1 text-[#000000]" aria-hidden="true">
                                 <span className="h-2 w-2 rounded-full bg-[#000000]" />
@@ -386,16 +399,16 @@ export default function AdminRidesPanel({
                                 <ChevronDown size={12} />
                               </div>
                               <div className="flex min-h-[42px] min-w-0 flex-1 flex-col justify-between">
-                                <div className="truncate font-medium text-[#1d1d1f]" title={formatTableRouteAddress(booking, booking.pickup, 'pickup')}>
+                                <div className="line-clamp-2 break-words font-medium leading-snug text-[#1d1d1f]" title={formatTableRouteAddress(booking, booking.pickup, 'pickup')}>
                                   {formatTableRouteAddress(booking, booking.pickup, 'pickup')}
                                 </div>
-                                <div className="truncate font-medium text-[#1d1d1f]" title={formatTableRouteAddress(booking, booking.destination, 'destination')}>
+                                <div className="line-clamp-2 break-words font-medium leading-snug text-[#1d1d1f]" title={formatTableRouteAddress(booking, booking.destination, 'destination')}>
                                   {formatTableRouteAddress(booking, booking.destination, 'destination')}
                                 </div>
                               </div>
                             </div>
                           </td>
-                          <td className={`min-w-[140px] px-2 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.passenger} px-2 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
                             <div className="flex min-h-[42px] flex-col justify-between text-[16px] font-medium leading-tight text-[#1d1d1f]">
                               <div>{Number(booking.passengers || 0)} Pers. • {Number(booking.luggage || 0)} K • {handLuggage} H</div>
                               {hasAnySeat ? (
@@ -411,7 +424,7 @@ export default function AdminRidesPanel({
                               )}
                             </div>
                           </td>
-                          <td className={`px-2 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.customer} px-2 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
                             <a href={getTelHref(booking.phone)} className="block h-full transition-colors hover:text-[#0071e3]">
                               <div className="flex min-h-[42px] flex-col justify-between">
                                 <div className="flex items-center gap-1.5 font-semibold text-[#1d1d1f]">
@@ -422,7 +435,7 @@ export default function AdminRidesPanel({
                               </div>
                             </a>
                           </td>
-                          <td className={`w-[80px] px-0 py-1 align-top text-center ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.payment} px-0 py-1 align-top text-center ${isCancelled ? 'opacity-35' : ''}`}>
                             <div className="flex min-h-[42px] flex-col items-center justify-between">
                               <div className="font-semibold text-[#1d1d1f]">{formatPriceDisplay(booking.price)}</div>
                               <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[16px] font-semibold uppercase ${payment.className}`}>
@@ -430,7 +443,7 @@ export default function AdminRidesPanel({
                               </span>
                             </div>
                           </td>
-                          <td className={`px-2 py-1 text-center align-middle md:px-0 ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.note} px-1.5 py-1 text-center align-middle ${isCancelled ? 'opacity-35' : ''}`}>
                             {displayNotes ? (
                               <button
                                 type="button"
@@ -443,7 +456,7 @@ export default function AdminRidesPanel({
                               </button>
                             ) : null}
                           </td>
-                          <td className={`px-2 py-1 text-center align-middle md:px-0 ${isCancelled ? 'opacity-35' : ''}`}>
+                          <td className={`${tableColumnClass.edit} px-1.5 py-1 text-center align-middle ${isCancelled ? 'opacity-35' : ''}`}>
                             <button
                               type="button"
                               onClick={() => openEditBooking(booking)}
@@ -454,7 +467,7 @@ export default function AdminRidesPanel({
                               <Edit size={15} />
                             </button>
                           </td>
-                          <td className="px-2 py-1 text-center align-middle md:px-1.5">
+                          <td className={`${tableColumnClass.status} px-1.5 py-1 text-center align-middle`}>
                             <button
                               type="button"
                               onClick={() => {
