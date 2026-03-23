@@ -62,7 +62,7 @@ export default function DriverConfirmClient({
             <p className="max-w-[34rem] text-[1rem] leading-8 text-[#5d6b7c] md:text-[1.06rem]">
               {alreadyConfirmed
                 ? message || 'Sie haben diese Buchung bereits bestaetigt.'
-                : 'Ihre Fahrt wurde erfolgreich bestaetigt. Unser Team plant nun die weiteren Schritte fuer Ihren Transfer.'}
+                : 'Ihre Fahrt wurde erfolgreich bestaetigt.'}
             </p>
           </div>
         </div>
@@ -97,14 +97,7 @@ export default function DriverConfirmClient({
   return (
     <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
       <div className="mx-auto flex max-w-[42rem] flex-col items-center text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#8fc3ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.10)_0%,rgba(36,144,255,0.14)_100%)] text-[#0a63ff]">
-          <ShieldCheck size={38} />
-        </div>
-
-        <div className="mt-14 flex flex-col items-center gap-6">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1679FF]">
-            Bestaetigung
-          </p>
+        <div className="flex flex-col items-center gap-6">
           <h1 className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[2.6rem]">
             Fahrt bestaetigen
           </h1>
