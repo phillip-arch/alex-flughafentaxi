@@ -124,6 +124,8 @@ export default function AccountClient({
   const accountDangerButtonClass =
     'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#f1d1d6] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#d70015] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#fff4f6]';
   const hasReachedFavoriteLimit = favorites.length >= 3;
+  const shouldShowFavoritesEmptyState =
+    activeTab === 'favoriten' && favoritesLoaded && !favoritesLoading && favorites.length === 0;
   const favoritePresetItems: { label: FavoritePreset; icon: typeof House }[] = [
     { label: 'House', icon: House },
     { label: 'Office', icon: Building2 },
@@ -508,7 +510,7 @@ export default function AccountClient({
                       </button>
                     </div>
                   ))}
-                  {favorites.length === 0 ? (
+                  {shouldShowFavoritesEmptyState ? (
                     <p className="text-sm text-[#1679ff]">Keine Favoriten gespeichert.</p>
                   ) : null}
                 </div>

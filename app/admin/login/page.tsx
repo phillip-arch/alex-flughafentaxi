@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { ChevronLeft, Loader2, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ChevronLeft, Loader2, Lock, Mail, ShieldCheck } from 'lucide-react';
 import { adminLogin } from '@/app/(auth)/actions';
 
 export default function AdminLoginPage() {
@@ -105,7 +105,10 @@ export default function AdminLoginPage() {
                       <span>Anmelden...</span>
                     </>
                   ) : (
-                    <span>Anmelden</span>
+                    <>
+                      <span>Anmelden</span>
+                      <ArrowRight size={16} />
+                    </>
                   )}
                 </button>
               </fieldset>

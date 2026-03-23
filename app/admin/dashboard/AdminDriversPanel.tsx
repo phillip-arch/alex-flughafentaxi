@@ -63,7 +63,7 @@ export default function AdminDriversPanel({
 
       <div>
         <div className="bg-white rounded-[24px] border border-[#d2d2d7] shadow-sm p-8 sticky top-24">
-          <h3 className="text-[19px] font-semibold text-[#1d1d1f] mb-12 flex items-center gap-2">
+          <h3 className="text-[19px] font-semibold text-[#1d1d1f] mb-16 flex items-center gap-2">
             <Plus size={20} className="text-[#0071e3]" /> Neuen Fahrer hinzufügen
           </h3>
           <form onSubmit={handleAddDriver} className="space-y-4">
