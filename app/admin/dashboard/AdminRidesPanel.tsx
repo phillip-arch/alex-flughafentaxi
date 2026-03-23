@@ -88,7 +88,7 @@ export default function AdminRidesPanel({
   const ridesActionButtonClass = '!h-[42px] !min-h-[42px] !min-w-[136px] !px-3 !py-2 !text-[0.85rem]';
   const tableColumnClass = {
     time: 'w-[88px] min-w-[88px]',
-    direction: 'w-[64px] min-w-[64px]',
+    direction: 'w-[54px] min-w-[54px]',
     driver: 'w-[88px] min-w-[88px]',
     vehicle: 'w-[74px] min-w-[74px]',
     route: 'w-[230px] min-w-[230px]',
