@@ -3,7 +3,6 @@ import { ArrowRight, CheckCircle2, Mail, ShieldCheck } from 'lucide-react';
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import NavbarClient from '@/components/NavbarClient';
-import BookingInstallBanner from '@/components/pwa/BookingInstallBanner';
 
 export const metadata: Metadata = {
   robots: {
@@ -93,8 +92,6 @@ export default async function BookingSuccessPage() {
                     {isLoggedIn ? 'Zu Mein Konto' : 'Zur Startseite'}
                   </Link>
                 </div>
-
-                <BookingInstallBanner />
               </div>
             </div>
           </div>

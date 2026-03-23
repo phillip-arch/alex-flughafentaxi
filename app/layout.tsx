@@ -1,9 +1,9 @@
 import { Archivo, Inter } from 'next/font/google';
-import './globals.css';
 import { Metadata } from 'next';
 import FooterGate from '@/components/FooterGate';
 import GlobalChromeClient from '@/components/GlobalChromeClient';
 import PwaInstallEvents from '@/components/pwa/PwaInstallEvents';
+import './globals.css';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -17,17 +17,18 @@ const archivo = Archivo({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | FlughafenTaxi Wien',
-    default: 'FlughafenTaxi Wien | Zuverlässiger Flughafentransfer',
+    template: '%s | Alex Flughafentaxi',
+    default: 'Ihr professioneller Flughafen Taxi Service',
   },
-  description: 'Buchen Sie Ihren Flughafentransfer in Wien. Fixpreise, zuverlässiger Service und komfortable Fahrten zum und vom Flughafen Wien.',
+  description:
+    'Buchen Sie Ihren Flughafentransfer in Wien. Fixpreise, zuverlaessiger Service und komfortable Fahrten zum und vom Flughafen Wien.',
   metadataBase: new URL('https://flughafentaxi-wien.at'),
   manifest: '/manifest.json',
   openGraph: {
-    title: 'FlughafenTaxi Wien',
-    description: 'Zuverlässiger Flughafentransfer in Wien.',
+    title: 'Alex Flughafentaxi',
+    description: 'Zuverlaessiger Flughafentransfer in Wien.',
     url: 'https://flughafentaxi-wien.at',
-    siteName: 'FlughafenTaxi Wien',
+    siteName: 'Alex Flughafentaxi',
     locale: 'de_AT',
     type: 'website',
   },
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'FlughafenTaxi Wien',
+    title: 'Alex Flughafentaxi',
   },
 };
 
@@ -53,8 +54,8 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" href="/pwa-icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/pwa-icon.svg" />
+        <link rel="icon" href="/favtaxi.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/favtaxi.png" />
       </head>
       <body suppressHydrationWarning className="app-shell font-sans antialiased">
         {children}

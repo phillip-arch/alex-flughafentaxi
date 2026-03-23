@@ -30,7 +30,8 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
   const requestedTab =
     params?.tab === 'buchungsverlauf' ||
     params?.tab === 'profil' ||
-    params?.tab === 'favoriten'
+    params?.tab === 'favoriten' ||
+    params?.tab === 'app'
       ? params.tab
       : 'buchungsverlauf';
 
