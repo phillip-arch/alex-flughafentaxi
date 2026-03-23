@@ -89,8 +89,8 @@ export default function AdminRidesPanel({
   const tableColumnClass = {
     time: 'w-[88px] min-w-[88px]',
     direction: 'w-[64px] min-w-[64px]',
-    driver: 'w-[100px] min-w-[100px]',
-    vehicle: 'w-[92px] min-w-[92px]',
+    driver: 'w-[88px] min-w-[88px]',
+    vehicle: 'w-[74px] min-w-[74px]',
     route: 'w-[230px] min-w-[230px]',
     passenger: 'w-[160px] min-w-[160px]',
     customer: 'w-[160px] min-w-[160px]',
