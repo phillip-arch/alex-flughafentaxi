@@ -395,8 +395,23 @@ export default function AdminRidesPanel({
                                 <ChevronDown size={12} />
                               </div>
                               <div className="flex min-h-[42px] min-w-0 flex-1 flex-col justify-between">
-                                <div className="line-clamp-2 break-words font-medium leading-snug text-[#1d1d1f]" title={formatTableRouteAddress(booking, booking.pickup, 'pickup')}>
-                                  {formatTableRouteAddress(booking, booking.pickup, 'pickup')}
+                                <div
+                                  className="line-clamp-2 break-words font-medium leading-snug text-[#1d1d1f]"
+                                  title={(() => {
+                                    const pickupLabel = formatTableRouteAddress(booking, booking.pickup, 'pickup');
+                                    const flightNumber = getFlightNumberFromNotes(booking);
+                                    return /flughafen/i.test(pickupLabel) && flightNumber
+                                      ? `${pickupLabel} ${flightNumber}`
+                                      : pickupLabel;
+                                  })()}
+                                >
+                                  {(() => {
+                                    const pickupLabel = formatTableRouteAddress(booking, booking.pickup, 'pickup');
+                                    const flightNumber = getFlightNumberFromNotes(booking);
+                                    return /flughafen/i.test(pickupLabel) && flightNumber
+                                      ? `${pickupLabel} ${flightNumber}`
+                                      : pickupLabel;
+                                  })()}
                                 </div>
                                 <div className="line-clamp-2 break-words font-medium leading-snug text-[#1d1d1f]" title={formatTableRouteAddress(booking, booking.destination, 'destination')}>
                                   {formatTableRouteAddress(booking, booking.destination, 'destination')}
