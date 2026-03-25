@@ -1,17 +1,17 @@
 ﻿'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useDeferredValue } from 'react';
 import { addDays, format, subDays, startOfDay, endOfDay } from 'date-fns';
 import {
   Car, Users, BarChart3, Calendar,
   ChevronLeft, ChevronRight,
   Menu, LogOut,
-  LayoutGrid, Rows3
+  LayoutGrid, Rows3, History, Search
 } from 'lucide-react';
 import { 
   fetchBookings, fetchDrivers, addDriver, deleteDriver, 
-  updateBookingStatus, updateBookingDetails, assignDriver, unassignDriver, fetchStats, fetchPassengerCountsBatch 
+  updateBookingStatus, updateBookingDetails, assignDriver, unassignDriver, fetchStats, fetchPassengerCountsBatch, fetchAuditLogs, searchBookings
 } from './actions';
 import { composeBookingNotes, parseBookingNotes } from '@/lib/booking/notes';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
@@ -19,6 +19,7 @@ import { APP_HEADER_CLASS, APP_PAGE_BG_CLASS } from '@/components/ui/sharedStyle
 import AdminDriversPanel from './AdminDriversPanel';
 import AdminRidesPanel from './AdminRidesPanel';
 import AdminBookingEditModal from './AdminBookingEditModal';
+import AdminAuditLogPanel from './AdminAuditLogPanel';
 
 const AdminStatsPanel = dynamic(() => import('./AdminStatsPanel'), {
   loading: () => (
@@ -50,10 +51,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     'w-full appearance-none bg-transparent text-center text-[1.5rem] font-semibold text-[#111827] outline-none';
   const adminIconCloseButtonClass =
     'inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]';
-  const [currentTab, setCurrentTab] = useState<'rides' | 'drivers' | 'stats'>('rides');
+  const [currentTab, setCurrentTab] = useState<'rides' | 'drivers' | 'stats' | 'logs'>('rides');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [ridesSearchTerm, setRidesSearchTerm] = useState('');
   const [bookings, setBookings] = useState<any[]>([]);
   const [drivers, setDrivers] = useState<any[]>([]);
   const [statsData, setStatsData] = useState<any[]>([]);
@@ -63,6 +65,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const [driverSelection, setDriverSelection] = useState<Record<string, string>>({});
   const [driversLoaded, setDriversLoaded] = useState(false);
   const [statsCache, setStatsCache] = useState<Record<string, any[]>>({});
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [auditLogRange, setAuditLogRange] = useState<'today' | '7' | '30' | 'all'>('today');
+  const [auditLogsCache, setAuditLogsCache] = useState<Record<string, any[]>>({});
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [editDirection, setEditDirection] = useState<'to_airport' | 'from_airport' | null>(null);
   const [editAddress, setEditAddress] = useState('');
@@ -102,6 +107,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const [statsRange, setStatsRange] = useState('30'); // days
   const [statsPaymentFilter, setStatsPaymentFilter] = useState<'all' | 'cash' | 'card'>('all');
   const [statsDriverFilter, setStatsDriverFilter] = useState('all');
+  const deferredRidesSearchTerm = useDeferredValue(ridesSearchTerm);
+  const normalizedRidesSearch = deferredRidesSearchTerm.trim();
+  const isRidesSearchActive = currentTab === 'rides' && normalizedRidesSearch.length > 0;
 
   const getShiftedDate = (baseDate: string, dayOffset: number) => {
     const parsed = new Date(`${baseDate}T00:00:00`);
@@ -240,13 +248,13 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
     const view = params.get('view');
-    setCurrentTab(tab === 'drivers' || tab === 'stats' ? tab : 'rides');
+    setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'logs' ? tab : 'rides');
     setViewMode(view === 'table' ? 'table' : 'grid');
   }, []);
 
   useEffect(() => {
     loadData();
-  }, [currentTab, date, statsRange]);
+  }, [currentTab, date, statsRange, deferredRidesSearchTerm, auditLogRange]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -268,7 +276,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       const params = new URLSearchParams(window.location.search);
       const tab = params.get('tab');
       const view = params.get('view');
-      setCurrentTab(tab === 'drivers' || tab === 'stats' ? tab : 'rides');
+      setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'logs' ? tab : 'rides');
       setViewMode(view === 'table' ? 'table' : 'grid');
     };
     window.addEventListener('popstate', onPopState);
@@ -293,9 +301,56 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     });
   }
 
+  function getAuditLogFetchWindow(range: 'today' | '7' | '30' | 'all') {
+    if (range === 'all') return {};
+
+    const now = new Date();
+    const endDate = endOfDay(now).toISOString();
+    const startDate =
+      range === 'today'
+        ? startOfDay(now).toISOString()
+        : startOfDay(subDays(now, parseInt(range, 10))).toISOString();
+
+    return { startDate, endDate };
+  }
+
+  async function refreshAuditLogs(range = auditLogRange, force = false) {
+    if (!force && auditLogsCache[range]) {
+      setAuditLogs(auditLogsCache[range]);
+      return;
+    }
+
+    const logsData = await fetchAuditLogs({
+      limit: range === 'all' ? 200 : 150,
+      ...getAuditLogFetchWindow(range),
+    });
+    const nextLogs = logsData || [];
+    setAuditLogs(nextLogs);
+    setAuditLogsCache((prev) => ({ ...prev, [range]: nextLogs }));
+  }
+
   async function loadData() {
     try {
       if (currentTab === 'rides') {
+        const normalizedSearch = deferredRidesSearchTerm.trim();
+        if (normalizedSearch) {
+          setLoading(true);
+          const dataPromise = searchBookings(normalizedSearch);
+          const driversPromise = !driversLoaded ? fetchDrivers() : Promise.resolve(drivers);
+          const [data, driversData] = await Promise.all([dataPromise, driversPromise]);
+
+          setBookings(data || []);
+          if (!driversLoaded) {
+            setDrivers(driversData || []);
+            setDriversLoaded(true);
+          }
+
+          const uniqueEmails = Array.from(new Set((data || []).map((b: any) => b.email).filter(Boolean)));
+          const counts = await fetchPassengerCountsBatch(uniqueEmails);
+          setPassengerCounts(counts);
+          return;
+        }
+
         const cachedRides = ridesCache[date];
         if (cachedRides) {
           setBookings(cachedRides.bookings);
@@ -353,6 +408,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
           setStatsData(nextStats);
           setStatsCache((prev) => ({ ...prev, [statsRange]: nextStats }));
         }
+      } else if (currentTab === 'logs') {
+        setLoading(true);
+        await refreshAuditLogs(auditLogRange);
       }
     } catch (error) {
       console.error('Failed to load data', error);
@@ -362,7 +420,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   }
 
   const handleTabChange = (tab: string) => {
-    setCurrentTab(tab === 'drivers' || tab === 'stats' ? tab : 'rides');
+    setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'logs' ? tab : 'rides');
     setMobileTabsOpen(false);
   };
 
@@ -413,6 +471,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         delete next[bookingId];
         return next;
       });
+      await refreshAuditLogs(auditLogRange, true);
       return true;
     } catch (error) {
       console.error('handleAssignDriver failed:', error);
@@ -478,6 +537,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         delete next[bookingId];
         return next;
       });
+      await refreshAuditLogs(auditLogRange, true);
       return true;
     } catch (error) {
       console.error('handleUnassignDriver failed:', error);
@@ -507,6 +567,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         };
       });
       setStatsCache({});
+      await refreshAuditLogs(auditLogRange, true);
     } catch (error) {
       console.error('handleStatusChange failed:', error);
       alert('Fahrt konnte nicht aktualisiert werden: Serverfehler. Bitte erneut versuchen.');
@@ -540,6 +601,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       setRidesCache({});
       setStatsCache({});
       await loadData();
+      await refreshAuditLogs(auditLogRange, true);
     } catch (err) {
       console.error('Unexpected error adding driver:', err);
       alert('Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen.');
@@ -552,7 +614,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       setDriversLoaded(false);
       setRidesCache({});
       setStatsCache({});
-      loadData();
+      await loadData();
+      await refreshAuditLogs(auditLogRange, true);
     }
   };
 
@@ -734,6 +797,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       setEditingBooking(null);
       setRidesCache({});
       setStatsCache({});
+      await refreshAuditLogs(auditLogRange, true);
     } finally {
       setSavingEdit(false);
     }
@@ -747,6 +811,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         { id: 'rides', label: '', icon: <Car size={18} /> },
         { id: 'drivers', label: '', icon: <Users size={18} /> },
         { id: 'stats', label: '', icon: <BarChart3 size={18} /> },
+        { id: 'logs', label: '', icon: <History size={18} /> },
       ]}
       activeTab={currentTab}
       onChange={handleTabChange}
@@ -804,6 +869,37 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     </div>
   );
 
+  const renderSearchModeHeader = () => (
+    <div className="flex min-w-0 items-center gap-3">
+      <div className="min-w-0">
+        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#1679ff]">Suchmodus</p>
+        <p className="truncate text-[0.95rem] font-medium text-[#1d1d1f]">
+          Ergebnisse fuer "{normalizedRidesSearch}"
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => setRidesSearchTerm('')}
+        className="inline-flex shrink-0 items-center justify-center rounded-[11px] border border-[#dbe7f8] bg-white px-3 py-2 text-[0.9rem] font-medium text-[#1679ff] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]"
+      >
+        Suche beenden
+      </button>
+    </div>
+  );
+
+  const renderRidesSearchInput = () => (
+    <div className="relative w-full max-w-[360px]">
+      <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#98a2b3]" size={16} />
+      <input
+        type="search"
+        value={ridesSearchTerm}
+        onChange={(e) => setRidesSearchTerm(e.target.value)}
+        placeholder="Suche nach Name, E-Mail oder Buchungsnummer"
+        className="w-full rounded-[12px] border border-[#d2d2d7] bg-white py-2.5 pl-10 pr-4 text-[14px] text-[#1d1d1f] outline-none placeholder:text-[#98a2b3] focus:border-[#1679ff]"
+      />
+    </div>
+  );
+
   return (
     <div className={APP_PAGE_BG_CLASS}>
       {/* Header */}
@@ -811,9 +907,16 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 gap-3">
             <div className="min-w-0">
-              {currentTab === 'rides' ? renderHeaderDatePicker() : null}
+              {currentTab === 'rides'
+                ? isRidesSearchActive
+                  ? renderSearchModeHeader()
+                  : renderHeaderDatePicker()
+                : null}
             </div>
-            {currentTab === 'rides' ? renderViewModeToggle() : null}
+            <div className="hidden min-w-0 flex-1 justify-center lg:flex">
+              {currentTab === 'rides' && viewMode === 'grid' ? renderRidesSearchInput() : null}
+            </div>
+            {currentTab === 'rides' && !isRidesSearchActive ? renderViewModeToggle() : null}
             <div className="flex items-center gap-4 relative ml-auto">
               <div className="md:hidden">
                 <button
@@ -866,6 +969,19 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                       <BarChart3 size={16} className="shrink-0" />
                       <span className="text-[0.95rem] font-medium">Statistik</span>
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabChange('logs')}
+                      className={`inline-flex h-12 w-full items-center gap-3 rounded-[0.95rem] px-3 transition-colors ${
+                        currentTab === 'logs'
+                          ? 'bg-[#eef5ff] text-[#1679ff]'
+                          : 'text-[#1d1d1f] hover:bg-[#f8fbff]'
+                      }`}
+                      aria-label="Logs"
+                    >
+                      <History size={16} className="shrink-0" />
+                      <span className="text-[0.95rem] font-medium">Logs</span>
+                    </button>
                     </div>
                     <div className="border-t border-[#edf2f7] p-2.5">
                     <form action="/auth/logout" method="post">
@@ -899,11 +1015,18 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {currentTab === 'rides' && viewMode === 'grid' ? (
+            <div className="mb-4 lg:hidden">
+              {renderRidesSearchInput()}
+            </div>
+          ) : null}
           {currentTab === 'rides' && (
             <AdminRidesPanel
               loading={loading}
               bookings={bookings}
               viewMode={viewMode}
+              isSearchActive={isRidesSearchActive}
+              searchTerm={normalizedRidesSearch}
               notesPopup={notesPopup}
               setNotesPopup={setNotesPopup}
               passengerCounts={passengerCounts}
@@ -950,6 +1073,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               setStatsRange={setStatsRange}
               setStatsPaymentFilter={setStatsPaymentFilter}
               setStatsDriverFilter={setStatsDriverFilter}
+            />
+          )}
+          {currentTab === 'logs' && (
+            <AdminAuditLogPanel
+              loading={loading}
+              logs={auditLogs}
+              timeFilter={auditLogRange}
+              onTimeFilterChange={setAuditLogRange}
             />
           )}
         </div>

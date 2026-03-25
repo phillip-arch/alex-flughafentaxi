@@ -1,5 +1,4 @@
-'use client';
-
+﻿'use client';
 import { format } from 'date-fns';
 import {
   Briefcase,
@@ -24,6 +23,8 @@ type AdminRidesPanelProps = {
   loading: boolean;
   bookings: any[];
   viewMode: 'grid' | 'table';
+  isSearchActive: boolean;
+  searchTerm: string;
   notesPopup: { open: boolean; text: string };
   setNotesPopup: (value: { open: boolean; text: string }) => void;
   passengerCounts: Record<string, number>;
@@ -57,6 +58,8 @@ export default function AdminRidesPanel({
   loading,
   bookings,
   viewMode,
+  isSearchActive,
+  searchTerm,
   notesPopup,
   setNotesPopup,
   passengerCounts,
@@ -98,14 +101,22 @@ export default function AdminRidesPanel({
     edit: 'w-[56px] min-w-[56px]',
     status: 'w-[56px] min-w-[56px]',
   } as const;
-
   return (
     <div className="space-y-2">
+      {isSearchActive ? (
+        <div className="rounded-[20px] border border-[#dbe7f8] bg-[#f8fbff] px-4 py-3 text-[0.95rem] text-[#1d1d1f]">
+          Suchergebnisse fuer <span className="font-semibold">"{searchTerm}"</span>
+        </div>
+      ) : null}
       {loading && bookings.length === 0 ? (
-        <div className="py-12 text-center text-[#86868b]">Fahrten werden geladen...</div>
+        <div className="py-12 text-center text-[#86868b]">
+          {isSearchActive ? 'Suchergebnisse werden geladen...' : 'Fahrten werden geladen...'}
+        </div>
       ) : bookings.length === 0 ? (
         <div className="rounded-[24px] border border-[#d2d2d7] bg-white py-12 text-center text-[#86868b]">
-          Keine Fahrten für dieses Datum gefunden.
+          {isSearchActive
+            ? `Keine Buchungen fuer "${searchTerm}" gefunden.`
+            : 'Keine Fahrten fuer dieses Datum gefunden.'}
         </div>
       ) : (
         <>
@@ -118,6 +129,9 @@ export default function AdminRidesPanel({
                     isCancelledBooking(booking.status) ? 'border-[#cfd4dc] bg-[#e5e7eb]' : ''
                   }`}
                 >
+                  <div className={`mb-2 text-[13px] font-medium uppercase tracking-[0.12em] text-[#86868b] ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
+                    {format(new Date(booking.pickup_at), 'dd.MM.yyyy')}
+                  </div>
                   <div className={`mb-4 flex flex-nowrap items-center gap-1 sm:gap-2 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                     <span className="inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold text-[#000000] sm:px-4 sm:text-[18px]">
                       {format(new Date(booking.pickup_at), 'HH:mm')}
@@ -147,6 +161,11 @@ export default function AdminRidesPanel({
                         </span>
                       );
                     })()}
+                    {booking.booking_reference ? (
+                      <span className="inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide text-[#000000] sm:px-4 sm:text-[16px]">
+                        {booking.booking_reference}
+                      </span>
+                    ) : null}
                   </div>
 
                   <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[1.15fr_0.95fr_0.8fr]">
@@ -238,7 +257,7 @@ export default function AdminRidesPanel({
                             <>
                               {seats.baby > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.baby} BABYSCHALE</span> : null}
                               {seats.child > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.child} KINDERSITZ</span> : null}
-                              {seats.booster > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.booster} Sitzerhöhung</span> : null}
+                              {seats.booster > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.booster} SitzerhÃ¶hung</span> : null}
                             </>
                           );
                         })()}
@@ -296,7 +315,7 @@ export default function AdminRidesPanel({
                           <button
                             type="button"
                             onClick={() => {
-                              if (confirm('Möchten Sie die Bestellung aktivieren?')) {
+                              if (confirm('MÃ¶chten Sie die Bestellung aktivieren?')) {
                                 handleStatusChange(booking.id, 'pending');
                               }
                             }}
@@ -332,7 +351,7 @@ export default function AdminRidesPanel({
                       <th className={`${tableColumnClass.driver} px-0 py-1.5 text-center font-medium`}>Fahrer</th>
                       <th className={`${tableColumnClass.vehicle} px-0 py-1.5 text-center font-medium`}>Auto</th>
                       <th className={`${tableColumnClass.route} px-0 py-1.5 text-center font-medium`}>Route</th>
-                      <th className="px-2 py-1.5 text-center font-medium">Fahrgast, Gepäck</th>
+                      <th className="px-2 py-1.5 text-center font-medium">Fahrgast, GepÃ¤ck</th>
                       <th className={`${tableColumnClass.customer} px-2 py-1.5 text-center font-medium`}>Kunde</th>
                       <th className={`${tableColumnClass.payment} px-0 py-1.5 text-center font-medium`}>Zahlung</th>
                       <th className={`${tableColumnClass.note} px-1.5 py-1.5 text-center font-medium`}>Notiz</th>
@@ -421,13 +440,13 @@ export default function AdminRidesPanel({
                           </td>
                           <td className={`${tableColumnClass.passenger} px-2 py-1 align-top ${isCancelled ? 'opacity-35' : ''}`}>
                             <div className="flex min-h-[42px] flex-col justify-between text-[16px] font-medium leading-tight text-[#1d1d1f]">
-                              <div>{Number(booking.passengers || 0)} Pers. • {Number(booking.luggage || 0)} K • {handLuggage} H</div>
+                              <div>{Number(booking.passengers || 0)} Pers. {Number(booking.luggage || 0)} K {handLuggage} H</div>
                               {hasAnySeat ? (
                                 <div className="text-[16px] text-[#6e6e73]">
                                   {seats.baby > 0 ? `${seats.baby} B` : ''}
-                                  {seats.baby > 0 && (seats.child > 0 || seats.booster > 0) ? ' • ' : ''}
+                                  {seats.baby > 0 && (seats.child > 0 || seats.booster > 0) ? ' ' : ''}
                                   {seats.child > 0 ? `${seats.child} K` : ''}
-                                  {seats.child > 0 && seats.booster > 0 ? ' • ' : ''}
+                                  {seats.child > 0 && seats.booster > 0 ? ' ' : ''}
                                   {seats.booster > 0 ? `${seats.booster} S` : ''}
                                 </div>
                               ) : (
@@ -460,8 +479,8 @@ export default function AdminRidesPanel({
                                 type="button"
                                 onClick={() => setNotesPopup({ open: true, text: displayNotes })}
                                 className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#e7ebf3] text-[#1d1d1f] transition-colors hover:bg-[#dbe3f0]"
-                                aria-label="Notiz öffnen"
-                                title="Notiz öffnen"
+                                aria-label="Notiz Ã¶ffnen"
+                                title="Notiz Ã¶ffnen"
                               >
                                 <FileText size={15} />
                               </button>
@@ -483,7 +502,7 @@ export default function AdminRidesPanel({
                               type="button"
                               onClick={() => {
                                 if (isCancelled) {
-                                  if (confirm('Möchten Sie die Bestellung aktivieren?')) {
+                                  if (confirm('MÃ¶chten Sie die Bestellung aktivieren?')) {
                                     handleStatusChange(booking.id, 'pending');
                                   }
                                   return;
@@ -518,7 +537,7 @@ export default function AdminRidesPanel({
                     type="button"
                     onClick={() => setNotesPopup({ open: false, text: '' })}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:bg-[#e7ebf3]"
-                    aria-label="Notiz schließen"
+                    aria-label="Notiz schlieÃŸen"
                   >
                     <XCircle size={16} />
                   </button>

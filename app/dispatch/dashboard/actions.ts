@@ -7,6 +7,13 @@ import { redirect } from 'next/navigation';
 import { requireSameOrigin } from '@/lib/security/origin';
 import { Resend } from 'resend';
 import { parseBookingNotes } from '@/lib/booking/notes';
+import {
+  buildPassengerCancellationEmailHtml,
+  buildPassengerConfirmationEmailHtml,
+} from '@/lib/booking/passengerEmail';
+import { buildDriverCancellationEmailHtml } from '@/lib/booking/driverCancellationEmail';
+import { buildDriverAssignmentEmailHtml } from '@/lib/booking/driverAssignmentEmail';
+import { logAuditEvent } from '@/lib/audit/logAuditEvent';
 
 function normalizeBookingReference(reference?: string | null) {
   if (!reference) return '-';
@@ -100,6 +107,34 @@ export async function fetchBookings(date: string) {
   return data;
 }
 
+export async function searchBookings(query: string) {
+  const admin = await checkAdmin();
+  if (admin.error) return [];
+
+  const normalized = String(query || '').trim();
+  if (!normalized) return [];
+
+  const escaped = normalized.replace(/[%_,]/g, (match) => `\\${match}`);
+  const filter = `%${escaped}%`;
+
+  const { data, error: fetchError } = await supabaseAdmin
+    .from('bookings')
+    .select(`
+      *,
+      driver:driver_id(name)
+    `)
+    .or(`full_name.ilike.${filter},email.ilike.${filter},booking_reference.ilike.${filter}`)
+    .order('pickup_at', { ascending: false })
+    .limit(150);
+
+  if (fetchError) {
+    console.error('Error searching bookings:', fetchError);
+    return [];
+  }
+
+  return data || [];
+}
+
 export async function fetchDrivers() {
   const admin = await checkAdmin();
   if (admin.error) return [];
@@ -116,6 +151,44 @@ export async function fetchDrivers() {
   return data;
 }
 
+export async function fetchAuditLogs(
+  options: number | { limit?: number; startDate?: string; endDate?: string } = 100,
+) {
+  const admin = await checkAdmin();
+  if (admin.error) return [];
+
+  const normalizedOptions =
+    typeof options === 'number'
+      ? { limit: options }
+      : options || {};
+  const safeLimit = Number.isFinite(normalizedOptions.limit)
+    ? Math.min(Math.max(Math.trunc(normalizedOptions.limit as number), 1), 200)
+    : 100;
+
+  let query = supabaseAdmin
+    .from('audit_logs')
+    .select('id, actor_user_id, action, entity, entity_id, meta, created_at')
+    .order('created_at', { ascending: false })
+    .limit(safeLimit);
+
+  if (normalizedOptions.startDate) {
+    query = query.gte('created_at', normalizedOptions.startDate);
+  }
+
+  if (normalizedOptions.endDate) {
+    query = query.lte('created_at', normalizedOptions.endDate);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching audit logs:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 export async function addDriver(formData: FormData) {
   await requireSameOrigin();
   const admin = await checkAdmin();
@@ -125,9 +198,11 @@ export async function addDriver(formData: FormData) {
   const email = formData.get('email') as string;
   const phone = formData.get('phone') as string;
 
-  const { error: insertError } = await supabaseAdmin
+  const { data: createdDriver, error: insertError } = await supabaseAdmin
     .from('drivers')
-    .insert([{ name, email, phone }]);
+    .insert([{ name, email, phone }])
+    .select('id, name, email, phone')
+    .maybeSingle();
 
   if (insertError) {
     // Unique constraint on drivers.email
@@ -136,6 +211,16 @@ export async function addDriver(formData: FormData) {
     }
     return safeActionError('Fahrer konnte nicht hinzugefügt werden. Bitte erneut versuchen.', 'addDriver insert failed', insertError);
   }
+  await logAuditEvent({
+    actor: admin.user,
+    action: 'CREATE_DRIVER',
+    entity: 'drivers',
+    entityId: createdDriver?.id,
+    meta: {
+      after: createdDriver || { name, email, phone },
+    },
+  });
+
   revalidatePath('/dispatch/dashboard');
   return { success: true };
 }
@@ -145,6 +230,12 @@ export async function deleteDriver(id: string) {
   const admin = await checkAdmin();
   if (admin.error) return { error: admin.error || 'Unauthorized' };
 
+  const { data: existingDriver } = await supabaseAdmin
+    .from('drivers')
+    .select('id, name, email, phone')
+    .eq('id', id)
+    .maybeSingle();
+
   const { error: deleteError } = await supabaseAdmin
     .from('drivers')
     .delete()
@@ -153,6 +244,17 @@ export async function deleteDriver(id: string) {
   if (deleteError) {
     return safeActionError('Fahrer konnte nicht gelöscht werden. Bitte erneut versuchen.', 'deleteDriver failed', deleteError);
   }
+
+  await logAuditEvent({
+    actor: admin.user,
+    action: 'DELETE_DRIVER',
+    entity: 'drivers',
+    entityId: id,
+    meta: {
+      before: existingDriver || null,
+    },
+  });
+
   revalidatePath('/dispatch/dashboard');
   return { success: true };
 }
@@ -163,6 +265,12 @@ export async function updateBookingStatus(id: string, status: string) {
     const admin = await checkAdmin();
     if (admin.error) return { error: admin.error || 'Unauthorized' };
     if (!id) return { error: 'Buchungs-ID fehlt' };
+
+    const { data: beforeBooking } = await supabaseAdmin
+      .from('bookings')
+      .select('id, status, driver_id, full_name, email, pickup, destination, pickup_at, price, vehicle_type, notes, booking_reference')
+      .eq('id', id)
+      .maybeSingle();
 
     const allowedStatuses = new Set(['pending', 'confirmed', 'cancelled', 'canceled', 'completed']);
     if (!allowedStatuses.has(status)) return { error: 'Ungültiger Statuswert' };
@@ -178,7 +286,7 @@ export async function updateBookingStatus(id: string, status: string) {
         .from('bookings')
         .update({ status: candidate })
         .eq('id', id)
-        .select('id, status, driver_id, full_name, email, pickup, destination, pickup_at, price, vehicle_type, notes')
+        .select('id, status, driver_id, full_name, email, pickup, destination, pickup_at, price, vehicle_type, notes, booking_reference')
         .maybeSingle();
 
       if (!result.error && result.data) {
@@ -198,16 +306,31 @@ export async function updateBookingStatus(id: string, status: string) {
       return { error: 'Buchung nicht gefunden oder Aktualisierung nicht erlaubt' };
     }
 
+    let notificationData = data;
+    if (finalStatus === 'cancelled' || finalStatus === 'canceled') {
+      const { data: freshBookingData, error: freshBookingError } = await supabaseAdmin
+        .from('bookings')
+        .select('id, status, driver_id, full_name, email, pickup, destination, pickup_at, price, vehicle_type, notes, booking_reference')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (freshBookingError) {
+        console.error('updateBookingStatus notification reload failed:', freshBookingError);
+      } else if (freshBookingData) {
+        notificationData = freshBookingData;
+      }
+    }
+
     if (finalStatus === 'cancelled' || finalStatus === 'canceled') {
       if (process.env.RESEND_API_KEY) {
-        const pickupRaw = String(data.pickup || '').toLowerCase();
-        const destinationRaw = String(data.destination || '').toLowerCase();
+        const pickupRaw = String(notificationData.pickup || '').toLowerCase();
+        const destinationRaw = String(notificationData.destination || '').toLowerCase();
         const isFromAirport = pickupRaw.includes('flughafen');
         const isToAirport = destinationRaw.includes('flughafen');
         const directionLabel = isFromAirport ? 'Vom Flughafen' : isToAirport ? 'Zum Flughafen' : 'Transfer';
         const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
 
-        const parsedNotes = parseBookingNotes(data.notes);
+        const parsedNotes = parseBookingNotes(notificationData.notes);
         const paymentInNotes = String(parsedNotes.paymentLabel || '').toLowerCase();
         const flightNumberInfo = parsedNotes.flightNumberInfo;
         const isCardPayment =
@@ -220,132 +343,54 @@ export async function updateBookingStatus(id: string, status: string) {
             ? 'background:linear-gradient(135deg,rgba(10,99,255,0.12) 0%,rgba(36,144,255,0.18) 100%);color:#0a63ff;'
             : 'background:#f5f5f7;color:#86868b;';
 
-        const safePassengerName = escapeHtml(String(data.full_name || ''));
-        const pickupRawValue = String(data.pickup || '');
-        const destinationRawValue = String(data.destination || '');
-        const safePickup = escapeHtml(pickupRawValue);
-        const safeDestination = escapeHtml(destinationRawValue);
-        const pickupMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pickupRawValue)}`;
-        const destinationMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationRawValue)}`;
-        const pickupIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(pickupRawValue);
-        const destinationIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(destinationRawValue);
-        const safeVehicle = escapeHtml(String(data.vehicle_type || '-'));
-        const safePayment = escapeHtml(paymentLabel);
-        const safeFlightNumberInfo = escapeHtml(flightNumberInfo || '');
-        const { date: pickupDate, time: pickupTime } = formatDateTimeForEmail(String(data.pickup_at));
-        const safeDate = escapeHtml(pickupDate);
-        const safeTime = escapeHtml(pickupTime);
-        const safeDirectionLabel = escapeHtml(directionLabel);
-        const safePrice = escapeHtml(
-          new Intl.NumberFormat('de-AT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-            Number(data.price ?? 0),
-          ),
-        );
-
+        const safePassengerName = escapeHtml(String(notificationData.full_name || ''));
         const resend = new Resend(process.env.RESEND_API_KEY);
         const fromCandidates = Array.from(
           new Set([process.env.RESEND_FROM_EMAIL, 'onboarding@resend.dev'].filter(Boolean) as string[]),
         );
 
-        const sharedBody = `
-          <tr>
-            <td style="padding:20px 28px 8px 28px;">
-              <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
-                <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safePassengerName}</td></tr>
-              </table>
-              <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
-                ${data.booking_reference ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Buchungsnummer:</strong> ${escapeHtml(String(data.booking_reference || ''))}</td></tr>` : ''}
-                <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Abholung:</strong> ${pickupIsAirport ? safePickup : `<a href="${pickupMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safePickup}</a>`}</td></tr>
-                ${safeFlightNumberInfo ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Flugnummer:</strong> ${safeFlightNumberInfo}</td></tr>` : ''}
-                <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Ziel:</strong> ${destinationIsAirport ? safeDestination : `<a href="${destinationMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safeDestination}</a>`}</td></tr>
-                <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Datum:</strong> ${safeDate}</td></tr>
-                <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Uhrzeit:</strong> ${safeTime}</td></tr>
-                <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Fahrzeug:</strong> ${safeVehicle}</td></tr>
-              </table>
-              <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#ffffff;border:1px solid #e5e5ea;border-radius:16px;">
-                <tr>
-                  <td style="padding:18px 14px 16px 18px;text-align:center;width:62%;border-right:1px solid #e5e5ea;">
-                    <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Gesamtpreis</div>
-                    <div style="font-size:42px;line-height:1.05;color:#1d1d1f;font-weight:700;letter-spacing:-0.02em;">${safePrice} &euro;</div>
-                    <span style="display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;text-transform:uppercase;${paymentStyle}">${safePayment}</span>
-                  </td>
-                  <td style="padding:18px 14px 16px 14px;text-align:center;width:38%;">
-                    <div style="font-size:30px;line-height:1;margin-bottom:8px;">${directionIcon}</div>
-                    <div style="font-size:20px;line-height:1;color:#8b8b90;margin-bottom:8px;">____</div>
-                    <div style="font-size:14px;color:#1d1d1f;font-weight:700;line-height:1.3;">${safeDirectionLabel}</div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        `;
-
-        if (data.email) {
-          const safePassengerEmail = escapeHtml(String(data.email || ''));
+        if (notificationData.email) {
           for (const from of fromCandidates) {
             const { error } = await resend.emails.send({
               from,
-              to: data.email,
-              subject: `Ihre Fahrt wurde storniert (${directionLabel})`.trim(),
-              html: `
-                <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;">
-                    <tr>
-                      <td style="padding:28px 28px 8px 28px;text-align:center;">
-                        <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
-                        <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:700;color:#1d1d1f;">Fahrt storniert</h1>
-                        <p style="margin:12px 0 0 0;font-size:16px;line-height:1.5;color:#86868b;">Hallo ${safePassengerName}, Ihre Fahrt wurde storniert. Bei Fragen erreichen Sie uns per Telefon, WhatsApp oder Viber.</p>
-                      </td>
-                    </tr>
-                    ${sharedBody}
-                    <tr>
-                      <td style="padding:0 28px 28px 28px;">
-                        <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                          <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Kontakt</td></tr>
-                          <tr><td style="padding:0 18px 8px 18px;font-size:14px;color:#1d1d1f;"><strong>E-Mail:</strong> ${safePassengerEmail}</td></tr>
-                          <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;">Falls Sie eine Ersatzfahrt benötigen, buchen Sie bitte erneut oder kontaktieren Sie unser Team direkt.</td></tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              `,
+              to: notificationData.email,
+              subject: 'Ihre Fahrt wurde storniert',
+              html: buildPassengerCancellationEmailHtml({
+                fullName: notificationData.full_name,
+                bookingReference: notificationData.booking_reference,
+                pickup: notificationData.pickup,
+                destination: notificationData.destination,
+                pickupAt: notificationData.pickup_at,
+                vehicleType: notificationData.vehicle_type,
+                price: notificationData.price,
+              }),
             });
             if (!error) break;
+            console.error('updateBookingStatus passenger cancellation email failed:', error);
           }
         }
 
-        if (data.driver_id) {
+        if (notificationData.driver_id) {
           const { data: driver, error: driverError } = await supabaseAdmin
             .from('drivers')
             .select('id, name, email')
-            .eq('id', data.driver_id)
+            .eq('id', notificationData.driver_id)
             .maybeSingle();
 
           if (!driverError && driver?.email) {
-            const safeDriverName = escapeHtml(String(driver.name || 'Fahrer'));
-
             for (const from of fromCandidates) {
               const { error } = await resend.emails.send({
                 from,
                 to: driver.email,
                 subject: `Fahrtstornierung (${directionLabel})`.trim(),
-                html: `
-                <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;">
-                    <tr>
-                      <td style="padding:28px 28px 8px 28px;text-align:center;">
-                        <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
-                        <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:700;color:#1d1d1f;">Fahrt storniert</h1>
-                        <p style="margin:12px 0 0 0;font-size:16px;line-height:1.5;color:#86868b;">Hallo ${safeDriverName}, diese zugewiesene Fahrt wurde storniert.</p>
-                      </td>
-                    </tr>
-                    ${sharedBody}
-                  </table>
-                </div>
-              `,
+                html: buildDriverCancellationEmailHtml({
+                  driverName: driver.name,
+                  pickup: notificationData.pickup,
+                  destination: notificationData.destination,
+                  pickupAt: notificationData.pickup_at,
+                  vehicleType: notificationData.vehicle_type,
+                  price: notificationData.price,
+                }),
               });
               if (!error) break;
             }
@@ -356,12 +401,16 @@ export async function updateBookingStatus(id: string, status: string) {
       }
     }
 
-    await supabaseAdmin.from('audit_logs').insert({
-      actor_user_id: admin.user?.id,
+    await logAuditEvent({
+      actor: admin.user,
       action: 'UPDATE_STATUS',
       entity: 'bookings',
-      entity_id: id,
-      meta: { status: finalStatus },
+      entityId: id,
+      meta: {
+        before: beforeBooking || null,
+        after: notificationData || data || null,
+        status: finalStatus,
+      },
     });
 
     revalidatePath('/dispatch/dashboard');
@@ -403,6 +452,12 @@ export async function updateBookingDetails(payload: {
   if (!payload?.id) return { error: 'Buchungs-ID fehlt' };
   if (!allowedStatuses.has(payload.status)) return { error: 'Ungültiger Statuswert' };
 
+  const { data: beforeBooking } = await supabaseAdmin
+    .from('bookings')
+    .select('id, full_name, email, phone, pickup, destination, pickup_at, passengers, luggage, price, vehicle_type, notes, status, booking_reference')
+    .eq('id', payload.id)
+    .maybeSingle();
+
   const { data: updated, error: updateError } = await supabaseAdmin
     .from('bookings')
     .update({
@@ -420,7 +475,7 @@ export async function updateBookingDetails(payload: {
       status: payload.status,
     })
     .eq('id', payload.id)
-    .select('id, booking_reference')
+    .select('id, booking_reference, confirm_token')
     .maybeSingle();
 
   if (updateError) {
@@ -436,6 +491,7 @@ export async function updateBookingDetails(payload: {
     }
 
     const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const confirmLink = `${appUrl}/book/confirm?token=${updated.confirm_token}`;
     const pickupRaw = String(payload.pickup || '').toLowerCase();
     const destinationRaw = String(payload.destination || '').toLowerCase();
     const isFromAirport = pickupRaw.includes('flughafen');
@@ -461,36 +517,6 @@ export async function updateBookingDetails(payload: {
         ? 'background:linear-gradient(135deg,rgba(10,99,255,0.12) 0%,rgba(36,144,255,0.18) 100%);color:#0a63ff;'
         : 'background:#f5f5f7;color:#86868b;';
 
-    const safeName = escapeHtml(String(payload.full_name || ''));
-    const safePickup = escapeHtml(String(payload.pickup || ''));
-    const safeDestination = escapeHtml(String(payload.destination || ''));
-    const safeEmail = escapeHtml(String(payload.email || ''));
-    const safePhone = escapeHtml(String(payload.phone || ''));
-    const phoneHref = String(payload.phone || '').replace(/[^\d+]/g, '');
-    const safeVehicle = escapeHtml(String(payload.vehicle_type || '-'));
-    const safePassengers = escapeHtml(String(payload.passengers ?? '-'));
-    const safeLuggage = escapeHtml(String(payload.luggage ?? '-'));
-    const safeDateTime = formatDateTimeForEmail(String(payload.pickup_at));
-    const safeDate = escapeHtml(safeDateTime.date);
-    const safeTime = escapeHtml(safeDateTime.time);
-    const safeDirectionLabel = escapeHtml(directionLabel);
-    const safePayment = escapeHtml(paymentLabel);
-    const safeNotes = escapeHtml(cleanedNotes || '');
-    const safeFlightNumberInfo = escapeHtml(flightNumberInfo || '');
-    const safeHandLuggageInfo = escapeHtml(handLuggageInfo || '0');
-    const safeChildSeatInfo = escapeHtml(childSeatInfo || '-');
-    const safeIntermediateStopInfo = escapeHtml(intermediateStopInfo || '-');
-    const safePrice = escapeHtml(
-      new Intl.NumberFormat('de-AT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-        Number(payload.price ?? 0),
-      ),
-    );
-    const pickupMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(String(payload.pickup || ''))}`;
-    const destinationMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(String(payload.destination || ''))}`;
-    const pickupIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(String(payload.pickup || ''));
-    const destinationIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(String(payload.destination || ''));
-    const safeReference = escapeHtml(normalizeBookingReference(updated.booking_reference));
-
     const resend = new Resend(process.env.RESEND_API_KEY);
     const fromCandidates = Array.from(
       new Set([process.env.RESEND_FROM_EMAIL, 'onboarding@resend.dev'].filter(Boolean) as string[]),
@@ -501,81 +527,26 @@ export async function updateBookingDetails(payload: {
       const { error } = await resend.emails.send({
         from,
         to: payload.email,
-        subject: `Ihre Buchungsbestaetigung (${directionLabel}) ${safeReference}`.trim(),
-        html: `
-          <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
-            <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
-              <tr>
-                <td style="padding:28px 28px 8px 28px;text-align:center;">
-                  <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
-                  <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:700;color:#1d1d1f;">Buchungsbestaetigung</h1>
-                  <p style="margin:12px 0 0 0;font-size:16px;line-height:1.5;color:#86868b;">Hallo ${safeName}, vielen Dank fuer Ihre Buchung. Hier sind Ihre Angaben im Ueberblick.</p>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:20px 28px 8px 28px;">
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:12px;background:#ffffff;border:1px solid #e5e5ea;border-radius:16px;">
-                    <tr>
-                      <td style="padding:18px 14px 16px 18px;text-align:center;width:62%;border-right:1px solid #e5e5ea;">
-                        <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Gesamtpreis</div>
-                        <div style="font-size:42px;line-height:1.05;color:#1d1d1f;font-weight:700;letter-spacing:-0.02em;">${safePrice} &euro;</div>
-                        <span style="display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;text-transform:uppercase;${paymentStyle}">${safePayment}</span>
-                      </td>
-                      <td style="padding:18px 14px 16px 14px;text-align:center;width:38%;">
-                        <div style="font-size:30px;line-height:1;margin-bottom:8px;">${directionIcon}</div>
-                        <div style="font-size:20px;line-height:1;color:#8b8b90;margin-bottom:8px;">____</div>
-                        <div style="font-size:14px;color:#1d1d1f;font-weight:700;line-height:1.3;">${safeDirectionLabel}</div>
-                      </td>
-                    </tr>
-                  </table>
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                    <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safeName}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>E-Mail:</strong> ${safeEmail}</td></tr>
-                    <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Telefon:</strong> <a href="tel:${phoneHref}" style="color:#0071e3;text-decoration:none;font-weight:600;">${safePhone}</a></td></tr>
-                  </table>
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                    <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Abholung:</strong> ${pickupIsAirport ? safePickup : `<a href="${pickupMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safePickup}</a>`}</td></tr>
-                    ${safeFlightNumberInfo ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Flugnummer:</strong> ${safeFlightNumberInfo}</td></tr>` : ''}
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Ziel:</strong> ${destinationIsAirport ? safeDestination : `<a href="${destinationMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safeDestination}</a>`}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Datum:</strong> ${safeDate}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Uhrzeit:</strong> ${safeTime}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Fahrzeug:</strong> ${safeVehicle}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Personen:</strong> ${safePassengers}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Koffer:</strong> ${safeLuggage}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Handgepäck:</strong> ${safeHandLuggageInfo}</td></tr>
-                    ${hasNotes ? `<tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Notizen:</strong> ${safeNotes}</td></tr>` : ''}
-                  </table>
-                  ${hasAdditionalInfo ? `
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                    <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Zusatzinformationen</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Kindersitze:</strong> ${safeChildSeatInfo}</td></tr>
-                    <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Zwischenstopp:</strong> ${safeIntermediateStopInfo}</td></tr>
-                  </table>
-                  ` : ''}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:18px 28px 10px 28px;text-align:center;">
-                  <p style="margin:0;font-size:14px;line-height:1.5;color:#86868b;">Diese E-Mail dient als Bestaetigung Ihrer Buchungsanfrage.</p>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:0 28px 28px 28px;">
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                    <tr><td style="padding:16px 18px 10px 18px;font-size:15px;line-height:1.4;color:#1d1d1f;font-weight:700;">Aenderungen &amp; Stornierungen</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">• Fuer Fahrten bis 22:00 Uhr:<br/>Aenderungen oder Stornierungen sind bis spaetestens 3 Stunden vor Abholzeit moeglich.</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">• Fuer Fahrten zwischen 22:00 und 07:00 Uhr:<br/>Aenderungen oder Stornierungen sind mindestens 8 Stunden vor Abholzeit erforderlich.</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">Weitere Details finden Sie hier:<br/><a href="${appUrl}/faq" style="color:#0071e3;text-decoration:none;font-weight:600;">FAQ</a></td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">Fragen? Starten Sie einen WhatsApp-Chat mit uns.</td></tr>
-                    <tr><td style="padding:0 18px 16px 18px;"><a href="https://wa.me/?text=Hallo%20FlughafenTaxi%20Wien%2C%20ich%20habe%20eine%20Frage%20zu%20meiner%20Buchung." style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;">WhatsApp Chat starten</a></td></tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </div>
-        `,
+        subject: `Ihre Buchungsbestaetigung (${directionLabel}) ${normalizeBookingReference(updated.booking_reference)}`.trim(),
+        html: buildPassengerConfirmationEmailHtml({
+          fullName: payload.full_name,
+          email: payload.email,
+          phone: payload.phone,
+          bookingReference: normalizeBookingReference(updated.booking_reference),
+          pickup: payload.pickup,
+          destination: payload.destination,
+          pickupAt: payload.pickup_at,
+          vehicleType: payload.vehicle_type,
+          passengers: payload.passengers,
+          luggage: payload.luggage,
+          handLuggage: handLuggageInfo || '0',
+          paymentLabel,
+          flightNumber: flightNumberInfo || '',
+          childSeatInfo: childSeatInfo || '',
+          intermediateStopInfo: intermediateStopInfo || '',
+          notes: cleanedNotes || '',
+          price: Number(payload.price ?? 0),
+        }),
       });
       if (!error) {
         emailError = null;
@@ -588,6 +559,33 @@ export async function updateBookingDetails(payload: {
       return safeActionError('E-Mail Versand fehlgeschlagen. Bitte erneut versuchen.', 'updateBookingDetails email failed', emailError);
     }
   }
+
+  await logAuditEvent({
+    actor: admin.user,
+    action: 'UPDATE_BOOKING',
+    entity: 'bookings',
+    entityId: payload.id,
+    meta: {
+      before: beforeBooking || null,
+      after: {
+        id: payload.id,
+        full_name: payload.full_name,
+        email: payload.email,
+        phone: payload.phone,
+        pickup: payload.pickup,
+        destination: payload.destination,
+        pickup_at: payload.pickup_at,
+        passengers: payload.passengers,
+        luggage: payload.luggage,
+        price: payload.price,
+        vehicle_type: payload.vehicle_type || null,
+        notes: payload.notes || null,
+        status: payload.status,
+        booking_reference: updated.booking_reference || null,
+      },
+      sendPassengerEmail: Boolean(payload.sendPassengerEmail),
+    },
+  });
 
   revalidatePath('/dispatch/dashboard');
   return { success: true };
@@ -602,6 +600,13 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     if (!bookingId || !driverId) {
       return { error: 'bookingId oder driverId fehlt' };
     }
+
+    const { data: beforeAssignment } = await supabaseAdmin
+      .from('bookings')
+      .select('id, driver_id, status, confirm_token, booking_reference')
+      .eq('id', bookingId)
+      .maybeSingle();
+    let assignedBookingReference = beforeAssignment?.booking_reference || null;
 
     const { error: updateError } = await supabaseAdmin
       .from('bookings')
@@ -636,6 +641,7 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     if (bookingError || !booking) {
       return safeActionError('Buchung konnte für die Zuweisung nicht geladen werden.', 'assignDriver booking lookup failed', bookingError);
     }
+    assignedBookingReference = booking.booking_reference || assignedBookingReference;
 
     if (driverError || !driver) {
       return safeActionError('Fahrer konnte für die Zuweisung nicht geladen werden.', 'assignDriver driver lookup failed', driverError);
@@ -726,75 +732,60 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
       from,
       to: driver.email,
       subject: driverSubject,
-      html: `
-        <div style="margin:0;padding:8px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
-          <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:none;margin:0;background:#ffffff;border:none;border-radius:24px;overflow:hidden;">
-            <tr>
-              <td style="padding:18px 10px 0 10px;text-align:center;">
-                <a href="${confirmLink}" style="display:inline-block;background:#0071e3;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;padding:12px 24px;border-radius:9999px;">Bestaetigen Sie die Fahrt hier</a>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:12px 10px 8px 10px;">
-                <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                  <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safePassengerName}</td></tr>
-                  <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Telefon:</strong> <a href="tel:${phoneHref}" style="color:#0071e3;text-decoration:none;font-weight:600;">${safePhone}</a></td></tr>
-                </table>
-                <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                  <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Abholung:</strong> ${pickupIsAirport ? safePickup : `<a href="${pickupMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safePickup}</a>`}</td></tr>
-                  ${safeFlightNumberInfo ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Flugnummer:</strong> ${safeFlightNumberInfo}</td></tr>` : ''}
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Ziel:</strong> ${destinationIsAirport ? safeDestination : `<a href="${destinationMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safeDestination}</a>`}</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Datum:</strong> ${safeDate}</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Uhrzeit:</strong> ${safeTime}</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Fahrzeug:</strong> ${safeVehicle}</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Personen:</strong> ${safePassengers}</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Koffer:</strong> ${safeLuggage}</td></tr>
-                  <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Handgepäck:</strong> ${safeHandLuggageInfo}</td></tr>
-                  ${hasNotes ? `<tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Notizen:</strong> ${safeNotes}</td></tr>` : ''}
-                </table>
-                ${hasAdditionalInfo ? `
-                <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                  <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Zusatzinformationen</td></tr>
-                  ${childSeatInfo ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Kindersitze:</strong> ${safeChildSeatInfo}</td></tr>` : ''}
-                  ${intermediateStopInfo ? `<tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Zwischenstopp:</strong> ${safeIntermediateStopInfo}</td></tr>` : ''}
-                </table>
-                ` : ''}
-                <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#ffffff;border:1px solid #e5e5ea;border-radius:16px;">
-                  <tr>
-                    <td style="padding:12px 8px 12px 10px;text-align:center;width:44%;border-right:1px solid #e5e5ea;">
-                      <div style="font-size:22px;line-height:1;margin-bottom:6px;">${directionIcon}</div>
-                      <div style="font-size:14px;line-height:1;color:#8b8b90;margin-bottom:6px;">____</div>
-                      <div style="font-size:13px;color:#1d1d1f;font-weight:700;line-height:1.2;">${safeDirectionLabel}</div>
-                    </td>
-                    <td style="padding:12px 10px 12px 8px;text-align:center;width:56%;">
-                      <div style="font-size:11px;letter-spacing:.08em;color:#86868b;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Gesamtpreis</div>
-                      <div style="font-size:30px;line-height:1.05;color:#1d1d1f;font-weight:700;letter-spacing:-0.01em;">${safePrice} &euro;</div>
-                      <span style="display:inline-block;margin-top:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;${paymentStyle}">${safePayment}</span>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </div>
-      `,
+      html: buildDriverAssignmentEmailHtml({
+        confirmLink,
+        passengerNameHtml: safePassengerName,
+        phoneHref,
+        phoneHtml: safePhone,
+        pickupHtml: safePickup,
+        destinationHtml: safeDestination,
+        pickupMapsLink,
+        destinationMapsLink,
+        pickupIsAirport,
+        destinationIsAirport,
+        dateHtml: safeDate,
+        timeHtml: safeTime,
+        vehicleHtml: safeVehicle,
+        passengersHtml: safePassengers,
+        luggageHtml: safeLuggage,
+        handLuggageHtml: safeHandLuggageInfo,
+        flightNumberHtml: safeFlightNumberInfo,
+        notesHtml: safeNotes,
+        hasNotes,
+        childSeatInfoHtml: childSeatInfo ? safeChildSeatInfo : '',
+        intermediateStopInfoHtml: intermediateStopInfo ? safeIntermediateStopInfo : '',
+        hasAdditionalInfo,
+        directionIcon,
+        directionLabelHtml: safeDirectionLabel,
+        priceHtml: safePrice,
+        paymentHtml: safePayment,
+        paymentStyle,
+      }),
     });
 
     if (emailError) {
       return safeActionError('E-Mail Versand fehlgeschlagen. Bitte erneut versuchen.', 'assignDriver email failed', emailError);
     }
 
-      await supabaseAdmin.from('audit_logs').insert({
-        actor_user_id: admin.user?.id,
-        action: 'ASSIGN_DRIVER',
-        entity: 'bookings',
-        entity_id: bookingId,
-        meta: { driverId, emailSentTo: driver.email },
-      });
     }
-    
+
+    await logAuditEvent({
+      actor: admin.user,
+      action: 'ASSIGN_DRIVER',
+      entity: 'bookings',
+      entityId: bookingId,
+      meta: {
+        before: beforeAssignment || null,
+        after: {
+          id: bookingId,
+          driver_id: driverId,
+          status: sendEmail ? 'pending' : beforeAssignment?.status || null,
+          booking_reference: assignedBookingReference,
+        },
+        sendEmail,
+      },
+    });
+
     revalidatePath('/dispatch/dashboard');
     return { success: true, emailSent: sendEmail };
   } catch (error) {
@@ -809,6 +800,12 @@ export async function unassignDriver(bookingId: string) {
     const admin = await checkAdmin();
     if (admin.error) return { error: admin.error || 'Nicht autorisiert' };
     if (!bookingId) return { error: 'bookingId fehlt' };
+
+    const { data: beforeUnassign } = await supabaseAdmin
+      .from('bookings')
+      .select('id, driver_id, status, confirm_token, booking_reference')
+      .eq('id', bookingId)
+      .maybeSingle();
 
     const { data, error } = await supabaseAdmin
       .from('bookings')
@@ -863,6 +860,22 @@ export async function unassignDriver(bookingId: string) {
       if (!cleanupError) break;
       console.warn('unassignDriver cleanup skipped:', cleanupError);
     }
+
+    await logAuditEvent({
+      actor: admin.user,
+      action: 'UNASSIGN_DRIVER',
+      entity: 'bookings',
+      entityId: bookingId,
+      meta: {
+        before: beforeUnassign || null,
+        after: {
+          id: bookingId,
+          driver_id: null,
+          status: data.status,
+          booking_reference: beforeUnassign?.booking_reference || null,
+        },
+      },
+    });
 
     revalidatePath('/dispatch/dashboard');
     return { success: true, status: data.status };

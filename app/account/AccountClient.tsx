@@ -673,8 +673,8 @@ export default function AccountClient({
                   </div>
                   <UnderlineTabNav
                     items={[
-                      { id: 'previous', label: 'Vergangen' },
                       { id: 'upcoming', label: 'Kommend' },
+                      { id: 'previous', label: 'Vergangen' },
                     ]}
                     activeTab={bookingFilter === 'upcoming' ? 'upcoming' : 'previous'}
                     onChange={(tab) => setBookingFilter(tab as BookingFilter)}

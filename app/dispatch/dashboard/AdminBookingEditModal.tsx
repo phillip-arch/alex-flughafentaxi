@@ -409,14 +409,27 @@ export default function AdminBookingEditModal({
             <textarea className={`${BOOKING_FORM_INPUT_CLASS} min-h-[90px]`} placeholder="Notizen" value={editForm.notes} onChange={(e) => setEditForm((p: any) => ({ ...p, notes: e.target.value }))} />
           </div>
 
-          <div className="mt-6 flex gap-3">
-            <button type="button" onClick={() => setEditingBooking(null)} className={adminIconCloseButtonClass} aria-label="Bearbeiten schliessen">
-              <X size={14} strokeWidth={2.25} className="translate-y-[1px]" />
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <button
+              type="button"
+              onClick={() => setEditingBooking(null)}
+              className={`w-full whitespace-nowrap ${adminSecondaryButtonClass}`}
+            >
+              Abbrechen
             </button>
-            <button type="button" disabled={savingEdit} onClick={() => handleSaveBookingEdit(undefined, false)} className={`flex-1 ${adminSecondaryButtonClass}`}>
+            <button
+              type="button"
+              disabled={savingEdit}
+              onClick={() => handleSaveBookingEdit(undefined, false)}
+              className={`w-full min-h-[58px] whitespace-nowrap px-6 text-center ${adminSecondaryButtonClass}`}
+            >
               {savingEdit ? 'Speichern...' : 'Nur speichern'}
             </button>
-            <button type="submit" disabled={savingEdit} className={`flex-1 ${adminPrimaryButtonClass}`}>
+            <button
+              type="submit"
+              disabled={savingEdit}
+              className={`w-full min-h-[58px] whitespace-nowrap px-6 text-center ${adminPrimaryButtonClass}`}
+            >
               {savingEdit ? 'Speichern...' : 'Speichern & senden'}
             </button>
           </div>
