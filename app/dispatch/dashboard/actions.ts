@@ -82,6 +82,25 @@ async function checkAdmin() {
   return { user, supabase };
 }
 
+const DASHBOARD_BOOKING_SELECT = `
+  id,
+  status,
+  driver_id,
+  confirm_token,
+  full_name,
+  email,
+  phone,
+  pickup,
+  destination,
+  pickup_at,
+  passengers,
+  luggage,
+  price,
+  vehicle_type,
+  notes,
+  booking_reference
+`;
+
 export async function fetchBookings(date: string) {
   const admin = await checkAdmin();
   if (admin.error) return [];
@@ -92,10 +111,7 @@ export async function fetchBookings(date: string) {
 
   const { data, error: fetchError } = await supabaseAdmin
     .from('bookings')
-    .select(`
-      *,
-      driver:driver_id(name)
-    `)
+    .select(DASHBOARD_BOOKING_SELECT)
     .gte('pickup_at', startOfDay.toISOString())
     .lte('pickup_at', endOfDay.toISOString())
     .order('pickup_at', { ascending: true });
@@ -119,13 +135,10 @@ export async function searchBookings(query: string) {
 
   const { data, error: fetchError } = await supabaseAdmin
     .from('bookings')
-    .select(`
-      *,
-      driver:driver_id(name)
-    `)
+    .select(DASHBOARD_BOOKING_SELECT)
     .or(`full_name.ilike.${filter},email.ilike.${filter},booking_reference.ilike.${filter}`)
     .order('pickup_at', { ascending: false })
-    .limit(150);
+    .limit(100);
 
   if (fetchError) {
     console.error('Error searching bookings:', fetchError);

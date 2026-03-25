@@ -29,6 +29,19 @@ const AdminStatsPanel = dynamic(() => import('./AdminStatsPanel'), {
   ),
 });
 
+function getDefaultDispatchDate() {
+  const now = new Date();
+  const dispatchDate = new Date(now);
+
+  // Keep the previous operational day active shortly after midnight so
+  // dispatch doesn't open on an empty next-day schedule.
+  if (now.getHours() < 4) {
+    dispatchDate.setDate(dispatchDate.getDate() - 1);
+  }
+
+  return format(dispatchDate, 'yyyy-MM-dd');
+}
+
 export default function AdminDashboardClient({ userEmail }: { userEmail: string }) {
   const AIRPORT_LABEL = 'Flughafen Wien (VIE)';
   const adminPrimaryButtonClass =
@@ -52,9 +65,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const adminIconCloseButtonClass =
     'inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]';
   const [currentTab, setCurrentTab] = useState<'rides' | 'drivers' | 'stats' | 'logs'>('rides');
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
 
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [date, setDate] = useState(getDefaultDispatchDate);
   const [ridesSearchTerm, setRidesSearchTerm] = useState('');
   const [bookings, setBookings] = useState<any[]>([]);
   const [drivers, setDrivers] = useState<any[]>([]);
@@ -249,7 +262,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     const tab = params.get('tab');
     const view = params.get('view');
     setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'logs' ? tab : 'rides');
-    setViewMode(view === 'table' ? 'table' : 'grid');
+    setViewMode(view === 'grid' ? 'grid' : 'table');
   }, []);
 
   useEffect(() => {
@@ -277,29 +290,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       const tab = params.get('tab');
       const view = params.get('view');
       setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'logs' ? tab : 'rides');
-      setViewMode(view === 'table' ? 'table' : 'grid');
+      setViewMode(view === 'grid' ? 'grid' : 'table');
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
-
-  async function prefetchRidesForDate(targetDate: string) {
-    if (!targetDate) return;
-    if (ridesCache[targetDate]) return;
-
-    const data = await fetchBookings(targetDate);
-    const nextBookings = data || [];
-    const uniqueEmails = Array.from(new Set(nextBookings.map((b: any) => b.email).filter(Boolean)));
-    const counts = await fetchPassengerCountsBatch(uniqueEmails);
-
-    setRidesCache((prev) => {
-      if (prev[targetDate]) return prev;
-      return {
-        ...prev,
-        [targetDate]: { bookings: nextBookings, passengerCounts: counts },
-      };
-    });
-  }
 
   function getAuditLogFetchWindow(range: 'today' | '7' | '30' | 'all') {
     if (range === 'all') return {};
@@ -381,9 +376,6 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             [date]: { bookings: data || [], passengerCounts: counts },
           }));
         }
-
-        void prefetchRidesForDate(getShiftedDate(date, -1));
-        void prefetchRidesForDate(getShiftedDate(date, 1));
       } else if (currentTab === 'drivers') {
         if (!driversLoaded) {
           setLoading(true);
