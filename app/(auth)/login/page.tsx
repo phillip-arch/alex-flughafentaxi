@@ -1,4 +1,3 @@
-import Navbar from '@/components/Navbar';
 import LoginPageClient from './LoginPageClient';
 
 type LoginPageProps = {
@@ -15,7 +14,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <main className="min-h-screen bg-white text-[var(--color-text)]">
-      <Navbar />
       <LoginPageClient initialIsLogin={initialIsLogin} accountDeleted={accountDeleted} />
     </main>
   );
