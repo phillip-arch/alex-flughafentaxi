@@ -305,8 +305,8 @@ export default function AccountClient({
     <div suppressHydrationWarning className="bg-[#f7f9fc] pb-14 pt-8 lg:pt-10">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
-          <section className="rounded-[1.85rem] border border-[#e8edf3] bg-white px-5 py-5 shadow-[0_18px_50px_rgba(17,17,17,0.04)] md:px-7 md:py-6">
-            <div className="space-y-2">
+          <section className="space-y-4">
+            <div className="space-y-2 px-1">
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#1679ff]">
                 Kundenkonto
               </p>
@@ -316,16 +316,18 @@ export default function AccountClient({
               </p>
             </div>
 
-            <UnderlineTabNav
-              className="mt-6 flex flex-wrap items-center gap-2"
-              items={[
-                { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
-                { id: 'favoriten', label: 'Favoriten', icon: <Heart size={16} /> },
-                { id: 'profil', label: 'Profil', icon: <User size={16} /> },
-              ]}
-              activeTab={activeTab}
-              onChange={(tab) => setActiveTab(tab as AccountTab)}
-            />
+            <div className="rounded-[1.2rem] border border-[#e8edf3] bg-white px-3 py-2 shadow-[0_12px_34px_rgba(17,17,17,0.035)] md:px-4">
+              <UnderlineTabNav
+                className="flex flex-wrap items-center gap-2"
+                items={[
+                  { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
+                  { id: 'favoriten', label: 'Favoriten', icon: <Heart size={16} /> },
+                  { id: 'profil', label: 'Profil', icon: <User size={16} /> },
+                ]}
+                activeTab={activeTab}
+                onChange={(tab) => setActiveTab(tab as AccountTab)}
+              />
+            </div>
           </section>
 
           {activeTab === 'profil' ? (
