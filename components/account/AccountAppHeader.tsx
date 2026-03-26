@@ -25,7 +25,7 @@ export default function AccountAppHeader() {
             <form action={logout}>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/6 px-4 py-2 text-[0.95rem] font-medium text-white transition-colors hover:bg-white/10"
+                className="inline-flex items-center gap-2 text-[15px] font-medium text-white transition-colors hover:text-white/78"
               >
                 <LogOut size={16} />
                 Abmelden

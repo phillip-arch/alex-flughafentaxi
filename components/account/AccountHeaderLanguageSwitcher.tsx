@@ -60,14 +60,16 @@ export default function AccountHeaderLanguageSwitcher() {
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/6 px-3 py-2 text-[0.95rem] font-medium text-white transition-colors hover:bg-white/10"
+        className="inline-flex items-center gap-1 text-[15px] font-medium text-white transition-colors hover:text-white/78"
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label="Sprache waehlen"
       >
-        <Globe size={18} />
-        <span className="inline-flex w-[2rem] justify-center uppercase">{activeLang}</span>
-        <ChevronDown size={14} />
+        <Globe size={20} strokeWidth={2.1} />
+        <span className="inline-flex w-[2.1rem] justify-center text-[15px] font-medium uppercase">
+          {activeLang}
+        </span>
+        <ChevronDown size={14} strokeWidth={2.2} />
       </button>
 
       {isOpen ? (
