@@ -53,7 +53,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className="app-shell font-sans antialiased">
         {children}
         <GlobalChromeClient surface={surface} />
-        <FooterGate />
+        <FooterGate surface={surface} />
       </body>
     </html>
   );

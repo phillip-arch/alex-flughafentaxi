@@ -3,9 +3,10 @@
 import { usePathname } from 'next/navigation';
 import Footer from '@/components/Footer';
 
-export default function FooterGate() {
+export default function FooterGate({ surface }: { surface: 'www' | 'app' | 'dispatch' }) {
   const pathname = usePathname();
   if (
+    surface !== 'www' ||
     pathname?.startsWith('/dispatch') ||
     pathname === '/login' ||
     pathname === '/forgot-password' ||
