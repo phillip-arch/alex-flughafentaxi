@@ -20,7 +20,7 @@ export default function AccountAppHeader() {
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-5">
             <AccountHeaderLanguageSwitcher />
             <form action={logout}>
               <button
