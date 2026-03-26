@@ -302,18 +302,26 @@ export default function AccountClient({
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
   return (
-    <div suppressHydrationWarning className="bg-white pb-14 pt-10 lg:pt-12">
+    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-14 pt-8 lg:pt-10">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
-          <section className="space-y-5">
-            <h1 className="ui-heading-lg text-[#111827]">Mein Konto</h1>
+          <section className="rounded-[1.85rem] border border-[#e8edf3] bg-white px-5 py-5 shadow-[0_18px_50px_rgba(17,17,17,0.04)] md:px-7 md:py-6">
+            <div className="space-y-2">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#1679ff]">
+                Kundenkonto
+              </p>
+              <h1 className="ui-heading-lg text-[#111827]">Mein Konto</h1>
+              <p className="max-w-[38rem] text-[0.98rem] leading-7 text-[#6a7d96]">
+                Verwalten Sie Ihre Fahrten, Favoriten und Profildaten in einer klaren Uebersicht.
+              </p>
+            </div>
 
             <UnderlineTabNav
-              className="flex flex-wrap items-center gap-6 border-b border-[#e9edf3] pb-2"
+              className="mt-6 flex flex-wrap items-center gap-2"
               items={[
-                { id: 'buchungsverlauf', label: '', icon: <History size={16} /> },
-                { id: 'favoriten', label: '', icon: <Heart size={16} /> },
-                { id: 'profil', label: '', icon: <User size={16} /> },
+                { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
+                { id: 'favoriten', label: 'Favoriten', icon: <Heart size={16} /> },
+                { id: 'profil', label: 'Profil', icon: <User size={16} /> },
               ]}
               activeTab={activeTab}
               onChange={(tab) => setActiveTab(tab as AccountTab)}
@@ -584,15 +592,17 @@ export default function AccountClient({
           {activeTab === 'buchungsverlauf' ? (
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                  <div className={accountSectionIntroClass}>
-                    <h2 className="ui-heading-lg text-[#111827]">Fahrten</h2>
-                    <p className="ui-copy-compact text-[#6a7d96]">
-                      Ihre kommenden und vergangenen Fahrten in einer klaren Uebersicht.
-                    </p>
+                <div className="rounded-[1.7rem] border border-[#e8edf3] bg-white px-5 py-5 shadow-[0_16px_44px_rgba(17,17,17,0.035)] md:px-6">
+                  <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+                    <div className={accountSectionIntroClass}>
+                      <h2 className="ui-heading-lg text-[#111827]">Fahrten</h2>
+                      <p className="ui-copy-compact text-[#6a7d96]">
+                        Ihre kommenden und vergangenen Fahrten in einer klaren Uebersicht.
+                      </p>
+                    </div>
                     <Link
                       href="/book"
-                      className="ui-button-booking-primary w-full self-start sm:w-auto sm:min-w-[220px]"
+                      className="ui-button-booking-primary w-full md:w-auto md:min-w-[220px] md:self-start"
                     >
                       Fahrt buchen
                     </Link>
@@ -604,7 +614,7 @@ export default function AccountClient({
                     ]}
                     activeTab={bookingFilter === 'upcoming' ? 'upcoming' : 'previous'}
                     onChange={(tab) => setBookingFilter(tab as BookingFilter)}
-                    className="flex flex-wrap gap-6"
+                    className="mt-5 flex flex-wrap gap-2"
                   />
                 </div>
 
@@ -641,13 +651,13 @@ export default function AccountClient({
                           return (
                             <div
                               key={b.id}
-                              className={`rounded-[1.4rem] border border-[#e8edf3] bg-white px-4 py-4 md:px-5 ${
+                              className={`rounded-[1.55rem] border border-[#dde6f2] bg-white px-4 py-4 shadow-[0_10px_26px_rgba(17,17,17,0.03)] md:px-5 ${
                                 isCanceled(b.status) ? 'opacity-70' : ''
                               }`}
                             >
-                              <div className="flex items-center gap-3 md:gap-3.5">
-                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] md:h-10 md:w-10">
-                                  <Car size={18} className="md:h-[19px] md:w-[19px]" />
+                              <div className="flex items-start gap-3 md:gap-4">
+                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] md:h-12 md:w-12">
+                                  <Car size={18} className="md:h-[20px] md:w-[20px]" />
                                 </div>
 
                                 <button
@@ -655,29 +665,34 @@ export default function AccountClient({
                                   onClick={() =>
                                     setExpandedBookingId((prev) => (prev === b.id ? null : b.id))
                                   }
-                                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                                  className="flex min-w-0 flex-1 items-start gap-4 text-left"
                                   aria-expanded={isExpanded}
                                 >
                                   <div className="min-w-0 flex-1">
-                                    <p className="text-[0.82rem] text-[#7b8798] md:text-[0.88rem]">{fmtRideMeta(b.pickup_at)}</p>
-                                    <p className="mt-1 line-clamp-2 text-[1.02rem] font-semibold leading-[1.28] tracking-[-0.03em] text-[#111827] md:text-[1.22rem] md:leading-[1.24] md:tracking-[-0.035em]">
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.82rem] text-[#7b8798] md:text-[0.88rem]">
+                                      <span>{fmtRideMeta(b.pickup_at)}</span>
+                                      <span className="rounded-full bg-[#f1f5fb] px-2.5 py-1 font-semibold uppercase tracking-[0.08em] text-[#5f6f84]">
+                                        {String(b.vehicle_type || 'fahrt').toUpperCase()}
+                                      </span>
+                                    </div>
+                                    <p className="mt-2 line-clamp-2 text-[1.06rem] font-semibold leading-[1.26] tracking-[-0.03em] text-[#111827] md:text-[1.24rem]">
                                       {primaryLocation}
                                     </p>
                                     <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                                      <p className="text-[0.82rem] text-[#6a7d96] md:text-[0.88rem]">{secondaryLocation}</p>
+                                      <p className="text-[0.82rem] text-[#6a7d96] md:text-[0.9rem]">{secondaryLocation}</p>
                                       {isCanceled(b.status) ? (
                                         <span className="rounded-full border border-[#f1d1d6] bg-[#fff4f6] px-2.5 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#d70015]">
                                           Storniert
                                         </span>
                                       ) : null}
                                     </div>
-                                    <p className="mt-1.5 text-[0.92rem] font-semibold text-[#111827] md:mt-1.5 md:text-[0.96rem]">
+                                    <p className="mt-2 text-[1rem] font-semibold text-[#111827]">
                                       {fmtPrice(b.price)}
                                     </p>
                                   </div>
                                   <ChevronDown
                                     size={16}
-                                    className={`shrink-0 text-[#7b8798] transition-transform md:h-4 md:w-4 ${
+                                    className={`mt-1 shrink-0 text-[#7b8798] transition-transform md:h-4 md:w-4 ${
                                       isExpanded ? 'rotate-180' : ''
                                     }`}
                                   />

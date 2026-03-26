@@ -4,7 +4,7 @@ import { logout } from '@/app/(auth)/actions';
 
 export default function AccountAppHeader() {
   return (
-    <header className="border-b border-[#e9edf3] bg-white/96 backdrop-blur">
+    <header className="border-b border-white/10 bg-[#050505] text-white">
       <div className="app-container">
         <div className="mx-auto flex h-[76px] max-w-[57.5rem] items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -18,17 +18,17 @@ export default function AccountAppHeader() {
               />
             </span>
             <div className="min-w-0">
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#1679ff]">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#5ea2ff]">
                 Kundenkonto
               </p>
-              <p className="text-[1rem] font-semibold tracking-[-0.03em] text-[#111827]">App</p>
+              <p className="text-[1rem] font-semibold tracking-[-0.03em] text-white">App</p>
             </div>
           </div>
 
           <form action={logout}>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 rounded-full border border-[#dbe7f8] bg-white px-4 py-2 text-[0.95rem] font-medium text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/6 px-4 py-2 text-[0.95rem] font-medium text-white transition-colors hover:bg-white/10"
             >
               <LogOut size={16} />
               Abmelden
