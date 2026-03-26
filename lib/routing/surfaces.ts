@@ -45,6 +45,8 @@ export function isCustomerAppPath(pathname: string) {
     pathname === '/login' ||
     pathname === '/forgot-password' ||
     pathname === '/update-password' ||
+    pathname === '/book' ||
+    pathname.startsWith('/book/') ||
     pathname === '/account' ||
     pathname.startsWith('/account/') ||
     pathname === '/auth/callback' ||
