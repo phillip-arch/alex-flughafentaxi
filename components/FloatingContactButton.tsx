@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { Phone, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { ViberIcon, WhatsAppIcon } from '@/components/ui/ContactIcons';
@@ -79,13 +78,14 @@ export default function FloatingContactButton() {
                   </div>
                 ) : null}
 
-                <Link
+                <a
                   href={option.href}
                   className={option.className}
                   onClick={() => setIsOpen(false)}
+                  rel={option.href.startsWith('https://') ? 'noopener noreferrer' : undefined}
                 >
                   <Icon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
-                </Link>
+                </a>
               </div>
             );
           })}

@@ -7,10 +7,16 @@ const FloatingContactButton = dynamic(() => import('@/components/FloatingContact
   ssr: false,
 });
 
-export default function GlobalChromeClient() {
+export default function GlobalChromeClient({ surface }: { surface: 'www' | 'app' | 'dispatch' }) {
   const pathname = usePathname();
 
-  if (pathname === '/driver/confirm') {
+  if (
+    surface !== 'www' ||
+    pathname === '/driver/confirm' ||
+    pathname === '/login' ||
+    pathname === '/forgot-password' ||
+    pathname === '/update-password'
+  ) {
     return null;
   }
 
