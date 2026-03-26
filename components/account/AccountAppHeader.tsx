@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { LogOut } from 'lucide-react';
 import { logout } from '@/app/(auth)/actions';
+import AccountHeaderLanguageSwitcher from './AccountHeaderLanguageSwitcher';
 
 export default function AccountAppHeader() {
   return (
@@ -19,15 +20,18 @@ export default function AccountAppHeader() {
             </span>
           </div>
 
-          <form action={logout}>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/6 px-4 py-2 text-[0.95rem] font-medium text-white transition-colors hover:bg-white/10"
-            >
-              <LogOut size={16} />
-              Abmelden
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            <AccountHeaderLanguageSwitcher />
+            <form action={logout}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/6 px-4 py-2 text-[0.95rem] font-medium text-white transition-colors hover:bg-white/10"
+              >
+                <LogOut size={16} />
+                Abmelden
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </header>
