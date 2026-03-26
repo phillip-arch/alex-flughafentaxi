@@ -8,12 +8,12 @@ export default function AccountAppHeader() {
       <div className="app-container">
         <div className="flex h-[66px] items-center justify-between gap-4 lg:h-[72px]">
           <div className="flex items-center gap-3">
-            <span className="relative block h-10 w-[76px] overflow-hidden">
+            <span className="relative block h-11 w-[120px] overflow-hidden lg:h-12 lg:w-[220px]">
               <Image
                 src="https://web-site.website/images/aflogo.jpg"
                 alt="Alex Flughafentaxi"
                 fill
-                sizes="76px"
+                sizes="(max-width: 1023px) 120px, 220px"
                 className="object-contain object-left"
               />
             </span>
