@@ -63,7 +63,7 @@ export async function middleware(request: NextRequest) {
 
   if (surface === 'dispatch') {
     if (path === '/') {
-      return NextResponse.redirect(buildSurfaceUrl('dispatch', '/dispatch'));
+      return NextResponse.redirect(buildSurfaceUrl('dispatch', '/dispatch/login'));
     }
 
     if (!isDispatchPath(path) && path !== '/auth/logout') {
