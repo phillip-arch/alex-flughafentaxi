@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import {
   ArrowRight,
-  ChevronLeft,
   Loader2,
   Lock,
   Mail,
@@ -54,14 +53,6 @@ export default function LoginPageClient({ initialIsLogin, accountDeleted }: Logi
       <div className="app-container flex justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
         <div className="w-full max-w-[34rem]">
           <div className="ui-card-surface-light px-5 py-6 md:px-8 md:py-8">
-            <Link
-              href="/"
-              className="mb-6 inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
-            >
-              <ChevronLeft size={18} />
-              Zurueck zur Startseite
-            </Link>
-
             <div className="ui-text-block-sm">
               <h2 className="ui-heading-lg text-[#111827]">
                 {isLogin ? 'Anmelden' : 'Registrieren'}
