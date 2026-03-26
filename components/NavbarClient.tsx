@@ -29,7 +29,13 @@ const languages: LanguageOption[] = [
   { code: 'tr', label: 'T\u00fcrk\u00e7e' },
 ];
 
-export default function NavbarClient() {
+export default function NavbarClient({
+  accountHref = '/account?tab=buchungsverlauf',
+  showAccountEntry = true,
+}: {
+  accountHref?: string;
+  showAccountEntry?: boolean;
+}) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktopLangMenuOpen, setIsDesktopLangMenuOpen] = useState(false);
@@ -205,9 +211,11 @@ export default function NavbarClient() {
             ) : null}
           </div>
 
-          <Link href="/account?tab=buchungsverlauf" className="ui-icon-button-accent -translate-y-px" aria-label="Zum Konto">
-            <User size={18} strokeWidth={2.1} className="text-[#111111]" />
-          </Link>
+          {showAccountEntry ? (
+            <Link href={accountHref} className="ui-icon-button-accent -translate-y-px" aria-label="Zum Konto">
+              <User size={18} strokeWidth={2.1} className="text-[#111111]" />
+            </Link>
+          ) : null}
         </div>
 
         <div className="flex h-10 items-center gap-4 lg:hidden">
@@ -228,9 +236,11 @@ export default function NavbarClient() {
             </button>
           </div>
 
-          <Link href="/account?tab=buchungsverlauf" className="ui-icon-button-accent" aria-label="Zum Konto">
-            <User size={18} strokeWidth={2.1} className="text-[#111111]" />
-          </Link>
+          {showAccountEntry ? (
+            <Link href={accountHref} className="ui-icon-button-accent" aria-label="Zum Konto">
+              <User size={18} strokeWidth={2.1} className="text-[#111111]" />
+            </Link>
+          ) : null}
 
           <button
             className="ml-2 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-white"
@@ -278,14 +288,16 @@ export default function NavbarClient() {
                 </button>
               </div>
 
-              <Link
-                href="/account?tab=buchungsverlauf"
-                onClick={closeMobileMenu}
-                className="ui-icon-button-accent"
-                aria-label="Zum Konto"
-              >
-                <User size={18} strokeWidth={2.1} className="text-[#111111]" />
-              </Link>
+              {showAccountEntry ? (
+                <Link
+                  href={accountHref}
+                  onClick={closeMobileMenu}
+                  className="ui-icon-button-accent"
+                  aria-label="Zum Konto"
+                >
+                  <User size={18} strokeWidth={2.1} className="text-[#111111]" />
+                </Link>
+              ) : null}
 
               <button
                 type="button"

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { buildSurfaceUrl, getAppSurface } from '@/lib/routing/surfaces';
 import { createClient } from '@/lib/supabase/server';
 import { requireSameOrigin } from '@/lib/security/origin';
 
@@ -12,10 +13,18 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   await supabase.auth.signOut();
 
-  return NextResponse.redirect(new URL('/dispatch/login', request.url), { status: 303 });
+  const loginUrl = getAppSurface() === 'dispatch'
+    ? buildSurfaceUrl('dispatch', '/dispatch/login')
+    : buildSurfaceUrl('app', '/login');
+
+  return NextResponse.redirect(loginUrl, { status: 303 });
 }
 
 // UX fallback: opening /auth/logout directly should not show 405.
 export async function GET(request: NextRequest) {
-  return NextResponse.redirect(new URL('/dispatch/login', request.url), { status: 303 });
+  const loginUrl = getAppSurface() === 'dispatch'
+    ? buildSurfaceUrl('dispatch', '/dispatch/login')
+    : buildSurfaceUrl('app', '/login');
+
+  return NextResponse.redirect(loginUrl, { status: 303 });
 }

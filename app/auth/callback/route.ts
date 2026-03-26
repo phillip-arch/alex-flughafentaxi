@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { buildSurfaceUrl } from '@/lib/routing/surfaces';
 import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: Request) {
@@ -7,7 +8,7 @@ export async function GET(request: Request) {
   const tokenHash = requestUrl.searchParams.get('token_hash');
   const type = requestUrl.searchParams.get('type');
   const requestedNext = requestUrl.searchParams.get('next');
-  const fallbackNext = type === 'recovery' ? '/update-password' : '/';
+  const fallbackNext = type === 'recovery' ? '/update-password' : '/account?tab=buchungsverlauf';
   const next = requestedNext && requestedNext.startsWith('/') ? requestedNext : fallbackNext;
   const supabase = await createClient();
 
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error) {
-      return NextResponse.redirect(new URL(next, requestUrl.origin));
+      return NextResponse.redirect(buildSurfaceUrl('app', next));
     }
   }
 
@@ -27,10 +28,12 @@ export async function GET(request: Request) {
     });
 
     if (!error) {
-      return NextResponse.redirect(new URL('/update-password', requestUrl.origin));
+      return NextResponse.redirect(buildSurfaceUrl('app', '/update-password'));
     }
   }
 
   // If there's an error or no code, redirect to login with an error
-  return NextResponse.redirect(new URL('/login?error=Ungueltiger+oder+abgelaufener+Link', requestUrl.origin));
+  return NextResponse.redirect(
+    buildSurfaceUrl('app', '/login?error=Ungueltiger+oder+abgelaufener+Link'),
+  );
 }

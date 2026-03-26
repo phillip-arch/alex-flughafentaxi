@@ -1,5 +1,13 @@
+import { getAppSurface, getPublicAppUrl } from '@/lib/routing/surfaces';
 import NavbarClient from './NavbarClient';
 
 export default async function Navbar() {
-  return <NavbarClient />;
+  const surface = getAppSurface();
+
+  return (
+    <NavbarClient
+      accountHref={`${getPublicAppUrl()}/account?tab=buchungsverlauf`}
+      showAccountEntry={surface === 'www'}
+    />
+  );
 }

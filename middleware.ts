@@ -1,10 +1,18 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import {
+  buildSurfaceUrl,
+  getAppSurface,
+  isCustomerAppPath,
+  isDispatchPath,
+} from '@/lib/routing/surfaces';
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  const surface = getAppSurface();
+  const pathnameWithSearch = `${path}${request.nextUrl.search}`;
   const applyRouteHeaders = (nextResponse: NextResponse) => {
-    if (path.startsWith('/dispatch')) {
+    if (path.startsWith('/dispatch') || surface === 'dispatch') {
       nextResponse.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
     }
     return nextResponse;
@@ -18,7 +26,7 @@ export async function middleware(request: NextRequest) {
     const type = request.nextUrl.searchParams.get('type');
 
     if (code || (tokenHash && type === 'recovery')) {
-      const callbackUrl = new URL('/auth/callback', request.url);
+      const callbackUrl = buildSurfaceUrl('app', '/auth/callback');
       request.nextUrl.searchParams.forEach((value, key) => {
         callbackUrl.searchParams.set(key, value);
       });
@@ -26,6 +34,44 @@ export async function middleware(request: NextRequest) {
         callbackUrl.searchParams.set('next', '/update-password');
       }
       return NextResponse.redirect(callbackUrl);
+    }
+  }
+
+  if (surface === 'www') {
+    if (isDispatchPath(path)) {
+      return NextResponse.redirect(buildSurfaceUrl('dispatch', pathnameWithSearch));
+    }
+
+    if (isCustomerAppPath(path)) {
+      return NextResponse.redirect(buildSurfaceUrl('app', pathnameWithSearch));
+    }
+  }
+
+  if (surface === 'app') {
+    if (path === '/') {
+      return NextResponse.redirect(buildSurfaceUrl('app', '/account?tab=buchungsverlauf'));
+    }
+
+    if (isDispatchPath(path)) {
+      return NextResponse.redirect(buildSurfaceUrl('dispatch', pathnameWithSearch));
+    }
+
+    if (!isCustomerAppPath(path)) {
+      return NextResponse.redirect(buildSurfaceUrl('www', pathnameWithSearch));
+    }
+  }
+
+  if (surface === 'dispatch') {
+    if (path === '/') {
+      return NextResponse.redirect(buildSurfaceUrl('dispatch', '/dispatch'));
+    }
+
+    if (!isDispatchPath(path) && path !== '/auth/logout') {
+      if (isCustomerAppPath(path)) {
+        return NextResponse.redirect(buildSurfaceUrl('app', pathnameWithSearch));
+      }
+
+      return NextResponse.redirect(buildSurfaceUrl('www', pathnameWithSearch));
     }
   }
 
@@ -57,7 +103,9 @@ export async function middleware(request: NextRequest) {
           const vercelEnv = process.env.VERCEL_ENV; // 'production' | 'preview' | 'development' | undefined
           
           // Auto-detect AI Studio preview environment if APP_ENV not explicitly set
-          const appEnv = process.env.APP_ENV || (process.env.NEXT_PUBLIC_APP_URL?.includes('.run.app') ? 'preview' : undefined);
+          const appEnv =
+            process.env.APP_ENV ||
+            (process.env.NEXT_PUBLIC_APP_URL?.includes('.run.app') ? 'preview' : undefined);
 
           const isVercelProd = vercelEnv === 'production';
           const isIframePreview = vercelEnv === 'preview' || appEnv === 'preview';
@@ -126,11 +174,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Include "/" to catch password-reset links that fallback to homepage.
-    '/',
-    // Run auth/session middleware on routes that need auth protection.
-    '/dispatch/:path*',
-    '/account/:path*',
-    '/login',
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)',
   ],
 };
