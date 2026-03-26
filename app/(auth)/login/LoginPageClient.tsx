@@ -37,9 +37,8 @@ export default function LoginPageClient({
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone);
-    const isMobileViewport = window.innerWidth < 768;
 
-    setShowWebsiteBackLink(isMobileViewport && !isStandalone);
+    setShowWebsiteBackLink(!isStandalone);
   }, []);
 
   const passwordsMismatch =
