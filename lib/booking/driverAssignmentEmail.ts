@@ -95,7 +95,7 @@ export function buildDriverAssignmentEmailHtml(input: DriverAssignmentEmailInput
                 <td style="padding:12px 10px 12px 8px;text-align:center;width:56%;">
                   <div style="font-size:11px;letter-spacing:.08em;color:#86868b;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Gesamtpreis</div>
                   <div style="font-size:30px;line-height:1.05;color:#1d1d1f;font-weight:700;letter-spacing:-0.01em;">${input.priceHtml} &euro;</div>
-                  <span style="display:inline-block;margin-top:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;${input.paymentStyle}">${input.paymentHtml}</span>
+                  <div style="margin-top:8px;font-size:12px;font-weight:700;color:#1d1d1f;">${input.paymentHtml}</div>
                 </td>
               </tr>
             </table>

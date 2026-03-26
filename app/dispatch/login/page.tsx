@@ -23,6 +23,19 @@ export default function AdminLoginPage() {
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-white">
+      {loading ? (
+        <div className="fixed inset-x-4 bottom-4 z-50 rounded-[1.1rem] border border-[#dbe7f8] bg-white/95 px-4 py-3 shadow-[0_18px_45px_rgba(17,17,17,0.12)] backdrop-blur-sm md:inset-x-auto md:right-6 md:top-6 md:bottom-auto md:w-[20rem]">
+          <div className="flex items-center gap-3 text-[#111827]">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f8fbff] text-[#1679ff]">
+              <Loader2 size={18} className="animate-spin" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[0.95rem] font-semibold">Anmeldung laeuft</p>
+              <p className="text-[0.84rem] text-[#6a7d96]">Admin-Zugang wird geprueft...</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="app-container flex min-h-screen justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
         <div className="w-full max-w-[34rem]">
           <div className="ui-card-surface-light bg-white px-5 py-6 md:px-8 md:py-8">
@@ -114,11 +127,7 @@ export default function AdminLoginPage() {
               </fieldset>
             </form>
 
-            {loading ? (
-              <p className="mt-3 text-[0.88rem] font-medium text-[#6a7d96]">
-                Anmeldung wird verarbeitet...
-              </p>
-            ) : null}
+            {loading ? <p className="mt-3 text-[0.88rem] font-medium text-[#6a7d96]">Anmeldung wird verarbeitet...</p> : null}
           </div>
         </div>
       </div>

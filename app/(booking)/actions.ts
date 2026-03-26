@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { isIP } from 'net';
 import { Resend } from 'resend';
+import { buildPassengerConfirmationEmailHtml } from '@/lib/booking/passengerEmail';
 
 import { z } from 'zod';
 import { calculateVehiclePrice, type VehicleType } from '@/lib/pricing';
@@ -248,25 +249,6 @@ export async function createBooking(payload: any) {
     const fromCandidates = Array.from(
       new Set([configuredFrom, 'onboarding@resend.dev'].filter(Boolean) as string[])
     );
-    const safeName = escapeHtml(String(data.full_name || ''));
-    const pickupRawValue = String(bookingData.pickup || '');
-    const destinationRawValue = String(bookingData.destination || '');
-    const safePickup = escapeHtml(pickupRawValue);
-    const safeDestination = escapeHtml(destinationRawValue);
-    const pickupMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pickupRawValue)}`;
-    const destinationMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destinationRawValue)}`;
-    const pickupIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(pickupRawValue);
-    const destinationIsAirport = /flughafen\s+wien\s*\(vie\)/i.test(destinationRawValue);
-    const safeReference = escapeHtml(normalizeBookingReference(data.booking_reference));
-    const { date: pickupDate, time: pickupTime } = formatDateTimeForEmail(String(bookingData.pickup_at));
-    const safeDate = escapeHtml(pickupDate);
-    const safeTime = escapeHtml(pickupTime);
-    const safeEmail = escapeHtml(String(bookingData.email || ''));
-    const safePhone = escapeHtml(String(bookingData.phone || ''));
-    const phoneHref = String(bookingData.phone || '').replace(/[^\d+]/g, '');
-    const safeVehicle = escapeHtml(String(bookingData.vehicle_type || ''));
-    const safePassengers = escapeHtml(String(bookingData.passengers ?? ''));
-    const safeLuggage = escapeHtml(String(bookingData.luggage ?? ''));
     const notesRaw = String(bookingData.notes || '');
     const notesLower = notesRaw.toLowerCase();
     const paymentInNotes = notesLower.match(/\(zahlung:\s*([^)]+)\)/i)?.[1]?.toLowerCase() || '';
@@ -286,29 +268,22 @@ export async function createBooking(payload: any) {
       .replace(/\(handgepaeck:\s*[^)]*\)/gi, '')
       .replace(/\s{2,}/g, ' ')
       .trim();
-    const safeNotes = escapeHtml(cleanedNotes || '');
-    const safeChildSeatInfo = escapeHtml(childSeatInfo || '-');
-    const safeIntermediateStopInfo = escapeHtml(intermediateStopInfo || '-');
-    const safeFlightNumberInfo = escapeHtml(flightNumberInfo || '');
-    const safeHandLuggageInfo = escapeHtml(handLuggageInfo || '0');
-    const hasAdditionalInfo = Boolean(childSeatInfo || intermediateStopInfo);
-    const hasNotes = Boolean(cleanedNotes);
     const directPayment = String((bookingData as any).payment_method || '').toLowerCase();
     const paymentSource = `${directPayment} ${paymentInNotes}`.trim();
     const isCardPayment =
       paymentSource.includes('kredit') || paymentSource.includes('card') || paymentSource.includes('karte');
     const isCashPayment = paymentSource.includes('bar') || paymentSource.includes('cash');
-    const paymentLabel = isCardPayment ? 'Kreditkarte' : isCashPayment ? 'Barzahlung' : '-';
-    const paymentStyle = isCardPayment
-      ? 'background:#e8f2ff;color:#0071e3;'
+    const isVoucherPayment = paymentSource.includes('lieferschein') || paymentSource.includes('voucher');
+    const isFreePayment = paymentSource.includes('gratis') || paymentSource.includes('free');
+    const paymentLabel = isCardPayment
+      ? 'Kreditkarte'
       : isCashPayment
-        ? 'background:linear-gradient(135deg,rgba(10,99,255,0.12) 0%,rgba(36,144,255,0.18) 100%);color:#0a63ff;'
-        : 'background:#f5f5f7;color:#86868b;';
-    const safePayment = escapeHtml(paymentLabel);
-    const safePrice = escapeHtml(
-      new Intl.NumberFormat('de-AT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(finalPrice),
-    );
-    const safeDirectionLabel = escapeHtml(directionLabel);
+        ? 'Barzahlung'
+        : isVoucherPayment
+          ? 'Lieferschein'
+          : isFreePayment
+            ? 'Gratis'
+            : '-';
 
     let emailError: any = null;
     for (const from of fromCandidates) {
@@ -316,81 +291,25 @@ export async function createBooking(payload: any) {
         from,
         to: data.email,
         subject: `Ihre Buchungsbestaetigung (${directionLabel}) ${normalizeBookingReference(data.booking_reference)}`.trim(),
-        html: `
-          <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';color:#1d1d1f;">
-            <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #d2d2d7;border-radius:24px;overflow:hidden;">
-              <tr>
-                <td style="padding:28px 28px 8px 28px;text-align:center;">
-                  <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
-                  <h1 style="margin:0;font-size:30px;line-height:1.2;font-weight:700;color:#1d1d1f;">Buchungsbestaetigung</h1>
-                  <p style="margin:12px 0 0 0;font-size:16px;line-height:1.5;color:#86868b;">Hallo ${safeName}, vielen Dank fuer Ihre Buchung. Hier sind Ihre Angaben im Ueberblick.</p>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:20px 28px 8px 28px;">
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:12px;background:#ffffff;border:1px solid #e5e5ea;border-radius:16px;">
-                    <tr>
-                      <td style="padding:18px 14px 16px 18px;text-align:center;width:62%;border-right:1px solid #e5e5ea;">
-                        <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Gesamtpreis</div>
-                        <div style="font-size:42px;line-height:1.05;color:#1d1d1f;font-weight:700;letter-spacing:-0.02em;">${safePrice} &euro;</div>
-                        <span style="display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;text-transform:uppercase;${paymentStyle}">${safePayment}</span>
-                      </td>
-                      <td style="padding:18px 14px 16px 14px;text-align:center;width:38%;">
-                        <div style="font-size:30px;line-height:1;margin-bottom:8px;">${directionIcon}</div>
-                        <div style="font-size:20px;line-height:1;color:#8b8b90;margin-bottom:8px;">____</div>
-                        <div style="font-size:14px;color:#1d1d1f;font-weight:700;line-height:1.3;">${safeDirectionLabel}</div>
-                      </td>
-                    </tr>
-                  </table>
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                    <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Passagierinformationen</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Name:</strong> ${safeName}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>E-Mail:</strong> ${safeEmail}</td></tr>
-                    <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Telefon:</strong> <a href="tel:${phoneHref}" style="color:#0071e3;text-decoration:none;font-weight:600;">${safePhone}</a></td></tr>
-                  </table>
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                    <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Referenz:</strong> ${safeReference}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Abholung:</strong> ${pickupIsAirport ? safePickup : `<a href="${pickupMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safePickup}</a>`}</td></tr>
-                    ${safeFlightNumberInfo ? `<tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Flugnummer:</strong> ${safeFlightNumberInfo}</td></tr>` : ''}
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Ziel:</strong> ${destinationIsAirport ? safeDestination : `<a href="${destinationMapsLink}" style="color:#0071e3;text-decoration:none;font-weight:600;" target="_blank" rel="noopener noreferrer">${safeDestination}</a>`}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Datum:</strong> ${safeDate}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Uhrzeit:</strong> ${safeTime}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Fahrzeug:</strong> ${safeVehicle}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Personen:</strong> ${safePassengers}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Koffer:</strong> ${safeLuggage}</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Handgepäck:</strong> ${safeHandLuggageInfo}</td></tr>
-                    ${hasNotes ? `<tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Notizen:</strong> ${safeNotes}</td></tr>` : ''}
-                  </table>
-                  ${hasAdditionalInfo ? `
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:12px;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                    <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Zusatzinformationen</td></tr>
-                    <tr><td style="padding:0 18px 12px 18px;font-size:14px;color:#1d1d1f;"><strong>Kindersitze:</strong> ${safeChildSeatInfo}</td></tr>
-                    <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Zwischenstopp:</strong> ${safeIntermediateStopInfo}</td></tr>
-                  </table>
-                  ` : ''}
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:18px 28px 10px 28px;text-align:center;">
-                  <p style="margin:0;font-size:14px;line-height:1.5;color:#86868b;">Diese E-Mail dient als Bestaetigung Ihrer Buchungsanfrage.</p>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding:0 28px 28px 28px;">
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                    <tr><td style="padding:16px 18px 10px 18px;font-size:15px;line-height:1.4;color:#1d1d1f;font-weight:700;">Aenderungen &amp; Stornierungen</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">• Fuer Fahrten bis 22:00 Uhr:<br/>Aenderungen oder Stornierungen sind bis spaetestens 3 Stunden vor Abholzeit moeglich.</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">• Fuer Fahrten zwischen 22:00 und 07:00 Uhr:<br/>Aenderungen oder Stornierungen sind mindestens 8 Stunden vor Abholzeit erforderlich.</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">Weitere Details finden Sie hier:<br/><a href="${appUrl}/faq" style="color:#0071e3;text-decoration:none;font-weight:600;">FAQ</a></td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;line-height:1.55;color:#1d1d1f;">Fragen? Starten Sie einen WhatsApp-Chat mit uns.</td></tr>
-                    <tr><td style="padding:0 18px 16px 18px;"><a href="https://wa.me/?text=Hallo%20FlughafenTaxi%20Wien%2C%20ich%20habe%20eine%20Frage%20zu%20meiner%20Buchung." style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;">WhatsApp Chat starten</a></td></tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </div>
-        `,
+        html: buildPassengerConfirmationEmailHtml({
+          fullName: data.full_name,
+          email: bookingData.email,
+          phone: bookingData.phone,
+          bookingReference: normalizeBookingReference(data.booking_reference),
+          pickup: bookingData.pickup,
+          destination: bookingData.destination,
+          pickupAt: bookingData.pickup_at,
+          vehicleType: bookingData.vehicle_type,
+          passengers: bookingData.passengers,
+          luggage: bookingData.luggage,
+          handLuggage: handLuggageInfo || '0',
+          paymentLabel,
+          flightNumber: flightNumberInfo || '',
+          childSeatInfo: childSeatInfo || '',
+          intermediateStopInfo: intermediateStopInfo || '',
+          notes: cleanedNotes || '',
+          price: finalPrice,
+        }),
       });
       if (!error) {
         emailError = null;

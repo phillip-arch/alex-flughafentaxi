@@ -165,7 +165,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
     if (isCard) {
       return {
-        label: 'KARTE',
+        label: 'KK',
         className: 'bg-[#e8f2ff] text-[#0071e3]',
       };
     }
@@ -177,7 +177,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     }
     if (isVoucher) {
       return {
-        label: 'LIEFERSCHEIN',
+        label: 'LIEF.',
         className: 'bg-[#f3f7ff] text-[#2759b8]',
       };
     }
@@ -826,7 +826,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-[128px] md:w-auto px-2 md:pl-10 md:pr-4 py-2 border border-[#d2d2d7] rounded-[12px] text-[15px] focus:ring-2 focus:ring-[#0071e3] outline-none text-[#1d1d1f] bg-white"
+          className="h-10 w-[138px] md:h-auto md:w-auto px-2 md:pl-10 md:pr-4 py-2 border border-[#d2d2d7] rounded-[12px] text-[15px] leading-none focus:ring-2 focus:ring-[#0071e3] outline-none text-[#1d1d1f] bg-white"
         />
       </div>
       <button
@@ -843,20 +843,20 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const renderViewModeToggle = () => (
     <div className="flex items-center gap-2 bg-[#f5f5f7] p-1 rounded-[12px] shrink-0">
       <button
-        onClick={() => setViewMode('grid')}
-        aria-label="Kacheln Ansicht"
-        title="Kacheln"
-        className={`inline-flex h-9 w-9 items-center justify-center rounded-[8px] transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b]'}`}
-      >
-        <LayoutGrid size={16} />
-      </button>
-      <button
         onClick={() => setViewMode('table')}
         aria-label="Tabellen Ansicht"
         title="Tabelle"
         className={`inline-flex h-9 w-9 items-center justify-center rounded-[8px] transition-all ${viewMode === 'table' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b]'}`}
       >
         <Rows3 size={16} />
+      </button>
+      <button
+        onClick={() => setViewMode('grid')}
+        aria-label="Kacheln Ansicht"
+        title="Kacheln"
+        className={`inline-flex h-9 w-9 items-center justify-center rounded-[8px] transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b]'}`}
+      >
+        <LayoutGrid size={16} />
       </button>
     </div>
   );
@@ -1005,7 +1005,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 ${currentTab === 'rides' && viewMode === 'table' ? 'pt-3' : 'pt-8'}`}>
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           {currentTab === 'rides' && viewMode === 'grid' ? (
             <div className="mb-4 lg:hidden">

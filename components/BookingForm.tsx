@@ -843,7 +843,17 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
                (formData.extraStop ? ` (Zwischenstopp: ${formData.extraStopStreet})` : '') +
                (formData.flightNumber ? ` (Flugnummer: ${formData.flightNumber})` : '') +
                (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Handgepaeck: ${formData.handLuggage})` : '') +
-               (formData.paymentMethod ? ` (Zahlung: ${formData.paymentMethod === 'cash' ? 'Barzahlung' : 'Kreditkarte'})` : ''),
+               (formData.paymentMethod
+                 ? ` (Zahlung: ${
+                     formData.paymentMethod === 'cash'
+                       ? 'Barzahlung'
+                       : formData.paymentMethod === 'card'
+                         ? 'Kreditkarte'
+                         : formData.paymentMethod === 'voucher'
+                           ? 'Lieferschein'
+                           : 'Gratis'
+                   })`
+                 : ''),
         _zip: formData.zip,
         _extraStop: formData.extraStop,
       };

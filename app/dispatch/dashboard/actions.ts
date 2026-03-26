@@ -349,7 +349,17 @@ export async function updateBookingStatus(id: string, status: string) {
         const isCardPayment =
           paymentInNotes.includes('kredit') || paymentInNotes.includes('card') || paymentInNotes.includes('karte');
         const isCashPayment = paymentInNotes.includes('bar') || paymentInNotes.includes('cash');
-        const paymentLabel = isCardPayment ? 'Kreditkarte' : isCashPayment ? 'Barzahlung' : '-';
+        const isVoucherPayment = paymentInNotes.includes('lieferschein') || paymentInNotes.includes('voucher');
+        const isFreePayment = paymentInNotes.includes('gratis') || paymentInNotes.includes('free');
+        const paymentLabel = isCardPayment
+          ? 'Kreditkarte'
+          : isCashPayment
+            ? 'Barzahlung'
+            : isVoucherPayment
+              ? 'Lieferschein'
+              : isFreePayment
+                ? 'Gratis'
+                : '-';
         const paymentStyle = isCardPayment
           ? 'background:#e8f2ff;color:#0071e3;'
           : isCashPayment
@@ -523,7 +533,17 @@ export async function updateBookingDetails(payload: {
     const isCardPayment =
       paymentInNotes.includes('kredit') || paymentInNotes.includes('card') || paymentInNotes.includes('karte');
     const isCashPayment = paymentInNotes.includes('bar') || paymentInNotes.includes('cash');
-    const paymentLabel = isCardPayment ? 'Kreditkarte' : isCashPayment ? 'Barzahlung' : '-';
+    const isVoucherPayment = paymentInNotes.includes('lieferschein') || paymentInNotes.includes('voucher');
+    const isFreePayment = paymentInNotes.includes('gratis') || paymentInNotes.includes('free');
+    const paymentLabel = isCardPayment
+      ? 'Kreditkarte'
+      : isCashPayment
+        ? 'Barzahlung'
+        : isVoucherPayment
+          ? 'Lieferschein'
+          : isFreePayment
+            ? 'Gratis'
+            : '-';
     const paymentStyle = isCardPayment
       ? 'background:#e8f2ff;color:#0071e3;'
       : isCashPayment
@@ -718,7 +738,17 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
     const isCardPayment =
       paymentSource.includes('kredit') || paymentSource.includes('card') || paymentSource.includes('karte');
     const isCashPayment = paymentSource.includes('bar') || paymentSource.includes('cash');
-    const paymentLabel = isCardPayment ? 'Kreditkarte' : isCashPayment ? 'Barzahlung' : '-';
+    const isVoucherPayment = paymentSource.includes('lieferschein') || paymentSource.includes('voucher');
+    const isFreePayment = paymentSource.includes('gratis') || paymentSource.includes('free');
+    const paymentLabel = isCardPayment
+      ? 'Kreditkarte'
+      : isCashPayment
+        ? 'Barzahlung'
+        : isVoucherPayment
+          ? 'Lieferschein'
+          : isFreePayment
+            ? 'Gratis'
+            : '-';
     const paymentStyle = isCardPayment
       ? 'background:#e8f2ff;color:#0071e3;'
       : isCashPayment

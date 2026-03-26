@@ -156,8 +156,8 @@ export default function AdminRidesPanel({
                     {(() => {
                       const payment = getBookingPaymentMeta(booking);
                       return (
-                        <span className={`inline-flex w-auto items-center justify-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-semibold uppercase ${payment.className} sm:gap-2 sm:px-4 sm:text-[16px]`}>
-                          <CreditCard size={14} className="sm:h-[18px] sm:w-[18px]" /> {payment.label}
+                        <span className={`inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-semibold uppercase ${payment.className} sm:px-4 sm:text-[16px]`}>
+                          {payment.label}
                         </span>
                       );
                     })()}
@@ -257,7 +257,7 @@ export default function AdminRidesPanel({
                             <>
                               {seats.baby > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.baby} BABYSCHALE</span> : null}
                               {seats.child > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.child} KINDERSITZ</span> : null}
-                              {seats.booster > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.booster} SitzerhÃ¶hung</span> : null}
+                              {seats.booster > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.booster} Sitzerhoehung</span> : null}
                             </>
                           );
                         })()}
@@ -468,8 +468,8 @@ export default function AdminRidesPanel({
                           <td className={`${tableColumnClass.payment} px-0 py-1 align-top text-center ${isCancelled ? 'opacity-35' : ''}`}>
                             <div className="flex min-h-[42px] flex-col items-center justify-between">
                               <div className="font-semibold text-[#1d1d1f]">{formatPriceDisplay(booking.price)}</div>
-                              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[16px] font-semibold uppercase ${payment.className}`}>
-                                <CreditCard size={11} /> {payment.label}
+                              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[16px] font-semibold uppercase ${payment.className}`}>
+                                {payment.label}
                               </span>
                             </div>
                           </td>
