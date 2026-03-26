@@ -9,20 +9,16 @@ import {
   ChevronDown,
   ChevronRight,
   Edit,
-  LogOut,
   GraduationCap,
   Heart,
   History,
   House,
   MapPin,
-  Smartphone,
   Star,
   User,
   X,
   XCircle,
 } from 'lucide-react';
-import { logout } from '@/app/(auth)/actions';
-import InstallAppCard from '@/components/pwa/InstallAppCard';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
 import { parseBookingNotes } from '@/lib/booking/notes';
 import {
@@ -36,7 +32,7 @@ import {
   updateAccountProfile,
 } from './actions';
 
-type AccountTab = 'profil' | 'favoriten' | 'buchungsverlauf' | 'app';
+type AccountTab = 'profil' | 'favoriten' | 'buchungsverlauf';
 
 type Favorite = {
   id: string;
@@ -112,7 +108,6 @@ export default function AccountClient({
   const [bookingsLoaded, setBookingsLoaded] = useState(initialBookingsLoaded);
   const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [bookingsLoading, setBookingsLoading] = useState(false);
-  const [showAppTab, setShowAppTab] = useState(false);
 
   const accountShellClass = 'mx-auto max-w-[57.5rem]';
   const contentSectionClass = 'pt-2';
@@ -306,66 +301,12 @@ export default function AccountClient({
     }
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const evaluateAppVisibility = () => {
-      const userAgent = window.navigator.userAgent || '';
-      const isMobileDevice =
-        /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent) ||
-        window.matchMedia('(max-width: 1024px)').matches;
-      const hasInstallPrompt = Boolean(window.__aftDeferredInstallPrompt);
-      const isInstalled =
-        window.matchMedia('(display-mode: standalone)').matches ||
-        Boolean(window.navigator.standalone);
-
-      setShowAppTab(isMobileDevice || hasInstallPrompt || isInstalled);
-    };
-
-    evaluateAppVisibility();
-    window.addEventListener('aft-install-available', evaluateAppVisibility);
-    window.addEventListener('aft-install-installed', evaluateAppVisibility);
-
-    return () => {
-      window.removeEventListener('aft-install-available', evaluateAppVisibility);
-      window.removeEventListener('aft-install-installed', evaluateAppVisibility);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (activeTab === 'app' && !showAppTab) {
-      setActiveTab('buchungsverlauf');
-    }
-  }, [activeTab, showAppTab]);
-
   return (
-    <div suppressHydrationWarning className="bg-white pb-14 pt-24 lg:pt-28">
+    <div suppressHydrationWarning className="bg-white pb-14 pt-10 lg:pt-12">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
           <section className="space-y-5">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-start justify-between gap-4">
-                <h1 className="ui-heading-lg text-[#111827]">Mein Konto</h1>
-                <form action={logout} className="md:hidden">
-                  <button
-                    type="submit"
-                    className="inline-flex items-center gap-2 text-[0.95rem] font-medium leading-none text-[#1679ff] transition-colors hover:text-[#0a63ff]"
-                  >
-                    <LogOut size={15} />
-                    Abmelden
-                  </button>
-                </form>
-              </div>
-              <form action={logout} className="hidden md:block">
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-2 text-[0.95rem] font-medium text-[#1679ff] transition-colors hover:text-[#0a63ff]"
-                >
-                  <LogOut size={16} />
-                  Abmelden
-                </button>
-              </form>
-            </div>
+            <h1 className="ui-heading-lg text-[#111827]">Mein Konto</h1>
 
             <UnderlineTabNav
               className="flex flex-wrap items-center gap-6 border-b border-[#e9edf3] pb-2"
@@ -373,7 +314,6 @@ export default function AccountClient({
                 { id: 'buchungsverlauf', label: '', icon: <History size={16} /> },
                 { id: 'favoriten', label: '', icon: <Heart size={16} /> },
                 { id: 'profil', label: '', icon: <User size={16} /> },
-                ...(showAppTab ? [{ id: 'app', label: '', icon: <Smartphone size={16} /> }] : []),
               ]}
               activeTab={activeTab}
               onChange={(tab) => setActiveTab(tab as AccountTab)}
@@ -638,20 +578,6 @@ export default function AccountClient({
                 </form>
               </div>
               {error ? <p className="mt-3 text-sm text-[#d70015]">{error}</p> : null}
-            </section>
-          ) : null}
-
-          {activeTab === 'app' && showAppTab ? (
-            <section className={`${contentSectionClass} max-w-[44rem]`}>
-              <div className={accountSectionStackClass}>
-                <div className={accountSectionIntroClass}>
-                  <h2 className="ui-heading-lg text-[#111827]">App</h2>
-                  <p className="ui-copy-compact text-[#6a7d96]">
-                    Installieren Sie die App fuer schnelleren Zugriff auf Buchung und Konto.
-                  </p>
-                </div>
-                <InstallAppCard />
-              </div>
             </section>
           ) : null}
 

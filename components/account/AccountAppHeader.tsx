@@ -1,0 +1,41 @@
+import Image from 'next/image';
+import { LogOut } from 'lucide-react';
+import { logout } from '@/app/(auth)/actions';
+
+export default function AccountAppHeader() {
+  return (
+    <header className="border-b border-[#e9edf3] bg-white/96 backdrop-blur">
+      <div className="app-container">
+        <div className="mx-auto flex h-[76px] max-w-[57.5rem] items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="relative block h-10 w-[76px] overflow-hidden">
+              <Image
+                src="https://web-site.website/images/aflogo.jpg"
+                alt="Alex Flughafentaxi"
+                fill
+                sizes="76px"
+                className="object-contain object-left"
+              />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#1679ff]">
+                Kundenkonto
+              </p>
+              <p className="text-[1rem] font-semibold tracking-[-0.03em] text-[#111827]">App</p>
+            </div>
+          </div>
+
+          <form action={logout}>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-full border border-[#dbe7f8] bg-white px-4 py-2 text-[0.95rem] font-medium text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]"
+            >
+              <LogOut size={16} />
+              Abmelden
+            </button>
+          </form>
+        </div>
+      </div>
+    </header>
+  );
+}
