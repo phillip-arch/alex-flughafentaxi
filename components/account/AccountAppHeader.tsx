@@ -6,7 +6,7 @@ export default function AccountAppHeader() {
   return (
     <header className="border-b border-white/10 bg-[#050505] text-white">
       <div className="app-container">
-        <div className="mx-auto flex h-[76px] max-w-[57.5rem] items-center justify-between gap-4">
+        <div className="flex h-[66px] items-center justify-between gap-4 lg:h-[72px]">
           <div className="flex items-center gap-3">
             <span className="relative block h-10 w-[76px] overflow-hidden">
               <Image

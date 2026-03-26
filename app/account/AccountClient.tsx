@@ -109,7 +109,7 @@ export default function AccountClient({
   const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [bookingsLoading, setBookingsLoading] = useState(false);
 
-  const accountShellClass = 'mx-auto max-w-[57.5rem]';
+  const accountShellClass = 'w-full';
   const contentSectionClass = 'pt-2';
   const accountSectionTitleClass = 'ui-heading-lg mb-6 text-[#111827]';
   const accountSectionIntroClass = 'ui-text-block-sm gap-6';
