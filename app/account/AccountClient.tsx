@@ -606,8 +606,8 @@ export default function AccountClient({
                     </Link>
                   </div>
 
-                  <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex w-full max-w-[29rem] flex-wrap items-center gap-3">
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    <div className="flex w-full flex-wrap items-center gap-3">
                       <button
                         type="button"
                         onClick={() => setBookingFilter('upcoming')}
@@ -632,15 +632,15 @@ export default function AccountClient({
                         <Clock3 size={18} />
                         <span>Vergangen</span>
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('favoriten')}
+                        className="inline-flex min-w-[9.5rem] items-center justify-center gap-2 rounded-[1.05rem] border border-[#e2e8f2] bg-[#FDFDFE] px-4 py-3 text-[1.02rem] font-medium text-[#657489] shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all hover:text-[#111827]"
+                      >
+                        <Star size={18} className="text-[#657489]" />
+                        <span>Favoriten</span>
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('favoriten')}
-                      className="inline-flex items-center gap-2 rounded-[1.05rem] border border-[#f3d5db] bg-[#FDFDFE] px-4 py-3 text-[0.98rem] font-medium text-[#1d1d1f] shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#fff7f8]"
-                    >
-                      <Star size={18} className="fill-[#ff5c8a] text-[#ff5c8a]" />
-                      <span>Favoriten</span>
-                    </button>
                   </div>
                 </div>
 
