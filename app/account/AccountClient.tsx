@@ -611,34 +611,37 @@ export default function AccountClient({
                       <button
                         type="button"
                         onClick={() => setBookingFilter('upcoming')}
-                        className={`inline-flex min-w-[9.5rem] items-center justify-center gap-2 rounded-[1.05rem] border px-4 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all ${
+                        className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
                           bookingFilter === 'upcoming'
                             ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
                             : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
                         }`}
+                        aria-label="Kommend"
                       >
                         <Calendar size={18} />
-                        <span>Kommend</span>
+                        <span className="hidden sm:inline">Kommend</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setBookingFilter('previous')}
-                        className={`inline-flex min-w-[9.5rem] items-center justify-center gap-2 rounded-[1.05rem] border px-4 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all ${
+                        className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
                           bookingFilter === 'previous'
                             ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
                             : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
                         }`}
+                        aria-label="Vergangen"
                       >
                         <Clock3 size={18} />
-                        <span>Vergangen</span>
+                        <span className="hidden sm:inline">Vergangen</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setActiveTab('favoriten')}
-                        className="inline-flex min-w-[9.5rem] items-center justify-center gap-2 rounded-[1.05rem] border border-[#e2e8f2] bg-[#FDFDFE] px-4 py-3 text-[1.02rem] font-medium text-[#657489] shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all hover:text-[#111827]"
+                        className="inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border border-[#e2e8f2] bg-[#FDFDFE] px-3 py-3 text-[1.02rem] font-medium text-[#657489] shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all hover:text-[#111827] sm:min-w-[9.5rem] sm:px-4"
+                        aria-label="Favoriten"
                       >
                         <Star size={18} className="text-[#657489]" />
-                        <span>Favoriten</span>
+                        <span className="hidden sm:inline">Favoriten</span>
                       </button>
                     </div>
                   </div>
