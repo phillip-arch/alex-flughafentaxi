@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
-import { ArrowRight, ChevronLeft, Loader2, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Loader2, Lock, Mail, ShieldCheck } from 'lucide-react';
 import { adminLogin } from '@/app/(auth)/actions';
 
 export default function AdminLoginPage() {
@@ -39,22 +38,11 @@ export default function AdminLoginPage() {
       <div className="app-container flex min-h-screen justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
         <div className="w-full max-w-[34rem]">
           <div className="ui-card-surface-light bg-white px-5 py-6 md:px-8 md:py-8">
-            <Link
-              href="/"
-              className="mb-6 inline-flex w-fit items-center gap-2 text-[0.95rem] font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text)]"
-            >
-              <ChevronLeft size={18} />
-              Zurueck zur Startseite
-            </Link>
-
             <div className="ui-text-block-sm">
               <div className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff]">
                 <ShieldCheck size={20} />
               </div>
               <h1 className="ui-heading-lg text-[#111827]">Admin-Portal</h1>
-              <p className="ui-copy-compact text-[#6a7d96]">
-                Melden Sie sich an, um Buchungen und Fahrer zu verwalten.
-              </p>
             </div>
 
             {error ? (
@@ -81,7 +69,7 @@ export default function AdminLoginPage() {
                     <input
                       type="email"
                       name="email"
-                      placeholder="Admin-E-Mail"
+                      placeholder="E-Mail"
                       required
                       className="ui-input !bg-white !pl-[3.2rem] focus:!bg-white"
                     />
