@@ -619,7 +619,10 @@ export default function AccountClient({
                     <div className="flex w-full flex-wrap items-center gap-3">
                       <button
                         type="button"
-                        onClick={() => setBookingFilter('upcoming')}
+                        onClick={() => {
+                          setActiveTab('buchungsverlauf');
+                          setBookingFilter('upcoming');
+                        }}
                         className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
                           bookingFilter === 'upcoming'
                             ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
@@ -632,7 +635,10 @@ export default function AccountClient({
                       </button>
                       <button
                         type="button"
-                        onClick={() => setBookingFilter('previous')}
+                        onClick={() => {
+                          setActiveTab('buchungsverlauf');
+                          setBookingFilter('previous');
+                        }}
                         className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
                           bookingFilter === 'previous'
                             ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
