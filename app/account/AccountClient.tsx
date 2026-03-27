@@ -475,7 +475,7 @@ export default function AccountClient({
             </section>
           ) : null}
 
-          {activeTab === 'favoriten' ? (
+          {false && activeTab === 'favoriten' ? (
             <section className={`${contentSectionClass} max-w-[44rem]`}>
               <div className={accountSectionStackClass}>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -611,7 +611,7 @@ export default function AccountClient({
             </section>
           ) : null}
 
-          {activeTab === 'buchungsverlauf' ? (
+          {activeTab === 'buchungsverlauf' || activeTab === 'favoriten' ? (
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
                 <div className="px-1 py-1 md:px-2">
@@ -656,19 +656,155 @@ export default function AccountClient({
                   </div>
                 </div>
 
-                {bookingsLoading ? (
-                  <p className="text-[#6a7d96]">Buchungsverlauf wird geladen...</p>
+                {activeTab === 'favoriten' ? (
+                  <div className="space-y-6 px-1 pt-3 md:px-2">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {favoritesLoading ? (
+                        <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
+                      ) : null}
+                      {favorites.map((fav) => (
+                        <div
+                          key={fav.id}
+                          className="relative rounded-[1rem] border border-[#e9edf3] bg-white px-3 py-3 text-center shadow-[0_8px_20px_rgba(17,17,17,0.04)]"
+                        >
+                          <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
+                            {(() => {
+                              const Icon = getFavoriteIcon(fav.name);
+                              return <Icon size={15} />;
+                            })()}
+                          </span>
+                          <span className="mt-2 block text-sm leading-5 text-[#6a7d96]">
+                            {fav.street} {fav.house_number}, {fav.zip} {fav.city}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              startTransition(async () => {
+                                if (!confirm('Moechten Sie diesen Favoriten loeschen?')) return;
+                                const res = await deleteFavoriteAddress(fav.id);
+                                if ((res as { error?: string })?.error) {
+                                  setError((res as { error: string }).error);
+                                  return;
+                                }
+                                setFavorites((prev) => prev.filter((f) => f.id !== fav.id));
+                              })
+                            }
+                            aria-label="Favorit loeschen"
+                            className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]"
+                          >
+                            <X size={12} strokeWidth={2.25} />
+                          </button>
+                        </div>
+                      ))}
+                      {shouldShowFavoritesEmptyState ? (
+                        <p className="text-sm text-[#1679ff]">Keine Favoriten gespeichert.</p>
+                      ) : null}
+                    </div>
+
+                    <p className="text-sm text-[#6a7d96]">
+                      {hasReachedFavoriteLimit
+                        ? 'Maximal 3 Favoriten gespeichert.'
+                        : `${favorites.length}/3 Favoriten gespeichert.`}
+                    </p>
+
+                    <form
+                      action={() => {
+                        setError(null);
+                        startTransition(async () => {
+                          if (favorites.length >= 3) {
+                            setError('Maximal 3 Favoriten sind moeglich.');
+                            return;
+                          }
+
+                          const parsedAddress = parseFavoriteAddressInput(favAddress);
+                          if (!parsedAddress) {
+                            setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
+                            return;
+                          }
+
+                          if (!favLabel.trim()) {
+                            setError('Bitte waehlen Sie House, Office oder School.');
+                            return;
+                          }
+
+                          const formData = new FormData();
+                          formData.set('name', favLabel.trim());
+                          formData.set('city', parsedAddress.city);
+                          formData.set('zip', parsedAddress.zip);
+                          formData.set('street', parsedAddress.street);
+                          formData.set('house_number', parsedAddress.house_number);
+
+                          const res = await addFavoriteAddress(formData);
+                          if ((res as { error?: string })?.error) {
+                            setError((res as { error: string }).error);
+                            return;
+                          }
+                          const inserted = (res as { favorite?: Favorite }).favorite;
+                          if (inserted?.id) {
+                            setFavorites((prev) => [...prev, inserted]);
+                          }
+                          setFavLabel('');
+                          setFavAddress('');
+                        });
+                      }}
+                      className="grid grid-cols-1 gap-3"
+                    >
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-[10.75rem_minmax(0,1fr)]">
+                        <div className="relative">
+                          <select
+                            value={favLabel}
+                            onChange={(e) => setFavLabel(e.target.value)}
+                            className="ui-input appearance-none pr-10"
+                            disabled={isPending || hasReachedFavoriteLimit}
+                            required
+                          >
+                            <option value="">Label</option>
+                            {favoritePresetItems.map((item) => (
+                              <option key={item.label} value={item.label}>
+                                {item.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">
+                            <ChevronDown size={16} />
+                          </div>
+                        </div>
+                        <input
+                          value={favAddress}
+                          onChange={(e) => setFavAddress(e.target.value)}
+                          className="ui-input"
+                          placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                          disabled={isPending || hasReachedFavoriteLimit}
+                          required
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={isPending || hasReachedFavoriteLimit}
+                        className="ui-button-booking-primary w-full sm:w-auto sm:min-w-[220px] sm:justify-self-start"
+                      >
+                        {isPending ? 'Speichert...' : 'Speichern'}
+                      </button>
+                    </form>
+                    {error ? <p className="text-sm text-[#d70015]">{error}</p> : null}
+                  </div>
                 ) : null}
 
-                <div className="space-y-8">
-                  {groupedBookings.map((group) => (
-                    <div key={group.month} className={bookingsMonthGroupClass}>
-                      <h3 className={bookingsMonthTitleClass}>
-                        {group.month}
-                      </h3>
+                {activeTab === 'buchungsverlauf' ? (
+                  <>
+                    {bookingsLoading ? (
+                      <p className="text-[#6a7d96]">Buchungsverlauf wird geladen...</p>
+                    ) : null}
 
-                      <div className="mt-6 space-y-2 md:mt-7">
-                        {group.items.map((b) => {
+                    <div className="space-y-8">
+                      {groupedBookings.map((group) => (
+                        <div key={group.month} className={bookingsMonthGroupClass}>
+                          <h3 className={bookingsMonthTitleClass}>
+                            {group.month}
+                          </h3>
+
+                          <div className="mt-6 space-y-2 md:mt-7">
+                            {group.items.map((b) => {
                           const primaryLocation = isToAirport(b) ? b.pickup : b.destination;
                           const secondaryLocation = isToAirport(b)
                             ? 'Zum Flughafen Wien'
@@ -936,11 +1072,13 @@ export default function AccountClient({
                               ) : null}
                             </div>
                           );
-                        })}
-                      </div>
+                            })}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </>
+                ) : null}
 
                 {groupedBookings.length === 0 ? (
                   <p className="text-[#6a7d96]">
