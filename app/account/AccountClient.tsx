@@ -314,6 +314,7 @@ export default function AccountClient({
       className="flex flex-wrap items-center gap-2"
       items={[
         { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
+        { id: 'favoriten', label: 'Favoriten', icon: <Star size={16} /> },
         { id: 'profil', label: 'Profil', icon: <User size={16} /> },
       ]}
       activeTab={activeTab}
