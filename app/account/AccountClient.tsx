@@ -625,7 +625,7 @@ export default function AccountClient({
                           setBookingFilter('upcoming');
                         }}
                           className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
-                            bookingFilter === 'upcoming'
+                            activeTab === 'buchungsverlauf' && bookingFilter === 'upcoming'
                               ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
                               : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
                           }`}
@@ -641,7 +641,7 @@ export default function AccountClient({
                           setBookingFilter('previous');
                         }}
                           className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
-                            bookingFilter === 'previous'
+                            activeTab === 'buchungsverlauf' && bookingFilter === 'previous'
                               ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
                               : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
                           }`}
