@@ -333,9 +333,9 @@ export default function AccountClient({
         <div className={`${accountShellClass} space-y-6`}>
           <section className="px-1 py-2 md:px-2">
             <div className="flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <h2 className="text-[2rem] font-semibold tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
-                  {greetingLabel} <span className="align-[0.04em] text-[0.78em]">👋</span>
+                  {greetingLabel}
                 </h2>
                 <p className="text-[1rem] text-[#6a7d96] md:text-[1.05rem]">{accountHeroSubtitle}</p>
               </div>
