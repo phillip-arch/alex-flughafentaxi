@@ -314,7 +314,6 @@ export default function AccountClient({
       className="flex flex-wrap items-center gap-2"
       items={[
         { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
-        { id: 'favoriten', label: 'Favoriten', icon: <Star size={16} /> },
         { id: 'profil', label: 'Profil', icon: <User size={16} /> },
       ]}
       activeTab={activeTab}
@@ -332,15 +331,15 @@ export default function AccountClient({
     <div suppressHydrationWarning className="bg-[#f7f9fc] pb-14 pt-8 lg:pt-10">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
-          <section className="px-1 py-1 md:px-2">
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-              <div className="space-y-2">
+          <section className="px-1 py-2 md:px-2">
+            <div className="flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
+              <div className="space-y-3">
                 <h2 className="text-[2rem] font-semibold tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
                   {greetingLabel} <span className="align-[0.04em] text-[0.78em]">👋</span>
                 </h2>
                 <p className="text-[1rem] text-[#6a7d96] md:text-[1.05rem]">{accountHeroSubtitle}</p>
               </div>
-              <div className="flex flex-col-reverse gap-3 xl:flex-row xl:items-center xl:justify-end">
+              <div className="flex flex-col-reverse gap-5 xl:flex-row xl:items-center xl:justify-end xl:gap-4">
                 {accountPrimaryNav}
                 <Link
                   href="/book"

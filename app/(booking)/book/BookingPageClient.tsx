@@ -143,9 +143,9 @@ export default function BookingPageClient({ initialName = '' }: { initialName?: 
       <section className="bg-white">
         <div className="app-container pb-10 pt-28 md:pb-12 md:pt-28">
           {isAppSurface ? (
-            <section className="mb-8 px-1 py-1 md:px-2">
-              <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-                <div className="space-y-2">
+            <section className="mb-8 px-1 py-2 md:px-2">
+              <div className="flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
+                <div className="space-y-3">
                   <h2 className="text-[2rem] font-semibold tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
                     {greetingLabel} <span className="align-[0.04em] text-[0.78em]">👋</span>
                   </h2>
@@ -153,7 +153,7 @@ export default function BookingPageClient({ initialName = '' }: { initialName?: 
                     Hier kannst du deine naechste Fahrt buchen.
                   </p>
                 </div>
-                <div className="flex flex-col-reverse gap-3 xl:flex-row xl:items-center xl:justify-end">
+                <div className="flex flex-col-reverse gap-5 xl:flex-row xl:items-center xl:justify-end xl:gap-4">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
                       href="/account?tab=buchungsverlauf"
