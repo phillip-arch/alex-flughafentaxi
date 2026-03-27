@@ -317,17 +317,17 @@ export default function AccountClient({
             </div>
 
             <div className="rounded-[1.2rem] border border-[#e8edf3] bg-white px-3 py-2 shadow-[0_12px_34px_rgba(17,17,17,0.035)] md:px-4">
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <UnderlineTabNav
-                  className="flex flex-wrap items-center gap-2"
-                  items={[
-                    { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
-                    { id: 'favoriten', label: 'Favoriten', icon: <Heart size={16} /> },
-                    { id: 'profil', label: 'Profil', icon: <User size={16} /> },
-                  ]}
-                  activeTab={activeTab}
-                  onChange={(tab) => setActiveTab(tab as AccountTab)}
-                />
+              <UnderlineTabNav
+                className="flex flex-wrap items-center gap-2"
+                items={[
+                  { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
+                  { id: 'favoriten', label: 'Favoriten', icon: <Heart size={16} /> },
+                  { id: 'profil', label: 'Profil', icon: <User size={16} /> },
+                ]}
+                activeTab={activeTab}
+                onChange={(tab) => setActiveTab(tab as AccountTab)}
+              />
+              <div className="mt-3 border-t border-[#edf2f7] pt-3">
                 <Link
                   href="/book"
                   className="ui-button-booking-primary w-full md:w-auto md:min-w-[220px]"
