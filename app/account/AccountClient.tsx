@@ -272,8 +272,12 @@ export default function AccountClient({
     return groups;
   }, []);
   const currentHour = new Date().getHours();
-  const greetingLabel =
-    currentHour < 11 ? 'Guten Morgen!' : currentHour < 18 ? 'Guten Tag!' : 'Guten Abend!';
+  const firstName = String(name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)[0];
+  const greetingBase = currentHour < 11 ? 'Guten Morgen' : currentHour < 18 ? 'Guten Tag' : 'Guten Abend';
+  const greetingLabel = firstName ? `${greetingBase} ${firstName}!` : `${greetingBase}!`;
 
   useEffect(() => {
     if (activeTab === 'favoriten' && !favoritesLoaded && !favoritesLoading) {
@@ -305,29 +309,28 @@ export default function AccountClient({
     }
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
+  const accountPrimaryNav = (
+    <UnderlineTabNav
+      className="flex flex-wrap items-center gap-2"
+      items={[
+        { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
+        { id: 'profil', label: 'Profil', icon: <User size={16} /> },
+      ]}
+      activeTab={activeTab}
+      onChange={(tab) => setActiveTab(tab as AccountTab)}
+    />
+  );
+
   return (
     <div suppressHydrationWarning className="bg-[#f7f9fc] pb-14 pt-8 lg:pt-10">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
-          <section className="space-y-4">
-            <div className="rounded-[1.2rem] border border-[#e8edf3] bg-white px-3 py-2 shadow-[0_12px_34px_rgba(17,17,17,0.035)] md:px-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <UnderlineTabNav
-                  className="flex flex-wrap items-center gap-2"
-                  items={[
-                    { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
-                    { id: 'profil', label: 'Profil', icon: <User size={16} /> },
-                  ]}
-                  activeTab={activeTab}
-                  onChange={(tab) => setActiveTab(tab as AccountTab)}
-                />
-              </div>
-            </div>
-          </section>
-
           {activeTab === 'profil' ? (
             <section className={`${contentSectionClass} max-w-[44rem]`}>
               <div className={accountSectionStackClass}>
+                <div className="px-1 pb-1 md:px-2">
+                  {accountPrimaryNav}
+                </div>
                 {!isEditingProfile ? (
                   <div className="rounded-[1.35rem] border border-[#e9edf3] bg-white px-4 py-4 shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
                     <div className="flex items-start justify-between gap-4">
@@ -452,6 +455,9 @@ export default function AccountClient({
           {activeTab === 'favoriten' ? (
             <section className={`${contentSectionClass} max-w-[44rem]`}>
               <div className={accountSectionStackClass}>
+                <div className="px-1 pb-1 md:px-2">
+                  {accountPrimaryNav}
+                </div>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {favoritesLoading ? (
                     <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
@@ -589,7 +595,7 @@ export default function AccountClient({
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
                 <div className="px-1 py-1 md:px-2">
-                  <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
                     <div className="space-y-2">
                       <h2 className="text-[2rem] font-semibold tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
                         {greetingLabel} <span className="align-[0.04em] text-[0.78em]">👋</span>
@@ -598,12 +604,15 @@ export default function AccountClient({
                         Hier siehst du deine kommenden Fahrten.
                       </p>
                     </div>
-                    <Link
-                      href="/book"
-                      className="ui-button-booking-primary w-full justify-center lg:min-w-[18rem] lg:w-auto"
-                    >
-                      Fahrt buchen
-                    </Link>
+                    <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-end">
+                      {accountPrimaryNav}
+                      <Link
+                        href="/book"
+                        className="ui-button-booking-primary w-full justify-center xl:min-w-[18rem] xl:w-auto"
+                      >
+                        Fahrt buchen
+                      </Link>
+                    </div>
                   </div>
 
                   <div className="mt-5 flex flex-wrap items-center gap-3">
