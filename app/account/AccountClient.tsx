@@ -681,9 +681,6 @@ export default function AccountClient({
                                   <div className="min-w-0 flex-1">
                                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.82rem] text-[#7b8798] md:text-[0.88rem]">
                                       <span>{fmtRideMeta(b.pickup_at)}</span>
-                                      <span className="rounded-full bg-[#f1f5fb] px-2.5 py-1 font-semibold uppercase tracking-[0.08em] text-[#5f6f84]">
-                                        {String(b.vehicle_type || 'fahrt').toUpperCase()}
-                                      </span>
                                     </div>
                                     <p className="mt-2 line-clamp-2 text-[1.06rem] font-semibold leading-[1.26] tracking-[-0.03em] text-[#111827] md:text-[1.24rem]">
                                       {primaryLocation}
