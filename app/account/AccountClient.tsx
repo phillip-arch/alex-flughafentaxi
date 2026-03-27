@@ -271,6 +271,30 @@ export default function AccountClient({
     return groups;
   }, []);
 
+  const upcomingBookings = bookings
+    .filter((booking) => !isCanceled(booking.status) && isUpcoming(booking))
+    .sort((a, b) => new Date(a.pickup_at).getTime() - new Date(b.pickup_at).getTime());
+  const nextUpcomingBooking = upcomingBookings[0] || null;
+  const nextUpcomingDirection = nextUpcomingBooking
+    ? isToAirport(nextUpcomingBooking)
+      ? 'Zum Flughafen Wien'
+      : 'Ab Flughafen Wien'
+    : null;
+  const nextUpcomingPrimaryLocation = nextUpcomingBooking
+    ? isToAirport(nextUpcomingBooking)
+      ? nextUpcomingBooking.pickup
+      : nextUpcomingBooking.destination
+    : null;
+  const nextUpcomingDate = nextUpcomingBooking
+    ? new Intl.DateTimeFormat('de-AT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(new Date(nextUpcomingBooking.pickup_at))
+    : null;
+
   useEffect(() => {
     if (activeTab === 'favoriten' && !favoritesLoaded && !favoritesLoading) {
       setFavoritesLoading(true);
@@ -602,22 +626,138 @@ export default function AccountClient({
           {activeTab === 'buchungsverlauf' ? (
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
-                <div className="rounded-[1.7rem] border border-[#e8edf3] bg-white px-5 py-5 shadow-[0_16px_44px_rgba(17,17,17,0.035)] md:px-6">
-                  <div className={accountSectionIntroClass}>
-                    <h2 className="ui-heading-lg text-[#111827]">Fahrten</h2>
-                    <p className="ui-copy-compact text-[#6a7d96]">
-                      Ihre kommenden und vergangenen Fahrten in einer klaren Uebersicht.
-                    </p>
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(18rem,0.95fr)]">
+                  <div className="rounded-[1.7rem] border border-[#e8edf3] bg-white px-5 py-5 shadow-[0_16px_44px_rgba(17,17,17,0.035)] md:px-6">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="space-y-2">
+                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#1679ff]">
+                          {nextUpcomingBooking ? 'Naechste Fahrt' : 'Bereit zur Fahrt'}
+                        </p>
+                        {nextUpcomingBooking ? (
+                          <>
+                            <h2 className="ui-heading-lg text-[#111827]">
+                              {nextUpcomingPrimaryLocation}
+                            </h2>
+                            <p className="max-w-[32rem] text-[0.98rem] leading-7 text-[#6a7d96]">
+                              {nextUpcomingDirection} am {nextUpcomingDate}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <h2 className="ui-heading-lg text-[#111827]">
+                              Keine kommende Fahrt
+                            </h2>
+                            <p className="max-w-[32rem] text-[0.98rem] leading-7 text-[#6a7d96]">
+                              Buchen Sie Ihren naechsten Transfer direkt aus dem Kundenkonto.
+                            </p>
+                          </>
+                        )}
+                      </div>
+                      {nextUpcomingBooking ? (
+                        <div className="rounded-[1.1rem] border border-[#dbe7f8] bg-[#f8fbff] px-4 py-3 text-right">
+                          <p className="text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">
+                            Gesamtpreis
+                          </p>
+                          <p className="mt-2 text-[1.2rem] font-semibold tracking-[-0.04em] text-[#111827]">
+                            {fmtPrice(nextUpcomingBooking.price)}
+                          </p>
+                        </div>
+                      ) : null}
+                    </div>
+                    {nextUpcomingBooking ? (
+                      <div className="mt-5 grid gap-3 md:grid-cols-2">
+                        <div className="rounded-[1.15rem] border border-[#edf2f7] bg-[#fbfdff] px-4 py-3">
+                          <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">
+                            Abholung
+                          </p>
+                          <p className="mt-2 text-[0.98rem] text-[#111827]">
+                            {nextUpcomingBooking.pickup}
+                          </p>
+                        </div>
+                        <div className="rounded-[1.15rem] border border-[#edf2f7] bg-[#fbfdff] px-4 py-3">
+                          <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">
+                            Ziel
+                          </p>
+                          <p className="mt-2 text-[0.98rem] text-[#111827]">
+                            {nextUpcomingBooking.destination}
+                          </p>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
-                  <UnderlineTabNav
-                    items={[
-                      { id: 'upcoming', label: 'Kommend' },
-                      { id: 'previous', label: 'Vergangen' },
-                    ]}
-                    activeTab={bookingFilter === 'upcoming' ? 'upcoming' : 'previous'}
-                    onChange={(tab) => setBookingFilter(tab as BookingFilter)}
-                    className="mt-5 flex flex-wrap gap-2"
-                  />
+
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                    <Link
+                      href="/book"
+                      className="group rounded-[1.55rem] border border-[#111827] bg-[#111827] px-5 py-5 text-white shadow-[0_16px_36px_rgba(17,17,17,0.16)] transition-colors hover:bg-[#1f2937]"
+                    >
+                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[#9fbefc]">
+                        Schnellaktion
+                      </p>
+                      <p className="mt-3 text-[1.3rem] font-semibold tracking-[-0.04em]">
+                        Fahrt buchen
+                      </p>
+                      <p className="mt-2 text-[0.95rem] text-[#d3dded]">
+                        Neue Abholung oder Flughafentransfer starten.
+                      </p>
+                    </Link>
+
+                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('favoriten')}
+                        className="rounded-[1.35rem] border border-[#e8edf3] bg-white px-5 py-4 text-left shadow-[0_12px_28px_rgba(17,17,17,0.035)] transition-colors hover:bg-[#f8fbff]"
+                      >
+                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#1679ff]">
+                          Schnellzugriff
+                        </p>
+                        <p className="mt-2 text-[1.05rem] font-semibold tracking-[-0.03em] text-[#111827]">
+                          Favoriten
+                        </p>
+                        <p className="mt-1 text-[0.92rem] text-[#6a7d96]">
+                          Gespeicherte Adressen direkt verwalten.
+                        </p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('profil')}
+                        className="rounded-[1.35rem] border border-[#e8edf3] bg-white px-5 py-4 text-left shadow-[0_12px_28px_rgba(17,17,17,0.035)] transition-colors hover:bg-[#f8fbff]"
+                      >
+                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#1679ff]">
+                          Schnellzugriff
+                        </p>
+                        <p className="mt-2 text-[1.05rem] font-semibold tracking-[-0.03em] text-[#111827]">
+                          Profil
+                        </p>
+                        <p className="mt-1 text-[0.92rem] text-[#6a7d96]">
+                          Kontaktdaten und Einstellungen aktualisieren.
+                        </p>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-[1.7rem] border border-[#e8edf3] bg-white px-5 py-5 shadow-[0_16px_44px_rgba(17,17,17,0.035)] md:px-6">
+                  <div className="flex flex-wrap items-end justify-between gap-4">
+                    <div className="space-y-2">
+                      <h2 className="text-[1.65rem] font-semibold tracking-[-0.05em] text-[#111827]">
+                        Fahrten
+                      </h2>
+                      <p className="text-[0.95rem] text-[#6a7d96]">
+                        Ihre kommenden und vergangenen Fahrten in einer klaren Uebersicht.
+                      </p>
+                    </div>
+                    <UnderlineTabNav
+                      items={[
+                        { id: 'upcoming', label: 'Kommend' },
+                        { id: 'previous', label: 'Vergangen' },
+                      ]}
+                      activeTab={bookingFilter === 'upcoming' ? 'upcoming' : 'previous'}
+                      onChange={(tab) => setBookingFilter(tab as BookingFilter)}
+                      className="flex flex-wrap gap-2"
+                    />
+                  </div>
                 </div>
 
                 {bookingsLoading ? (
