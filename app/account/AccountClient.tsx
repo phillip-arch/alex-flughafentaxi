@@ -317,7 +317,7 @@ export default function AccountClient({
             </div>
 
             <div className="rounded-[1.2rem] border border-[#e8edf3] bg-white px-3 py-2 shadow-[0_12px_34px_rgba(17,17,17,0.035)] md:px-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <UnderlineTabNav
                   className="flex flex-wrap items-center gap-2"
                   items={[
@@ -328,12 +328,6 @@ export default function AccountClient({
                   activeTab={activeTab}
                   onChange={(tab) => setActiveTab(tab as AccountTab)}
                 />
-                <Link
-                  href="/book"
-                  className="ui-button-booking-primary w-full md:w-auto md:min-w-[220px] md:self-center"
-                >
-                  Fahrt buchen
-                </Link>
               </div>
             </div>
           </section>
@@ -603,7 +597,8 @@ export default function AccountClient({
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
                 <div className="rounded-[1.7rem] border border-[#e8edf3] bg-white px-5 py-5 shadow-[0_16px_44px_rgba(17,17,17,0.035)] md:px-6">
-                  <div className="flex flex-wrap items-end justify-between gap-4">
+                  <div className="space-y-5">
+                    <div className="flex flex-wrap items-end justify-between gap-4">
                     <div className="space-y-2">
                       <h2 className="text-[1.65rem] font-semibold tracking-[-0.05em] text-[#111827]">
                         Fahrten
@@ -612,6 +607,8 @@ export default function AccountClient({
                         Ihre kommenden und vergangenen Fahrten in einer klaren Uebersicht.
                       </p>
                     </div>
+                  </div>
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
                     <UnderlineTabNav
                       items={[
                         { id: 'upcoming', label: 'Kommend' },
@@ -621,6 +618,13 @@ export default function AccountClient({
                       onChange={(tab) => setBookingFilter(tab as BookingFilter)}
                       className="flex flex-wrap gap-2"
                     />
+                    <Link
+                      href="/book"
+                      className="inline-flex items-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] px-4 py-2 text-[0.98rem] font-medium text-[#1679ff] transition-colors hover:bg-[#eef5ff] hover:text-[#0a63ff]"
+                      >
+                      Fahrt buchen
+                    </Link>
+                  </div>
                   </div>
                 </div>
 
