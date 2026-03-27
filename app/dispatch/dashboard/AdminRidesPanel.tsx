@@ -123,53 +123,52 @@ export default function AdminRidesPanel({
           <div className={viewMode === 'grid' ? 'space-y-4' : 'overflow-hidden border border-[#d2d2d7] bg-white'}>
             {viewMode === 'grid' ? (
               bookings.map((booking) => (
-                <div
-                  key={booking.id}
-                  className={`relative rounded-[24px] border border-[#d9dde4] bg-[#f8f9fb] p-4 shadow-sm transition-all hover:shadow-md md:p-5 ${
-                    isCancelledBooking(booking.status) ? 'border-[#cfd4dc] bg-[#e5e7eb]' : ''
-                  }`}
-                >
-                  <div className={`mb-2 text-[13px] font-medium uppercase tracking-[0.12em] text-[#86868b] ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
-                    {format(new Date(booking.pickup_at), 'dd.MM.yyyy')}
-                  </div>
-                  <div className={`mb-4 flex flex-nowrap items-center gap-1 sm:gap-2 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
-                    <span className="inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold text-[#000000] sm:px-4 sm:text-[18px]">
-                      {format(new Date(booking.pickup_at), 'HH:mm')}
-                    </span>
-                    <span className="inline-flex w-auto items-center justify-center gap-1 whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold tracking-wide text-[#000000] sm:gap-2 sm:px-4 sm:text-[18px]">
-                      {booking.destination?.includes('Flughafen') ? <PlaneTakeoff size={14} className="sm:h-5 sm:w-5" /> : <PlaneLanding size={14} className="sm:h-5 sm:w-5" />}
-                      {booking.destination?.includes('Flughafen') ? 'ZUM' : 'VOM'}
-                    </span>
-                    {(() => {
-                      const flightNumber = getFlightNumberFromNotes(booking);
-                      const isFromAirportRide = /flughafen/i.test(String(booking?.pickup || ''));
-                      if (!isFromAirportRide || !flightNumber) return null;
-                      return (
+                (() => {
+                  const displayNotes = getBookingDisplayNotes(booking);
+                  return (
+                    <div
+                      key={booking.id}
+                      className={`relative rounded-[24px] border border-[#d9dde4] bg-[#f8f9fb] p-4 shadow-sm transition-all hover:shadow-md md:p-5 ${
+                        isCancelledBooking(booking.status) ? 'border-[#cfd4dc] bg-[#e5e7eb]' : ''
+                      }`}
+                    >
+                      <div className={`mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-medium uppercase tracking-[0.12em] text-[#86868b] ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
+                        <span>{format(new Date(booking.pickup_at), 'dd.MM.yyyy')}</span>
+                        {booking.booking_reference ? <span>{booking.booking_reference}</span> : null}
+                      </div>
+                      <div className={`mb-4 flex flex-nowrap items-center gap-1 sm:gap-2 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                         <span className="inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold text-[#000000] sm:px-4 sm:text-[18px]">
-                          {flightNumber}
+                          {format(new Date(booking.pickup_at), 'HH:mm')}
                         </span>
-                      );
-                    })()}
-                    <span className="inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide text-[#000000] sm:px-4 sm:text-[16px]">
-                      {booking.vehicle_type || 'LIMOUSINE'}
-                    </span>
-                    {(() => {
-                      const payment = getBookingPaymentMeta(booking);
-                      return (
-                        <span className={`inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-semibold uppercase ${payment.className} sm:px-4 sm:text-[16px]`}>
-                          {payment.label}
+                        <span className="inline-flex w-auto items-center justify-center gap-1 whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold tracking-wide text-[#000000] sm:gap-2 sm:px-4 sm:text-[18px]">
+                          {booking.destination?.includes('Flughafen') ? <PlaneTakeoff size={14} className="sm:h-5 sm:w-5" /> : <PlaneLanding size={14} className="sm:h-5 sm:w-5" />}
+                          {booking.destination?.includes('Flughafen') ? 'ZUM' : 'VOM'}
                         </span>
-                      );
-                    })()}
-                    {booking.booking_reference ? (
-                      <span className="inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide text-[#000000] sm:px-4 sm:text-[16px]">
-                        {booking.booking_reference}
-                      </span>
-                    ) : null}
-                  </div>
+                        {(() => {
+                          const flightNumber = getFlightNumberFromNotes(booking);
+                          const isFromAirportRide = /flughafen/i.test(String(booking?.pickup || ''));
+                          if (!isFromAirportRide || !flightNumber) return null;
+                          return (
+                            <span className="inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold text-[#000000] sm:px-4 sm:text-[18px]">
+                              {flightNumber}
+                            </span>
+                          );
+                        })()}
+                        <span className="inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full bg-[#e7ebf3] px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide text-[#000000] sm:px-4 sm:text-[16px]">
+                          {booking.vehicle_type || 'LIMOUSINE'}
+                        </span>
+                        {(() => {
+                          const payment = getBookingPaymentMeta(booking);
+                          return (
+                            <span className={`inline-flex w-auto items-center justify-center whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-semibold uppercase ${payment.className} sm:px-4 sm:text-[16px]`}>
+                              {payment.label}
+                            </span>
+                          );
+                        })()}
+                      </div>
 
-                  <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[1.15fr_0.95fr_0.8fr]">
-                    <div className={`space-y-2.5 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
+                      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[1.15fr_0.95fr_0.8fr]">
+                        <div className={`space-y-2.5 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
                       <div className="flex items-stretch gap-2.5">
                         <div className="flex shrink-0 flex-col items-center pt-1 text-[#000000]" aria-hidden="true">
                           <span className="h-2.5 w-2.5 rounded-full bg-[#000000]" />
@@ -211,136 +210,141 @@ export default function AdminRidesPanel({
                           </div>
                         </div>
                       </div>
-                      {(() => {
-                        const displayNotes = getBookingDisplayNotes(booking);
-                        return displayNotes ? (
-                          <div className="mt-2 max-w-[620px] rounded-[11px] border border-[#d2d2d7] bg-white px-3 py-2">
-                            <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#86868b]">Anmerkung</p>
-                            <p className="line-clamp-3 text-[15px] leading-snug text-[#1d1d1f]">{displayNotes}</p>
+                          {displayNotes ? (
+                            <div className="mt-2 hidden max-w-[620px] rounded-[11px] border border-[#d2d2d7] bg-white px-3 py-2 lg:block">
+                              <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#86868b]">Anmerkung</p>
+                              <p className="line-clamp-3 text-[15px] leading-snug text-[#1d1d1f]">{displayNotes}</p>
+                            </div>
+                          ) : null}
+                        </div>
+
+                        <div className={`space-y-4 lg:-mt-3 lg:pl-8 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
+                          <h3 className="flex items-center gap-2 text-[19px] font-semibold text-[#000000]">
+                            {booking.full_name}
+                            {passengerCounts[booking.email] >= 5 && <Star size={15} className="fill-yellow-400 text-yellow-400" />}
+                          </h3>
+                          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-[#000000]">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <a href={getTelHref(booking.phone)} aria-label="Call passenger" className="shrink-0 text-[#000000] transition-colors hover:text-[#0071e3]">
+                                <Phone size={18} />
+                              </a>
+                              <span className="truncate">{booking.phone}</span>
+                            </div>
+                            <div className="flex min-w-0 items-center gap-2">
+                              <a href={getMailtoHref(booking.email)} aria-label="Email passenger" className="shrink-0 text-[#000000] transition-colors hover:text-[#0071e3]">
+                                <Mail size={18} />
+                              </a>
+                              <span className="truncate">{booking.email}</span>
+                            </div>
                           </div>
-                        ) : null;
-                      })()}
-                    </div>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">
+                              <Users size={14} /> {booking.passengers} PERS.
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">
+                              <Briefcase size={14} /> {booking.luggage} KOFFER
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">
+                              <Briefcase size={14} /> {getHandLuggageCountFromNotes(booking)} HANDG.
+                            </span>
+                            {(() => {
+                              const seats = getChildSeatCountsFromNotes(booking);
+                              return (
+                                <>
+                                  {seats.baby > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.baby} BABYSCHALE</span> : null}
+                                  {seats.child > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.child} KINDERSITZ</span> : null}
+                                  {seats.booster > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.booster} Sitzerhoehung</span> : null}
+                                </>
+                              );
+                            })()}
+                          </div>
+                          {displayNotes ? (
+                            <div className="rounded-[11px] border border-[#d2d2d7] bg-white px-3 py-2 lg:hidden">
+                              <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#86868b]">Anmerkung</p>
+                              <p className="line-clamp-3 text-[15px] leading-snug text-[#1d1d1f]">{displayNotes}</p>
+                            </div>
+                          ) : null}
+                        </div>
 
-                    <div className={`space-y-4 lg:-mt-3 lg:pl-8 ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
-                      <h3 className="flex items-center gap-2 text-[19px] font-semibold text-[#000000]">
-                        {booking.full_name}
-                        {passengerCounts[booking.email] >= 5 && <Star size={15} className="fill-yellow-400 text-yellow-400" />}
-                      </h3>
-                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-[#000000]">
-                        <div className="flex min-w-0 items-center gap-2">
-                          <a href={getTelHref(booking.phone)} aria-label="Call passenger" className="shrink-0 text-[#000000] transition-colors hover:text-[#0071e3]">
-                            <Phone size={18} />
-                          </a>
-                          <span className="truncate">{booking.phone}</span>
+                        <div className="flex h-full flex-col gap-4">
+                          <div className={`flex w-full flex-col items-end gap-2 sm:flex-row sm:items-center sm:justify-end ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
+                            <button
+                              type="button"
+                              onClick={() => openEditBooking(booking)}
+                              aria-label="Buchung bearbeiten"
+                              className="z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#eef5ff] hover:text-[#0a63ff] lg:absolute lg:right-5 lg:top-5"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <div className="text-right text-[30px] font-semibold leading-none text-[#081a42] sm:ml-auto">
+                              {formatPriceDisplay(booking.price)}
+                            </div>
+                          </div>
+                          <select
+                            className={`w-full rounded-[11px] border px-3 py-2 text-[12px] outline-none focus:border-[#4f46e5] ${isCancelledBooking(booking.status) ? 'opacity-35' : ''} ${getDriverSelectTone(booking)}`}
+                            value={getSelectedDriverId(booking)}
+                            disabled={isCancelledBooking(booking.status)}
+                            onChange={(e) => setDriverSelection((prev) => ({ ...prev, [booking.id]: e.target.value }))}
+                          >
+                            <option value="">Fahrer zuweisen...</option>
+                            {drivers.map((driver) => (
+                              <option key={driver.id} value={driver.id}>
+                                {driver.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="mt-1 grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (isCancelledBooking(booking.status)) return;
+                                const driverId = getSelectedDriverId(booking);
+                                if (!driverId) {
+                                  if (booking.driver_id && confirm('Moechten Sie diese Buchung wieder von allen Fahrern loesen?')) {
+                                    await handleUnassignDriver(booking.id);
+                                  }
+                                  return;
+                                }
+                                await confirmAndSendToDriver(booking.id, driverId);
+                              }}
+                              disabled={(!getSelectedDriverId(booking) && !booking.driver_id) || isCancelledBooking(booking.status)}
+                              className={`w-full ${adminPrimaryButtonClass} ${ridesActionButtonClass} ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}
+                            >
+                              <Send size={12} />
+                              Senden
+                            </button>
+                            {isCancelledBooking(booking.status) ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (confirm('MÃ¶chten Sie die Bestellung aktivieren?')) {
+                                    handleStatusChange(booking.id, 'pending');
+                                  }
+                                }}
+                                className={`w-full shadow-none ${adminSecondaryButtonClass} ${ridesActionButtonClass}`}
+                              >
+                                <CheckCircle size={12} />
+                                Aktivieren
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (confirm('Diese Fahrt jetzt stornieren?')) {
+                                    handleStatusChange(booking.id, 'cancelled');
+                                  }
+                                }}
+                                className={`w-full ${adminDangerButtonClass} ${ridesActionButtonClass}`}
+                              >
+                                Stornieren
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex min-w-0 items-center gap-2">
-                          <a href={getMailtoHref(booking.email)} aria-label="Email passenger" className="shrink-0 text-[#000000] transition-colors hover:text-[#0071e3]">
-                            <Mail size={18} />
-                          </a>
-                          <span className="truncate">{booking.email}</span>
-                        </div>
-                      </div>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">
-                          <Users size={14} /> {booking.passengers} PERS.
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">
-                          <Briefcase size={14} /> {booking.luggage} KOFFER
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">
-                          <Briefcase size={14} /> {getHandLuggageCountFromNotes(booking)} HANDG.
-                        </span>
-                        {(() => {
-                          const seats = getChildSeatCountsFromNotes(booking);
-                          return (
-                            <>
-                              {seats.baby > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.baby} BABYSCHALE</span> : null}
-                              {seats.child > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.child} KINDERSITZ</span> : null}
-                              {seats.booster > 0 ? <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e7ebf3] px-3 py-1.5 text-[11px] font-semibold text-[#000000]">{seats.booster} Sitzerhoehung</span> : null}
-                            </>
-                          );
-                        })()}
                       </div>
                     </div>
-
-                    <div className="flex h-full flex-col gap-4">
-                      <div className={`flex w-full flex-col items-end gap-2 sm:flex-row sm:items-center sm:justify-end ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}>
-                        <button
-                          type="button"
-                          onClick={() => openEditBooking(booking)}
-                          aria-label="Buchung bearbeiten"
-                          className="z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#eef5ff] hover:text-[#0a63ff] lg:absolute lg:right-5 lg:top-5"
-                        >
-                          <Edit size={16} />
-                        </button>
-                        <div className="text-right text-[30px] font-semibold leading-none text-[#081a42] sm:ml-auto">
-                          {formatPriceDisplay(booking.price)}
-                        </div>
-                      </div>
-                      <select
-                        className={`w-full rounded-[11px] border px-3 py-2 text-[12px] outline-none focus:border-[#4f46e5] ${isCancelledBooking(booking.status) ? 'opacity-35' : ''} ${getDriverSelectTone(booking)}`}
-                        value={getSelectedDriverId(booking)}
-                        disabled={isCancelledBooking(booking.status)}
-                        onChange={(e) => setDriverSelection((prev) => ({ ...prev, [booking.id]: e.target.value }))}
-                      >
-                        <option value="">Fahrer zuweisen...</option>
-                        {drivers.map((driver) => (
-                          <option key={driver.id} value={driver.id}>
-                            {driver.name}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="mt-1 grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            if (isCancelledBooking(booking.status)) return;
-                            const driverId = getSelectedDriverId(booking);
-                            if (!driverId) {
-                              if (booking.driver_id && confirm('Moechten Sie diese Buchung wieder von allen Fahrern loesen?')) {
-                                await handleUnassignDriver(booking.id);
-                              }
-                              return;
-                            }
-                            await confirmAndSendToDriver(booking.id, driverId);
-                          }}
-                          disabled={(!getSelectedDriverId(booking) && !booking.driver_id) || isCancelledBooking(booking.status)}
-                          className={`w-full ${adminPrimaryButtonClass} ${ridesActionButtonClass} ${isCancelledBooking(booking.status) ? 'opacity-35' : ''}`}
-                        >
-                          <Send size={12} />
-                          Senden
-                        </button>
-                        {isCancelledBooking(booking.status) ? (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (confirm('MÃ¶chten Sie die Bestellung aktivieren?')) {
-                                handleStatusChange(booking.id, 'pending');
-                              }
-                            }}
-                            className={`w-full shadow-none ${adminSecondaryButtonClass} ${ridesActionButtonClass}`}
-                          >
-                            <CheckCircle size={12} />
-                            Aktivieren
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (confirm('Diese Fahrt jetzt stornieren?')) {
-                                handleStatusChange(booking.id, 'cancelled');
-                              }
-                            }}
-                            className={`w-full ${adminDangerButtonClass} ${ridesActionButtonClass}`}
-                          >
-                            Stornieren
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()
               ))
             ) : (
               <div className="w-full overflow-x-auto">
