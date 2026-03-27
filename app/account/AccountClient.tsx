@@ -12,7 +12,6 @@ import {
   Clock3,
   Edit,
   GraduationCap,
-  Heart,
   History,
   House,
   MapPin,
@@ -317,7 +316,6 @@ export default function AccountClient({
                   className="flex flex-wrap items-center gap-2"
                   items={[
                     { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
-                    { id: 'favoriten', label: 'Favoriten', icon: <Heart size={16} /> },
                     { id: 'profil', label: 'Profil', icon: <User size={16} /> },
                   ]}
                   activeTab={activeTab}
@@ -590,7 +588,7 @@ export default function AccountClient({
           {activeTab === 'buchungsverlauf' ? (
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
-                <div className="rounded-[1.9rem] border border-[#e3eaf4] bg-[linear-gradient(180deg,#f5f8fc_0%,#edf3fa_100%)] px-5 py-5 shadow-[0_16px_44px_rgba(17,17,17,0.035)] md:px-6 md:py-6">
+                <div className="px-1 py-1 md:px-2">
                   <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-2">
                       <h2 className="text-[2rem] font-semibold tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
@@ -608,30 +606,40 @@ export default function AccountClient({
                     </Link>
                   </div>
 
-                  <div className="mt-5 inline-flex w-full max-w-[29rem] rounded-[1.5rem] border border-[#dce5f2] bg-white/75 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)]">
+                  <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                    <div className="inline-flex w-full max-w-[29rem] rounded-[1.5rem] border border-[#dce5f2] bg-white/75 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)]">
+                      <button
+                        type="button"
+                        onClick={() => setBookingFilter('upcoming')}
+                        className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[1.15rem] px-4 py-3 text-[1.02rem] font-medium transition-all ${
+                          bookingFilter === 'upcoming'
+                            ? 'bg-white text-[#0a63ff] shadow-[0_8px_20px_rgba(17,17,17,0.08)]'
+                            : 'text-[#657489] hover:text-[#111827]'
+                        }`}
+                      >
+                        <Calendar size={18} />
+                        <span>Kommend</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBookingFilter('previous')}
+                        className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[1.15rem] px-4 py-3 text-[1.02rem] font-medium transition-all ${
+                          bookingFilter === 'previous'
+                            ? 'bg-white text-[#0a63ff] shadow-[0_8px_20px_rgba(17,17,17,0.08)]'
+                            : 'text-[#657489] hover:text-[#111827]'
+                        }`}
+                      >
+                        <Clock3 size={18} />
+                        <span>Vergangen</span>
+                      </button>
+                    </div>
                     <button
                       type="button"
-                      onClick={() => setBookingFilter('upcoming')}
-                      className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[1.15rem] px-4 py-3 text-[1.02rem] font-medium transition-all ${
-                        bookingFilter === 'upcoming'
-                          ? 'bg-white text-[#0a63ff] shadow-[0_8px_20px_rgba(17,17,17,0.08)]'
-                          : 'text-[#657489] hover:text-[#111827]'
-                      }`}
+                      onClick={() => setActiveTab('favoriten')}
+                      className="inline-flex items-center gap-2 rounded-[1.05rem] border border-[#f3d5db] bg-[#FDFDFE] px-4 py-3 text-[0.98rem] font-medium text-[#1d1d1f] shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#fff7f8]"
                     >
-                      <Calendar size={18} />
-                      <span>Kommend</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setBookingFilter('previous')}
-                      className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[1.15rem] px-4 py-3 text-[1.02rem] font-medium transition-all ${
-                        bookingFilter === 'previous'
-                          ? 'bg-white text-[#0a63ff] shadow-[0_8px_20px_rgba(17,17,17,0.08)]'
-                          : 'text-[#657489] hover:text-[#111827]'
-                      }`}
-                    >
-                      <Clock3 size={18} />
-                      <span>Vergangen</span>
+                      <Star size={18} className="fill-[#ff5c8a] text-[#ff5c8a]" />
+                      <span>Favoriten</span>
                     </button>
                   </div>
                 </div>
