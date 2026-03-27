@@ -12,6 +12,7 @@ import {
 import BookingForm from '@/components/BookingForm';
 import NavbarClient from '@/components/NavbarClient';
 import SectionIntro from '@/components/ui/SectionIntro';
+import { getAppSurface } from '@/lib/routing/surfaces';
 
 type Direction = 'to_airport' | 'from_airport' | null;
 
@@ -124,21 +125,14 @@ function getInfoBlock(direction: Direction) {
 
 export default function BookingPageClient() {
   const [direction, setDirection] = useState<Direction>('to_airport');
+  const isAppSurface = getAppSurface() === 'app';
 
   return (
     <>
       <NavbarClient />
       <section className="bg-white">
         <div className="app-container pb-10 pt-28 md:pb-12 md:pt-28">
-          <SectionIntro
-            eyebrow="Buchung"
-            title="Transfer buchen"
-            description="Die Buchung nutzt dieselbe klare Sprache und Struktur wie die Startseite: direkte Auswahl, feste Preise und alle wichtigen Hinweise ohne Umwege."
-            align="center"
-            className="max-w-[46rem]"
-          />
-
-          <div className="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)] lg:gap-10">
+          <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)] lg:gap-10">
             <section className="order-1 self-start lg:sticky lg:top-24">
               <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
                 <BookingForm onDirectionChange={setDirection} />
@@ -154,58 +148,62 @@ export default function BookingPageClient() {
 
       <section className="bg-white">
         <div className="app-container pb-28 md:pb-28">
-          <section className="mx-auto mt-8 max-w-[57.5rem]">
-            <div className="rounded-[1.55rem] border border-[#e9edf3] bg-white px-6 py-8 shadow-[0_8px_22px_rgba(17,17,17,0.045)] md:px-8 md:py-10">
-              <SectionIntro
-                eyebrow="Bewertungen"
-                title="Bewertungen von Fahrgaesten."
-                description="Echte Rueckmeldungen unserer Fahrgaeste vor Ihrer Buchung."
-                className="max-w-[42rem]"
-              />
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
-                {reviews.map(({ name, review }) => (
-                  <div
-                    key={name}
-                    className="rounded-[1.5rem] border border-[#e7edf5] bg-white px-5 py-5"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-[1rem] font-semibold text-[#111827]">{name}</p>
-                        <p className="mt-1 text-[0.9rem] text-[#5d6b7c]">Google Review</p>
-                      </div>
-                      <span className="rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.82rem] font-semibold text-[#1679FF]">
-                        Google
-                      </span>
-                    </div>
-                    <p className="mt-4 text-[1rem] tracking-[0.08em] text-[#f4b400]">
-                      {'\u2605\u2605\u2605\u2605\u2605'}
-                    </p>
-                    <p className="mt-3 text-[1rem] leading-[1.65] text-[#42566f]">&quot;{review}&quot;</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
           <section className="mx-auto mt-6 max-w-[57.5rem] lg:hidden">
             <InfoPanel direction={direction} />
           </section>
 
-          <section className="mx-auto mt-6 max-w-[57.5rem]">
-            <div className="ui-card-surface-light px-5 py-5 md:px-6 md:py-6">
-              <div className="flex flex-wrap gap-2.5">
-                {trustItems.map(({ label, icon: Icon }) => (
-                  <div
-                    key={label}
-                    className="flex items-center gap-2 rounded-full border border-[#e8edf3] bg-white px-3 py-2 text-[13px] font-medium text-[var(--color-text)]"
-                  >
-                    <Icon size={14} className="text-[#1679FF]" />
-                    <span>{label}</span>
+          {!isAppSurface ? (
+            <>
+              <section className="mx-auto mt-8 max-w-[57.5rem]">
+                <div className="rounded-[1.55rem] border border-[#e9edf3] bg-white px-6 py-8 shadow-[0_8px_22px_rgba(17,17,17,0.045)] md:px-8 md:py-10">
+                  <SectionIntro
+                    eyebrow="Bewertungen"
+                    title="Bewertungen von Fahrgaesten."
+                    description="Echte Rueckmeldungen unserer Fahrgaeste vor Ihrer Buchung."
+                    className="max-w-[42rem]"
+                  />
+                  <div className="mt-6 grid gap-4 md:grid-cols-3">
+                    {reviews.map(({ name, review }) => (
+                      <div
+                        key={name}
+                        className="rounded-[1.5rem] border border-[#e7edf5] bg-white px-5 py-5"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-[1rem] font-semibold text-[#111827]">{name}</p>
+                            <p className="mt-1 text-[0.9rem] text-[#5d6b7c]">Google Review</p>
+                          </div>
+                          <span className="rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.82rem] font-semibold text-[#1679FF]">
+                            Google
+                          </span>
+                        </div>
+                        <p className="mt-4 text-[1rem] tracking-[0.08em] text-[#f4b400]">
+                          {'\u2605\u2605\u2605\u2605\u2605'}
+                        </p>
+                        <p className="mt-3 text-[1rem] leading-[1.65] text-[#42566f]">&quot;{review}&quot;</p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          </section>
+                </div>
+              </section>
+
+              <section className="mx-auto mt-6 max-w-[57.5rem]">
+                <div className="ui-card-surface-light px-5 py-5 md:px-6 md:py-6">
+                  <div className="flex flex-wrap gap-2.5">
+                    {trustItems.map(({ label, icon: Icon }) => (
+                      <div
+                        key={label}
+                        className="flex items-center gap-2 rounded-full border border-[#e8edf3] bg-white px-3 py-2 text-[13px] font-medium text-[var(--color-text)]"
+                      >
+                        <Icon size={14} className="text-[#1679FF]" />
+                        <span>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            </>
+          ) : null}
         </div>
       </section>
     </>
