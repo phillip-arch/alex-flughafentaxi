@@ -5,9 +5,11 @@ import Link from 'next/link';
 import {
   Briefcase,
   Building2,
+  Calendar,
   Car,
   ChevronDown,
   ChevronRight,
+  Clock3,
   Edit,
   GraduationCap,
   Heart,
@@ -270,6 +272,9 @@ export default function AccountClient({
     lastGroup.items.push(booking);
     return groups;
   }, []);
+  const currentHour = new Date().getHours();
+  const greetingLabel =
+    currentHour < 11 ? 'Guten Morgen!' : currentHour < 18 ? 'Guten Tag!' : 'Guten Abend!';
 
   useEffect(() => {
     if (activeTab === 'favoriten' && !favoritesLoaded && !favoritesLoading) {
@@ -585,25 +590,49 @@ export default function AccountClient({
           {activeTab === 'buchungsverlauf' ? (
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
-                <div className="rounded-[1.7rem] border border-[#e8edf3] bg-white px-5 py-5 shadow-[0_16px_44px_rgba(17,17,17,0.035)] md:px-6">
-                  <div>
-                  <div className="mt-5 flex flex-wrap items-center gap-3">
-                    <UnderlineTabNav
-                      items={[
-                        { id: 'upcoming', label: 'Kommend' },
-                        { id: 'previous', label: 'Vergangen' },
-                      ]}
-                      activeTab={bookingFilter === 'upcoming' ? 'upcoming' : 'previous'}
-                      onChange={(tab) => setBookingFilter(tab as BookingFilter)}
-                      className="flex flex-wrap gap-2"
-                    />
+                <div className="rounded-[1.9rem] border border-[#e3eaf4] bg-[linear-gradient(180deg,#f5f8fc_0%,#edf3fa_100%)] px-5 py-5 shadow-[0_16px_44px_rgba(17,17,17,0.035)] md:px-6 md:py-6">
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="space-y-2">
+                      <h2 className="text-[2rem] font-semibold tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
+                        {greetingLabel} <span className="align-[0.04em] text-[0.78em]">👋</span>
+                      </h2>
+                      <p className="text-[1rem] text-[#6a7d96] md:text-[1.05rem]">
+                        Hier siehst du deine kommenden Fahrten.
+                      </p>
+                    </div>
                     <Link
                       href="/book"
-                      className="inline-flex items-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] px-4 py-2 text-[0.98rem] font-medium text-[#1679ff] transition-colors hover:bg-[#eef5ff] hover:text-[#0a63ff]"
+                      className="ui-button-booking-primary w-full justify-center lg:min-w-[18rem] lg:w-auto"
                     >
                       Fahrt buchen
                     </Link>
                   </div>
+
+                  <div className="mt-5 inline-flex w-full max-w-[29rem] rounded-[1.5rem] border border-[#dce5f2] bg-white/75 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)]">
+                    <button
+                      type="button"
+                      onClick={() => setBookingFilter('upcoming')}
+                      className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[1.15rem] px-4 py-3 text-[1.02rem] font-medium transition-all ${
+                        bookingFilter === 'upcoming'
+                          ? 'bg-white text-[#0a63ff] shadow-[0_8px_20px_rgba(17,17,17,0.08)]'
+                          : 'text-[#657489] hover:text-[#111827]'
+                      }`}
+                    >
+                      <Calendar size={18} />
+                      <span>Kommend</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBookingFilter('previous')}
+                      className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[1.15rem] px-4 py-3 text-[1.02rem] font-medium transition-all ${
+                        bookingFilter === 'previous'
+                          ? 'bg-white text-[#0a63ff] shadow-[0_8px_20px_rgba(17,17,17,0.08)]'
+                          : 'text-[#657489] hover:text-[#111827]'
+                      }`}
+                    >
+                      <Clock3 size={18} />
+                      <span>Vergangen</span>
+                    </button>
                   </div>
                 </div>
 
