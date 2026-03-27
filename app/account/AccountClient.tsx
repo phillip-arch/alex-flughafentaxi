@@ -340,7 +340,7 @@ export default function AccountClient({
                 </h2>
                 <p className="text-[1rem] text-[#6a7d96] md:text-[1.05rem]">{accountHeroSubtitle}</p>
               </div>
-              <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-end">
+              <div className="flex flex-col-reverse gap-3 xl:flex-row xl:items-center xl:justify-end">
                 {accountPrimaryNav}
                 <Link
                   href="/book"

@@ -153,7 +153,7 @@ export default function BookingPageClient({ initialName = '' }: { initialName?: 
                     Hier kannst du deine naechste Fahrt buchen.
                   </p>
                 </div>
-                <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-end">
+                <div className="flex flex-col-reverse gap-3 xl:flex-row xl:items-center xl:justify-end">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
                       href="/account?tab=buchungsverlauf"
