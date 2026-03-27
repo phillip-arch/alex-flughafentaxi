@@ -42,7 +42,6 @@ export default function AdminLoginPage() {
               <div className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff]">
                 <ShieldCheck size={20} />
               </div>
-              <h1 className="ui-heading-lg text-[#111827]">Admin-Portal</h1>
             </div>
 
             {error ? (
@@ -59,9 +58,7 @@ export default function AdminLoginPage() {
                 }`}
               >
                 <label className="block">
-                  <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
-                    Admin-E-Mail
-                  </span>
+                  <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">E-Mail</span>
                   <div className="relative">
                     <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
                       <Mail size={15} />
