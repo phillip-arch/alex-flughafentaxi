@@ -317,16 +317,24 @@ export default function AccountClient({
             </div>
 
             <div className="rounded-[1.2rem] border border-[#e8edf3] bg-white px-3 py-2 shadow-[0_12px_34px_rgba(17,17,17,0.035)] md:px-4">
-              <UnderlineTabNav
-                className="flex flex-wrap items-center gap-2"
-                items={[
-                  { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
-                  { id: 'favoriten', label: 'Favoriten', icon: <Heart size={16} /> },
-                  { id: 'profil', label: 'Profil', icon: <User size={16} /> },
-                ]}
-                activeTab={activeTab}
-                onChange={(tab) => setActiveTab(tab as AccountTab)}
-              />
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <UnderlineTabNav
+                  className="flex flex-wrap items-center gap-2"
+                  items={[
+                    { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
+                    { id: 'favoriten', label: 'Favoriten', icon: <Heart size={16} /> },
+                    { id: 'profil', label: 'Profil', icon: <User size={16} /> },
+                  ]}
+                  activeTab={activeTab}
+                  onChange={(tab) => setActiveTab(tab as AccountTab)}
+                />
+                <Link
+                  href="/book"
+                  className="ui-button-booking-primary w-full md:w-auto md:min-w-[220px]"
+                >
+                  Fahrt buchen
+                </Link>
+              </div>
             </div>
           </section>
 
@@ -595,19 +603,11 @@ export default function AccountClient({
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
                 <div className="rounded-[1.7rem] border border-[#e8edf3] bg-white px-5 py-5 shadow-[0_16px_44px_rgba(17,17,17,0.035)] md:px-6">
-                  <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-                    <div className={accountSectionIntroClass}>
-                      <h2 className="ui-heading-lg text-[#111827]">Fahrten</h2>
-                      <p className="ui-copy-compact text-[#6a7d96]">
-                        Ihre kommenden und vergangenen Fahrten in einer klaren Uebersicht.
-                      </p>
-                    </div>
-                    <Link
-                      href="/book"
-                      className="ui-button-booking-primary w-full md:w-auto md:min-w-[220px] md:self-start"
-                    >
-                      Fahrt buchen
-                    </Link>
+                  <div className={accountSectionIntroClass}>
+                    <h2 className="ui-heading-lg text-[#111827]">Fahrten</h2>
+                    <p className="ui-copy-compact text-[#6a7d96]">
+                      Ihre kommenden und vergangenen Fahrten in einer klaren Uebersicht.
+                    </p>
                   </div>
                   <UnderlineTabNav
                     items={[
