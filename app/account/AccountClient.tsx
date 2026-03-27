@@ -20,6 +20,8 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
+import BookingForm from '@/components/BookingForm';
+import { BookingDirection, BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
 import { parseBookingNotes } from '@/lib/booking/notes';
 import {
@@ -109,6 +111,8 @@ export default function AccountClient({
   const [bookingsLoaded, setBookingsLoaded] = useState(initialBookingsLoaded);
   const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingComposerDirection, setBookingComposerDirection] = useState<BookingDirection>('to_airport');
+  const [showBookingComposer, setShowBookingComposer] = useState(false);
 
   const accountShellClass = 'w-full';
   const contentSectionClass = 'pt-2';
@@ -316,13 +320,18 @@ export default function AccountClient({
         { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
         { id: 'profil', label: 'Profil', icon: <User size={16} /> },
       ]}
-      activeTab={activeTab}
-      onChange={(tab) => setActiveTab(tab as AccountTab)}
+      activeTab={activeTab === 'favoriten' ? 'buchungsverlauf' : activeTab}
+      onChange={(tab) => {
+        setShowBookingComposer(false);
+        setActiveTab(tab as AccountTab);
+      }}
     />
   );
   const accountHeroSubtitle =
     activeTab === 'profil'
       ? 'Hier verwaltest du deine Profildaten.'
+      : showBookingComposer
+        ? 'Hier kannst du deine naechste Fahrt buchen.'
       : activeTab === 'favoriten'
         ? 'Hier verwaltest du deine Favoriten.'
         : 'Hier siehst du deine kommenden Fahrten.';
@@ -332,7 +341,7 @@ export default function AccountClient({
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
           <section className="px-1 py-2 md:px-2">
-            <div className="flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
+            <div className="flex flex-col gap-9 xl:flex-row xl:items-end xl:justify-between">
               <div className="space-y-4">
                 <h2 className="text-[2rem] font-semibold tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
                   {greetingLabel}
@@ -341,12 +350,16 @@ export default function AccountClient({
               </div>
               <div className="flex flex-col-reverse gap-5 xl:flex-row xl:items-center xl:justify-end xl:gap-4">
                 {accountPrimaryNav}
-                <Link
-                  href="/book"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('buchungsverlauf');
+                    setShowBookingComposer(true);
+                  }}
                   className="ui-button-booking-primary w-full justify-center xl:min-w-[18rem] xl:w-auto"
                 >
                   Fahrt buchen
-                </Link>
+                </button>
               </div>
             </div>
           </section>
@@ -621,6 +634,7 @@ export default function AccountClient({
                         type="button"
                         onClick={() => {
                           setActiveTab('buchungsverlauf');
+                          setShowBookingComposer(false);
                           setBookingFilter('upcoming');
                         }}
                         className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
@@ -637,6 +651,7 @@ export default function AccountClient({
                         type="button"
                         onClick={() => {
                           setActiveTab('buchungsverlauf');
+                          setShowBookingComposer(false);
                           setBookingFilter('previous');
                         }}
                         className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
@@ -651,7 +666,10 @@ export default function AccountClient({
                       </button>
                       <button
                         type="button"
-                        onClick={() => setActiveTab('favoriten')}
+                        onClick={() => {
+                          setShowBookingComposer(false);
+                          setActiveTab('favoriten');
+                        }}
                         className="inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border border-[#e2e8f2] bg-[#FDFDFE] px-3 py-3 text-[1.02rem] font-medium text-[#657489] shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all hover:text-[#111827] sm:min-w-[9.5rem] sm:px-4"
                         aria-label="Favoriten"
                       >
@@ -662,7 +680,21 @@ export default function AccountClient({
                   </div>
                 </div>
 
-                {activeTab === 'favoriten' ? (
+                {showBookingComposer ? (
+                  <div className="grid items-start gap-8 px-1 pt-3 md:px-2 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)] lg:gap-10">
+                    <section className="order-1 self-start">
+                      <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
+                        <BookingForm onDirectionChange={setBookingComposerDirection} />
+                      </div>
+                    </section>
+
+                    <aside className="order-3 self-start lg:order-2">
+                      <BookingInfoPanel direction={bookingComposerDirection} />
+                    </aside>
+                  </div>
+                ) : null}
+
+                {!showBookingComposer && activeTab === 'favoriten' ? (
                   <div className="space-y-6 px-1 pt-3 md:px-2">
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                       {favoritesLoading ? (
@@ -796,7 +828,7 @@ export default function AccountClient({
                   </div>
                 ) : null}
 
-                {activeTab === 'buchungsverlauf' ? (
+                {!showBookingComposer && activeTab === 'buchungsverlauf' ? (
                   <>
                     {bookingsLoading ? (
                       <p className="text-[#6a7d96]">Buchungsverlauf wird geladen...</p>

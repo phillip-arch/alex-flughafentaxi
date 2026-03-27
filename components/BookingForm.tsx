@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { getAppSurface } from '@/lib/routing/surfaces';
 import { 
   Plane, 
   PlaneLanding, 
@@ -101,6 +102,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   const router = useRouter();
   const pathname = usePathname();
   const isHomepageForm = pathname === '/';
+  const isAppSurface = getAppSurface() === 'app';
   const allowExtendedDropdownSpace = !isHomepageForm;
   const supabase = supabaseBrowser();
   const [currentStep, setCurrentStep] = useState(1);
@@ -518,7 +520,7 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   };
 
   const renderFavoriteAddressButtons = () => {
-    if (!isLoggedIn || favoriteAddresses.length === 0) return null;
+    if (!isAppSurface || !isLoggedIn || favoriteAddresses.length === 0) return null;
 
     const getFavoriteIcon = (label: string) => {
       const normalized = String(label || '').toLowerCase();
