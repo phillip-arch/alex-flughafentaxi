@@ -607,14 +607,14 @@ export default function AccountClient({
                   </div>
 
                   <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                    <div className="inline-flex w-full max-w-[29rem] rounded-[1.5rem] border border-[#dce5f2] bg-white/75 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)]">
+                    <div className="flex w-full max-w-[29rem] flex-wrap items-center gap-3">
                       <button
                         type="button"
                         onClick={() => setBookingFilter('upcoming')}
-                        className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[1.15rem] px-4 py-3 text-[1.02rem] font-medium transition-all ${
+                        className={`inline-flex min-w-[9.5rem] items-center justify-center gap-2 rounded-[1.05rem] border px-4 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all ${
                           bookingFilter === 'upcoming'
-                            ? 'bg-white text-[#0a63ff] shadow-[0_8px_20px_rgba(17,17,17,0.08)]'
-                            : 'text-[#657489] hover:text-[#111827]'
+                            ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
+                            : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
                         }`}
                       >
                         <Calendar size={18} />
@@ -623,10 +623,10 @@ export default function AccountClient({
                       <button
                         type="button"
                         onClick={() => setBookingFilter('previous')}
-                        className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[1.15rem] px-4 py-3 text-[1.02rem] font-medium transition-all ${
+                        className={`inline-flex min-w-[9.5rem] items-center justify-center gap-2 rounded-[1.05rem] border px-4 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all ${
                           bookingFilter === 'previous'
-                            ? 'bg-white text-[#0a63ff] shadow-[0_8px_20px_rgba(17,17,17,0.08)]'
-                            : 'text-[#657489] hover:text-[#111827]'
+                            ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
+                            : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
                         }`}
                       >
                         <Clock3 size={18} />
