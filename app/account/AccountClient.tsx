@@ -320,7 +320,7 @@ export default function AccountClient({
         { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
         { id: 'profil', label: 'Profil', icon: <User size={16} /> },
       ]}
-      activeTab={activeTab === 'favoriten' ? 'buchungsverlauf' : activeTab}
+      activeTab={showBookingComposer || activeTab === 'favoriten' ? 'buchungsverlauf' : activeTab}
       onChange={(tab) => {
         setShowBookingComposer(false);
         setActiveTab(tab as AccountTab);
@@ -627,58 +627,60 @@ export default function AccountClient({
           {activeTab === 'buchungsverlauf' || activeTab === 'favoriten' ? (
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
-                <div className="px-1 py-1 md:px-2">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex w-full flex-wrap items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveTab('buchungsverlauf');
-                          setShowBookingComposer(false);
-                          setBookingFilter('upcoming');
-                        }}
-                        className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
-                          bookingFilter === 'upcoming'
-                            ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
-                            : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
-                        }`}
-                        aria-label="Kommend"
-                      >
-                        <Calendar size={18} />
-                        <span className="hidden sm:inline">Kommend</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveTab('buchungsverlauf');
-                          setShowBookingComposer(false);
-                          setBookingFilter('previous');
-                        }}
-                        className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
-                          bookingFilter === 'previous'
-                            ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
-                            : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
-                        }`}
-                        aria-label="Vergangen"
-                      >
-                        <Clock3 size={18} />
-                        <span className="hidden sm:inline">Vergangen</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowBookingComposer(false);
-                          setActiveTab('favoriten');
-                        }}
-                        className="inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border border-[#e2e8f2] bg-[#FDFDFE] px-3 py-3 text-[1.02rem] font-medium text-[#657489] shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all hover:text-[#111827] sm:min-w-[9.5rem] sm:px-4"
-                        aria-label="Favoriten"
-                      >
-                        <Star size={18} className="text-[#657489]" />
-                        <span className="hidden sm:inline">Favoriten</span>
-                      </button>
+                {!showBookingComposer ? (
+                  <div className="px-1 py-1 md:px-2">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div className="flex w-full flex-wrap items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveTab('buchungsverlauf');
+                            setShowBookingComposer(false);
+                            setBookingFilter('upcoming');
+                          }}
+                          className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
+                            bookingFilter === 'upcoming'
+                              ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
+                              : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
+                          }`}
+                          aria-label="Kommend"
+                        >
+                          <Calendar size={18} />
+                          <span className="hidden sm:inline">Kommend</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveTab('buchungsverlauf');
+                            setShowBookingComposer(false);
+                            setBookingFilter('previous');
+                          }}
+                          className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
+                            bookingFilter === 'previous'
+                              ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
+                              : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
+                          }`}
+                          aria-label="Vergangen"
+                        >
+                          <Clock3 size={18} />
+                          <span className="hidden sm:inline">Vergangen</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowBookingComposer(false);
+                            setActiveTab('favoriten');
+                          }}
+                          className="inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border border-[#e2e8f2] bg-[#FDFDFE] px-3 py-3 text-[1.02rem] font-medium text-[#657489] shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all hover:text-[#111827] sm:min-w-[9.5rem] sm:px-4"
+                          aria-label="Favoriten"
+                        >
+                          <Star size={18} className="text-[#657489]" />
+                          <span className="hidden sm:inline">Favoriten</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : null}
 
                 {showBookingComposer ? (
                   <div className="grid items-start gap-8 px-1 pt-3 md:px-2 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)] lg:gap-10">
