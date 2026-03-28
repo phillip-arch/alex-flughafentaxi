@@ -38,7 +38,7 @@ export default function AccountMobileBottomNav({
         className={
           placement === 'inline'
             ? 'rounded-[1.45rem] border border-[#dbe7f8] bg-white p-2 shadow-[0_10px_24px_rgba(17,17,17,0.06)]'
-            : 'w-full border-t border-[#dbe7f8] bg-white/98 px-4 pt-2 shadow-[0_-10px_30px_rgba(17,17,17,0.08)] backdrop-blur [padding-bottom:calc(env(safe-area-inset-bottom,0px)+12px)]'
+            : 'w-full border-t border-[#dbe7f8] bg-white/98 px-4 pt-1.5 shadow-[0_-10px_30px_rgba(17,17,17,0.08)] backdrop-blur [padding-bottom:calc(env(safe-area-inset-bottom,0px)+10px)]'
         }
       >
         <div className="grid grid-cols-3 gap-3">
@@ -58,7 +58,7 @@ export default function AccountMobileBottomNav({
                 href={item.href}
                 aria-current={isActive ? 'page' : undefined}
                 prefetch
-                className={`flex min-h-[3.65rem] flex-col items-center justify-center gap-1 rounded-[1.1rem] text-[0.82rem] tracking-[-0.02em] outline-none transition-colors ${
+                className={`flex ${placement === 'bottom' ? 'min-h-[2.9rem] gap-0.5' : 'min-h-[3.65rem] gap-1'} flex-col items-center justify-center rounded-[1.1rem] text-[0.82rem] tracking-[-0.02em] outline-none transition-colors ${
                   placement === 'inline'
                     ? `${
                         isActive
