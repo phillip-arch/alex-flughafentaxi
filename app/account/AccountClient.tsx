@@ -354,7 +354,7 @@ export default function AccountClient({
                 {accountPrimaryNav}
                 <Link
                   href="/book"
-                  className="ui-button-booking-primary w-full justify-center xl:min-w-[18rem] xl:w-auto"
+                  className="ui-button-booking-primary hidden w-full justify-center md:inline-flex xl:min-w-[18rem] xl:w-auto"
                 >
                   Fahrt buchen
                 </Link>
