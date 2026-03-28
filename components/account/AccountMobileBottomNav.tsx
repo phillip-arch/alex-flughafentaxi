@@ -32,17 +32,17 @@ export default function AccountMobileBottomNav({
       className={
         placement === 'inline'
           ? 'hidden md:block'
-          : 'fixed inset-x-0 bottom-4 z-[90] px-3 [padding-bottom:calc(env(safe-area-inset-bottom,0px))] md:hidden'
+          : 'fixed inset-x-0 bottom-0 z-[90] [padding-bottom:calc(env(safe-area-inset-bottom,0px))] md:hidden'
       }
     >
       <div
         className={
           placement === 'inline'
             ? 'rounded-[1.45rem] border border-[#dbe7f8] bg-white p-2 shadow-[0_10px_24px_rgba(17,17,17,0.06)]'
-            : 'mx-auto max-w-[25rem] rounded-[1.45rem] border border-[#dbe7f8] bg-white/95 p-2 shadow-[0_20px_40px_rgba(17,17,17,0.12)] backdrop-blur'
+            : 'w-full border-t border-[#dbe7f8] bg-white/98 px-4 pb-3 pt-2 shadow-[0_-10px_30px_rgba(17,17,17,0.08)] backdrop-blur'
         }
       >
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-3">
           {items.map((item) => {
             const Icon = item.icon;
             const itemUrl = new URL(item.href, 'https://app.local');
