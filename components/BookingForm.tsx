@@ -17,14 +17,17 @@ import {
   Calendar,
   Clock,
   Car,
+  CreditCard,
   Building2,
   GraduationCap,
   Users,
   Briefcase,
   ShoppingBag,
   ArrowUpDown,
+  Info,
   Plus,
   Minus,
+  X,
   LucideIcon,
 } from 'lucide-react';
 import { determineVehicle, calculateVehiclePrice } from '@/lib/pricing';
@@ -132,6 +135,7 @@ const BookingForm = ({
   // Picker States
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
+  const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(initialFavorites);
   const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
   const [accountDefaults, setAccountDefaults] = useState(initialAccountDefaults);
@@ -199,6 +203,19 @@ const BookingForm = ({
       document.removeEventListener('keydown', handleEscape);
     };
   }, [openInlineSelect]);
+
+  useEffect(() => {
+    if (!isInfoPanelOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsInfoPanelOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isInfoPanelOpen]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -930,35 +947,47 @@ const BookingForm = ({
     'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
 
   const StepIndicator = () => (
-    <div className="mt-2 mb-8 flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:mt-0 md:mb-10 md:gap-1 md:overflow-visible md:pb-0">
-      {stepItems.map((step, index) => {
-        const Icon = step.icon;
-        const isCurrent = currentStep === step.key;
-        const isComplete = currentStep > step.key;
+    <div className="mt-2 mb-8 flex items-start gap-3 md:mt-0 md:mb-10">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:gap-1 md:overflow-visible md:pb-0">
+          {stepItems.map((step, index) => {
+            const Icon = step.icon;
+            const isCurrent = currentStep === step.key;
+            const isComplete = currentStep > step.key;
 
-        return (
-          <React.Fragment key={step.key}>
-            <button
-              type="button"
-              onClick={() => handleStepIndicatorClick(step.key)}
-                className={`inline-flex shrink-0 items-center gap-[0.35rem] rounded-full border px-[0.57rem] py-[0.33rem] text-[10.25px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
-                isCurrent
-                  ? 'border-[#1679FF] bg-[#1679FF] text-white'
-                  : isComplete
-                    ? 'border-[#1679FF] bg-[#1679FF] text-white'
-                    : 'border-[#ddd8cd] bg-white text-[#111111] hover:border-[#cbc4b6]'
-              }`}
-              aria-current={isCurrent ? 'step' : undefined}
-            >
-                <Icon size={12} strokeWidth={2.2} className="md:h-4 md:w-4" />
-                <span className="text-[10.25px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
-              </button>
-              {index < stepItems.length - 1 ? (
-                <ChevronRight size={10} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
-              ) : null}
-          </React.Fragment>
-        );
-      })}
+            return (
+              <React.Fragment key={step.key}>
+                <button
+                  type="button"
+                  onClick={() => handleStepIndicatorClick(step.key)}
+                    className={`inline-flex shrink-0 items-center gap-[0.35rem] rounded-full border px-[0.57rem] py-[0.33rem] text-[10.25px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
+                    isCurrent
+                      ? 'border-[#1679FF] bg-[#1679FF] text-white'
+                      : isComplete
+                        ? 'border-[#1679FF] bg-[#1679FF] text-white'
+                        : 'border-[#ddd8cd] bg-white text-[#111111] hover:border-[#cbc4b6]'
+                  }`}
+                  aria-current={isCurrent ? 'step' : undefined}
+                >
+                    <Icon size={12} strokeWidth={2.2} className="md:h-4 md:w-4" />
+                    <span className="text-[10.25px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
+                  </button>
+                  {index < stepItems.length - 1 ? (
+                    <ChevronRight size={10} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
+                  ) : null}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+      <button
+        type="button"
+        aria-label="Informationen"
+        onClick={() => setIsInfoPanelOpen(true)}
+        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff] md:h-10 md:w-10"
+      >
+        <Info size={18} strokeWidth={2.1} />
+      </button>
     </div>
   );
 
@@ -1134,6 +1163,113 @@ const BookingForm = ({
           )}
         </form>
       </div>
+      {isInfoPanelOpen ? (
+        <div className="fixed inset-0 z-[140] bg-white/96 text-[#111827] backdrop-blur-sm">
+          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px] md:flex md:min-h-full md:items-center md:justify-center md:py-8">
+            <div className="w-full md:max-w-[56rem] md:max-h-[calc(100vh-4rem)] md:overflow-y-auto md:rounded-[2rem] md:border md:border-[#e8edf3] md:bg-white md:px-8 md:py-8 md:shadow-[0_18px_40px_rgba(17,17,17,0.08)]">
+              <div className="flex items-center justify-between gap-3 pb-6">
+                <button
+                  type="button"
+                  onClick={() => setIsInfoPanelOpen(false)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827] md:hidden"
+                  aria-label="Zurueck"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[0.82rem] font-semibold uppercase tracking-[0.22em] text-[#1679ff]">
+                    Informationen
+                  </p>
+                  <h2 className="mt-3 text-[2.2rem] font-semibold leading-[0.98] tracking-[-0.06em] text-[#111827] md:max-w-[11ch] md:text-[4rem]">
+                    Informationen zum Flughafentransfer
+                  </h2>
+                  <p className="mt-4 max-w-[44rem] text-[1.02rem] leading-8 text-[#6a7d96] md:text-[1.12rem]">
+                    Alle wichtigen Hinweise fuer Ankunft, Vorlaufzeit und Zahlung direkt neben der Buchung.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsInfoPanelOpen(false)}
+                  className="hidden md:inline-flex md:h-11 md:w-11 md:items-center md:justify-center md:rounded-full md:border md:border-[#e5e7eb] md:bg-white md:text-[#111827]"
+                  aria-label="Schliessen"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-4 md:space-y-5">
+                <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
+                  <p className="text-[0.82rem] font-semibold uppercase tracking-[0.22em] text-[#1679ff]">
+                    Abholung am Flughafen
+                  </p>
+                  <h3 className="mt-2 text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
+                    Wo Sie Ihren Fahrer treffen
+                  </h3>
+                  <ul className="mt-4 space-y-2 text-[1rem] leading-8 text-[#6a6a6a]">
+                    <li>• Der Fahrer wartet in der Ankunftshalle</li>
+                    <li>• Namensschild mit Ihrem Buchungsnamen</li>
+                    <li>• Kostenlose Wartezeit inklusive</li>
+                  </ul>
+                </div>
+
+                <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
+                  <h3 className="text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
+                    Mindestvorlauf fuer Buchungen
+                  </h3>
+                  <div className="mt-4 space-y-2 text-[1rem] leading-8 text-[#6a6a6a]">
+                    <p>07:00-22:00 - mindestens 3h vorher buchen</p>
+                    <p>22:00-07:00 - mindestens 8h vorher buchen</p>
+                  </div>
+                </div>
+
+                <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
+                  <h3 className="text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
+                    Kindersitze
+                  </h3>
+                  <p className="mt-3 text-[1rem] leading-8 text-[#6a6a6a]">
+                    Auf Wunsch direkt waehrend der Buchung waehlbar.
+                  </p>
+                </div>
+
+                <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
+                  <h3 className="text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
+                    Zahlungsarten
+                  </h3>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {['Bar', 'Visa', 'Mastercard', 'Apple Pay'].map((method) => (
+                      <div
+                        key={method}
+                        className="flex items-center gap-3 rounded-[1.2rem] border border-[#e8edf3] bg-[#f8fbff] px-4 py-4 text-[1rem] font-medium text-[#111827]"
+                      >
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#1679ff] shadow-[0_8px_18px_rgba(17,17,17,0.04)]">
+                          <CreditCard size={18} strokeWidth={2} />
+                        </span>
+                        <span>{method}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3 pb-8 md:pb-2">
+                  {[
+                    { label: 'Fixpreis', icon: Check },
+                    { label: 'Kostenlose Wartezeit', icon: Clock },
+                    { label: 'Flugtracking', icon: PlaneLanding },
+                  ].map(({ label, icon: Icon }) => (
+                    <div
+                      key={label}
+                      className="inline-flex items-center gap-2 rounded-full border border-[#e8edf3] bg-white px-4 py-3 text-[0.98rem] font-medium text-[#111827]"
+                    >
+                      <Icon size={18} className="text-[#1679ff]" />
+                      <span>{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };

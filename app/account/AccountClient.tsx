@@ -130,7 +130,8 @@ export default function AccountClient({
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
   const [openPanel, setOpenPanel] = useState<AccountPanel>(initialOpenPanel);
-  const [isDeleteAccountExpanded, setIsDeleteAccountExpanded] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isDeletingAccount, startDeleteTransition] = useTransition();
   const [isPending, startTransition] = useTransition();
   const [favoritesLoaded, setFavoritesLoaded] = useState(initialFavoritesLoaded);
@@ -167,6 +168,31 @@ export default function AccountClient({
   const activeLanguage = searchParams.get('lang')?.toLowerCase() || 'de';
   const activeLanguageLabel =
     languageOptions.find((option) => option.code === activeLanguage)?.label || 'Deutsch';
+  useEffect(() => {
+    if (!isLogoutConfirmOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsLogoutConfirmOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isLogoutConfirmOpen]);
+  useEffect(() => {
+    if (!isDeleteConfirmOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsDeleteConfirmOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isDeleteConfirmOpen]);
+
   const buildAccountHref = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
@@ -538,17 +564,16 @@ export default function AccountClient({
                     </div>
 
                     <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
-                      <form action={logout}>
-                        <button
-                          type="submit"
-                          className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827]"
-                        >
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                            <LogOut size={24} strokeWidth={1.8} />
-                          </span>
-                          <span className="text-[1rem] font-medium text-[#111827]">Abmelden</span>
-                        </button>
-                      </form>
+                      <button
+                        type="button"
+                        onClick={() => setIsLogoutConfirmOpen(true)}
+                        className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827]"
+                      >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                          <LogOut size={24} strokeWidth={1.8} />
+                        </span>
+                        <span className="text-[1rem] font-medium text-[#111827]">Abmelden</span>
+                      </button>
 
                       <div className="border-t border-[#efebe4]" />
 
@@ -557,11 +582,7 @@ export default function AccountClient({
                         disabled={isDeletingAccount}
                         onClick={() => {
                           setError(null);
-                          if (window.innerWidth < 768) {
-                            setOpenPanel('delete');
-                            return;
-                          }
-                          setIsDeleteAccountExpanded((prev) => !prev);
+                          setIsDeleteConfirmOpen(true);
                         }}
                         className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
                       >
@@ -570,43 +591,6 @@ export default function AccountClient({
                         </span>
                         <span className="text-[1rem] font-medium text-[#111827]">Konto loeschen</span>
                       </button>
-
-                      {isDeleteAccountExpanded ? (
-                        <div className="border-t border-[#efebe4] pb-2 pt-4">
-                          <p className="max-w-[38rem] text-[0.95rem] leading-6 text-[#6a6a6a]">
-                            Ihr Login, Profil und Ihre Favoriten werden entfernt. Buchungen bleiben fuer
-                            interne Nachvollziehbarkeit erhalten, aber E-Mail und Telefonnummer werden
-                            daraus entfernt.
-                          </p>
-                          <div className="mt-4 flex flex-wrap gap-3">
-                            <button
-                              type="button"
-                              disabled={isDeletingAccount}
-                              onClick={() => {
-                                setError(null);
-                                startDeleteTransition(async () => {
-                                  const res = await deleteOwnAccount();
-                                  if ((res as { error?: string })?.error) {
-                                    setError((res as { error: string }).error);
-                                    return;
-                                  }
-                                  window.location.assign('/login?account_deleted=1');
-                                });
-                              }}
-                              className={`${accountDangerButtonClass} disabled:cursor-not-allowed disabled:opacity-60`}
-                            >
-                              {isDeletingAccount ? 'Konto wird geloescht...' : 'Loeschen bestaetigen'}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setIsDeleteAccountExpanded(false)}
-                              className={accountSecondaryButtonClass}
-                            >
-                              Abbrechen
-                            </button>
-                          </div>
-                        </div>
-                      ) : null}
                     </div>
                   </div>
                 ) : (
@@ -1261,60 +1245,6 @@ export default function AccountClient({
           </div>
         </div>
       ) : null}
-      {openPanel === 'delete' ? (
-        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
-          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
-            <div className="flex items-center gap-3 pb-6">
-              <button
-                type="button"
-                onClick={() => setOpenPanel(null)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
-                aria-label="Zurueck"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <div>
-                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Konto loeschen</p>
-                <p className="text-[0.95rem] text-[#6a6a6a]">Bitte bestaetige die Loeschung deines Kontos</p>
-              </div>
-            </div>
-
-            <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
-              <p className="text-[0.98rem] leading-7 text-[#6a6a6a]">
-                Ihr Login, Profil und Ihre Favoriten werden entfernt. Buchungen bleiben fuer interne
-                Nachvollziehbarkeit erhalten, aber E-Mail und Telefonnummer werden daraus entfernt.
-              </p>
-              <div className="mt-5 flex flex-col gap-3">
-                <button
-                  type="button"
-                  disabled={isDeletingAccount}
-                  onClick={() => {
-                    setError(null);
-                    startDeleteTransition(async () => {
-                      const res = await deleteOwnAccount();
-                      if ((res as { error?: string })?.error) {
-                        setError((res as { error: string }).error);
-                        return;
-                      }
-                      window.location.assign('/login?account_deleted=1');
-                    });
-                  }}
-                  className={`${accountDangerButtonClass} w-full justify-center disabled:cursor-not-allowed disabled:opacity-60`}
-                >
-                  {isDeletingAccount ? 'Konto wird geloescht...' : 'Loeschen bestaetigen'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOpenPanel(null)}
-                  className={`${accountSecondaryButtonClass} w-full justify-center`}
-                >
-                  Abbrechen
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
       {openPanel === 'favorite-add' ? (
         <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
           <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
@@ -1417,6 +1347,85 @@ export default function AccountClient({
                   {isPending ? 'Speichert...' : 'Speichern'}
                 </button>
               </form>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {isLogoutConfirmOpen ? (
+        <div
+          className="fixed inset-0 z-[130] flex items-end justify-center bg-[rgba(17,17,17,0.18)] px-4 pb-6 pt-10 backdrop-blur-[2px] sm:items-center sm:px-6 sm:pb-10"
+          onClick={() => setIsLogoutConfirmOpen(false)}
+        >
+          <div
+            className="w-full max-w-[34rem] rounded-[2rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_18px_40px_rgba(17,17,17,0.12)] sm:px-6 sm:py-6"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="text-center">
+              <p className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] sm:text-[2.2rem]">
+                Abmelden?
+              </p>
+            </div>
+            <div className="mt-6 flex flex-col gap-3">
+              <form action={logout} className="w-full">
+                <button type="submit" className={`${accountDangerButtonClass} w-full justify-center`}>
+                  Abmelden
+                </button>
+              </form>
+              <button
+                type="button"
+                onClick={() => setIsLogoutConfirmOpen(false)}
+                className={`${accountSecondaryButtonClass} w-full justify-center`}
+              >
+                Zurueck
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {isDeleteConfirmOpen ? (
+        <div
+          className="fixed inset-0 z-[130] flex items-end justify-center bg-[rgba(17,17,17,0.18)] px-4 pb-6 pt-10 backdrop-blur-[2px] sm:items-center sm:px-6 sm:pb-10"
+          onClick={() => setIsDeleteConfirmOpen(false)}
+        >
+          <div
+            className="w-full max-w-[34rem] rounded-[2rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_18px_40px_rgba(17,17,17,0.12)] sm:px-6 sm:py-6"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="text-center">
+              <p className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] sm:text-[2.2rem]">
+                Account loeschen?
+              </p>
+              <p className="mt-5 text-[1.08rem] leading-8 text-[#111827] sm:text-[1.2rem] sm:leading-9">
+                Ihr Login, Profil und Ihre Favoriten werden entfernt. Buchungen bleiben fuer interne
+                Nachvollziehbarkeit erhalten, aber E-Mail und Telefonnummer werden daraus entfernt.
+              </p>
+            </div>
+            <div className="mt-8 flex flex-col gap-3">
+              <button
+                type="button"
+                disabled={isDeletingAccount}
+                onClick={() => {
+                  setError(null);
+                  startDeleteTransition(async () => {
+                    const res = await deleteOwnAccount();
+                    if ((res as { error?: string })?.error) {
+                      setError((res as { error: string }).error);
+                      return;
+                    }
+                    window.location.assign('/login?account_deleted=1');
+                  });
+                }}
+                className={`${accountDangerButtonClass} w-full justify-center disabled:cursor-not-allowed disabled:opacity-60`}
+              >
+                {isDeletingAccount ? 'Account wird geloescht...' : 'Account loeschen'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                className={`${accountSecondaryButtonClass} w-full justify-center`}
+              >
+                Nicht loeschen
+              </button>
             </div>
           </div>
         </div>
