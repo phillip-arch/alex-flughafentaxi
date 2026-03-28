@@ -75,7 +75,7 @@ export default function AccountMobileBottomNav({
                 <AccountNavIcon
                   item={item.id}
                   active={isActive}
-                  className={placement === 'bottom' ? 'h-[29px] w-[29px]' : 'h-[18px] w-[18px]'}
+                  className={placement === 'bottom' ? 'h-[30px] w-[30px]' : 'h-[18px] w-[18px]'}
                 />
                 <span>{item.label}</span>
               </Link>
