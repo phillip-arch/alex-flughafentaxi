@@ -449,6 +449,7 @@ export default function AccountClient({
                     <BookingForm
                       onDirectionChange={setBookingDirection}
                       showStepIndicator={false}
+                      showInfoTrigger
                       initialFavorites={favorites}
                       initialIsLoggedIn
                       initialAccountDefaults={{

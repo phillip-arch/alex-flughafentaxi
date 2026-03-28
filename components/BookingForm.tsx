@@ -87,6 +87,7 @@ interface ExtendedBookingInput {
 type BookingFormProps = {
   onDirectionChange?: (direction: Direction) => void;
   showStepIndicator?: boolean;
+  showInfoTrigger?: boolean;
   initialFavorites?: FavoriteAddress[];
   initialIsLoggedIn?: boolean;
   initialAccountDefaults?: {
@@ -117,6 +118,7 @@ const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const BookingForm = ({
   onDirectionChange,
   showStepIndicator = true,
+  showInfoTrigger = false,
   initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
   initialAccountDefaults = EMPTY_ACCOUNT_DEFAULTS,
@@ -975,7 +977,7 @@ const BookingForm = ({
     </div>
   );
 
-  const shouldShowInfoTrigger = showStepIndicator || (isAppSurface && hasMounted);
+  const shouldShowInfoTrigger = showStepIndicator || showInfoTrigger || (isAppSurface && hasMounted);
 
   return (
     <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
