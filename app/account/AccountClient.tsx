@@ -342,7 +342,7 @@ export default function AccountClient({
         <div className={`${accountShellClass} space-y-6`}>
           <section className="px-1 py-2 md:px-2">
             <div className="flex flex-col gap-9 xl:flex-row xl:items-end xl:justify-between">
-              <div className="flex flex-col gap-8 pt-6 md:gap-9 md:pt-8">
+              <div className="flex flex-col gap-5 pt-6 md:pt-8">
                 <h2 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
                   {greetingLabel}
                 </h2>
@@ -880,7 +880,7 @@ export default function AccountClient({
                               }`}
                             >
                               <div className="flex items-start gap-3 md:gap-4">
-                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] md:h-12 md:w-12">
+                                <div className="flex h-11 w-11 shrink-0 self-center items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] md:h-12 md:w-12">
                                   <Car size={18} className="md:h-[20px] md:w-[20px]" />
                                 </div>
 
@@ -919,59 +919,49 @@ export default function AccountClient({
                                   />
                                 </button>
 
-                                <div className="shrink-0">
                                 {showCancelAction ? (
-                                  <button
-                                    type="button"
-                                    disabled={!canCancel(b) || cancelingBookingId === b.id}
-                                    onClick={() =>
-                                      startTransition(async () => {
-                                        setBookingError(null);
-                                        setBookingNotice(null);
-                                        if (!confirm('Moechten Sie diese Fahrt stornieren?')) return;
-                                        setCancelingBookingId(b.id);
-                                        const res = await cancelOwnBooking(b.id);
-                                        setCancelingBookingId(null);
-                                        if ((res as { error?: string })?.error) {
-                                          setBookingError((res as { error: string }).error);
-                                          return;
-                                        }
-                                        if ((res as { info?: string }).info === 'already_canceled') {
-                                          setBookingNotice('Diese Buchung wurde bereits storniert.');
-                                        } else {
-                                          setBookingNotice('Buchung wurde storniert.');
-                                        }
-                                        setBookings((prev) =>
-                                          prev.map((item) =>
-                                            item.id === b.id
-                                              ? {
-                                                  ...item,
-                                                  status:
-                                                    (res as { status?: string }).status ||
-                                                    (isCanceled(item.status) ? item.status : 'canceled'),
-                                                }
-                                              : item,
-                                          ),
-                                        );
-                                      })
-                                    }
-                                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1d1d6] bg-[#fff4f6] text-[#d70015] transition-colors hover:bg-[#ffecef] disabled:cursor-not-allowed disabled:opacity-40 md:h-11 md:w-11"
-                                    aria-label="Fahrt stornieren"
-                                  >
-                                    <XCircle size={18} className="md:h-[19px] md:w-[19px]" />
-                                  </button>
-                                ) : hasMapLink ? (
-                                  <a
-                                    href={getGoogleMapsUrl(primaryLocation)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-label="Ort in Google Maps oeffnen"
-                                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] transition-colors hover:bg-[#eef5ff] md:h-11 md:w-11"
-                                  >
-                                    <MapPin size={17} className="md:h-[18px] md:w-[18px]" />
-                                  </a>
+                                  <div className="shrink-0">
+                                    <button
+                                      type="button"
+                                      disabled={!canCancel(b) || cancelingBookingId === b.id}
+                                      onClick={() =>
+                                        startTransition(async () => {
+                                          setBookingError(null);
+                                          setBookingNotice(null);
+                                          if (!confirm('Moechten Sie diese Fahrt stornieren?')) return;
+                                          setCancelingBookingId(b.id);
+                                          const res = await cancelOwnBooking(b.id);
+                                          setCancelingBookingId(null);
+                                          if ((res as { error?: string })?.error) {
+                                            setBookingError((res as { error: string }).error);
+                                            return;
+                                          }
+                                          if ((res as { info?: string }).info === 'already_canceled') {
+                                            setBookingNotice('Diese Buchung wurde bereits storniert.');
+                                          } else {
+                                            setBookingNotice('Buchung wurde storniert.');
+                                          }
+                                          setBookings((prev) =>
+                                            prev.map((item) =>
+                                              item.id === b.id
+                                                ? {
+                                                    ...item,
+                                                    status:
+                                                      (res as { status?: string }).status ||
+                                                      (isCanceled(item.status) ? item.status : 'canceled'),
+                                                  }
+                                                : item,
+                                            ),
+                                          );
+                                        })
+                                      }
+                                      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1d1d6] bg-[#fff4f6] text-[#d70015] transition-colors hover:bg-[#ffecef] disabled:cursor-not-allowed disabled:opacity-40 md:h-11 md:w-11"
+                                      aria-label="Fahrt stornieren"
+                                    >
+                                      <XCircle size={18} className="md:h-[19px] md:w-[19px]" />
+                                    </button>
+                                  </div>
                                 ) : null}
-                                </div>
                               </div>
 
                               {isExpanded ? (
