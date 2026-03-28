@@ -1,14 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { History, House, User } from 'lucide-react';
 
 type MobileNavItem = 'start' | 'fahrten' | 'profil';
 
-export default function AccountMobileBottomNav({ active }: { active: MobileNavItem }) {
+export default function AccountMobileBottomNav({ active }: { active?: MobileNavItem }) {
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const items: Array<{
     id: MobileNavItem;
@@ -30,7 +29,6 @@ export default function AccountMobileBottomNav({ active }: { active: MobileNavIt
         <div className="grid grid-cols-3 gap-2">
           {items.map((item) => {
             const Icon = item.icon;
-            const isActive = item.id === active;
             const itemUrl = new URL(item.href, 'https://app.local');
             const currentTab = searchParams.get('tab') || '';
             const targetTab = itemUrl.searchParams.get('tab') || '';
@@ -38,21 +36,14 @@ export default function AccountMobileBottomNav({ active }: { active: MobileNavIt
               itemUrl.pathname === '/book'
                 ? pathname === '/book'
                 : pathname === itemUrl.pathname && currentTab === targetTab;
+            const isActive = isCurrentHref || item.id === active;
 
             return (
               <Link
                 key={item.id}
                 href={item.href}
                 aria-current={isActive ? 'page' : undefined}
-                prefetch={false}
-                onClick={(event) => {
-                  if (isCurrentHref) {
-                    event.preventDefault();
-                    return;
-                  }
-                  event.preventDefault();
-                  router.push(item.href);
-                }}
+                prefetch
                 className={`flex min-h-[3.65rem] flex-col items-center justify-center gap-1 rounded-[1.1rem] border text-[0.82rem] font-medium tracking-[-0.02em] transition-colors ${
                   isActive
                     ? 'border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff]'

@@ -270,6 +270,20 @@ export default function AccountClient({
     return groups;
   }, []);
   useEffect(() => {
+    setActiveTab(initialRequestedTab);
+  }, [initialRequestedTab]);
+
+  useEffect(() => {
+    setFavorites(initialFavorites || []);
+    setFavoritesLoaded(initialFavoritesLoaded);
+  }, [initialFavorites, initialFavoritesLoaded]);
+
+  useEffect(() => {
+    setBookings(initialBookings || []);
+    setBookingsLoaded(initialBookingsLoaded);
+  }, [initialBookings, initialBookingsLoaded]);
+
+  useEffect(() => {
     if (activeTab === 'favoriten' && !favoritesLoaded && !favoritesLoading) {
       setFavoritesLoading(true);
       void loadFavoriteAddresses().then((res) => {
@@ -300,7 +314,7 @@ export default function AccountClient({
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
   return (
-    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-4 md:pb-14 md:pt-5 lg:pt-6">
+    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-0 md:pb-14">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
           {activeTab === 'profil' ? (
