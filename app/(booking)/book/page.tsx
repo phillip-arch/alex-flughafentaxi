@@ -14,16 +14,40 @@ export default async function BookingPage() {
   } = await supabase.auth.getUser();
 
   let initialName = '';
+  let initialPhone = '';
+  let initialEmail = '';
+  let initialFavorites: Array<{
+    id: string;
+    name: string;
+    city: string;
+    zip: string;
+    street: string;
+    house_number: string;
+  }> = [];
 
   if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('id', user.id)
-      .maybeSingle();
+    const [{ data: profile }, { data: favorites }] = await Promise.all([
+      supabase.from('profiles').select('full_name, phone').eq('id', user.id).maybeSingle(),
+      supabase
+        .from('saved_addresses')
+        .select('id, name, city, zip, street, house_number')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true }),
+    ]);
 
     initialName = profile?.full_name || '';
+    initialPhone = profile?.phone || '';
+    initialEmail = user.email || '';
+    initialFavorites = (favorites || []) as typeof initialFavorites;
   }
 
-  return <BookingPageClient initialName={initialName} />;
+  return (
+    <BookingPageClient
+      initialName={initialName}
+      initialPhone={initialPhone}
+      initialEmail={initialEmail}
+      initialFavorites={initialFavorites}
+      initialIsLoggedIn={Boolean(user)}
+    />
+  );
 }

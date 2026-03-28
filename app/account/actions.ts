@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { buildPassengerCancellationEmailHtml } from '@/lib/booking/passengerEmail';
 import { ReviewSchema } from '@/lib/validation/schemas';
 
 const ProfileSchema = z.object({
@@ -28,7 +29,7 @@ export async function loadFavoriteAddresses() {
 
   if (!user) return { error: 'Unauthorized' };
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('saved_addresses')
     .select('id, name, city, zip, street, house_number')
     .eq('user_id', user.id)
@@ -175,16 +176,21 @@ export async function addFavoriteAddress(formData: FormData) {
 
   if (!parsed.success) return { error: 'Bitte Favorit korrekt eingeben.' };
 
-  const { count } = await supabase
+  const { count, error: countError } = await supabaseAdmin
     .from('saved_addresses')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id);
+
+  if (countError) {
+    console.error('addFavoriteAddress count failed:', countError);
+    return { error: 'Favorit konnte nicht gespeichert werden.' };
+  }
 
   if ((count || 0) >= 3) {
     return { error: 'Maximal 3 Favoriten erlaubt.' };
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('saved_addresses')
     .insert({
       user_id: user.id,
@@ -217,7 +223,7 @@ export async function deleteFavoriteAddress(id: string) {
 
   if (!user) return { error: 'Unauthorized' };
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('saved_addresses')
     .delete()
     .eq('id', id)
@@ -330,55 +336,19 @@ export async function cancelOwnBooking(bookingId: string) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       const from = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
-      const pickupDate = new Date(String(existing.pickup_at || ''));
-      const formattedDate = Number.isNaN(pickupDate.getTime())
-        ? '-'
-        : new Intl.DateTimeFormat('de-AT', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          }).format(pickupDate);
-      const formattedTime = Number.isNaN(pickupDate.getTime())
-        ? '-'
-        : new Intl.DateTimeFormat('de-AT', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          }).format(pickupDate);
-      const formattedPrice = new Intl.NumberFormat('de-AT', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(Number(existing.price ?? 0));
-
       const { error: emailError } = await resend.emails.send({
         from,
         to: existing.email,
         subject: 'Ihre Fahrt wurde storniert',
-        html: `
-          <div style="margin:0;padding:24px;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1d1d1f;">
-            <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;">
-              <tr>
-                <td style="padding:28px;">
-                  <div style="font-size:12px;letter-spacing:.08em;color:#86868b;font-weight:600;text-transform:uppercase;margin-bottom:8px;">Alex Flughafentaxi</div>
-                  <h1 style="margin:0 0 12px 0;font-size:28px;line-height:1.2;font-weight:700;color:#1d1d1f;">Ihre Fahrt wurde storniert</h1>
-                  <p style="margin:0 0 18px 0;font-size:16px;line-height:1.6;color:#5f6368;">
-                    Hallo ${String(existing.full_name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}, Ihre Buchung wurde erfolgreich storniert.
-                  </p>
-                  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#f5f5f7;border-radius:16px;border:1px solid #e5e5ea;">
-                    <tr><td style="padding:16px 18px 8px 18px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#86868b;font-weight:700;">Fahrtinformationen</td></tr>
-                    ${existing.booking_reference ? `<tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Buchungsnummer:</strong> ${String(existing.booking_reference || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td></tr>` : ''}
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Abholung:</strong> ${String(existing.pickup || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Ziel:</strong> ${String(existing.destination || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Datum:</strong> ${formattedDate}</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Uhrzeit:</strong> ${formattedTime}</td></tr>
-                    <tr><td style="padding:0 18px 10px 18px;font-size:14px;color:#1d1d1f;"><strong>Fahrzeug:</strong> ${String(existing.vehicle_type || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td></tr>
-                    <tr><td style="padding:0 18px 16px 18px;font-size:14px;color:#1d1d1f;"><strong>Preis:</strong> ${formattedPrice} &euro;</td></tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </div>
-        `,
+        html: buildPassengerCancellationEmailHtml({
+          fullName: existing.full_name,
+          bookingReference: existing.booking_reference,
+          pickup: existing.pickup,
+          destination: existing.destination,
+          pickupAt: existing.pickup_at,
+          vehicleType: existing.vehicle_type,
+          price: existing.price,
+        }),
       });
 
       if (emailError) {

@@ -86,6 +86,13 @@ interface ExtendedBookingInput {
 type BookingFormProps = {
   onDirectionChange?: (direction: Direction) => void;
   showStepIndicator?: boolean;
+  initialFavorites?: FavoriteAddress[];
+  initialIsLoggedIn?: boolean;
+  initialAccountDefaults?: {
+    fullName: string;
+    phone: string;
+    email: string;
+  };
 };
 
 type StepperFieldName =
@@ -98,7 +105,13 @@ type StepperFieldName =
 
 type InlineSelectFieldName = StepperFieldName;
 
-const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFormProps) => {
+const BookingForm = ({
+  onDirectionChange,
+  showStepIndicator = true,
+  initialFavorites = [],
+  initialIsLoggedIn = false,
+  initialAccountDefaults = { fullName: '', phone: '', email: '' },
+}: BookingFormProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const isHomepageForm = pathname === '/';
@@ -112,9 +125,9 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
   // Picker States
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
-  const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [accountDefaults, setAccountDefaults] = useState({ fullName: '', phone: '', email: '' });
+  const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(initialFavorites);
+  const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
+  const [accountDefaults, setAccountDefaults] = useState(initialAccountDefaults);
   const [openInlineSelect, setOpenInlineSelect] = useState<InlineSelectFieldName | null>(null);
 
   const [formData, setFormData] = useState<ExtendedBookingInput>({
@@ -225,6 +238,24 @@ const BookingForm = ({ onDirectionChange, showStepIndicator = true }: BookingFor
       street: false,
     }));
   };
+
+  useEffect(() => {
+    setFavoriteAddresses(initialFavorites);
+  }, [initialFavorites]);
+
+  useEffect(() => {
+    setIsLoggedIn(initialIsLoggedIn);
+  }, [initialIsLoggedIn]);
+
+  useEffect(() => {
+    setAccountDefaults(initialAccountDefaults);
+    setFormData((prev) => ({
+      ...prev,
+      fullName: prev.fullName || initialAccountDefaults.fullName,
+      phone: prev.phone || initialAccountDefaults.phone,
+      email: prev.email || initialAccountDefaults.email,
+    }));
+  }, [initialAccountDefaults]);
 
   useEffect(() => {
     let isMounted = true;
