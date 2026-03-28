@@ -332,22 +332,36 @@ export default function AccountClient({
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
   return (
-    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-24 md:pb-14 md:pt-0">
+    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-0 md:pb-14">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
-          {activeTab === 'start' ? (
-            <section className="space-y-6 pt-4 md:pt-5">
-              <div className="px-1 md:px-2">
-                <div className="flex flex-col gap-3">
-                  <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
-                    {greetingLabel}
-                  </h1>
-                  <p className="text-[1rem] leading-[1.6] text-[#6a7d96] md:text-[1.05rem]">
-                    Hier kannst du deine naechste Fahrt buchen.
-                  </p>
-                </div>
+          <section className="space-y-4 pt-4 md:pt-5">
+            <div className="px-1 md:px-2">
+              <div className="flex flex-col gap-3">
+                <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
+                  {greetingLabel}
+                </h1>
+                <p className="text-[1rem] leading-[1.6] text-[#6a7d96] md:text-[1.05rem]">
+                  {activeTab === 'start'
+                    ? 'Hier kannst du deine naechste Fahrt buchen.'
+                    : activeTab === 'profil'
+                      ? 'Hier verwaltest du dein Profil.'
+                      : 'Hier siehst du deine Fahrten.'}
+                </p>
               </div>
+            </div>
+            <div className="px-1 md:px-2">
+              <AccountMobileBottomNav
+                placement="inline"
+                active={
+                  activeTab === 'start' ? 'start' : activeTab === 'profil' ? 'profil' : 'fahrten'
+                }
+              />
+            </div>
+          </section>
 
+          {activeTab === 'start' ? (
+            <section className="space-y-6">
               <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)] lg:gap-10">
                 <section className="order-1 self-start lg:sticky lg:top-24">
                   <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
@@ -1002,11 +1016,6 @@ export default function AccountClient({
           ) : null}
         </div>
       </div>
-      <AccountMobileBottomNav
-        active={
-          activeTab === 'start' ? 'start' : activeTab === 'profil' ? 'profil' : 'fahrten'
-        }
-      />
     </div>
   );
 }

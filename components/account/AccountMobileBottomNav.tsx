@@ -6,7 +6,13 @@ import { History, House, User } from 'lucide-react';
 
 type MobileNavItem = 'start' | 'fahrten' | 'profil';
 
-export default function AccountMobileBottomNav({ active }: { active?: MobileNavItem }) {
+export default function AccountMobileBottomNav({
+  active,
+  placement = 'bottom',
+}: {
+  active?: MobileNavItem;
+  placement?: 'bottom' | 'inline';
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const items: Array<{
@@ -23,9 +29,19 @@ export default function AccountMobileBottomNav({ active }: { active?: MobileNavI
   return (
     <nav
       aria-label="App Navigation"
-      className="fixed inset-x-0 top-0 z-[90] px-3 pt-3 [padding-top:calc(env(safe-area-inset-top,0px)+0.75rem)] md:hidden"
+      className={
+        placement === 'inline'
+          ? 'md:hidden'
+          : 'fixed inset-x-0 bottom-4 z-[90] px-3 [padding-bottom:calc(env(safe-area-inset-bottom,0px))] md:hidden'
+      }
     >
-      <div className="mx-auto max-w-[25rem] rounded-[1.45rem] border border-[#dbe7f8] bg-white/95 p-2 shadow-[0_20px_40px_rgba(17,17,17,0.12)] backdrop-blur">
+      <div
+        className={
+          placement === 'inline'
+            ? 'rounded-[1.45rem] border border-[#dbe7f8] bg-white p-2 shadow-[0_10px_24px_rgba(17,17,17,0.06)]'
+            : 'mx-auto max-w-[25rem] rounded-[1.45rem] border border-[#dbe7f8] bg-white/95 p-2 shadow-[0_20px_40px_rgba(17,17,17,0.12)] backdrop-blur'
+        }
+      >
         <div className="grid grid-cols-3 gap-2">
           {items.map((item) => {
             const Icon = item.icon;
