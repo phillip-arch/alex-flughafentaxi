@@ -165,7 +165,8 @@ export default function AdminStatsPanel({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-[24px] border border-[#d2d2d7] shadow-sm">
-          <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6">Umsatzverlauf</h3>
+          <div className="flex flex-col gap-8">
+          <h3 className="text-[15px] font-semibold text-[#1d1d1f]">Umsatzverlauf</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={areaChartData}>
@@ -182,10 +183,12 @@ export default function AdminStatsPanel({
               </AreaChart>
             </ResponsiveContainer>
           </div>
+          </div>
         </div>
 
         <div className="bg-white p-6 rounded-[24px] border border-[#d2d2d7] shadow-sm">
-          <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6">Umsatz/Fahrten pro Fahrer</h3>
+          <div className="flex flex-col gap-8">
+          <h3 className="text-[15px] font-semibold text-[#1d1d1f]">Umsatz/Fahrten pro Fahrer</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barChartData} layout="vertical">
@@ -204,11 +207,13 @@ export default function AdminStatsPanel({
               </BarChart>
             </ResponsiveContainer>
           </div>
+          </div>
         </div>
       </div>
 
       <div className="bg-white p-6 rounded-[24px] border border-[#d2d2d7] shadow-sm">
-        <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6">
+        <div className="flex flex-col gap-8">
+        <h3 className="text-[15px] font-semibold text-[#1d1d1f]">
           Fahrten pro Tag ({statsDriverFilter === 'all' ? 'Alle Fahrer' : statsDriverFilter})
         </h3>
         <div className="h-64">
@@ -221,6 +226,7 @@ export default function AdminStatsPanel({
               <Line type="monotone" dataKey="rides" stroke="#0071e3" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
+        </div>
         </div>
       </div>
     </div>

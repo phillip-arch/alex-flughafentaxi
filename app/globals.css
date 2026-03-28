@@ -182,6 +182,33 @@ p {
     gap: 0.9rem;
   }
 
+  .ui-section-intro {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ui-section-intro-eyebrow {
+    margin-bottom: 0.6rem;
+  }
+
+  .ui-section-intro-title {
+    margin-bottom: 1rem;
+  }
+
+  .ui-section-intro-copy {
+    margin-top: 0;
+  }
+
+  @media (min-width: 768px) {
+    .ui-section-intro-eyebrow {
+      margin-bottom: 0.75rem;
+    }
+
+    .ui-section-intro-title {
+      margin-bottom: 1.15rem;
+    }
+  }
+
   .ui-copy-group {
     display: flex;
     flex-direction: column;

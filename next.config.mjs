@@ -1,15 +1,8 @@
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import withPWAInit from 'next-pwa';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const withPWA = withPWAInit({
-  dest: 'public',
-  disable: process.env.NODE_ENV !== 'production',
-  register: true,
-  skipWaiting: true,
-});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -34,4 +27,4 @@ const nextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;
