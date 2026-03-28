@@ -10,11 +10,15 @@ import {
   ChevronRight,
   Clock3,
   Edit,
+  Globe,
   GraduationCap,
   History,
   House,
+  LogOut,
   MapPin,
+  Plus,
   Star,
+  Trash2,
   X,
   XCircle,
 } from 'lucide-react';
@@ -94,6 +98,7 @@ export default function AccountClient({
   const [bookings, setBookings] = useState<Booking[]>(initialBookings || []);
   const [favLabel, setFavLabel] = useState('');
   const [favAddress, setFavAddress] = useState('');
+  const [showFavoriteForm, setShowFavoriteForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [bookingNotice, setBookingNotice] = useState<string | null>(null);
@@ -105,6 +110,7 @@ export default function AccountClient({
   const [activeTab, setActiveTab] = useState<AccountTab>(initialRequestedTab);
   const [bookingDirection, setBookingDirection] = useState<BookingDirection>('to_airport');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isDeleteAccountExpanded, setIsDeleteAccountExpanded] = useState(false);
   const [isDeletingAccount, startDeleteTransition] = useTransition();
   const [isPending, startTransition] = useTransition();
   const [favoritesLoaded, setFavoritesLoaded] = useState(initialFavoritesLoaded);
@@ -146,6 +152,14 @@ export default function AccountClient({
     { label: 'Office', icon: Building2 },
     { label: 'School', icon: GraduationCap },
   ];
+
+  const getFavoriteDisplayLabel = (label: string) => {
+    const normalized = String(label || '').toLowerCase();
+    if (normalized === 'house' || normalized === 'home') return 'Zuhause';
+    if (normalized === 'office' || normalized === 'work') return 'Geschaeftsadresse';
+    if (normalized === 'school') return 'Schule';
+    return label || 'Gespeicherter Ort';
+  };
 
   const getFavoriteIcon = (label: string) => {
     const normalized = String(label || '').toLowerCase();
@@ -404,71 +418,108 @@ export default function AccountClient({
             <section className={`${contentSectionClass} max-w-[68rem]`}>
               <div className={accountSectionStackClass}>
                 {!isEditingProfile ? (
-                  <div className="rounded-[1.35rem] border border-[#e9edf3] bg-white px-4 py-4 shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-2">
-                        <p className="text-[1.15rem] font-semibold tracking-[-0.03em] text-[#111827]">
-                          {name || 'Kein Name hinterlegt'}
-                        </p>
-                        <p className="text-[0.95rem] text-[#6a7d96]">{userEmail}</p>
-                        <p className="text-[0.95rem] text-[#6a7d96]">{phone || '-'}</p>
+                  <div className="space-y-5">
+                    <div className="rounded-[1.35rem] border border-[#e9edf3] bg-white px-4 py-4 shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-2">
+                          <p className="text-[1.15rem] font-semibold tracking-[-0.03em] text-[#111827]">
+                            {name || 'Kein Name hinterlegt'}
+                          </p>
+                          <p className="text-[0.95rem] text-[#6a7d96]">{userEmail}</p>
+                          <p className="text-[0.95rem] text-[#6a7d96]">{phone || '-'}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setError(null);
+                            setIsEditingProfile(true);
+                          }}
+                          aria-label="Profil bearbeiten"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#eef5ff] hover:text-[#0a63ff]"
+                        >
+                          <Edit size={16} />
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setError(null);
-                          setIsEditingProfile(true);
-                        }}
-                        aria-label="Profil bearbeiten"
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#eef5ff] hover:text-[#0a63ff]"
-                      >
-                        <Edit size={16} />
-                      </button>
                     </div>
-                    <div className="mt-5 border-t border-[#edf2f7] pt-5">
+
+                    <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+                      <div className="flex items-start gap-4 py-3">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                          <Globe size={24} strokeWidth={1.8} />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-[1rem] font-medium text-[#111827]">Sprache</p>
+                          <p className="text-[0.95rem] leading-6 text-[#6a6a6a]">Deutsch</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
                       <form action={logout}>
                         <button
                           type="submit"
-                          className={accountSecondaryButtonClass}
+                          className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827]"
                         >
-                          Abmelden
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                            <LogOut size={24} strokeWidth={1.8} />
+                          </span>
+                          <span className="text-[1rem] font-medium text-[#111827]">Abmelden</span>
                         </button>
                       </form>
-                    </div>
-                    <div className="mt-5 border-t border-[#edf2f7] pt-5">
-                      <p className="text-[0.82rem] font-semibold uppercase tracking-[0.14em] text-[#d70015]">
-                        Konto loeschen
-                      </p>
-                      <p className="mt-2 max-w-[32rem] text-[0.95rem] text-[#6a7d96]">
-                        Ihr Login, Profil und Ihre Favoriten werden entfernt. Buchungen bleiben fuer
-                        interne Nachvollziehbarkeit erhalten, aber E-Mail und Telefonnummer werden
-                        daraus entfernt.
-                      </p>
+
+                      <div className="border-t border-[#efebe4]" />
+
                       <button
                         type="button"
                         disabled={isDeletingAccount}
                         onClick={() => {
-                          if (
-                            !confirm(
-                              'Moechten Sie Ihr Konto wirklich loeschen? Ihr Login und Ihre Favoriten werden entfernt.',
-                            )
-                          ) {
-                            return;
-                          }
                           setError(null);
-                          startDeleteTransition(async () => {
-                            const res = await deleteOwnAccount();
-                            if ((res as { error?: string })?.error) {
-                              setError((res as { error: string }).error);
-                              return;
-                            }
-                            window.location.assign('/login?account_deleted=1');
-                          });
+                          setIsDeleteAccountExpanded((prev) => !prev);
                         }}
-                        className={`${accountDangerButtonClass} mt-4 disabled:cursor-not-allowed disabled:opacity-60`}
+                        className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {isDeletingAccount ? 'Konto wird geloescht...' : 'Konto loeschen'}
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                          <Trash2 size={24} strokeWidth={1.8} />
+                        </span>
+                        <span className="text-[1rem] font-medium text-[#111827]">Konto loeschen</span>
                       </button>
+
+                      {isDeleteAccountExpanded ? (
+                        <div className="border-t border-[#efebe4] pb-2 pt-4">
+                          <p className="max-w-[38rem] text-[0.95rem] leading-6 text-[#6a6a6a]">
+                            Ihr Login, Profil und Ihre Favoriten werden entfernt. Buchungen bleiben fuer
+                            interne Nachvollziehbarkeit erhalten, aber E-Mail und Telefonnummer werden
+                            daraus entfernt.
+                          </p>
+                          <div className="mt-4 flex flex-wrap gap-3">
+                            <button
+                              type="button"
+                              disabled={isDeletingAccount}
+                              onClick={() => {
+                                setError(null);
+                                startDeleteTransition(async () => {
+                                  const res = await deleteOwnAccount();
+                                  if ((res as { error?: string })?.error) {
+                                    setError((res as { error: string }).error);
+                                    return;
+                                  }
+                                  window.location.assign('/login?account_deleted=1');
+                                });
+                              }}
+                              className={`${accountDangerButtonClass} disabled:cursor-not-allowed disabled:opacity-60`}
+                            >
+                              {isDeletingAccount ? 'Konto wird geloescht...' : 'Loeschen bestaetigen'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setIsDeleteAccountExpanded(false)}
+                              className={accountSecondaryButtonClass}
+                            >
+                              Abbrechen
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 ) : (
@@ -547,18 +598,36 @@ export default function AccountClient({
                   <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
                 ) : null}
 
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  {favorites.map((fav) => {
-                    const Icon = getFavoriteIcon(fav.name);
-                    return (
-                      <div
-                        key={fav.id}
-                        className="relative rounded-[1.2rem] border border-[#e3ebf5] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)]"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
-                            <Icon size={18} />
-                          </span>
+                <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+                  <div className="space-y-1">
+                    <p className="text-[1.9rem] font-semibold tracking-[-0.05em] text-[#111827]">
+                      Gespeicherte Orte
+                    </p>
+                  </div>
+
+                  <div className="mt-4">
+                    {favorites.map((fav, index) => {
+                      const Icon = getFavoriteIcon(fav.name);
+                      return (
+                        <div
+                          key={fav.id}
+                          className={`flex items-start justify-between gap-3 py-4 ${
+                            index > 0 ? 'border-t border-[#efebe4]' : ''
+                          }`}
+                        >
+                          <div className="flex min-w-0 items-start gap-4">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                              <Icon size={24} strokeWidth={1.8} />
+                            </span>
+                            <div className="min-w-0">
+                              <p className="text-[1rem] font-medium text-[#111827]">
+                                {getFavoriteDisplayLabel(fav.name)}
+                              </p>
+                              <p className="truncate text-[0.95rem] leading-6 text-[#6a6a6a]">
+                                {fav.street} {fav.house_number}, {fav.city} {fav.zip}
+                              </p>
+                            </div>
+                          </div>
                           <button
                             type="button"
                             onClick={() =>
@@ -573,39 +642,66 @@ export default function AccountClient({
                               })
                             }
                             aria-label="Favorit loeschen"
-                            className="flex h-8 w-8 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]"
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#8a8a8a] transition-colors hover:bg-[#fff4f6] hover:text-[#d70015]"
                           >
-                            <X size={14} strokeWidth={2.25} />
+                            <X size={16} strokeWidth={2.1} />
                           </button>
                         </div>
-                        <div className="mt-4 space-y-2">
-                          <p className="text-[1rem] font-semibold text-[#111827]">{fav.name}</p>
-                          <p className="text-[0.95rem] leading-6 text-[#6a7d96]">
-                            {fav.street} {fav.house_number}
-                            <br />
-                            {fav.zip} {fav.city}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
 
-                  {shouldShowFavoritesEmptyState ? (
-                    <div className="rounded-[1.2rem] border border-dashed border-[#dbe7f8] bg-[#f8fbff] px-5 py-6 text-center text-[#6a7d96] sm:col-span-2 xl:col-span-3">
-                      Keine Favoriten gespeichert.
-                    </div>
-                  ) : null}
-                </div>
+                    {favoritePresetItems
+                      .filter((item) => !favorites.some((fav) => fav.name === item.label))
+                      .slice(0, Math.max(0, 2 - favorites.length))
+                      .map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <button
+                            key={item.label}
+                            type="button"
+                            disabled={hasReachedFavoriteLimit}
+                            onClick={() => {
+                              setError(null);
+                              setFavLabel(item.label);
+                              setShowFavoriteForm(true);
+                            }}
+                            className="flex w-full items-center gap-4 border-t border-[#efebe4] py-4 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                              <Icon size={24} strokeWidth={1.8} />
+                            </span>
+                            <span className="text-[1rem] font-medium text-[#2f2f2f]">
+                              {getFavoriteDisplayLabel(item.label)} festlegen
+                            </span>
+                          </button>
+                        );
+                      })}
 
-                <div className="rounded-[1.35rem] border border-[#e3ebf5] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:px-5 md:py-5">
-                  <div className="space-y-1">
-                    <p className="text-[1rem] font-semibold text-[#111827]">Neuen Favoriten speichern</p>
-                    <p className="text-[0.95rem] text-[#6a7d96]">
-                      Nutze ein klares Label und das Format "Strasse Nr., 1234 Stadt".
-                    </p>
+                    {!hasReachedFavoriteLimit ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setError(null);
+                          setShowFavoriteForm(true);
+                        }}
+                        className="flex w-full items-center gap-4 border-t border-[#efebe4] py-4 text-left transition-colors hover:text-[#111827]"
+                      >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                          <Plus size={24} strokeWidth={1.8} />
+                        </span>
+                        <span className="text-[1rem] font-medium text-[#2f2f2f]">Ort hinzufuegen</span>
+                      </button>
+                    ) : null}
+
+                    {shouldShowFavoritesEmptyState && !showFavoriteForm ? (
+                      <p className="border-t border-[#efebe4] py-4 text-[0.95rem] text-[#6a7d96]">
+                        Keine Favoriten gespeichert.
+                      </p>
+                    ) : null}
                   </div>
 
-                  <form
+                  {showFavoriteForm ? (
+                    <form
                     action={() => {
                       setError(null);
                       startTransition(async () => {
@@ -643,9 +739,10 @@ export default function AccountClient({
                         }
                         setFavLabel('');
                         setFavAddress('');
+                        setShowFavoriteForm(false);
                       });
                     }}
-                    className="mt-5 grid grid-cols-1 gap-3"
+                    className="mt-5 grid grid-cols-1 gap-3 border-t border-[#efebe4] pt-5"
                   >
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-[10.75rem_minmax(0,1fr)]">
                       <div className="relative">
@@ -684,6 +781,7 @@ export default function AccountClient({
                       {isPending ? 'Speichert...' : 'Speichern'}
                     </button>
                   </form>
+                  ) : null}
                 </div>
 
                 {error ? <p className="text-sm text-[#d70015]">{error}</p> : null}
