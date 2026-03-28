@@ -660,7 +660,10 @@ export default function AccountClient({
                 <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
                   <div className="space-y-1">
                     <p className="text-[1.9rem] font-semibold tracking-[-0.05em] text-[#111827]">
-                      Gespeicherte Orte
+                      Favoriten
+                    </p>
+                    <p className="text-[0.95rem] leading-6 text-[#6a7d96]">
+                      Gespeicherte Adressen
                     </p>
                   </div>
 

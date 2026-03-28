@@ -947,52 +947,50 @@ const BookingForm = ({
     'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
 
   const StepIndicator = () => (
-    <div className="mt-2 mb-8 flex items-start gap-3 md:mt-0 md:mb-10">
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:gap-1 md:overflow-visible md:pb-0">
-          {stepItems.map((step, index) => {
-            const Icon = step.icon;
-            const isCurrent = currentStep === step.key;
-            const isComplete = currentStep > step.key;
+    <div className="mt-2 mb-8 flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:mt-0 md:mb-10 md:gap-1 md:overflow-visible md:pb-0">
+      {stepItems.map((step, index) => {
+        const Icon = step.icon;
+        const isCurrent = currentStep === step.key;
+        const isComplete = currentStep > step.key;
 
-            return (
-              <React.Fragment key={step.key}>
-                <button
-                  type="button"
-                  onClick={() => handleStepIndicatorClick(step.key)}
-                    className={`inline-flex shrink-0 items-center gap-[0.35rem] rounded-full border px-[0.57rem] py-[0.33rem] text-[10.25px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
-                    isCurrent
-                      ? 'border-[#1679FF] bg-[#1679FF] text-white'
-                      : isComplete
-                        ? 'border-[#1679FF] bg-[#1679FF] text-white'
-                        : 'border-[#ddd8cd] bg-white text-[#111111] hover:border-[#cbc4b6]'
-                  }`}
-                  aria-current={isCurrent ? 'step' : undefined}
-                >
-                    <Icon size={12} strokeWidth={2.2} className="md:h-4 md:w-4" />
-                    <span className="text-[10.25px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
-                  </button>
-                  {index < stepItems.length - 1 ? (
-                    <ChevronRight size={10} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
-                  ) : null}
-              </React.Fragment>
-            );
-          })}
-        </div>
-      </div>
-      <button
-        type="button"
-        aria-label="Informationen"
-        onClick={() => setIsInfoPanelOpen(true)}
-        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff] md:h-10 md:w-10"
-      >
-        <Info size={18} strokeWidth={2.1} />
-      </button>
+        return (
+          <React.Fragment key={step.key}>
+            <button
+              type="button"
+              onClick={() => handleStepIndicatorClick(step.key)}
+                className={`inline-flex shrink-0 items-center gap-[0.35rem] rounded-full border px-[0.57rem] py-[0.33rem] text-[10.25px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
+                isCurrent
+                  ? 'border-[#1679FF] bg-[#1679FF] text-white'
+                  : isComplete
+                    ? 'border-[#1679FF] bg-[#1679FF] text-white'
+                    : 'border-[#ddd8cd] bg-white text-[#111111] hover:border-[#cbc4b6]'
+              }`}
+              aria-current={isCurrent ? 'step' : undefined}
+            >
+                <Icon size={12} strokeWidth={2.2} className="md:h-4 md:w-4" />
+                <span className="text-[10.25px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
+              </button>
+              {index < stepItems.length - 1 ? (
+                <ChevronRight size={10} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
+              ) : null}
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 
   return (
     <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
+      {showStepIndicator ? (
+        <button
+          type="button"
+          aria-label="Informationen"
+          onClick={() => setIsInfoPanelOpen(true)}
+          className="absolute right-3 top-3 z-10 inline-flex items-center justify-center text-[#1679ff] transition-colors hover:text-[#0a63ff] md:right-4 md:top-4"
+        >
+          <Info size={20} strokeWidth={2.1} />
+        </button>
+      ) : null}
       <div
         className={`px-1 pt-2 md:px-2 md:pt-3 ${
           allowExtendedDropdownSpace ? 'pb-0 md:pb-1' : 'pb-2 md:pb-3'
