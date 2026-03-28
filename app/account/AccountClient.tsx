@@ -417,7 +417,7 @@ export default function AccountClient({
                       Hier kannst du deine naechste Fahrt buchen.
                     </p>
                   </div>
-                  <div className="md:min-w-[22rem] md:max-w-[26rem] md:flex-shrink-0">
+                  <div className="w-full md:flex-1">
                     <AccountMobileBottomNav
                       placement="inline"
                       active="start"
@@ -429,8 +429,8 @@ export default function AccountClient({
           ) : (
             <section className="hidden md:block md:pt-[30px]">
               <div className="px-1 md:px-2">
-                <div className="flex justify-end">
-                  <div className="md:min-w-[22rem] md:max-w-[26rem] md:flex-shrink-0">
+                <div className="w-full">
+                  <div className="w-full">
                     <AccountMobileBottomNav
                       placement="inline"
                       active={activeTab === 'profil' ? 'profil' : 'fahrten'}

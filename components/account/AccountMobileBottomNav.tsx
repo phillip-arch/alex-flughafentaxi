@@ -30,18 +30,18 @@ export default function AccountMobileBottomNav({
       aria-label="App Navigation"
       className={
         placement === 'inline'
-          ? 'hidden md:block'
+          ? 'hidden md:block md:w-full'
           : 'fixed inset-x-0 bottom-0 z-[90] md:hidden'
       }
     >
       <div
         className={
           placement === 'inline'
-            ? 'rounded-[1.45rem] border border-[#dbe7f8] bg-white p-2 shadow-[0_10px_24px_rgba(17,17,17,0.06)]'
+            ? 'w-full rounded-[1.45rem] border border-[#dbe7f8] bg-white p-2 shadow-[0_10px_24px_rgba(17,17,17,0.06)]'
             : 'w-full border-t border-[#dbe7f8] bg-white/98 px-4 pt-1.5 shadow-[0_-10px_30px_rgba(17,17,17,0.08)] backdrop-blur [padding-bottom:calc(env(safe-area-inset-bottom,0px)+10px)]'
         }
       >
-        <div className="grid grid-cols-3 gap-3">
+        <div className={placement === 'inline' ? 'ml-auto grid w-full max-w-[26rem] grid-cols-3 gap-3' : 'grid grid-cols-3 gap-3'}>
           {items.map((item) => {
             const itemUrl = new URL(item.href, 'https://app.local');
             const currentTab = searchParams.get('tab') || '';
