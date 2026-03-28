@@ -1169,17 +1169,27 @@ const BookingForm = ({
         <div className="fixed inset-0 z-[140] bg-white/96 text-[#111827] backdrop-blur-sm md:bg-transparent md:backdrop-blur-0">
           <div className="flex min-h-screen md:min-h-full md:justify-end md:p-0">
             <div className="min-h-screen w-full animate-in slide-in-from-right-full duration-300 md:h-screen md:w-[46vw] md:min-w-[34rem] md:max-w-[48rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
-              <div className="h-full overflow-y-auto px-6 pt-[30px] pb-8 md:px-8 md:py-8">
-              <div className="flex items-center justify-between gap-3 pb-6">
-                <button
-                  type="button"
-                  onClick={() => setIsInfoPanelOpen(false)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827] md:hidden"
-                  aria-label="Zurueck"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <div className="min-w-0 flex-1">
+              <div className="h-full overflow-y-auto px-6 pt-[24px] pb-8 md:px-8 md:py-8">
+              <div className="pb-6">
+                <div className="flex items-start justify-between gap-3 md:items-center">
+                  <button
+                    type="button"
+                    onClick={() => setIsInfoPanelOpen(false)}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827] md:hidden"
+                    aria-label="Zurueck"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsInfoPanelOpen(false)}
+                    className="hidden md:inline-flex md:h-11 md:w-11 md:items-center md:justify-center md:rounded-full md:border md:border-[#e5e7eb] md:bg-white md:text-[#111827]"
+                    aria-label="Schliessen"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+                <div className="mt-6 min-w-0">
                   <p className="text-[0.82rem] font-semibold uppercase tracking-[0.22em] text-[#1679ff]">
                     Informationen
                   </p>
@@ -1190,14 +1200,6 @@ const BookingForm = ({
                     Alle wichtigen Hinweise fuer Ankunft, Vorlaufzeit und Zahlung direkt neben der Buchung.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsInfoPanelOpen(false)}
-                  className="hidden md:inline-flex md:h-11 md:w-11 md:items-center md:justify-center md:rounded-full md:border md:border-[#e5e7eb] md:bg-white md:text-[#111827]"
-                  aria-label="Schliessen"
-                >
-                  <X size={18} />
-                </button>
               </div>
 
               <div className="space-y-4 md:space-y-5">
