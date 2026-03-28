@@ -105,12 +105,19 @@ type StepperFieldName =
 
 type InlineSelectFieldName = StepperFieldName;
 
+const EMPTY_FAVORITES: FavoriteAddress[] = [];
+const EMPTY_ACCOUNT_DEFAULTS = {
+  fullName: '',
+  phone: '',
+  email: '',
+};
+
 const BookingForm = ({
   onDirectionChange,
   showStepIndicator = true,
-  initialFavorites = [],
+  initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
-  initialAccountDefaults = { fullName: '', phone: '', email: '' },
+  initialAccountDefaults = EMPTY_ACCOUNT_DEFAULTS,
 }: BookingFormProps) => {
   const router = useRouter();
   const pathname = usePathname();

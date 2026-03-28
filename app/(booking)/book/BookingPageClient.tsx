@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import BookingForm from '@/components/BookingForm';
 import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
 import { BookingDirection, BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
@@ -16,11 +16,13 @@ type FavoriteAddress = {
   house_number: string;
 };
 
+const EMPTY_FAVORITES: FavoriteAddress[] = [];
+
 export default function BookingPageClient({
   initialName = '',
   initialPhone = '',
   initialEmail = '',
-  initialFavorites = [],
+  initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
 }: {
   initialName?: string;
@@ -31,6 +33,14 @@ export default function BookingPageClient({
 }) {
   const [direction, setDirection] = useState<BookingDirection>('to_airport');
   const isAppSurface = getAppSurface() === 'app';
+  const initialAccountDefaults = useMemo(
+    () => ({
+      fullName: initialName,
+      phone: initialPhone,
+      email: initialEmail,
+    }),
+    [initialName, initialPhone, initialEmail],
+  );
 
   return (
     <>
@@ -44,11 +54,7 @@ export default function BookingPageClient({
                   onDirectionChange={setDirection}
                   initialFavorites={initialFavorites}
                   initialIsLoggedIn={initialIsLoggedIn}
-                  initialAccountDefaults={{
-                    fullName: initialName,
-                    phone: initialPhone,
-                    email: initialEmail,
-                  }}
+                  initialAccountDefaults={initialAccountDefaults}
                 />
               </div>
             </section>
