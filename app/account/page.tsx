@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getAppSurface } from '@/lib/routing/surfaces';
 import AccountClient from './AccountClient';
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ type AccountPageProps = {
 
 export default async function AccountPage({ searchParams }: AccountPageProps) {
   const supabase = await createClient();
+  const isAppSurface = getAppSurface() === 'app';
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -27,11 +29,14 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
   if (!user) redirect('/login');
   const params = searchParams ? await searchParams : undefined;
   const requestedTab =
+    (isAppSurface && params?.tab === 'start') ||
     params?.tab === 'buchungsverlauf' ||
     params?.tab === 'profil' ||
     params?.tab === 'favoriten'
       ? params.tab
-      : 'buchungsverlauf';
+      : isAppSurface
+        ? 'start'
+        : 'buchungsverlauf';
 
   const profilePromise = supabase
     .from('profiles')
@@ -40,7 +45,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
     .maybeSingle();
 
   const favoritesPromise =
-    requestedTab === 'favoriten'
+    requestedTab === 'favoriten' || requestedTab === 'start'
       ? supabase
           .from('saved_addresses')
           .select('id, name, city, zip, street, house_number')
@@ -102,7 +107,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         initialFavorites={(favorites || []) as any}
         initialBookings={bookingsWithReviews as any}
         initialRequestedTab={requestedTab}
-        initialFavoritesLoaded={requestedTab === 'favoriten'}
+        initialFavoritesLoaded={requestedTab === 'favoriten' || requestedTab === 'start'}
         initialBookingsLoaded={requestedTab === 'buchungsverlauf'}
       />
     </main>

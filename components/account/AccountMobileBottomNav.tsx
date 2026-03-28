@@ -15,7 +15,7 @@ export default function AccountMobileBottomNav({ active }: { active?: MobileNavI
     href: string;
     icon: typeof House;
   }> = [
-    { id: 'start', label: 'Start', href: '/book', icon: House },
+    { id: 'start', label: 'Start', href: '/account?tab=start', icon: House },
     { id: 'fahrten', label: 'Fahrten', href: '/account?tab=buchungsverlauf', icon: History },
     { id: 'profil', label: 'Profil', href: '/account?tab=profil', icon: User },
   ];

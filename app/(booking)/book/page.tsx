@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getAppSurface } from '@/lib/routing/surfaces';
 import BookingPageClient from './BookingPageClient';
 
 export const metadata: Metadata = {
@@ -8,6 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default async function BookingPage() {
+  if (getAppSurface() === 'app') {
+    redirect('/account?tab=start');
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

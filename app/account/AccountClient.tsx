@@ -19,6 +19,8 @@ import {
   XCircle,
 } from 'lucide-react';
 import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
+import BookingForm from '@/components/BookingForm';
+import { BookingDirection, BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
 import { logout } from '@/app/(auth)/actions';
 import { parseBookingNotes } from '@/lib/booking/notes';
 import {
@@ -32,7 +34,7 @@ import {
   updateAccountProfile,
 } from './actions';
 
-type AccountTab = 'profil' | 'favoriten' | 'buchungsverlauf';
+type AccountTab = 'start' | 'profil' | 'favoriten' | 'buchungsverlauf';
 
 type Favorite = {
   id: string;
@@ -101,6 +103,7 @@ export default function AccountClient({
   const [reviewSavingId, setReviewSavingId] = useState<string | null>(null);
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('upcoming');
   const [activeTab, setActiveTab] = useState<AccountTab>(initialRequestedTab);
+  const [bookingDirection, setBookingDirection] = useState<BookingDirection>('to_airport');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isDeletingAccount, startDeleteTransition] = useTransition();
   const [isPending, startTransition] = useTransition();
@@ -116,6 +119,21 @@ export default function AccountClient({
   const bookingsMonthGroupClass = 'space-y-3';
   const bookingsMonthTitleClass =
     'text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.8rem]';
+  const firstName = String(name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)[0];
+  const currentHour = Number(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Berlin',
+      hour: '2-digit',
+      hour12: false,
+    })
+      .formatToParts(new Date())
+      .find((part) => part.type === 'hour')?.value ?? '0',
+  );
+  const greetingBase = currentHour < 11 ? 'Guten Morgen' : currentHour < 18 ? 'Guten Tag' : 'Guten Abend';
+  const greetingLabel = firstName ? `${greetingBase} ${firstName}!` : `${greetingBase}!`;
   const accountSecondaryButtonClass =
     'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#dbe7f8] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]';
   const accountDangerButtonClass =
@@ -317,6 +335,46 @@ export default function AccountClient({
     <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-0 md:pb-14">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
+          {activeTab === 'start' ? (
+            <section className="space-y-6 pt-4 md:pt-5">
+              <div className="px-1 md:px-2">
+                <div className="flex flex-col gap-3">
+                  <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
+                    {greetingLabel}
+                  </h1>
+                  <p className="text-[1rem] leading-[1.6] text-[#6a7d96] md:text-[1.05rem]">
+                    Hier kannst du deine naechste Fahrt buchen.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)] lg:gap-10">
+                <section className="order-1 self-start lg:sticky lg:top-24">
+                  <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
+                    <BookingForm
+                      onDirectionChange={setBookingDirection}
+                      initialFavorites={favorites}
+                      initialIsLoggedIn
+                      initialAccountDefaults={{
+                        fullName: name,
+                        phone,
+                        email: userEmail,
+                      }}
+                    />
+                  </div>
+                </section>
+
+                <aside className="order-3 hidden self-start lg:order-2 lg:sticky lg:top-24 lg:block">
+                  <BookingInfoPanel direction={bookingDirection} />
+                </aside>
+              </div>
+
+              <section className="lg:hidden">
+                <BookingInfoPanel direction={bookingDirection} />
+              </section>
+            </section>
+          ) : null}
+
           {activeTab === 'profil' ? (
             <section className={`${contentSectionClass} max-w-[68rem]`}>
               <div className={accountSectionStackClass}>
@@ -944,7 +1002,11 @@ export default function AccountClient({
           ) : null}
         </div>
       </div>
-      <AccountMobileBottomNav active={activeTab === 'profil' ? 'profil' : 'fahrten'} />
+      <AccountMobileBottomNav
+        active={
+          activeTab === 'start' ? 'start' : activeTab === 'profil' ? 'profil' : 'fahrten'
+        }
+      />
     </div>
   );
 }
