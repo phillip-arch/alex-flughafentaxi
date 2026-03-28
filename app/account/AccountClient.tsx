@@ -201,7 +201,6 @@ export default function AccountClient({
     const nextSearch = params.toString();
     return `${pathname}${nextSearch ? `?${nextSearch}` : ''}`;
   };
-  const hasReachedFavoriteLimit = favorites.length >= 3;
   const favoriteSlotItems = [
     {
       title: 'Home',
@@ -516,7 +515,7 @@ export default function AccountClient({
                           <p className="text-[1rem] font-medium text-[#111827]">Sprache</p>
                           <p className="text-[0.95rem] leading-6 text-[#6a6a6a]">{activeLanguageLabel}</p>
                         </div>
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                        <span className="hidden h-10 w-10 shrink-0 items-center justify-center text-[#676767] md:flex">
                           <ChevronDown
                             size={18}
                             strokeWidth={2}
@@ -708,7 +707,6 @@ export default function AccountClient({
                         <button
                           key={slot.emptyLabel}
                           type="button"
-                          disabled={hasReachedFavoriteLimit}
                           onClick={() => {
                             setError(null);
                             if (window.innerWidth < 768) {
@@ -717,7 +715,7 @@ export default function AccountClient({
                             }
                             setShowFavoriteForm(true);
                           }}
-                          className={`flex w-full items-center gap-4 py-4 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={`flex w-full items-center gap-4 py-4 text-left transition-colors hover:text-[#111827] ${
                             index > 0 ? 'border-t border-[#efebe4]' : ''
                           }`}
                         >
@@ -736,11 +734,6 @@ export default function AccountClient({
                     action={() => {
                       setError(null);
                       startTransition(async () => {
-                        if (favorites.length >= 3) {
-                          setError('Maximal 3 Favoriten sind moeglich.');
-                          return;
-                        }
-
                         const parsedAddress = parseFavoriteAddressInput(favAddress);
                         if (!parsedAddress) {
                           setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
@@ -774,13 +767,13 @@ export default function AccountClient({
                         onChange={(e) => setFavAddress(e.target.value)}
                         className="ui-input"
                         placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
-                        disabled={isPending || hasReachedFavoriteLimit}
+                        disabled={isPending}
                         required
                       />
                     </div>
                     <button
                       type="submit"
-                      disabled={isPending || hasReachedFavoriteLimit}
+                      disabled={isPending}
                       className="ui-button-booking-primary w-full sm:w-auto sm:min-w-[220px] sm:justify-self-start"
                     >
                       {isPending ? 'Speichert...' : 'Speichern'}
@@ -1209,11 +1202,6 @@ export default function AccountClient({
                 action={() => {
                   setError(null);
                   startTransition(async () => {
-                    if (favorites.length >= 3) {
-                      setError('Maximal 3 Favoriten sind moeglich.');
-                      return;
-                    }
-
                     const parsedAddress = parseFavoriteAddressInput(favAddress);
                     if (!parsedAddress) {
                       setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
@@ -1247,12 +1235,12 @@ export default function AccountClient({
                   onChange={(e) => setFavAddress(e.target.value)}
                   className="ui-input"
                   placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
-                  disabled={isPending || hasReachedFavoriteLimit}
+                  disabled={isPending}
                   required
                 />
                 <button
                   type="submit"
-                  disabled={isPending || hasReachedFavoriteLimit}
+                  disabled={isPending}
                   className="ui-button-booking-primary w-full justify-center"
                 >
                   {isPending ? 'Speichert...' : 'Speichern'}

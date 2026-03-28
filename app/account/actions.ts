@@ -174,20 +174,6 @@ export async function addFavoriteAddress(formData: FormData) {
 
   if (!parsed.success) return { error: 'Bitte Favorit korrekt eingeben.' };
 
-  const { count, error: countError } = await supabaseAdmin
-    .from('saved_addresses')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id);
-
-  if (countError) {
-    console.error('addFavoriteAddress count failed:', countError);
-    return { error: 'Favorit konnte nicht gespeichert werden.' };
-  }
-
-  if ((count || 0) >= 3) {
-    return { error: 'Maximal 3 Favoriten erlaubt.' };
-  }
-
   const { data, error } = await supabaseAdmin
     .from('saved_addresses')
     .insert({
