@@ -30,7 +30,7 @@ export default async function ConfirmBookingPage({
       <>
         {!isAppSurface ? <NavbarClient /> : null}
         <main className="bg-white">
-          <section className={`app-container pb-32 md:pb-28 ${isAppSurface ? 'pt-4 md:pt-5' : 'pt-28 md:pt-32'}`}>
+          <section className={`app-container pb-32 md:pb-28 ${isAppSurface ? 'pt-24 md:pt-0' : 'pt-28 md:pt-32'}`}>
             <div className="mx-auto max-w-[57.5rem]">
               <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
                 <div className="mx-auto flex max-w-[42rem] flex-col items-center text-center">
@@ -72,7 +72,7 @@ export default async function ConfirmBookingPage({
     <>
       {!isAppSurface ? <NavbarClient /> : null}
       <main className="bg-white">
-        <section className={`app-container pb-32 md:pb-28 ${isAppSurface ? 'pt-4 md:pt-5' : 'pt-28 md:pt-32'}`}>
+        <section className={`app-container pb-32 md:pb-28 ${isAppSurface ? 'pt-24 md:pt-0' : 'pt-28 md:pt-32'}`}>
           <div className="mx-auto max-w-[57.5rem]">
             <ConfirmClient token={token} driverId={driver} />
           </div>

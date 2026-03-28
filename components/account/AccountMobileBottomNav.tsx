@@ -23,7 +23,7 @@ export default function AccountMobileBottomNav({ active }: { active?: MobileNavI
   return (
     <nav
       aria-label="App Navigation"
-      className="fixed inset-x-0 bottom-4 z-[90] px-3 [padding-bottom:calc(env(safe-area-inset-bottom,0px))] md:hidden"
+      className="fixed inset-x-0 top-0 z-[90] px-3 pt-3 [padding-top:calc(env(safe-area-inset-top,0px)+0.75rem)] md:hidden"
     >
       <div className="mx-auto max-w-[25rem] rounded-[1.45rem] border border-[#dbe7f8] bg-white/95 p-2 shadow-[0_20px_40px_rgba(17,17,17,0.12)] backdrop-blur">
         <div className="grid grid-cols-3 gap-2">

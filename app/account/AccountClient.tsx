@@ -332,7 +332,7 @@ export default function AccountClient({
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
   return (
-    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-0 md:pb-14">
+    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-24 md:pb-14 md:pt-0">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
           {activeTab === 'start' ? (

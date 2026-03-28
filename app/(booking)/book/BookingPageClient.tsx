@@ -36,7 +36,7 @@ export default function BookingPageClient({
     <>
       {!isAppSurface ? <NavbarClient /> : null}
       <section className="bg-white">
-        <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-28 md:pt-28'}`}>
+        <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-24 md:pt-0' : 'pt-28 md:pt-28'}`}>
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,620px)_minmax(320px,1fr)] lg:gap-10">
             <section className="order-1 self-start lg:sticky lg:top-24">
               <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
