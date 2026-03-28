@@ -24,7 +24,6 @@ export default async function BookingPage() {
   let initialEmail = '';
   let initialFavorites: Array<{
     id: string;
-    name: string;
     city: string;
     zip: string;
     street: string;
@@ -36,7 +35,7 @@ export default async function BookingPage() {
       supabase.from('profiles').select('full_name, phone').eq('id', user.id).maybeSingle(),
       supabase
         .from('saved_addresses')
-        .select('id, name, city, zip, street, house_number')
+        .select('id, city, zip, street, house_number')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true }),
     ]);

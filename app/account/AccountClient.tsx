@@ -13,7 +13,6 @@ import {
   Clock3,
   Edit,
   Globe,
-  GraduationCap,
   History,
   House,
   LogOut,
@@ -44,7 +43,6 @@ type AccountTab = 'start' | 'profil' | 'favoriten' | 'buchungsverlauf';
 
 type Favorite = {
   id: string;
-  name: string;
   city: string;
   zip: string;
   street: string;
@@ -73,7 +71,6 @@ type Booking = {
 };
 
 type BookingFilter = 'all' | 'upcoming' | 'previous' | 'canceled' | 'to_airport' | 'from_airport';
-type FavoritePreset = 'House' | 'Office' | 'School';
 type AccountPanel = 'language' | 'delete' | 'favorite-add' | null;
 
 const languageOptions = [
@@ -114,7 +111,6 @@ export default function AccountClient({
   const [phone, setPhone] = useState(initialPhone || '');
   const [favorites, setFavorites] = useState<Favorite[]>(initialFavorites || []);
   const [bookings, setBookings] = useState<Booking[]>(initialBookings || []);
-  const [favLabel, setFavLabel] = useState('');
   const [favAddress, setFavAddress] = useState('');
   const [showFavoriteForm, setShowFavoriteForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -206,29 +202,26 @@ export default function AccountClient({
     return `${pathname}${nextSearch ? `?${nextSearch}` : ''}`;
   };
   const hasReachedFavoriteLimit = favorites.length >= 3;
-  const shouldShowFavoritesEmptyState =
-    activeTab === 'favoriten' && favoritesLoaded && !favoritesLoading && favorites.length === 0;
-  const favoritePresetItems: { label: FavoritePreset; icon: typeof House }[] = [
-    { label: 'House', icon: House },
-    { label: 'Office', icon: Building2 },
-    { label: 'School', icon: GraduationCap },
-  ];
-
-  const getFavoriteDisplayLabel = (label: string) => {
-    const normalized = String(label || '').toLowerCase();
-    if (normalized === 'house' || normalized === 'home') return 'Zuhause';
-    if (normalized === 'office' || normalized === 'work') return 'Geschaeftsadresse';
-    if (normalized === 'school') return 'Schule';
-    return label || 'Gespeicherter Ort';
-  };
-
-  const getFavoriteIcon = (label: string) => {
-    const normalized = String(label || '').toLowerCase();
-    if (normalized === 'house' || normalized === 'home') return House;
-    if (normalized === 'office' || normalized === 'work') return Building2;
-    if (normalized === 'school') return GraduationCap;
-    return MapPin;
-  };
+  const favoriteSlotItems = [
+    {
+      title: 'Home',
+      emptyLabel: 'Add Home',
+      filledIcon: House,
+      emptyIcon: House,
+    },
+    {
+      title: 'Work',
+      emptyLabel: 'Add Work',
+      filledIcon: Building2,
+      emptyIcon: Building2,
+    },
+    {
+      title: 'Place',
+      emptyLabel: 'Add a new place',
+      filledIcon: MapPin,
+      emptyIcon: Plus,
+    },
+  ] as const;
 
   const fmtPrice = (value: number | null | undefined) =>
     `${new Intl.NumberFormat('de-AT', {
@@ -317,7 +310,6 @@ export default function AccountClient({
     const houseNumber = houseNumberMatch[2].trim();
 
     return {
-      name: street,
       city,
       zip,
       street,
@@ -457,6 +449,7 @@ export default function AccountClient({
                   <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
                     <BookingForm
                       onDirectionChange={setBookingDirection}
+                      showStepIndicator={false}
                       initialFavorites={favorites}
                       initialIsLoggedIn
                       initialAccountDefaults={{
@@ -473,9 +466,6 @@ export default function AccountClient({
                 </aside>
               </div>
 
-              <section className="lg:hidden">
-                <BookingInfoPanel direction={bookingDirection} />
-              </section>
             </section>
           ) : null}
 
@@ -668,106 +658,77 @@ export default function AccountClient({
                   </div>
 
                   <div className="mt-4">
-                    {favorites.map((fav, index) => {
-                      const Icon = getFavoriteIcon(fav.name);
+                    {favoriteSlotItems.map((slot, index) => {
+                      const favorite = favorites[index];
+                      const FilledIcon = slot.filledIcon;
+                      const EmptyIcon = slot.emptyIcon;
+
+                      if (favorite) {
+                        return (
+                          <div
+                            key={favorite.id}
+                            className={`flex items-start justify-between gap-3 py-4 ${
+                              index > 0 ? 'border-t border-[#efebe4]' : ''
+                            }`}
+                          >
+                            <div className="flex min-w-0 items-start gap-4">
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                                <FilledIcon size={24} strokeWidth={1.8} />
+                              </span>
+                              <div className="min-w-0">
+                                <p className="text-[1rem] font-medium text-[#111827]">{slot.title}</p>
+                                <p className="truncate text-[0.95rem] leading-6 text-[#6a6a6a]">
+                                  {favorite.street} {favorite.house_number}, {favorite.city} {favorite.zip}
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                startTransition(async () => {
+                                  if (!confirm('Moechten Sie diesen Favoriten loeschen?')) return;
+                                  const res = await deleteFavoriteAddress(favorite.id);
+                                  if ((res as { error?: string })?.error) {
+                                    setError((res as { error: string }).error);
+                                    return;
+                                  }
+                                  setFavorites((prev) => prev.filter((f) => f.id !== favorite.id));
+                                })
+                              }
+                              aria-label="Favorit loeschen"
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#8a8a8a] transition-colors hover:bg-[#fff4f6] hover:text-[#d70015]"
+                            >
+                              <X size={16} strokeWidth={2.1} />
+                            </button>
+                          </div>
+                        );
+                      }
+
                       return (
-                        <div
-                          key={fav.id}
-                          className={`flex items-start justify-between gap-3 py-4 ${
+                        <button
+                          key={slot.emptyLabel}
+                          type="button"
+                          disabled={hasReachedFavoriteLimit}
+                          onClick={() => {
+                            setError(null);
+                            if (window.innerWidth < 768) {
+                              setOpenPanel('favorite-add');
+                              return;
+                            }
+                            setShowFavoriteForm(true);
+                          }}
+                          className={`flex w-full items-center gap-4 py-4 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-50 ${
                             index > 0 ? 'border-t border-[#efebe4]' : ''
                           }`}
                         >
-                          <div className="flex min-w-0 items-start gap-4">
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                              <Icon size={24} strokeWidth={1.8} />
-                            </span>
-                            <div className="min-w-0">
-                              <p className="text-[1rem] font-medium text-[#111827]">
-                                {getFavoriteDisplayLabel(fav.name)}
-                              </p>
-                              <p className="truncate text-[0.95rem] leading-6 text-[#6a6a6a]">
-                                {fav.street} {fav.house_number}, {fav.city} {fav.zip}
-                              </p>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              startTransition(async () => {
-                                if (!confirm('Moechten Sie diesen Favoriten loeschen?')) return;
-                                const res = await deleteFavoriteAddress(fav.id);
-                                if ((res as { error?: string })?.error) {
-                                  setError((res as { error: string }).error);
-                                  return;
-                                }
-                                setFavorites((prev) => prev.filter((f) => f.id !== fav.id));
-                              })
-                            }
-                            aria-label="Favorit loeschen"
-                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#8a8a8a] transition-colors hover:bg-[#fff4f6] hover:text-[#d70015]"
-                          >
-                            <X size={16} strokeWidth={2.1} />
-                          </button>
-                        </div>
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#111111]">
+                            <EmptyIcon size={24} strokeWidth={1.8} />
+                          </span>
+                          <span className="text-[1rem] font-medium text-[#2f2f2f]">{slot.emptyLabel}</span>
+                        </button>
                       );
                     })}
 
-                    {favoritePresetItems
-                      .filter((item) => !favorites.some((fav) => fav.name === item.label))
-                      .slice(0, Math.max(0, 2 - favorites.length))
-                      .map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <button
-                            key={item.label}
-                            type="button"
-                            disabled={hasReachedFavoriteLimit}
-                            onClick={() => {
-                              setError(null);
-                              setFavLabel(item.label);
-                              if (window.innerWidth < 768) {
-                                setOpenPanel('favorite-add');
-                                return;
-                              }
-                              setShowFavoriteForm(true);
-                            }}
-                            className="flex w-full items-center gap-4 border-t border-[#efebe4] py-4 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                              <Icon size={24} strokeWidth={1.8} />
-                            </span>
-                            <span className="text-[1rem] font-medium text-[#2f2f2f]">
-                              {getFavoriteDisplayLabel(item.label)} festlegen
-                            </span>
-                          </button>
-                        );
-                      })}
-
-                    {!hasReachedFavoriteLimit ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setError(null);
-                          if (window.innerWidth < 768) {
-                            setOpenPanel('favorite-add');
-                            return;
-                          }
-                          setShowFavoriteForm(true);
-                        }}
-                        className="flex w-full items-center gap-4 border-t border-[#efebe4] py-4 text-left transition-colors hover:text-[#111827]"
-                      >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                          <Plus size={24} strokeWidth={1.8} />
-                        </span>
-                        <span className="text-[1rem] font-medium text-[#2f2f2f]">Ort hinzufuegen</span>
-                      </button>
-                    ) : null}
-
-                    {shouldShowFavoritesEmptyState && !showFavoriteForm ? (
-                      <p className="border-t border-[#efebe4] py-4 text-[0.95rem] text-[#6a7d96]">
-                        Keine Favoriten gespeichert.
-                      </p>
-                    ) : null}
                   </div>
 
                   {showFavoriteForm ? (
@@ -786,13 +747,7 @@ export default function AccountClient({
                           return;
                         }
 
-                        if (!favLabel.trim()) {
-                          setError('Bitte waehlen Sie House, Office oder School.');
-                          return;
-                        }
-
                         const formData = new FormData();
-                        formData.set('name', favLabel.trim());
                         formData.set('city', parsedAddress.city);
                         formData.set('zip', parsedAddress.zip);
                         formData.set('street', parsedAddress.street);
@@ -807,33 +762,13 @@ export default function AccountClient({
                         if (inserted?.id) {
                           setFavorites((prev) => [...prev, inserted]);
                         }
-                        setFavLabel('');
                         setFavAddress('');
                         setShowFavoriteForm(false);
                       });
                     }}
                     className="mt-5 grid grid-cols-1 gap-3 border-t border-[#efebe4] pt-5"
                   >
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-[10.75rem_minmax(0,1fr)]">
-                      <div className="relative">
-                        <select
-                          value={favLabel}
-                          onChange={(e) => setFavLabel(e.target.value)}
-                          className="ui-input appearance-none pr-10"
-                          disabled={isPending || hasReachedFavoriteLimit}
-                          required
-                        >
-                          <option value="">Label</option>
-                          {favoritePresetItems.map((item) => (
-                            <option key={item.label} value={item.label}>
-                              {item.label}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">
-                          <ChevronDown size={16} />
-                        </div>
-                      </div>
+                    <div className="grid grid-cols-1 gap-3">
                       <input
                         value={favAddress}
                         onChange={(e) => setFavAddress(e.target.value)}
@@ -1252,13 +1187,12 @@ export default function AccountClient({
         <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
           <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
             <div className="flex items-center gap-3 pb-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenPanel(null);
-                  setFavLabel('');
-                  setFavAddress('');
-                }}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenPanel(null);
+                    setFavAddress('');
+                  }}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
                 aria-label="Zurueck"
               >
@@ -1286,13 +1220,7 @@ export default function AccountClient({
                       return;
                     }
 
-                    if (!favLabel.trim()) {
-                      setError('Bitte waehlen Sie House, Office oder School.');
-                      return;
-                    }
-
                     const formData = new FormData();
-                    formData.set('name', favLabel.trim());
                     formData.set('city', parsedAddress.city);
                     formData.set('zip', parsedAddress.zip);
                     formData.set('street', parsedAddress.street);
@@ -1307,7 +1235,6 @@ export default function AccountClient({
                     if (inserted?.id) {
                       setFavorites((prev) => [...prev, inserted]);
                     }
-                    setFavLabel('');
                     setFavAddress('');
                     setShowFavoriteForm(false);
                     setOpenPanel(null);
@@ -1315,25 +1242,6 @@ export default function AccountClient({
                 }}
                 className="grid grid-cols-1 gap-3"
               >
-                <div className="relative">
-                  <select
-                    value={favLabel}
-                    onChange={(e) => setFavLabel(e.target.value)}
-                    className="ui-input appearance-none pr-10"
-                    disabled={isPending || hasReachedFavoriteLimit}
-                    required
-                  >
-                    <option value="">Label</option>
-                    {favoritePresetItems.map((item) => (
-                      <option key={item.label} value={item.label}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">
-                    <ChevronDown size={16} />
-                  </div>
-                </div>
                 <input
                   value={favAddress}
                   onChange={(e) => setFavAddress(e.target.value)}

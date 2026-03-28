@@ -20,7 +20,7 @@ export default function AccountMobileBottomNav({
     label: string;
     href: string;
   }> = [
-    { id: 'start', label: 'Start', href: '/account?tab=start' },
+    { id: 'start', label: 'Home', href: '/account?tab=start' },
     { id: 'fahrten', label: 'Fahrten', href: '/account?tab=buchungsverlauf' },
     { id: 'profil', label: 'Profil', href: '/account?tab=profil' },
   ];

@@ -19,7 +19,6 @@ import {
   Car,
   CreditCard,
   Building2,
-  GraduationCap,
   Users,
   Briefcase,
   ShoppingBag,
@@ -48,7 +47,6 @@ const PENDING_BOOKING_STORAGE_KEY = 'pending-booking-form';
 
 interface FavoriteAddress {
   id: string;
-  name: string;
   city: string;
   zip: string;
   street: string;
@@ -114,6 +112,7 @@ const EMPTY_ACCOUNT_DEFAULTS = {
   phone: '',
   email: '',
 };
+const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 
 const BookingForm = ({
   onDirectionChange,
@@ -299,7 +298,7 @@ const BookingForm = ({
         supabase.from('profiles').select('full_name, phone').eq('id', user.id).maybeSingle(),
         supabase
           .from('saved_addresses')
-          .select('id, name, city, zip, street, house_number')
+          .select('id, city, zip, street, house_number')
           .eq('user_id', user.id)
           .order('created_at', { ascending: true }),
       ]);
@@ -577,19 +576,11 @@ const BookingForm = ({
   const renderFavoriteAddressButtons = () => {
     if (!isAppSurface || !isLoggedIn || favoriteAddresses.length === 0) return null;
 
-    const getFavoriteIcon = (label: string) => {
-      const normalized = String(label || '').toLowerCase();
-      if (normalized === 'house' || normalized === 'home') return House;
-      if (normalized === 'office' || normalized === 'work') return Building2;
-      if (normalized === 'school') return GraduationCap;
-      return MapPin;
-    };
-
     return (
       <div className="flex flex-wrap items-start gap-2">
-        {favoriteAddresses.map((favorite) => (
+        {favoriteAddresses.map((favorite, index) => (
           (() => {
-            const Icon = getFavoriteIcon(favorite.name);
+            const Icon = FAVORITE_ADDRESS_ICONS[index] || MapPin;
 
             return (
               <button
@@ -597,7 +588,7 @@ const BookingForm = ({
                 type="button"
                 onClick={() => applyFavoriteAddress(favorite)}
                 title={`${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`}
-                aria-label={`${favorite.name}: ${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`}
+                aria-label={`${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`}
                 className="group flex cursor-pointer items-center justify-center rounded-full border border-transparent bg-transparent p-0 text-center text-[11px] font-medium text-[#111111] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2"
               >
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff] transition-all duration-150 group-hover:scale-105 group-hover:bg-[#dfeeff] group-active:scale-[0.97]">

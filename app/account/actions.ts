@@ -14,7 +14,6 @@ const ProfileSchema = z.object({
 });
 
 const FavoriteSchema = z.object({
-  name: z.string().trim().min(2).max(40),
   city: z.string().trim().min(2).max(80),
   zip: z.string().trim().regex(/^\d{1,4}$/),
   street: z.string().trim().min(2).max(120),
@@ -31,7 +30,7 @@ export async function loadFavoriteAddresses() {
 
   const { data, error } = await supabaseAdmin
     .from('saved_addresses')
-    .select('id, name, city, zip, street, house_number')
+    .select('id, city, zip, street, house_number')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
@@ -167,7 +166,6 @@ export async function addFavoriteAddress(formData: FormData) {
   if (!user) return { error: 'Unauthorized' };
 
   const parsed = FavoriteSchema.safeParse({
-    name: formData.get('name'),
     city: formData.get('city'),
     zip: formData.get('zip'),
     street: formData.get('street'),
@@ -194,17 +192,16 @@ export async function addFavoriteAddress(formData: FormData) {
     .from('saved_addresses')
     .insert({
       user_id: user.id,
-      name: parsed.data.name,
       city: parsed.data.city,
       zip: parsed.data.zip,
       street: parsed.data.street,
       house_number: parsed.data.house_number,
     })
-    .select('id, name, city, zip, street, house_number')
+    .select('id, city, zip, street, house_number')
     .single();
 
   if (error) {
-    if (error.code === '23505') return { error: 'Dieser Favoriten-Name existiert bereits.' };
+    if (error.code === '23505') return { error: 'Diese Adresse existiert bereits.' };
     if (error.code === '42P01') return { error: 'Datenbank-Tabelle saved_addresses fehlt. Bitte Migration ausfuehren.' };
     console.error('addFavoriteAddress failed:', error);
     return { error: 'Favorit konnte nicht gespeichert werden.' };

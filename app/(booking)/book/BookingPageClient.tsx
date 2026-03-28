@@ -9,7 +9,6 @@ import { getAppSurface } from '@/lib/routing/surfaces';
 
 type FavoriteAddress = {
   id: string;
-  name: string;
   city: string;
   zip: string;
   street: string;
