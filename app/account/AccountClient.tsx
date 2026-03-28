@@ -21,6 +21,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
+import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
 import { logout } from '@/app/(auth)/actions';
 import { parseBookingNotes } from '@/lib/booking/notes';
 import {
@@ -336,7 +337,7 @@ export default function AccountClient({
       : 'Hier siehst du deine kommenden Fahrten.';
 
   return (
-    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-14 pt-8 lg:pt-10">
+    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-8 md:pb-14 lg:pt-10">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
           <section className="px-1 py-2 md:px-2">
@@ -1143,6 +1144,7 @@ export default function AccountClient({
           ) : null}
         </div>
       </div>
+      <AccountMobileBottomNav active={activeTab === 'profil' ? 'profil' : 'fahrten'} />
     </div>
   );
 }

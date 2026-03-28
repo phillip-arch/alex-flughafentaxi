@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
+import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
 import { BookingDirection, BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
 import NavbarClient from '@/components/NavbarClient';
 import { getAppSurface } from '@/lib/routing/surfaces';
@@ -14,9 +15,9 @@ export default function BookingPageClient({ initialName = '' }: { initialName?: 
 
   return (
     <>
-      <NavbarClient />
+      {!isAppSurface ? <NavbarClient /> : null}
       <section className="bg-white">
-        <div className="app-container pb-10 pt-28 md:pb-12 md:pt-28">
+        <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-10 md:pt-12' : 'pt-28 md:pt-28'}`}>
           {isAppSurface ? (
             <section className="mb-8 px-1 py-2 md:px-2">
               <Link
@@ -44,7 +45,7 @@ export default function BookingPageClient({ initialName = '' }: { initialName?: 
       </section>
 
       <section className="bg-white">
-        <div className="app-container pb-28 md:pb-28">
+        <div className="app-container pb-32 md:pb-28">
           <section className="mx-auto mt-6 max-w-[57.5rem] lg:hidden">
             <BookingInfoPanel direction={direction} />
           </section>
@@ -54,6 +55,7 @@ export default function BookingPageClient({ initialName = '' }: { initialName?: 
           ) : null}
         </div>
       </section>
+      {isAppSurface ? <AccountMobileBottomNav active="start" /> : null}
     </>
   );
 }

@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import AccountAppHeader from '@/components/account/AccountAppHeader';
 import AccountClient from './AccountClient';
 
 export const metadata: Metadata = {
@@ -96,7 +95,6 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   return (
     <main className="min-h-screen bg-white text-[var(--color-text)]">
-      <AccountAppHeader />
       <AccountClient
         userEmail={user.email || ''}
         initialName={profile?.full_name || ''}
