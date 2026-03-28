@@ -60,17 +60,24 @@ export default function AccountMobileBottomNav({
                 href={item.href}
                 aria-current={isActive ? 'page' : undefined}
                 prefetch
-                className={`flex min-h-[3.65rem] flex-col items-center justify-center gap-1 rounded-[1.1rem] border text-[0.82rem] font-medium tracking-[-0.02em] transition-colors outline-none ${
-                  isActive
-                    ? 'border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff]'
-                    : 'border-transparent bg-transparent text-[#6a7d96] hover:bg-[#f8fbff] hover:text-[#1679ff]'
-                } ${
+                className={`flex min-h-[3.65rem] flex-col items-center justify-center gap-1 rounded-[1.1rem] text-[0.82rem] tracking-[-0.02em] outline-none transition-colors ${
                   placement === 'inline'
-                    ? 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dbe7f8] focus-visible:ring-offset-0 active:bg-transparent'
-                    : 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dbe7f8] focus-visible:ring-offset-2 active:bg-[#f8fbff]'
+                    ? `${
+                        isActive
+                          ? 'border border-[#dbe7f8] bg-[#f8fbff] font-medium text-[#1679ff]'
+                          : 'border border-transparent bg-transparent font-medium text-[#6a7d96] hover:bg-[#f8fbff] hover:text-[#1679ff]'
+                      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dbe7f8] focus-visible:ring-offset-0 active:bg-transparent`
+                    : `${
+                        isActive
+                          ? 'border border-transparent bg-transparent font-semibold text-[#111111]'
+                          : 'border border-transparent bg-transparent font-medium text-[#6a6a6a]'
+                      } focus:outline-none focus-visible:ring-0 active:bg-transparent`
                 }`}
               >
-                <Icon size={18} />
+                <Icon
+                  size={18}
+                  className={placement === 'bottom' && isActive ? 'fill-current' : undefined}
+                />
                 <span>{item.label}</span>
               </Link>
             );
