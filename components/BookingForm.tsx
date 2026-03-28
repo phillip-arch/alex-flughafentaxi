@@ -135,6 +135,7 @@ const BookingForm = ({
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(initialFavorites);
   const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
   const [accountDefaults, setAccountDefaults] = useState(initialAccountDefaults);
@@ -177,6 +178,10 @@ const BookingForm = ({
   useEffect(() => {
     onDirectionChange?.(formData.direction);
   }, [formData.direction, onDirectionChange]);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!openInlineSelect) return;
@@ -970,9 +975,11 @@ const BookingForm = ({
     </div>
   );
 
+  const shouldShowInfoTrigger = showStepIndicator || (isAppSurface && hasMounted);
+
   return (
     <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
-      {showStepIndicator || isAppSurface ? (
+      {shouldShowInfoTrigger ? (
         <button
           type="button"
           aria-label="Informationen"
