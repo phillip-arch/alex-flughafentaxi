@@ -337,26 +337,28 @@ export default function AccountClient({
         <div className={`${accountShellClass} space-y-6`}>
           <section className="space-y-4 pt-4 md:pt-5">
             <div className="px-1 md:px-2">
-              <div className="flex flex-col gap-3">
-                <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
-                  {greetingLabel}
-                </h1>
-                <p className="text-[1rem] leading-[1.6] text-[#6a7d96] md:text-[1.05rem]">
-                  {activeTab === 'start'
-                    ? 'Hier kannst du deine naechste Fahrt buchen.'
-                    : activeTab === 'profil'
-                      ? 'Hier verwaltest du dein Profil.'
-                      : 'Hier siehst du deine Fahrten.'}
-                </p>
+              <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-8">
+                {activeTab === 'start' ? (
+                  <div className="flex flex-col gap-3">
+                    <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
+                      {greetingLabel}
+                    </h1>
+                    <p className="text-[1rem] leading-[1.6] text-[#6a7d96] md:text-[1.05rem]">
+                      Hier kannst du deine naechste Fahrt buchen.
+                    </p>
+                  </div>
+                ) : (
+                  <div />
+                )}
+                <div className="md:min-w-[22rem] md:max-w-[26rem] md:flex-shrink-0">
+                  <AccountMobileBottomNav
+                    placement="inline"
+                    active={
+                      activeTab === 'start' ? 'start' : activeTab === 'profil' ? 'profil' : 'fahrten'
+                    }
+                  />
+                </div>
               </div>
-            </div>
-            <div className="px-1 md:px-2">
-              <AccountMobileBottomNav
-                placement="inline"
-                active={
-                  activeTab === 'start' ? 'start' : activeTab === 'profil' ? 'profil' : 'fahrten'
-                }
-              />
             </div>
           </section>
 
