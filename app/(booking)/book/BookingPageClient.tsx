@@ -12,6 +12,21 @@ import { getAppSurface } from '@/lib/routing/surfaces';
 export default function BookingPageClient({ initialName = '' }: { initialName?: string }) {
   const [direction, setDirection] = useState<BookingDirection>('to_airport');
   const isAppSurface = getAppSurface() === 'app';
+  const firstName = String(initialName || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)[0];
+  const currentHour = Number(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Berlin',
+      hour: '2-digit',
+      hour12: false,
+    })
+      .formatToParts(new Date())
+      .find((part) => part.type === 'hour')?.value ?? '0',
+  );
+  const greetingBase = currentHour < 11 ? 'Guten Morgen' : currentHour < 18 ? 'Guten Tag' : 'Guten Abend';
+  const greetingLabel = firstName ? `${greetingBase} ${firstName}!` : `${greetingBase}!`;
 
   return (
     <>
@@ -27,6 +42,14 @@ export default function BookingPageClient({ initialName = '' }: { initialName?: 
                 <ChevronLeft size={18} />
                 Zurueck zum Konto
               </Link>
+              <div className="mt-7 flex flex-col gap-5">
+                <h2 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
+                  {greetingLabel}
+                </h2>
+                <p className="text-[1rem] leading-[1.6] text-[#6a7d96] md:text-[1.05rem]">
+                  Hier kannst du deine naechste Fahrt buchen.
+                </p>
+              </div>
             </section>
           ) : null}
 

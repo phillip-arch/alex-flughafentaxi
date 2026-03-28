@@ -16,11 +16,9 @@ import {
   House,
   MapPin,
   Star,
-  User,
   X,
   XCircle,
 } from 'lucide-react';
-import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
 import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
 import { logout } from '@/app/(auth)/actions';
 import { parseBookingNotes } from '@/lib/booking/notes';
@@ -318,22 +316,9 @@ export default function AccountClient({
     }
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
-  const accountPrimaryNav = (
-    <UnderlineTabNav
-      className="flex flex-wrap items-center gap-2"
-      items={[
-        { id: 'buchungsverlauf', label: 'Fahrten', icon: <History size={16} /> },
-        { id: 'profil', label: 'Profil', icon: <User size={16} /> },
-      ]}
-      activeTab={activeTab === 'favoriten' ? 'buchungsverlauf' : activeTab}
-      onChange={(tab) => {
-        setActiveTab(tab as AccountTab);
-      }}
-    />
-  );
   const accountHeroSubtitle =
     activeTab === 'profil'
-      ? 'Hier verwaltest du deine Profildaten.'
+      ? 'Hier verwaltest du dein Profil und deine Favoriten.'
       : 'Hier siehst du deine kommenden Fahrten.';
 
   return (
@@ -351,7 +336,6 @@ export default function AccountClient({
                 </p>
               </div>
               <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:gap-4 xl:pt-6">
-                {accountPrimaryNav}
                 <Link
                   href="/book"
                   className="ui-button-booking-primary hidden w-full justify-center md:inline-flex xl:min-w-[18rem] xl:w-auto"
@@ -363,7 +347,7 @@ export default function AccountClient({
           </section>
 
           {activeTab === 'profil' ? (
-            <section className={`${contentSectionClass} max-w-[44rem]`}>
+            <section className={`${contentSectionClass} max-w-[68rem]`}>
               <div className={accountSectionStackClass}>
                 {!isEditingProfile ? (
                   <div className="rounded-[1.35rem] border border-[#e9edf3] bg-white px-4 py-4 shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
@@ -492,147 +476,168 @@ export default function AccountClient({
                   </form>
                 )}
               </div>
-              {error ? <p className="mt-3 text-sm text-[#d70015]">{error}</p> : null}
-            </section>
-          ) : null}
+              <div className="space-y-6 pt-2">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-[1rem] font-semibold text-[#111827]">Gespeicherte Adressen</p>
+                    <p className="text-[0.95rem] text-[#6a7d96]">
+                      Speichere bis zu drei Favoriten fuer schnellere Buchungen.
+                    </p>
+                  </div>
+                  <span className="inline-flex items-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] px-3 py-1.5 text-[0.82rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">
+                    {favorites.length}/3 gespeichert
+                  </span>
+                </div>
 
-          {false && activeTab === 'favoriten' ? (
-            <section className={`${contentSectionClass} max-w-[44rem]`}>
-              <div className={accountSectionStackClass}>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {favoritesLoading ? (
-                    <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
-                  ) : null}
-                  {favorites.map((fav) => (
-                    <div
-                      key={fav.id}
-                      className="relative rounded-[1rem] border border-[#e9edf3] bg-white px-3 py-3 text-center shadow-[0_8px_20px_rgba(17,17,17,0.04)]"
-                    >
-                      <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
-                        {(() => {
-                          const Icon = getFavoriteIcon(fav.name);
-                          return <Icon size={15} />;
-                        })()}
-                      </span>
-                      <span className="mt-2 block text-sm leading-5 text-[#6a7d96]">
-                        {fav.street} {fav.house_number}, {fav.zip} {fav.city}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          startTransition(async () => {
-                            if (!confirm('Moechten Sie diesen Favoriten loeschen?')) return;
-                            const res = await deleteFavoriteAddress(fav.id);
-                            if ((res as { error?: string })?.error) {
-                              setError((res as { error: string }).error);
-                              return;
-                            }
-                            setFavorites((prev) => prev.filter((f) => f.id !== fav.id));
-                          })
-                        }
-                        aria-label="Favorit loeschen"
-                        className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]"
+                {favoritesLoading ? (
+                  <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
+                ) : null}
+
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  {favorites.map((fav) => {
+                    const Icon = getFavoriteIcon(fav.name);
+                    return (
+                      <div
+                        key={fav.id}
+                        className="relative rounded-[1.2rem] border border-[#e3ebf5] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)]"
                       >
-                        <X size={12} strokeWidth={2.25} />
-                      </button>
-                    </div>
-                  ))}
+                        <div className="flex items-start justify-between gap-3">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
+                            <Icon size={18} />
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              startTransition(async () => {
+                                if (!confirm('Moechten Sie diesen Favoriten loeschen?')) return;
+                                const res = await deleteFavoriteAddress(fav.id);
+                                if ((res as { error?: string })?.error) {
+                                  setError((res as { error: string }).error);
+                                  return;
+                                }
+                                setFavorites((prev) => prev.filter((f) => f.id !== fav.id));
+                              })
+                            }
+                            aria-label="Favorit loeschen"
+                            className="flex h-8 w-8 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]"
+                          >
+                            <X size={14} strokeWidth={2.25} />
+                          </button>
+                        </div>
+                        <div className="mt-4 space-y-2">
+                          <p className="text-[1rem] font-semibold text-[#111827]">{fav.name}</p>
+                          <p className="text-[0.95rem] leading-6 text-[#6a7d96]">
+                            {fav.street} {fav.house_number}
+                            <br />
+                            {fav.zip} {fav.city}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+
                   {shouldShowFavoritesEmptyState ? (
-                    <p className="text-sm text-[#1679ff]">Keine Favoriten gespeichert.</p>
+                    <div className="rounded-[1.2rem] border border-dashed border-[#dbe7f8] bg-[#f8fbff] px-5 py-6 text-center text-[#6a7d96] sm:col-span-2 xl:col-span-3">
+                      Keine Favoriten gespeichert.
+                    </div>
                   ) : null}
                 </div>
 
-                <p className="text-sm text-[#6a7d96]">
-                  {hasReachedFavoriteLimit
-                    ? 'Maximal 3 Favoriten gespeichert.'
-                    : `${favorites.length}/3 Favoriten gespeichert.`}
-                </p>
+                <div className="rounded-[1.35rem] border border-[#e3ebf5] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:px-5 md:py-5">
+                  <div className="space-y-1">
+                    <p className="text-[1rem] font-semibold text-[#111827]">Neuen Favoriten speichern</p>
+                    <p className="text-[0.95rem] text-[#6a7d96]">
+                      Nutze ein klares Label und das Format "Strasse Nr., 1234 Stadt".
+                    </p>
+                  </div>
 
-                <form
-                  action={() => {
-                    setError(null);
-                    startTransition(async () => {
-                      if (favorites.length >= 3) {
-                        setError('Maximal 3 Favoriten sind moeglich.');
-                        return;
-                      }
+                  <form
+                    action={() => {
+                      setError(null);
+                      startTransition(async () => {
+                        if (favorites.length >= 3) {
+                          setError('Maximal 3 Favoriten sind moeglich.');
+                          return;
+                        }
 
-                      const parsedAddress = parseFavoriteAddressInput(favAddress);
-                      if (!parsedAddress) {
-                        setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
-                        return;
-                      }
+                        const parsedAddress = parseFavoriteAddressInput(favAddress);
+                        if (!parsedAddress) {
+                          setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
+                          return;
+                        }
 
-                      if (!favLabel.trim()) {
-                        setError('Bitte waehlen Sie House, Office oder School.');
-                        return;
-                      }
+                        if (!favLabel.trim()) {
+                          setError('Bitte waehlen Sie House, Office oder School.');
+                          return;
+                        }
 
-                      const formData = new FormData();
-                      formData.set('name', favLabel.trim());
-                      formData.set('city', parsedAddress.city);
-                      formData.set('zip', parsedAddress.zip);
-                      formData.set('street', parsedAddress.street);
-                      formData.set('house_number', parsedAddress.house_number);
+                        const formData = new FormData();
+                        formData.set('name', favLabel.trim());
+                        formData.set('city', parsedAddress.city);
+                        formData.set('zip', parsedAddress.zip);
+                        formData.set('street', parsedAddress.street);
+                        formData.set('house_number', parsedAddress.house_number);
 
-                      const res = await addFavoriteAddress(formData);
-                      if ((res as { error?: string })?.error) {
-                        setError((res as { error: string }).error);
-                        return;
-                      }
-                      const inserted = (res as { favorite?: Favorite }).favorite;
-                      if (inserted?.id) {
-                        setFavorites((prev) => [...prev, inserted]);
-                      }
-                      setFavLabel('');
-                      setFavAddress('');
-                    });
-                  }}
-                  className="grid grid-cols-1 gap-3"
-                >
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-[10.75rem_minmax(0,1fr)]">
-                    <div className="relative">
-                      <select
-                        value={favLabel}
-                        onChange={(e) => setFavLabel(e.target.value)}
-                        className="ui-input appearance-none pr-10"
+                        const res = await addFavoriteAddress(formData);
+                        if ((res as { error?: string })?.error) {
+                          setError((res as { error: string }).error);
+                          return;
+                        }
+                        const inserted = (res as { favorite?: Favorite }).favorite;
+                        if (inserted?.id) {
+                          setFavorites((prev) => [...prev, inserted]);
+                        }
+                        setFavLabel('');
+                        setFavAddress('');
+                      });
+                    }}
+                    className="mt-5 grid grid-cols-1 gap-3"
+                  >
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-[10.75rem_minmax(0,1fr)]">
+                      <div className="relative">
+                        <select
+                          value={favLabel}
+                          onChange={(e) => setFavLabel(e.target.value)}
+                          className="ui-input appearance-none pr-10"
+                          disabled={isPending || hasReachedFavoriteLimit}
+                          required
+                        >
+                          <option value="">Label</option>
+                          {favoritePresetItems.map((item) => (
+                            <option key={item.label} value={item.label}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">
+                          <ChevronDown size={16} />
+                        </div>
+                      </div>
+                      <input
+                        value={favAddress}
+                        onChange={(e) => setFavAddress(e.target.value)}
+                        className="ui-input"
+                        placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
                         disabled={isPending || hasReachedFavoriteLimit}
                         required
-                      >
-                        <option value="">Label</option>
-                        {favoritePresetItems.map((item) => (
-                          <option key={item.label} value={item.label}>
-                            {item.label}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">
-                        <ChevronDown size={16} />
-                      </div>
+                      />
                     </div>
-                    <input
-                      value={favAddress}
-                      onChange={(e) => setFavAddress(e.target.value)}
-                      className="ui-input"
-                      placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                    <button
+                      type="submit"
                       disabled={isPending || hasReachedFavoriteLimit}
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isPending || hasReachedFavoriteLimit}
-                    className="ui-button-booking-primary w-full sm:w-auto sm:min-w-[220px] sm:justify-self-start"
-                  >
-                    {isPending ? 'Speichert...' : 'Speichern'}
-                  </button>
-                </form>
+                      className="ui-button-booking-primary w-full sm:w-auto sm:min-w-[220px] sm:justify-self-start"
+                    >
+                      {isPending ? 'Speichert...' : 'Speichern'}
+                    </button>
+                  </form>
+                </div>
+
+                {error ? <p className="text-sm text-[#d70015]">{error}</p> : null}
               </div>
-              {error ? <p className="mt-3 text-sm text-[#d70015]">{error}</p> : null}
             </section>
           ) : null}
 
-          {activeTab === 'buchungsverlauf' || activeTab === 'favoriten' ? (
+          {activeTab === 'buchungsverlauf' ? (
             <section className={contentSectionClass}>
               <div className="flex flex-col gap-6">
                 <div className="px-1 py-1 md:px-2">
@@ -670,185 +675,9 @@ export default function AccountClient({
                           <Clock3 size={18} />
                           <span className="hidden sm:inline">Vergangen</span>
                         </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveTab('favoriten');
-                        }}
-                        className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
-                          activeTab === 'favoriten'
-                            ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
-                            : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
-                        }`}
-                        aria-label="Favoriten"
-                      >
-                        <Star size={18} className={activeTab === 'favoriten' ? 'text-[#0a63ff]' : 'text-[#657489]'} />
-                        <span className="hidden sm:inline">Favoriten</span>
-                      </button>
                     </div>
                   </div>
                 </div>
-
-                {activeTab === 'favoriten' ? (
-                  <div className="space-y-6 px-1 pt-3 md:px-2">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="space-y-1">
-                        <p className="text-[1rem] font-semibold text-[#111827]">Gespeicherte Adressen</p>
-                        <p className="text-[0.95rem] text-[#6a7d96]">
-                          Speichere bis zu drei Favoriten fuer schnellere Buchungen.
-                        </p>
-                      </div>
-                      <span className="inline-flex items-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] px-3 py-1.5 text-[0.82rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">
-                        {favorites.length}/3 gespeichert
-                      </span>
-                    </div>
-
-                    {favoritesLoading ? (
-                      <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
-                    ) : null}
-
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                      {favorites.map((fav) => {
-                        const Icon = getFavoriteIcon(fav.name);
-                        return (
-                          <div
-                            key={fav.id}
-                            className="relative rounded-[1.2rem] border border-[#e3ebf5] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)]"
-                          >
-                            <div className="flex items-start justify-between gap-3">
-                              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
-                                <Icon size={18} />
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  startTransition(async () => {
-                                    if (!confirm('Moechten Sie diesen Favoriten loeschen?')) return;
-                                    const res = await deleteFavoriteAddress(fav.id);
-                                    if ((res as { error?: string })?.error) {
-                                      setError((res as { error: string }).error);
-                                      return;
-                                    }
-                                    setFavorites((prev) => prev.filter((f) => f.id !== fav.id));
-                                  })
-                                }
-                                aria-label="Favorit loeschen"
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]"
-                              >
-                                <X size={14} strokeWidth={2.25} />
-                              </button>
-                            </div>
-                            <div className="mt-4 space-y-2">
-                              <p className="text-[1rem] font-semibold text-[#111827]">{fav.name}</p>
-                              <p className="text-[0.95rem] leading-6 text-[#6a7d96]">
-                                {fav.street} {fav.house_number}
-                                <br />
-                                {fav.zip} {fav.city}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
-
-                      {shouldShowFavoritesEmptyState ? (
-                        <div className="rounded-[1.2rem] border border-dashed border-[#dbe7f8] bg-[#f8fbff] px-5 py-6 text-center text-[#6a7d96] sm:col-span-2 xl:col-span-3">
-                          Keine Favoriten gespeichert.
-                        </div>
-                      ) : null}
-                    </div>
-
-                    <div className="rounded-[1.35rem] border border-[#e3ebf5] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:px-5 md:py-5">
-                      <div className="space-y-1">
-                        <p className="text-[1rem] font-semibold text-[#111827]">Neuen Favoriten speichern</p>
-                        <p className="text-[0.95rem] text-[#6a7d96]">
-                          Nutze ein klares Label und das Format "Strasse Nr., 1234 Stadt".
-                        </p>
-                      </div>
-
-                      <form
-                        action={() => {
-                          setError(null);
-                          startTransition(async () => {
-                            if (favorites.length >= 3) {
-                              setError('Maximal 3 Favoriten sind moeglich.');
-                              return;
-                            }
-
-                            const parsedAddress = parseFavoriteAddressInput(favAddress);
-                            if (!parsedAddress) {
-                              setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
-                              return;
-                            }
-
-                            if (!favLabel.trim()) {
-                              setError('Bitte waehlen Sie House, Office oder School.');
-                              return;
-                            }
-
-                            const formData = new FormData();
-                            formData.set('name', favLabel.trim());
-                            formData.set('city', parsedAddress.city);
-                            formData.set('zip', parsedAddress.zip);
-                            formData.set('street', parsedAddress.street);
-                            formData.set('house_number', parsedAddress.house_number);
-
-                            const res = await addFavoriteAddress(formData);
-                            if ((res as { error?: string })?.error) {
-                              setError((res as { error: string }).error);
-                              return;
-                            }
-                            const inserted = (res as { favorite?: Favorite }).favorite;
-                            if (inserted?.id) {
-                              setFavorites((prev) => [...prev, inserted]);
-                            }
-                            setFavLabel('');
-                            setFavAddress('');
-                          });
-                        }}
-                        className="mt-5 grid grid-cols-1 gap-3"
-                      >
-                        <div className="grid grid-cols-1 gap-3 md:grid-cols-[10.75rem_minmax(0,1fr)]">
-                          <div className="relative">
-                            <select
-                              value={favLabel}
-                              onChange={(e) => setFavLabel(e.target.value)}
-                              className="ui-input appearance-none pr-10"
-                              disabled={isPending || hasReachedFavoriteLimit}
-                              required
-                            >
-                              <option value="">Label</option>
-                              {favoritePresetItems.map((item) => (
-                                <option key={item.label} value={item.label}>
-                                  {item.label}
-                                </option>
-                              ))}
-                            </select>
-                            <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">
-                              <ChevronDown size={16} />
-                            </div>
-                          </div>
-                          <input
-                            value={favAddress}
-                            onChange={(e) => setFavAddress(e.target.value)}
-                            className="ui-input"
-                            placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
-                            disabled={isPending || hasReachedFavoriteLimit}
-                            required
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={isPending || hasReachedFavoriteLimit}
-                          className="ui-button-booking-primary w-full sm:w-auto sm:min-w-[220px] sm:justify-self-start"
-                        >
-                          {isPending ? 'Speichert...' : 'Speichern'}
-                        </button>
-                      </form>
-                    </div>
-
-                    {error ? <p className="text-sm text-[#d70015]">{error}</p> : null}
-                  </div>
-                ) : null}
 
                 {activeTab === 'buchungsverlauf' ? (
                   <>
