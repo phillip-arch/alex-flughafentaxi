@@ -14,9 +14,8 @@ type NavIconComponent = (props: NavIconProps) => ReactElement;
 
 function StartIconOutline({ className }: NavIconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className={className} aria-hidden="true">
-      <path d="M3.75 10.5 12 3.75l8.25 6.75" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M6.75 9.75v8.25a1.5 1.5 0 0 0 1.5 1.5h2.25v-5.25c0-.414.336-.75.75-.75h1.5c.414 0 .75.336.75.75v5.25h2.25a1.5 1.5 0 0 0 1.5-1.5V9.75" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className} aria-hidden="true">
+      <path d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75V19.5A2.25 2.25 0 0 0 6.75 21.75h10.5A2.25 2.25 0 0 0 19.5 19.5V9.75M9 21.75v-6a1.5 1.5 0 0 1 1.5-1.5h3a1.5 1.5 0 0 1 1.5 1.5v6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -24,18 +23,16 @@ function StartIconOutline({ className }: NavIconProps) {
 function StartIconSolid({ className }: NavIconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M11.49 3.63a.75.75 0 0 1 .95 0l8.25 6.75a.75.75 0 0 1-.48 1.32h-.96v6.3a1.5 1.5 0 0 1-1.5 1.5h-2.64a.75.75 0 0 1-.75-.75v-4.86a.39.39 0 0 0-.39-.39h-1.92a.39.39 0 0 0-.39.39v4.86a.75.75 0 0 1-.75.75H6.24a1.5 1.5 0 0 1-1.5-1.5v-6.3h-.96a.75.75 0 0 1-.48-1.32l8.19-6.75Z" />
+      <path d="M11.47 3.84a.75.75 0 0 1 1.06 0l8.25 8.25a.75.75 0 0 1-.53 1.28h-.75v6.38A2.25 2.25 0 0 1 17.25 22H6.75A2.25 2.25 0 0 1 4.5 19.75v-6.38h-.75a.75.75 0 0 1-.53-1.28l8.25-8.25Z" />
     </svg>
   );
 }
 
 function TripsIconOutline({ className }: NavIconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className={className} aria-hidden="true">
-      <rect x="4.5" y="5.25" width="15" height="14.25" rx="2.25" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M8.25 3.75v3M15.75 3.75v3M4.5 9.75h8.25" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="15.75" cy="14.25" r="3.75" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="m15.75 12.75.001 1.75 1.249.75" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className} aria-hidden="true">
+      <path d="M6.75 3v2.25M17.25 3v2.25M3.75 8.25h16.5M5.25 4.5h13.5A1.5 1.5 0 0 1 20.25 6v12.75a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V6a1.5 1.5 0 0 1 1.5-1.5Z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 11.25v3.75l2.25 1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -43,17 +40,15 @@ function TripsIconOutline({ className }: NavIconProps) {
 function TripsIconSolid({ className }: NavIconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M8.25 3a.75.75 0 0 1 .75.75V5.25h6V3.75a.75.75 0 0 1 1.5 0V5.3A3 3 0 0 1 19.5 8.25v1.27a5.2 5.2 0 0 0-3.75-1.52 5.25 5.25 0 1 0 0 10.5c1.46 0 2.78-.6 3.73-1.56A3 3 0 0 1 16.5 19.5h-9A3 3 0 0 1 4.5 16.5v-8.25A3 3 0 0 1 7.5 5.3V3.75A.75.75 0 0 1 8.25 3Z" />
-      <path d="M15.75 10.5a3.75 3.75 0 1 1 0 7.5 3.75 3.75 0 0 1 0-7.5Zm0 1.5a.75.75 0 0 0-.75.75v1.89c0 .26.135.5.357.637l1.5.93a.75.75 0 1 0 .786-1.278l-1.143-.708V12.75a.75.75 0 0 0-.75-.75Z" />
+      <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3a.75.75 0 0 1 1.5 0v1.59A2.25 2.25 0 0 1 20.25 6.75v12A2.25 2.25 0 0 1 18 21H6A2.25 2.25 0 0 1 3.75 18.75v-12A2.25 2.25 0 0 1 6 4.59V3a.75.75 0 0 1 .75-.75ZM12 10.5a.75.75 0 0 1 .75.75v3.349l1.72 1.147a.75.75 0 1 1-.832 1.248l-2.055-1.37a.75.75 0 0 1-.333-.624V11.25A.75.75 0 0 1 12 10.5Z" clipRule="evenodd" />
     </svg>
   );
 }
 
 function ProfileIconOutline({ className }: NavIconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className={className} aria-hidden="true">
-      <circle cx="12" cy="8.25" r="3.75" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M5.25 19.5a6.75 6.75 0 0 1 13.5 0" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className} aria-hidden="true">
+      <path d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -61,8 +56,7 @@ function ProfileIconOutline({ className }: NavIconProps) {
 function ProfileIconSolid({ className }: NavIconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M12 4.5a3.75 3.75 0 1 1 0 7.5 3.75 3.75 0 0 1 0-7.5Z" />
-      <path d="M12 13.5c-3.63 0-6.75 2.427-6.75 5.25 0 .414.336.75.75.75h12a.75.75 0 0 0 .75-.75c0-2.823-3.12-5.25-6.75-5.25Z" />
+      <path fillRule="evenodd" d="M2.25 12a9.75 9.75 0 1 1 19.5 0 9.75 9.75 0 0 1-19.5 0Zm9.75-4.125a3.375 3.375 0 1 0 0 6.75 3.375 3.375 0 0 0 0-6.75Zm-2.847 8.884A5.25 5.25 0 0 1 12 15.75a5.25 5.25 0 0 1 2.847 1.009 7.5 7.5 0 1 1-5.694 0Z" clipRule="evenodd" />
     </svg>
   );
 }
