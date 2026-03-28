@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 type AccountPageProps = {
   searchParams?: Promise<{
     tab?: string;
+    panel?: string;
   }>;
 };
 
@@ -28,6 +29,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   if (!user) redirect('/login');
   const params = searchParams ? await searchParams : undefined;
+  const requestedPanel = params?.panel === 'language' ? 'language' : null;
   const requestedTab =
     (isAppSurface && params?.tab === 'start') ||
     params?.tab === 'buchungsverlauf' ||
@@ -107,6 +109,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         initialFavorites={(favorites || []) as any}
         initialBookings={bookingsWithReviews as any}
         initialRequestedTab={requestedTab}
+        initialOpenPanel={requestedPanel}
         initialFavoritesLoaded={requestedTab === 'favoriten' || requestedTab === 'start'}
         initialBookingsLoaded={requestedTab === 'buchungsverlauf'}
       />

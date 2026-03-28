@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   Briefcase,
   Building2,
   Calendar,
   Car,
+  ChevronLeft,
   ChevronDown,
   ChevronRight,
   Clock3,
@@ -72,6 +74,17 @@ type Booking = {
 
 type BookingFilter = 'all' | 'upcoming' | 'previous' | 'canceled' | 'to_airport' | 'from_airport';
 type FavoritePreset = 'House' | 'Office' | 'School';
+type AccountPanel = 'language' | null;
+
+const languageOptions = [
+  { code: 'de', label: 'Deutsch' },
+  { code: 'en', label: 'English' },
+  { code: 'fr', label: 'Francais' },
+  { code: 'es', label: 'Espanol' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'hu', label: 'Magyar' },
+  { code: 'tr', label: 'Tuerkce' },
+] as const;
 
 export default function AccountClient({
   userEmail,
@@ -80,6 +93,7 @@ export default function AccountClient({
   initialFavorites,
   initialBookings,
   initialRequestedTab,
+  initialOpenPanel,
   initialFavoritesLoaded,
   initialBookingsLoaded,
 }: {
@@ -89,9 +103,13 @@ export default function AccountClient({
   initialFavorites: Favorite[];
   initialBookings: Booking[];
   initialRequestedTab: AccountTab;
+  initialOpenPanel: AccountPanel;
   initialFavoritesLoaded: boolean;
   initialBookingsLoaded: boolean;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [name, setName] = useState(initialName || '');
   const [phone, setPhone] = useState(initialPhone || '');
   const [favorites, setFavorites] = useState<Favorite[]>(initialFavorites || []);
@@ -110,6 +128,8 @@ export default function AccountClient({
   const [activeTab, setActiveTab] = useState<AccountTab>(initialRequestedTab);
   const [bookingDirection, setBookingDirection] = useState<BookingDirection>('to_airport');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
+  const [openPanel, setOpenPanel] = useState<AccountPanel>(initialOpenPanel);
   const [isDeleteAccountExpanded, setIsDeleteAccountExpanded] = useState(false);
   const [isDeletingAccount, startDeleteTransition] = useTransition();
   const [isPending, startTransition] = useTransition();
@@ -144,6 +164,21 @@ export default function AccountClient({
     'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#dbe7f8] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]';
   const accountDangerButtonClass =
     'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#f1d1d6] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#d70015] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#fff4f6]';
+  const activeLanguage = searchParams.get('lang')?.toLowerCase() || 'de';
+  const activeLanguageLabel =
+    languageOptions.find((option) => option.code === activeLanguage)?.label || 'Deutsch';
+  const buildAccountHref = (updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === '') {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    const nextSearch = params.toString();
+    return `${pathname}${nextSearch ? `?${nextSearch}` : ''}`;
+  };
   const hasReachedFavoriteLimit = favorites.length >= 3;
   const shouldShowFavoritesEmptyState =
     activeTab === 'favoriten' && favoritesLoaded && !favoritesLoading && favorites.length === 0;
@@ -306,6 +341,10 @@ export default function AccountClient({
   }, [initialRequestedTab]);
 
   useEffect(() => {
+    setOpenPanel(initialOpenPanel);
+  }, [initialOpenPanel]);
+
+  useEffect(() => {
     setFavorites(initialFavorites || []);
     setFavoritesLoaded(initialFavoritesLoaded);
   }, [initialFavorites, initialFavoritesLoaded]);
@@ -443,15 +482,59 @@ export default function AccountClient({
                     </div>
 
                     <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
-                      <div className="flex items-start gap-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.innerWidth < 768) {
+                            router.push(buildAccountHref({ tab: 'profil', panel: 'language' }));
+                            return;
+                          }
+                          setIsLanguageExpanded((prev) => !prev);
+                        }}
+                        className="flex w-full items-start gap-4 py-3 text-left"
+                      >
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
                           <Globe size={24} strokeWidth={1.8} />
                         </span>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <p className="text-[1rem] font-medium text-[#111827]">Sprache</p>
-                          <p className="text-[0.95rem] leading-6 text-[#6a6a6a]">Deutsch</p>
+                          <p className="text-[0.95rem] leading-6 text-[#6a6a6a]">{activeLanguageLabel}</p>
                         </div>
-                      </div>
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                          <ChevronDown
+                            size={18}
+                            strokeWidth={2}
+                            className={`transition-transform ${isLanguageExpanded ? 'rotate-180' : ''}`}
+                          />
+                        </span>
+                      </button>
+
+                      {isLanguageExpanded ? (
+                        <div className="border-t border-[#efebe4] pb-2 pt-4">
+                          <div className="grid gap-2 sm:grid-cols-2">
+                            {languageOptions.map((option) => {
+                              const selected = option.code === activeLanguage;
+                              return (
+                                <button
+                                  key={option.code}
+                                  type="button"
+                                  onClick={() => {
+                                    router.push(buildAccountHref({ lang: option.code }));
+                                    setIsLanguageExpanded(false);
+                                  }}
+                                  className={`rounded-[1rem] border px-4 py-3 text-left text-[0.95rem] transition-colors ${
+                                    selected
+                                      ? 'border-[#dbe7f8] bg-[#f8fbff] font-medium text-[#1679ff]'
+                                      : 'border-[#ece7df] bg-white text-[#111827] hover:bg-[#f8fbff]'
+                                  }`}
+                                >
+                                  {option.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
 
                     <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
@@ -1130,6 +1213,54 @@ export default function AccountClient({
           activeTab === 'start' ? 'start' : activeTab === 'profil' ? 'profil' : 'fahrten'
         }
       />
+      {openPanel === 'language' ? (
+        <div className="fixed inset-0 z-[120] bg-white text-[#111827] md:hidden">
+          <div className="app-container min-h-screen pt-[30px]">
+            <div className="flex items-center gap-3 pb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenPanel(null);
+                  router.push(buildAccountHref({ panel: null }));
+                }}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
+                aria-label="Zurueck"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <div>
+                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Sprache</p>
+                <p className="text-[0.95rem] text-[#6a6a6a]">Waehle deine bevorzugte Sprache</p>
+              </div>
+            </div>
+
+            <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+              <div className="grid gap-2">
+                {languageOptions.map((option) => {
+                  const selected = option.code === activeLanguage;
+                  return (
+                    <button
+                      key={option.code}
+                      type="button"
+                      onClick={() => {
+                        setOpenPanel(null);
+                        router.push(buildAccountHref({ lang: option.code, panel: null }));
+                      }}
+                      className={`rounded-[1rem] border px-4 py-4 text-left text-[1rem] transition-colors ${
+                        selected
+                          ? 'border-[#dbe7f8] bg-[#f8fbff] font-medium text-[#1679ff]'
+                          : 'border-[#ece7df] bg-white text-[#111827]'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
