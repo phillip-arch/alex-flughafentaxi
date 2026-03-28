@@ -980,7 +980,7 @@ const BookingForm = ({
   const shouldShowInfoTrigger = showStepIndicator || showInfoTrigger || (isAppSurface && hasMounted);
 
   return (
-    <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
+    <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] md:max-w-none relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
       {shouldShowInfoTrigger ? (
         <button
           type="button"

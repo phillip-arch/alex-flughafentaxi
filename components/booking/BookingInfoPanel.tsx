@@ -58,7 +58,7 @@ export function BookingInfoPanel({ direction }: { direction: BookingDirection })
         eyebrow="Informationen"
         title="Informationen zum Flughafentransfer"
         description="Alle wichtigen Hinweise fuer Ankunft, Vorlaufzeit und Zahlung direkt neben der Buchung."
-        className="max-w-[26rem]"
+        className="max-w-none md:max-w-[34rem]"
       />
 
       <div className="mt-6 rounded-[1.4rem] border border-[#e8edf3] bg-white px-4 py-4 md:px-5">

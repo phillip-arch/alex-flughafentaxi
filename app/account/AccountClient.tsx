@@ -443,8 +443,8 @@ export default function AccountClient({
 
           {activeTab === 'start' ? (
             <section className="space-y-6">
-              <div className="grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(25rem,48rem)]">
-                <section className="order-1 self-start">
+              <div className="grid items-start gap-6 md:grid-cols-2">
+                <section className="order-1 min-w-0 self-start">
                   <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
                     <BookingForm
                       onDirectionChange={setBookingDirection}
@@ -460,7 +460,7 @@ export default function AccountClient({
                     />
                   </div>
                 </section>
-                <aside className="hidden self-start md:sticky md:top-6 md:block">
+                <aside className="hidden min-w-0 self-start md:sticky md:top-6 md:block">
                   <BookingInfoPanel direction={bookingDirection} />
                 </aside>
               </div>
