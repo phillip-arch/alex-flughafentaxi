@@ -3,6 +3,8 @@ import { ArrowRight, CheckCircle2, Mail, ShieldCheck } from 'lucide-react';
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import NavbarClient from '@/components/NavbarClient';
+import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
+import { getAppSurface } from '@/lib/routing/surfaces';
 
 export const metadata: Metadata = {
   robots: {
@@ -21,15 +23,16 @@ export default async function BookingSuccessPage() {
     data: { user },
   } = await supabase.auth.getUser();
   const isLoggedIn = Boolean(user);
+  const isAppSurface = getAppSurface() === 'app';
 
   const returnHomeHref = isLoggedIn ? '/account' : '/';
   const bookAnotherRideHref = '/book';
 
   return (
     <>
-      <NavbarClient />
+      {!isAppSurface ? <NavbarClient /> : null}
       <main className="bg-white">
-        <section className="app-container pb-24 pt-28 md:pb-28 md:pt-32">
+        <section className={`app-container pb-32 md:pb-28 ${isAppSurface ? 'pt-12 md:pt-14' : 'pt-28 md:pt-32'}`}>
           <div className="mx-auto max-w-[57.5rem]">
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
               <div className="mx-auto flex max-w-[42rem] flex-col items-center text-center">
@@ -97,6 +100,7 @@ export default async function BookingSuccessPage() {
           </div>
         </section>
       </main>
+      {isAppSurface ? <AccountMobileBottomNav active="start" /> : null}
     </>
   );
 }

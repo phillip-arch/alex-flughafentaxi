@@ -1,11 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { History, House, User } from 'lucide-react';
 
 type MobileNavItem = 'start' | 'fahrten' | 'profil';
 
 export default function AccountMobileBottomNav({ active }: { active: MobileNavItem }) {
+  const pathname = usePathname();
+  const router = useRouter();
   const items: Array<{
     id: MobileNavItem;
     label: string;
@@ -20,19 +23,30 @@ export default function AccountMobileBottomNav({ active }: { active: MobileNavIt
   return (
     <nav
       aria-label="App Navigation"
-      className="fixed inset-x-0 bottom-4 z-40 px-3 md:hidden"
+      className="fixed inset-x-0 bottom-4 z-[90] px-3 [padding-bottom:calc(env(safe-area-inset-bottom,0px))] md:hidden"
     >
       <div className="mx-auto max-w-[25rem] rounded-[1.45rem] border border-[#dbe7f8] bg-white/95 p-2 shadow-[0_20px_40px_rgba(17,17,17,0.12)] backdrop-blur">
         <div className="grid grid-cols-3 gap-2">
           {items.map((item) => {
             const Icon = item.icon;
             const isActive = item.id === active;
+            const isCurrentHref =
+              item.href === '/book' ? pathname === '/book' : pathname === item.href.split('?')[0];
 
             return (
               <Link
                 key={item.id}
                 href={item.href}
                 aria-current={isActive ? 'page' : undefined}
+                prefetch={false}
+                onClick={(event) => {
+                  if (isCurrentHref) {
+                    event.preventDefault();
+                    return;
+                  }
+                  event.preventDefault();
+                  router.push(item.href);
+                }}
                 className={`flex min-h-[3.65rem] flex-col items-center justify-center gap-1 rounded-[1.1rem] border text-[0.82rem] font-medium tracking-[-0.02em] transition-colors ${
                   isActive
                     ? 'border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff]'
