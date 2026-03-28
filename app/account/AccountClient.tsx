@@ -332,9 +332,7 @@ export default function AccountClient({
   const accountHeroSubtitle =
     activeTab === 'profil'
       ? 'Hier verwaltest du deine Profildaten.'
-      : activeTab === 'favoriten'
-        ? 'Hier verwaltest du deine Favoriten.'
-        : 'Hier siehst du deine kommenden Fahrten.';
+      : 'Hier siehst du deine kommenden Fahrten.';
 
   return (
     <div suppressHydrationWarning className="bg-[#f7f9fc] pb-14 pt-8 lg:pt-10">
@@ -350,7 +348,7 @@ export default function AccountClient({
                   {accountHeroSubtitle}
                 </p>
               </div>
-              <div className="flex flex-col gap-4 xl:items-end xl:pt-6">
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:gap-4 xl:pt-6">
                 {accountPrimaryNav}
                 <Link
                   href="/book"
