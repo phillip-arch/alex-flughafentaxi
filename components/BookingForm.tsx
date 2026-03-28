@@ -988,11 +988,11 @@ const BookingForm = ({
           onClick={() => setIsInfoPanelOpen(true)}
           className={`absolute z-10 inline-flex items-center justify-center text-[#1679ff] transition-colors hover:text-[#0a63ff] ${
             isAppSurface
-              ? 'right-[-0.35rem] top-[-0.35rem] md:right-[-0.45rem] md:top-[-0.45rem]'
+              ? 'right-4 top-4 md:right-6 md:top-6'
               : 'right-3 top-3 md:right-4 md:top-4'
           }`}
         >
-          <Info size={20} strokeWidth={2.1} />
+          <Info size={22} strokeWidth={2.2} />
         </button>
       ) : null}
       <div
@@ -1168,7 +1168,7 @@ const BookingForm = ({
       {isInfoPanelOpen ? (
         <div className="fixed inset-0 z-[140] bg-white/96 text-[#111827] backdrop-blur-sm">
           <div className="flex min-h-screen md:min-h-full md:justify-end">
-            <div className="min-h-screen w-full animate-in slide-in-from-left-full duration-300 md:h-screen md:max-w-[56rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
+            <div className="min-h-screen w-full animate-in slide-in-from-right-full duration-300 md:h-screen md:max-w-[56rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
               <div className="h-full overflow-y-auto px-6 pt-[30px] pb-8 md:px-8 md:py-8">
               <div className="flex items-center justify-between gap-3 pb-6">
                 <button
