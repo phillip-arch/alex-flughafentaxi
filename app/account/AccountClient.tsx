@@ -74,7 +74,7 @@ type Booking = {
 
 type BookingFilter = 'all' | 'upcoming' | 'previous' | 'canceled' | 'to_airport' | 'from_airport';
 type FavoritePreset = 'House' | 'Office' | 'School';
-type AccountPanel = 'language' | 'delete' | null;
+type AccountPanel = 'language' | 'delete' | 'favorite-add' | null;
 
 const languageOptions = [
   { code: 'de', label: 'Deutsch' },
@@ -669,18 +669,6 @@ export default function AccountClient({
                 )}
               </div>
               <div className="space-y-6 pt-2">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="space-y-1">
-                    <p className="text-[1rem] font-semibold text-[#111827]">Gespeicherte Adressen</p>
-                    <p className="text-[0.95rem] text-[#6a7d96]">
-                      Speichere bis zu drei Favoriten fuer schnellere Buchungen.
-                    </p>
-                  </div>
-                  <span className="inline-flex items-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] px-3 py-1.5 text-[0.82rem] font-semibold uppercase tracking-[0.12em] text-[#1679ff]">
-                    {favorites.length}/3 gespeichert
-                  </span>
-                </div>
-
                 {favoritesLoading ? (
                   <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
                 ) : null}
@@ -750,6 +738,10 @@ export default function AccountClient({
                             onClick={() => {
                               setError(null);
                               setFavLabel(item.label);
+                              if (window.innerWidth < 768) {
+                                setOpenPanel('favorite-add');
+                                return;
+                              }
                               setShowFavoriteForm(true);
                             }}
                             className="flex w-full items-center gap-4 border-t border-[#efebe4] py-4 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-50"
@@ -769,6 +761,10 @@ export default function AccountClient({
                         type="button"
                         onClick={() => {
                           setError(null);
+                          if (window.innerWidth < 768) {
+                            setOpenPanel('favorite-add');
+                            return;
+                          }
                           setShowFavoriteForm(true);
                         }}
                         className="flex w-full items-center gap-4 border-t border-[#efebe4] py-4 text-left transition-colors hover:text-[#111827]"
@@ -1219,7 +1215,7 @@ export default function AccountClient({
       />
       {openPanel === 'language' ? (
         <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
-          <div className="app-container min-h-screen animate-in slide-in-from-left-full duration-300 pt-[30px]">
+          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
             <div className="flex items-center gap-3 pb-6">
               <button
                 type="button"
@@ -1267,7 +1263,7 @@ export default function AccountClient({
       ) : null}
       {openPanel === 'delete' ? (
         <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
-          <div className="app-container min-h-screen animate-in slide-in-from-left-full duration-300 pt-[30px]">
+          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
             <div className="flex items-center gap-3 pb-6">
               <button
                 type="button"
@@ -1315,6 +1311,112 @@ export default function AccountClient({
                   Abbrechen
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {openPanel === 'favorite-add' ? (
+        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
+          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
+            <div className="flex items-center gap-3 pb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenPanel(null);
+                  setFavLabel('');
+                  setFavAddress('');
+                }}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
+                aria-label="Zurueck"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <div>
+                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Ort hinzufuegen</p>
+                <p className="text-[0.95rem] text-[#6a6a6a]">Favorit fuer schnellere Buchungen speichern</p>
+              </div>
+            </div>
+
+            <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+              <form
+                action={() => {
+                  setError(null);
+                  startTransition(async () => {
+                    if (favorites.length >= 3) {
+                      setError('Maximal 3 Favoriten sind moeglich.');
+                      return;
+                    }
+
+                    const parsedAddress = parseFavoriteAddressInput(favAddress);
+                    if (!parsedAddress) {
+                      setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
+                      return;
+                    }
+
+                    if (!favLabel.trim()) {
+                      setError('Bitte waehlen Sie House, Office oder School.');
+                      return;
+                    }
+
+                    const formData = new FormData();
+                    formData.set('name', favLabel.trim());
+                    formData.set('city', parsedAddress.city);
+                    formData.set('zip', parsedAddress.zip);
+                    formData.set('street', parsedAddress.street);
+                    formData.set('house_number', parsedAddress.house_number);
+
+                    const res = await addFavoriteAddress(formData);
+                    if ((res as { error?: string })?.error) {
+                      setError((res as { error: string }).error);
+                      return;
+                    }
+                    const inserted = (res as { favorite?: Favorite }).favorite;
+                    if (inserted?.id) {
+                      setFavorites((prev) => [...prev, inserted]);
+                    }
+                    setFavLabel('');
+                    setFavAddress('');
+                    setShowFavoriteForm(false);
+                    setOpenPanel(null);
+                  });
+                }}
+                className="grid grid-cols-1 gap-3"
+              >
+                <div className="relative">
+                  <select
+                    value={favLabel}
+                    onChange={(e) => setFavLabel(e.target.value)}
+                    className="ui-input appearance-none pr-10"
+                    disabled={isPending || hasReachedFavoriteLimit}
+                    required
+                  >
+                    <option value="">Label</option>
+                    {favoritePresetItems.map((item) => (
+                      <option key={item.label} value={item.label}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">
+                    <ChevronDown size={16} />
+                  </div>
+                </div>
+                <input
+                  value={favAddress}
+                  onChange={(e) => setFavAddress(e.target.value)}
+                  className="ui-input"
+                  placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                  disabled={isPending || hasReachedFavoriteLimit}
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={isPending || hasReachedFavoriteLimit}
+                  className="ui-button-booking-primary w-full justify-center"
+                >
+                  {isPending ? 'Speichert...' : 'Speichern'}
+                </button>
+              </form>
             </div>
           </div>
         </div>
