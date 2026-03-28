@@ -972,7 +972,7 @@ const BookingForm = ({
 
   return (
     <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
-      {showStepIndicator ? (
+      {showStepIndicator || isAppSurface ? (
         <button
           type="button"
           aria-label="Informationen"
@@ -1154,8 +1154,9 @@ const BookingForm = ({
       </div>
       {isInfoPanelOpen ? (
         <div className="fixed inset-0 z-[140] bg-white/96 text-[#111827] backdrop-blur-sm">
-          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px] md:flex md:min-h-full md:items-center md:justify-center md:py-8">
-            <div className="w-full md:max-w-[56rem] md:max-h-[calc(100vh-4rem)] md:overflow-y-auto md:rounded-[2rem] md:border md:border-[#e8edf3] md:bg-white md:px-8 md:py-8 md:shadow-[0_18px_40px_rgba(17,17,17,0.08)]">
+          <div className="flex min-h-screen md:min-h-full md:justify-end">
+            <div className="min-h-screen w-full animate-in slide-in-from-left-full duration-300 md:h-screen md:max-w-[56rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
+              <div className="h-full overflow-y-auto px-6 pt-[30px] pb-8 md:px-8 md:py-8">
               <div className="flex items-center justify-between gap-3 pb-6">
                 <button
                   type="button"
@@ -1254,6 +1255,7 @@ const BookingForm = ({
                     </div>
                   ))}
                 </div>
+              </div>
               </div>
             </div>
           </div>
