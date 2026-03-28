@@ -21,6 +21,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
+import { logout } from '@/app/(auth)/actions';
 import { parseBookingNotes } from '@/lib/booking/notes';
 import {
   addFavoriteAddress,
@@ -384,6 +385,16 @@ export default function AccountClient({
                       >
                         <Edit size={16} />
                       </button>
+                    </div>
+                    <div className="mt-5 border-t border-[#edf2f7] pt-5">
+                      <form action={logout}>
+                        <button
+                          type="submit"
+                          className={accountSecondaryButtonClass}
+                        >
+                          Abmelden
+                        </button>
+                      </form>
                     </div>
                     <div className="mt-5 border-t border-[#edf2f7] pt-5">
                       <p className="text-[0.82rem] font-semibold uppercase tracking-[0.14em] text-[#d70015]">

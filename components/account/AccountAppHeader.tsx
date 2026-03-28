@@ -1,6 +1,4 @@
 import Image from 'next/image';
-import { LogOut } from 'lucide-react';
-import { logout } from '@/app/(auth)/actions';
 import AccountHeaderLanguageSwitcher from './AccountHeaderLanguageSwitcher';
 
 export default function AccountAppHeader() {
@@ -22,15 +20,6 @@ export default function AccountAppHeader() {
 
           <div className="flex items-center gap-5">
             <AccountHeaderLanguageSwitcher />
-            <form action={logout}>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 text-[15px] font-medium text-white transition-colors hover:text-white/78"
-              >
-                <LogOut size={16} />
-                Abmelden
-              </button>
-            </form>
           </div>
         </div>
       </div>
