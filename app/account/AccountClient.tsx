@@ -74,7 +74,7 @@ type Booking = {
 
 type BookingFilter = 'all' | 'upcoming' | 'previous' | 'canceled' | 'to_airport' | 'from_airport';
 type FavoritePreset = 'House' | 'Office' | 'School';
-type AccountPanel = 'language' | null;
+type AccountPanel = 'language' | 'delete' | null;
 
 const languageOptions = [
   { code: 'de', label: 'Deutsch' },
@@ -557,6 +557,10 @@ export default function AccountClient({
                         disabled={isDeletingAccount}
                         onClick={() => {
                           setError(null);
+                          if (window.innerWidth < 768) {
+                            setOpenPanel('delete');
+                            return;
+                          }
                           setIsDeleteAccountExpanded((prev) => !prev);
                         }}
                         className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
@@ -1214,8 +1218,8 @@ export default function AccountClient({
         }
       />
       {openPanel === 'language' ? (
-        <div className="fixed inset-0 z-[120] bg-white text-[#111827] md:hidden">
-          <div className="app-container min-h-screen pt-[30px]">
+        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
+          <div className="app-container min-h-screen animate-in slide-in-from-left-full duration-300 pt-[30px]">
             <div className="flex items-center gap-3 pb-6">
               <button
                 type="button"
@@ -1256,6 +1260,60 @@ export default function AccountClient({
                     </button>
                   );
                 })}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {openPanel === 'delete' ? (
+        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
+          <div className="app-container min-h-screen animate-in slide-in-from-left-full duration-300 pt-[30px]">
+            <div className="flex items-center gap-3 pb-6">
+              <button
+                type="button"
+                onClick={() => setOpenPanel(null)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
+                aria-label="Zurueck"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <div>
+                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Konto loeschen</p>
+                <p className="text-[0.95rem] text-[#6a6a6a]">Bitte bestaetige die Loeschung deines Kontos</p>
+              </div>
+            </div>
+
+            <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+              <p className="text-[0.98rem] leading-7 text-[#6a6a6a]">
+                Ihr Login, Profil und Ihre Favoriten werden entfernt. Buchungen bleiben fuer interne
+                Nachvollziehbarkeit erhalten, aber E-Mail und Telefonnummer werden daraus entfernt.
+              </p>
+              <div className="mt-5 flex flex-col gap-3">
+                <button
+                  type="button"
+                  disabled={isDeletingAccount}
+                  onClick={() => {
+                    setError(null);
+                    startDeleteTransition(async () => {
+                      const res = await deleteOwnAccount();
+                      if ((res as { error?: string })?.error) {
+                        setError((res as { error: string }).error);
+                        return;
+                      }
+                      window.location.assign('/login?account_deleted=1');
+                    });
+                  }}
+                  className={`${accountDangerButtonClass} w-full justify-center disabled:cursor-not-allowed disabled:opacity-60`}
+                >
+                  {isDeletingAccount ? 'Konto wird geloescht...' : 'Loeschen bestaetigen'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOpenPanel(null)}
+                  className={`${accountSecondaryButtonClass} w-full justify-center`}
+                >
+                  Abbrechen
+                </button>
               </div>
             </div>
           </div>
