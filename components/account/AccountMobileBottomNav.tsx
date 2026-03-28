@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { History, House, User } from 'lucide-react';
 
 type MobileNavItem = 'start' | 'fahrten' | 'profil';
@@ -9,6 +9,7 @@ type MobileNavItem = 'start' | 'fahrten' | 'profil';
 export default function AccountMobileBottomNav({ active }: { active: MobileNavItem }) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const items: Array<{
     id: MobileNavItem;
     label: string;
@@ -30,8 +31,13 @@ export default function AccountMobileBottomNav({ active }: { active: MobileNavIt
           {items.map((item) => {
             const Icon = item.icon;
             const isActive = item.id === active;
+            const itemUrl = new URL(item.href, 'https://app.local');
+            const currentTab = searchParams.get('tab') || '';
+            const targetTab = itemUrl.searchParams.get('tab') || '';
             const isCurrentHref =
-              item.href === '/book' ? pathname === '/book' : pathname === item.href.split('?')[0];
+              itemUrl.pathname === '/book'
+                ? pathname === '/book'
+                : pathname === itemUrl.pathname && currentTab === targetTab;
 
             return (
               <Link

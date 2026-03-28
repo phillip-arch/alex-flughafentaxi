@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import Link from 'next/link';
 import {
   Briefcase,
   Building2,
@@ -270,22 +269,6 @@ export default function AccountClient({
     lastGroup.items.push(booking);
     return groups;
   }, []);
-  const currentHour = Number(
-    new Intl.DateTimeFormat('en-GB', {
-      timeZone: 'Europe/Berlin',
-      hour: '2-digit',
-      hour12: false,
-    })
-      .formatToParts(new Date())
-      .find((part) => part.type === 'hour')?.value ?? '0',
-  );
-  const firstName = String(name || '')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)[0];
-  const greetingBase = currentHour < 11 ? 'Guten Morgen' : currentHour < 18 ? 'Guten Tag' : 'Guten Abend';
-  const greetingLabel = firstName ? `${greetingBase} ${firstName}!` : `${greetingBase}!`;
-
   useEffect(() => {
     if (activeTab === 'favoriten' && !favoritesLoaded && !favoritesLoading) {
       setFavoritesLoading(true);
@@ -316,36 +299,10 @@ export default function AccountClient({
     }
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
-  const accountHeroSubtitle =
-    activeTab === 'profil'
-      ? 'Hier verwaltest du dein Profil und deine Favoriten.'
-      : 'Hier siehst du deine kommenden Fahrten.';
-
   return (
-    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-8 md:pb-14 lg:pt-10">
+    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-4 md:pb-14 md:pt-5 lg:pt-6">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
-          <section className="px-1 py-2 md:px-2">
-            <div className="flex flex-col gap-9 xl:flex-row xl:items-end xl:justify-between">
-              <div className="flex flex-col gap-5 pt-6 md:pt-8">
-                <h2 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
-                  {greetingLabel}
-                </h2>
-                <p className="text-[1rem] leading-[1.6] text-[#6a7d96] md:text-[1.05rem]">
-                  {accountHeroSubtitle}
-                </p>
-              </div>
-              <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:gap-4 xl:pt-6">
-                <Link
-                  href="/book"
-                  className="ui-button-booking-primary hidden w-full justify-center md:inline-flex xl:min-w-[18rem] xl:w-auto"
-                >
-                  Fahrt buchen
-                </Link>
-              </div>
-            </div>
-          </section>
-
           {activeTab === 'profil' ? (
             <section className={`${contentSectionClass} max-w-[68rem]`}>
               <div className={accountSectionStackClass}>
