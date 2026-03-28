@@ -31,7 +31,7 @@ export default function AccountMobileBottomNav({
       aria-label="App Navigation"
       className={
         placement === 'inline'
-          ? 'md:hidden'
+          ? 'hidden md:block'
           : 'fixed inset-x-0 bottom-4 z-[90] px-3 [padding-bottom:calc(env(safe-area-inset-bottom,0px))] md:hidden'
       }
     >

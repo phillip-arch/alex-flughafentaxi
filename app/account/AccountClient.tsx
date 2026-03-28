@@ -1016,6 +1016,11 @@ export default function AccountClient({
           ) : null}
         </div>
       </div>
+      <AccountMobileBottomNav
+        active={
+          activeTab === 'start' ? 'start' : activeTab === 'profil' ? 'profil' : 'fahrten'
+        }
+      />
     </div>
   );
 }
