@@ -58,24 +58,16 @@ export default function AccountMobileBottomNav({
                 href={item.href}
                 aria-current={isActive ? 'page' : undefined}
                 prefetch
-                className={`flex ${placement === 'bottom' ? 'min-h-[2.9rem] gap-0.5' : 'min-h-[3.65rem] gap-1'} flex-col items-center justify-center rounded-[1.1rem] text-[0.82rem] tracking-[-0.02em] outline-none transition-colors ${
-                  placement === 'inline'
-                    ? `${
-                        isActive
-                          ? 'border border-[#dbe7f8] bg-[#f8fbff] font-medium text-[#1679ff]'
-                          : 'border border-transparent bg-transparent font-medium text-[#6a7d96] hover:bg-[#f8fbff] hover:text-[#1679ff]'
-                      } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dbe7f8] focus-visible:ring-offset-0 active:bg-transparent`
-                    : `${
-                        isActive
-                          ? 'border border-transparent bg-transparent font-semibold text-[#111111]'
-                          : 'border border-transparent bg-transparent font-medium text-[#6a6a6a]'
-                      } focus:outline-none focus-visible:ring-0 active:bg-transparent`
-                }`}
+                className={`flex min-h-[2.9rem] flex-col items-center justify-center gap-0.5 rounded-[1.1rem] border text-[0.82rem] tracking-[-0.02em] outline-none transition-[color,background-color,border-color,opacity] ${
+                  isActive
+                    ? 'border-[#dbe7f8] bg-[#f8fbff] font-medium text-[#1679ff]'
+                    : 'border-transparent bg-transparent font-medium text-[#6a7d96] opacity-60 hover:bg-[#f8fbff] hover:text-[#1679ff] hover:opacity-100'
+                } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dbe7f8] focus-visible:ring-offset-0 active:bg-transparent`}
               >
                 <AccountNavIcon
                   item={item.id}
                   active={isActive}
-                  className={placement === 'bottom' ? 'h-[21px] w-[21px]' : 'h-[18px] w-[18px]'}
+                  className="h-[21px] w-[21px]"
                 />
                 <span>{item.label}</span>
               </Link>
