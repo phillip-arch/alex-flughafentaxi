@@ -350,7 +350,7 @@ export default function AccountClient({
                   {accountHeroSubtitle}
                 </p>
               </div>
-              <div className="flex flex-col gap-4 xl:items-end">
+              <div className="flex flex-col gap-4 xl:items-end xl:pt-6">
                 {accountPrimaryNav}
                 <Link
                   href="/book"
