@@ -1,12 +1,12 @@
 'use client';
 
 import {
-  ClipboardDocumentListIcon as ClipboardDocumentListOutlineIcon,
+  CalendarIcon as CalendarOutlineIcon,
   HomeIcon as HomeOutlineIcon,
   UserCircleIcon as UserCircleOutlineIcon,
 } from '@heroicons/react/24/outline';
 import {
-  ClipboardDocumentListIcon as ClipboardDocumentListSolidIcon,
+  CalendarIcon as CalendarSolidIcon,
   HomeIcon as HomeSolidIcon,
   UserCircleIcon as UserCircleSolidIcon,
 } from '@heroicons/react/24/solid';
@@ -21,7 +21,7 @@ type IconComponent = ComponentType<{ className?: string; 'aria-hidden'?: boolean
 
 const navIcons: Record<'start' | 'fahrten' | 'profil', { outline: IconComponent; solid: IconComponent }> = {
   start: { outline: HomeOutlineIcon, solid: HomeSolidIcon },
-  fahrten: { outline: ClipboardDocumentListOutlineIcon, solid: ClipboardDocumentListSolidIcon },
+  fahrten: { outline: CalendarOutlineIcon, solid: CalendarSolidIcon },
   profil: { outline: UserCircleOutlineIcon, solid: UserCircleSolidIcon },
 };
 
