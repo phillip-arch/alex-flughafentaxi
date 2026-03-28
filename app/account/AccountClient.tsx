@@ -332,13 +332,13 @@ export default function AccountClient({
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
   return (
-    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-0 md:pb-14">
+    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-[30px] md:pb-14 md:pt-0">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
-          <section className="space-y-4 pt-[30px]">
-            <div className="px-1 md:px-2">
-              <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-8">
-                {activeTab === 'start' ? (
+          {activeTab === 'start' ? (
+            <section className="space-y-4 md:pt-[30px]">
+              <div className="px-1 md:px-2">
+                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-8">
                   <div className="flex flex-col gap-3">
                     <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
                       {greetingLabel}
@@ -347,20 +347,29 @@ export default function AccountClient({
                       Hier kannst du deine naechste Fahrt buchen.
                     </p>
                   </div>
-                ) : (
-                  <div />
-                )}
-                <div className="md:min-w-[22rem] md:max-w-[26rem] md:flex-shrink-0">
-                  <AccountMobileBottomNav
-                    placement="inline"
-                    active={
-                      activeTab === 'start' ? 'start' : activeTab === 'profil' ? 'profil' : 'fahrten'
-                    }
-                  />
+                  <div className="md:min-w-[22rem] md:max-w-[26rem] md:flex-shrink-0">
+                    <AccountMobileBottomNav
+                      placement="inline"
+                      active="start"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+          ) : (
+            <section className="hidden md:block md:pt-[30px]">
+              <div className="px-1 md:px-2">
+                <div className="flex justify-end">
+                  <div className="md:min-w-[22rem] md:max-w-[26rem] md:flex-shrink-0">
+                    <AccountMobileBottomNav
+                      placement="inline"
+                      active={activeTab === 'profil' ? 'profil' : 'fahrten'}
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
 
           {activeTab === 'start' ? (
             <section className="space-y-6">
