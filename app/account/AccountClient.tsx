@@ -526,7 +526,8 @@ export default function AccountClient({
 
                       {isLanguageExpanded ? (
                         <div className="border-t border-[#efebe4] pb-2 pt-4">
-                          <div className="grid gap-2 sm:grid-cols-2">
+                          <div className="rounded-[1.5rem] border border-[#e8e8ed] bg-white p-3 shadow-[0_18px_40px_rgba(17,17,17,0.08)]">
+                            <div className="grid grid-cols-2 gap-1">
                             {languageOptions.map((option) => {
                               const selected = option.code === activeLanguage;
                               return (
@@ -537,16 +538,18 @@ export default function AccountClient({
                                     router.push(buildAccountHref({ lang: option.code }));
                                     setIsLanguageExpanded(false);
                                   }}
-                                  className={`rounded-[1rem] border px-4 py-3 text-left text-[0.95rem] transition-colors ${
-                                    selected
-                                      ? 'border-[#dbe7f8] bg-[#f8fbff] font-medium text-[#1679ff]'
-                                      : 'border-[#ece7df] bg-white text-[#111827] hover:bg-[#f8fbff]'
+                                  className={`flex items-center justify-between rounded-[16px] px-3 py-3 text-left text-[15px] font-medium transition-colors ${
+                                    selected ? 'bg-[#f5f5f7] text-[#111111]' : 'text-[#111111] hover:bg-[#f5f5f7]'
                                   }`}
                                 >
-                                  {option.label}
+                                  <span>{option.label}</span>
+                                  <span className="text-[13px] font-semibold uppercase text-[#6b7280]">
+                                    {option.code}
+                                  </span>
                                 </button>
                               );
                             })}
+                            </div>
                           </div>
                         </div>
                       ) : null}
@@ -1149,8 +1152,8 @@ export default function AccountClient({
               </div>
             </div>
 
-            <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
-              <div className="grid gap-2">
+            <div className="px-0 pt-2">
+              <div className="flex flex-col items-start gap-8">
                 {languageOptions.map((option) => {
                   const selected = option.code === activeLanguage;
                   return (
@@ -1161,13 +1164,14 @@ export default function AccountClient({
                         setOpenPanel(null);
                         router.push(buildAccountHref({ lang: option.code, panel: null }));
                       }}
-                      className={`rounded-[1rem] border px-4 py-4 text-left text-[1rem] transition-colors ${
-                        selected
-                          ? 'border-[#dbe7f8] bg-[#f8fbff] font-medium text-[#1679ff]'
-                          : 'border-[#ece7df] bg-white text-[#111827]'
+                      className={`flex w-full items-center justify-between text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111] ${
+                        selected ? 'bg-[#f5f5f7]' : ''
                       }`}
                     >
-                      {option.label}
+                      <span>{option.label}</span>
+                      <span className="text-[0.95rem] font-semibold uppercase text-[#6b7280]">
+                        {option.code}
+                      </span>
                     </button>
                   );
                 })}
