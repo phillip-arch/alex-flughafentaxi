@@ -136,7 +136,7 @@ export default function AccountMobileBottomNav({
                       } focus:outline-none focus-visible:ring-0 active:bg-transparent`
                 }`}
               >
-                <Icon className="h-[18px] w-[18px]" />
+                <Icon className={placement === 'bottom' ? 'h-9 w-9' : 'h-[18px] w-[18px]'} />
                 <span>{item.label}</span>
               </Link>
             );
