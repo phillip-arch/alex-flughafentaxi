@@ -62,13 +62,13 @@ export default function AccountMobileBottomNav({
                   placement === 'inline'
                     ? `${
                         isActive
-                          ? 'border border-[#dbe7f8] bg-[#f8fbff] font-medium text-[#1679ff]'
-                          : 'border border-transparent bg-transparent font-medium text-[#6a7d96] hover:bg-[#f8fbff] hover:text-[#1679ff]'
+                          ? 'border border-transparent bg-transparent font-medium text-[#1679ff]'
+                          : 'border border-transparent bg-transparent font-medium text-[#8090a5] opacity-80 hover:text-[#1679ff] hover:opacity-100'
                       } focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dbe7f8] focus-visible:ring-offset-0 active:bg-transparent`
                     : `${
                         isActive
                           ? 'border border-transparent bg-transparent font-semibold text-[#111111]'
-                          : 'border border-transparent bg-transparent font-medium text-[#6a6a6a]'
+                          : 'border border-transparent bg-transparent font-medium text-[#7c7c7c] opacity-80'
                       } focus:outline-none focus-visible:ring-0 active:bg-transparent`
                 }`}
               >
