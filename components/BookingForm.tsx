@@ -1013,13 +1013,13 @@ const BookingForm = ({
                 )}
               <div className="-ml-2 rounded-[2.2rem] bg-transparent py-3 pl-3 pr-0 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
                 <div className="flex gap-4">
-                  <div className="flex w-[2.1rem] shrink-0 flex-col items-center pt-[1.45rem]">
-                    <div className={`flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
-                      {formData.direction === 'from_airport' ? <PlaneLanding size={13} /> : <MapPin size={13} />}
+                  <div className="flex w-[1.45rem] shrink-0 flex-col items-center pt-[1.45rem] md:w-[2.1rem]">
+                    <div className={`flex h-[1.45rem] w-[1.45rem] items-center justify-center rounded-full md:h-[2.1rem] md:w-[2.1rem] ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
+                      {formData.direction === 'from_airport' ? <PlaneLanding size={9} className="md:h-[13px] md:w-[13px]" /> : <MapPin size={9} className="md:h-[13px] md:w-[13px]" />}
                     </div>
                     <div className="h-[3.55rem] w-px bg-[#111111]" />
-                    <div className="-mt-0.9 flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white">
-                      <Check size={13} />
+                    <div className="-mt-0.9 flex h-[1.45rem] w-[1.45rem] items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white md:h-[2.1rem] md:w-[2.1rem]">
+                      <Check size={9} className="md:h-[13px] md:w-[13px]" />
                     </div>
                   </div>
 
