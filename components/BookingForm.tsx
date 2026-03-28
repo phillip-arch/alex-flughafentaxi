@@ -984,7 +984,11 @@ const BookingForm = ({
           type="button"
           aria-label="Informationen"
           onClick={() => setIsInfoPanelOpen(true)}
-          className="absolute right-3 top-3 z-10 inline-flex items-center justify-center text-[#1679ff] transition-colors hover:text-[#0a63ff] md:right-4 md:top-4"
+          className={`absolute z-10 inline-flex items-center justify-center text-[#1679ff] transition-colors hover:text-[#0a63ff] ${
+            isAppSurface
+              ? 'right-[-0.35rem] top-[-0.35rem] md:right-[-0.45rem] md:top-[-0.45rem]'
+              : 'right-3 top-3 md:right-4 md:top-4'
+          }`}
         >
           <Info size={20} strokeWidth={2.1} />
         </button>
