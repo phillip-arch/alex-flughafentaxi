@@ -988,7 +988,7 @@ const BookingForm = ({
           onClick={() => setIsInfoPanelOpen(true)}
           className={`absolute z-10 inline-flex items-center justify-center text-[#1679ff] transition-colors hover:text-[#0a63ff] ${
             isAppSurface
-              ? 'right-4 top-4 md:right-6 md:top-6'
+              ? 'right-4 top-4 md:hidden'
               : 'right-3 top-3 md:right-4 md:top-4'
           }`}
         >
