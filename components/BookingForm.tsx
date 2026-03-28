@@ -1168,7 +1168,7 @@ const BookingForm = ({
       {isInfoPanelOpen ? (
         <div className="fixed inset-0 z-[140] bg-white/96 text-[#111827] backdrop-blur-sm md:bg-transparent md:backdrop-blur-0">
           <div className="flex min-h-screen md:min-h-full md:justify-end md:p-0">
-            <div className="min-h-screen w-full animate-in slide-in-from-right-full duration-300 md:h-screen md:w-[min(46vw,48rem)] md:min-w-[34rem] md:max-w-[48rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
+            <div className="min-h-screen w-full animate-in slide-in-from-right-full duration-300 md:h-screen md:w-[46vw] md:min-w-[34rem] md:max-w-[48rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
               <div className="h-full overflow-y-auto px-6 pt-[30px] pb-8 md:px-8 md:py-8">
               <div className="flex items-center justify-between gap-3 pb-6">
                 <button
