@@ -408,7 +408,13 @@ export default function AccountClient({
           {activeTab === 'start' ? (
             <section className="space-y-4 md:pt-[30px]">
               <div className="px-1 md:px-2">
-                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-8">
+                <div className="flex flex-col gap-4 md:gap-6">
+                  <div className="hidden md:block">
+                    <AccountMobileBottomNav
+                      placement="inline"
+                      active="start"
+                    />
+                  </div>
                   <div className="flex flex-col gap-3">
                     <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
                       {greetingLabel}
@@ -417,7 +423,7 @@ export default function AccountClient({
                       Hier kannst du deine naechste Fahrt buchen.
                     </p>
                   </div>
-                  <div className="w-full md:flex-1">
+                  <div className="md:hidden">
                     <AccountMobileBottomNav
                       placement="inline"
                       active="start"
