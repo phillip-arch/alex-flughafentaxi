@@ -335,7 +335,7 @@ export default function AccountClient({
     <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-0 md:pb-14">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
-          <section className="space-y-4 pt-4 md:pt-5">
+          <section className="space-y-4 pt-[30px]">
             <div className="px-1 md:px-2">
               <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-8">
                 {activeTab === 'start' ? (
