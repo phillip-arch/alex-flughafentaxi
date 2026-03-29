@@ -481,12 +481,27 @@ export default function AccountClient({
                   <div className="space-y-5">
                     <div className="rounded-[1.35rem] border border-[#e9edf3] bg-white px-4 py-4 shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
                       <div className="flex items-start justify-between gap-4">
-                        <div className="space-y-2">
-                          <p className="text-[1.15rem] font-semibold tracking-[-0.03em] text-[#111827]">
-                            {name || 'Kein Name hinterlegt'}
-                          </p>
-                          <p className="text-[0.95rem] text-[#6a7d96]">{userEmail}</p>
-                          <p className="text-[0.95rem] text-[#6a7d96]">{phone || '-'}</p>
+                        <div className="min-w-0 space-y-3">
+                          <div className="flex min-w-0 items-start gap-4">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                              <Edit size={22} strokeWidth={1.8} />
+                            </span>
+                            <p className="min-w-0 text-[1.15rem] font-semibold tracking-[-0.03em] text-[#111827]">
+                              {name || 'Kein Name hinterlegt'}
+                            </p>
+                          </div>
+                          <div className="flex min-w-0 items-start gap-4">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                              <Edit size={22} strokeWidth={1.8} />
+                            </span>
+                            <p className="min-w-0 break-all text-[0.95rem] text-[#6a7d96]">{userEmail}</p>
+                          </div>
+                          <div className="flex min-w-0 items-start gap-4">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                              <Edit size={22} strokeWidth={1.8} />
+                            </span>
+                            <p className="min-w-0 text-[0.95rem] text-[#6a7d96]">{phone || '-'}</p>
+                          </div>
                         </div>
                         <button
                           type="button"
