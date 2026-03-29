@@ -71,7 +71,7 @@ type Booking = {
 };
 
 type BookingFilter = 'all' | 'upcoming' | 'previous' | 'canceled' | 'to_airport' | 'from_airport';
-type AccountPanel = 'language' | 'delete' | 'favorite-add' | null;
+type AccountPanel = 'language' | 'delete' | 'favorite-add' | 'profile-edit' | null;
 
 const languageOptions = [
   { code: 'de', label: 'Deutsch' },
@@ -200,6 +200,14 @@ export default function AccountClient({
     });
     const nextSearch = params.toString();
     return `${pathname}${nextSearch ? `?${nextSearch}` : ''}`;
+  };
+  const openProfileEditor = () => {
+    setError(null);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      router.push(buildAccountHref({ tab: 'profil', panel: 'profile-edit' }));
+      return;
+    }
+    setIsEditingProfile(true);
   };
   const favoriteSlotItems = [
     {
@@ -480,41 +488,19 @@ export default function AccountClient({
                 {!isEditingProfile ? (
                   <div className="space-y-5">
                     <div className="rounded-[1.35rem] border border-[#e9edf3] bg-white px-4 py-4 shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0 space-y-3">
-                          <div className="flex min-w-0 items-start gap-4">
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                              <Edit size={22} strokeWidth={1.8} />
-                            </span>
-                            <p className="min-w-0 text-[1.15rem] font-semibold tracking-[-0.03em] text-[#111827]">
-                              {name || 'Kein Name hinterlegt'}
-                            </p>
-                          </div>
-                          <div className="flex min-w-0 items-start gap-4">
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                              <Edit size={22} strokeWidth={1.8} />
-                            </span>
-                            <p className="min-w-0 break-all text-[0.95rem] text-[#6a7d96]">{userEmail}</p>
-                          </div>
-                          <div className="flex min-w-0 items-start gap-4">
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                              <Edit size={22} strokeWidth={1.8} />
-                            </span>
-                            <p className="min-w-0 text-[0.95rem] text-[#6a7d96]">{phone || '-'}</p>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setError(null);
-                            setIsEditingProfile(true);
-                          }}
-                          aria-label="Profil bearbeiten"
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#eef5ff] hover:text-[#0a63ff]"
-                        >
-                          <Edit size={16} />
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={openProfileEditor}
+                        aria-label="Profil bearbeiten"
+                        className="flex w-full items-start gap-4 text-left transition-colors hover:text-[#111827]"
+                      >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                          <Edit size={22} strokeWidth={1.8} />
+                        </span>
+                        <p className="min-w-0 text-[1.15rem] font-semibold tracking-[-0.03em] text-[#111827]">
+                          {name || 'Kein Name hinterlegt'}
+                        </p>
+                      </button>
                     </div>
 
                     <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
@@ -1250,6 +1236,77 @@ export default function AccountClient({
                   className="ui-button-booking-primary w-full justify-center"
                 >
                   {isPending ? 'Speichert...' : 'Speichern'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {openPanel === 'profile-edit' ? (
+        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
+          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
+            <div className="flex items-center gap-3 pb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenPanel(null);
+                  router.push(buildAccountHref({ panel: null }));
+                }}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
+                aria-label="Zurueck"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <div>
+                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Profil bearbeiten</p>
+                <p className="text-[0.95rem] text-[#6a6a6a]">Name und Telefonnummer aktualisieren</p>
+              </div>
+            </div>
+
+            <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+              <form
+                action={(formData) => {
+                  setError(null);
+                  startTransition(async () => {
+                    const res = await updateAccountProfile(formData);
+                    if ((res as { error?: string })?.error) {
+                      setError((res as { error: string }).error);
+                      return;
+                    }
+                    setOpenPanel(null);
+                    router.push(buildAccountHref({ panel: null }));
+                  });
+                }}
+                className="grid grid-cols-1 gap-3"
+              >
+                <input
+                  name="full_name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="ui-input"
+                  placeholder="Name"
+                  required
+                />
+                <input
+                  name="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="ui-input"
+                  placeholder="Telefon"
+                  required
+                />
+                <input
+                  value={userEmail}
+                  readOnly
+                  aria-label="E-Mail kann nicht geaendert werden"
+                  className="ui-input cursor-not-allowed border-[#e5e7eb] bg-[#f3f4f6] text-[#8b95a7]"
+                />
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="ui-button-booking-primary w-full justify-center"
+                >
+                  {isPending ? 'Speichern...' : 'Profil speichern'}
                 </button>
               </form>
             </div>

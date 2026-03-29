@@ -29,7 +29,10 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   if (!user) redirect('/login');
   const params = searchParams ? await searchParams : undefined;
-  const requestedPanel = params?.panel === 'language' ? 'language' : null;
+  const requestedPanel =
+    params?.panel === 'language' || params?.panel === 'profile-edit'
+      ? params.panel
+      : null;
   const requestedTab =
     (isAppSurface && params?.tab === 'start') ||
     params?.tab === 'buchungsverlauf' ||
