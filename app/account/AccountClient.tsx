@@ -572,7 +572,7 @@ export default function AccountClient({
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
           {activeTab === 'start' ? (
-            <section className="space-y-4 pt-[70px] md:pt-[100px]">
+            <section className="space-y-4 pt-[70px] md:pt-[30px]">
               <div className="px-1 md:px-2">
                 <div className="flex flex-col gap-4 md:gap-6">
                   <div className="hidden md:block">
@@ -581,7 +581,7 @@ export default function AccountClient({
                       active="start"
                     />
                   </div>
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-3 md:pt-[64px]">
                     <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
                       {greetingLabel}
                     </h1>

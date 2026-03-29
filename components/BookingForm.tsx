@@ -580,7 +580,7 @@ const BookingForm = ({
           </button>
 
           {isOpen ? (
-            <div className="absolute left-0 right-0 top-[calc(100%+0.45rem)] z-30 max-h-52 overflow-hidden rounded-[16px] border border-[#d8d4ca] bg-white p-2 shadow-[0_16px_40px_rgba(17,17,17,0.12)] sm:max-h-60">
+            <div className="absolute bottom-[calc(100%+0.45rem)] left-0 right-0 z-30 max-h-52 overflow-hidden rounded-[16px] border border-[#d8d4ca] bg-white p-2 shadow-[0_16px_40px_rgba(17,17,17,0.12)] sm:max-h-60 md:bottom-auto md:top-[calc(100%+0.45rem)]">
               <div className="grid max-h-48 grid-cols-1 gap-1 overflow-y-auto pr-1 sm:max-h-56">
                 {options.map((option) => {
                   const selected = option === value;
@@ -1051,13 +1051,13 @@ const BookingForm = ({
                 )}
               <div className="-ml-2 rounded-[2.2rem] bg-transparent py-3 pl-3 pr-0 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
                 <div className="flex gap-4">
-                  <div className="flex w-6 shrink-0 flex-col items-center pt-[calc(1.45rem+8px)] md:w-[2.1rem] md:pt-[1.45rem]">
-                    <div className={`flex h-6 w-6 items-center justify-center rounded-full md:h-[2.1rem] md:w-[2.1rem] ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
-                      {formData.direction === 'from_airport' ? <PlaneLanding size={9} className="md:h-[13px] md:w-[13px]" /> : <MapPin size={9} className="md:h-[13px] md:w-[13px]" />}
+                  <div className="flex w-6 shrink-0 flex-col items-center pt-[calc(1.45rem+8px)] md:w-7 md:pt-[calc(1.45rem+8px)]">
+                    <div className={`flex h-6 w-6 items-center justify-center rounded-full md:h-7 md:w-7 ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
+                      {formData.direction === 'from_airport' ? <PlaneLanding size={9} className="md:h-[11px] md:w-[11px]" /> : <MapPin size={9} className="md:h-[11px] md:w-[11px]" />}
                     </div>
-                    <div className="h-[calc(3.55rem+5px)] w-px bg-[#111111] md:h-[3.55rem]" />
-                    <div className="-mt-0.9 flex h-6 w-6 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white md:h-[2.1rem] md:w-[2.1rem]">
-                      <Check size={9} className="md:h-[13px] md:w-[13px]" />
+                    <div className="h-[calc(3.55rem+5px)] w-px bg-[#111111] md:h-[calc(3.55rem+5px)]" />
+                    <div className="-mt-0.9 flex h-6 w-6 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white md:h-7 md:w-7">
+                      <Check size={9} className="md:h-[11px] md:w-[11px]" />
                     </div>
                   </div>
 
@@ -1229,9 +1229,9 @@ const BookingForm = ({
       </div>
       {isInfoPanelOpen ? (
         <div className="fixed inset-0 z-[140] bg-white/96 text-[#111827] backdrop-blur-sm md:bg-transparent md:backdrop-blur-0">
-          <div className="flex min-h-screen md:min-h-full md:justify-end md:p-0">
-            <div className="min-h-screen w-full animate-in slide-in-from-right-full duration-300 md:h-screen md:w-[46vw] md:min-w-[34rem] md:max-w-[48rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
-              <div className="h-full overflow-y-auto px-6 pt-[24px] pb-8 md:px-8 md:py-8">
+          <div className="flex h-[100dvh] md:min-h-full md:justify-end md:p-0">
+            <div className="h-[100dvh] w-full overflow-y-auto overscroll-contain animate-in slide-in-from-right-full duration-300 md:h-screen md:w-[46vw] md:min-w-[34rem] md:max-w-[48rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
+              <div className="min-h-full px-6 pt-[24px] pb-8 md:px-8 md:py-8">
               <div className="pb-6">
                 <div className="flex items-start justify-between gap-3 md:items-center">
                   <button
