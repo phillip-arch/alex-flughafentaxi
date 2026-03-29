@@ -1017,7 +1017,7 @@ const BookingForm = ({
                     <div className={`flex h-6 w-6 items-center justify-center rounded-full md:h-[2.1rem] md:w-[2.1rem] ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={9} className="md:h-[13px] md:w-[13px]" /> : <MapPin size={9} className="md:h-[13px] md:w-[13px]" />}
                     </div>
-                    <div className="h-[3.55rem] w-px bg-[#111111]" />
+                    <div className="h-[calc(3.55rem+5px)] w-px bg-[#111111] md:h-[3.55rem]" />
                     <div className="-mt-0.9 flex h-6 w-6 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white md:h-[2.1rem] md:w-[2.1rem]">
                       <Check size={9} className="md:h-[13px] md:w-[13px]" />
                     </div>
