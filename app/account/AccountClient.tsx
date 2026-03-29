@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useEffect, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -39,6 +40,40 @@ import {
   submitBookingReview,
   updateAccountProfile,
 } from './actions';
+
+function AccountSlidePanel({
+  title,
+  subtitle,
+  onBack,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  onBack: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
+      <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
+        <div className="flex items-center gap-3 pb-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
+            aria-label="Zurueck"
+          >
+            <ChevronRight size={18} />
+          </button>
+          <div>
+            <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">{title}</p>
+            <p className="text-[0.95rem] text-[#6a6a6a]">{subtitle}</p>
+          </div>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 type AccountTab = 'start' | 'profil' | 'favoriten' | 'buchungsverlauf';
 
@@ -260,10 +295,19 @@ export default function AccountClient({
     const nextSearch = params.toString();
     return `${pathname}${nextSearch ? `?${nextSearch}` : ''}`;
   };
+  const isMobileViewport = () => typeof window !== 'undefined' && window.innerWidth < 768;
+  const openPanelRoute = (panel: Exclude<AccountPanel, null>) => {
+    setOpenPanel(panel);
+    router.push(buildAccountHref({ tab: 'profil', panel }));
+  };
+  const closePanelRoute = () => {
+    setOpenPanel(null);
+    router.push(buildAccountHref({ panel: null }));
+  };
   const openProfileEditor = () => {
     setError(null);
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      router.push(buildAccountHref({ tab: 'profil', panel: 'profile-edit' }));
+    if (isMobileViewport()) {
+      openPanelRoute('profile-edit');
       return;
     }
     setIsEditingProfile(true);
@@ -524,11 +568,11 @@ export default function AccountClient({
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
   return (
-    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-[100px] md:pb-14 md:pt-0">
+    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-[30px] md:pb-14 md:pt-0">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
           {activeTab === 'start' ? (
-            <section className="space-y-4 md:pt-[100px]">
+            <section className="space-y-4 pt-[70px] md:pt-[100px]">
               <div className="px-1 md:px-2">
                 <div className="flex flex-col gap-4 md:gap-6">
                   <div className="hidden md:block">
@@ -555,7 +599,7 @@ export default function AccountClient({
               </div>
             </section>
           ) : (
-            <section className="hidden md:block md:pt-[100px]">
+            <section className="hidden md:block md:pt-[30px]">
               <div className="px-1 md:px-2">
                 <div className="w-full">
                   <div className="w-full">
@@ -621,8 +665,8 @@ export default function AccountClient({
                       <button
                         type="button"
                         onClick={() => {
-                          if (window.innerWidth < 768) {
-                            router.push(buildAccountHref({ tab: 'profil', panel: 'language' }));
+                          if (isMobileViewport()) {
+                            openPanelRoute('language');
                             return;
                           }
                           setIsLanguageExpanded((prev) => !prev);
@@ -681,8 +725,8 @@ export default function AccountClient({
                         type="button"
                         onClick={() => {
                           setInstallNotice(null);
-                          if (window.innerWidth < 768) {
-                            router.push(buildAccountHref({ tab: 'profil', panel: 'install' }));
+                          if (isMobileViewport()) {
+                            openPanelRoute('install');
                             return;
                           }
                           void triggerInstallPrompt();
@@ -831,7 +875,7 @@ export default function AccountClient({
                           onClick={() => {
                             setError(null);
                             setPendingFavoriteSlot(index);
-                            if (window.innerWidth < 768) {
+                            if (isMobileViewport()) {
                               setOpenPanel('favorite-add');
                               return;
                             }
@@ -1282,267 +1326,205 @@ export default function AccountClient({
         }
       />
       {openPanel === 'language' ? (
-        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
-          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
-            <div className="flex items-center gap-3 pb-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenPanel(null);
-                  router.push(buildAccountHref({ panel: null }));
-                }}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
-                aria-label="Zurueck"
-              >
-                <ChevronRight size={18} />
-              </button>
-              <div>
-                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Sprache</p>
-                <p className="text-[0.95rem] text-[#6a6a6a]">Waehlen Sie Ihre bevorzugte Sprache</p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-start gap-8 px-2">
-              {languageOptions.map((option) => {
-                const selected = option.code === activeLanguage;
-                return (
-                  <button
-                    key={option.code}
-                    type="button"
-                    onClick={() => {
-                      setOpenPanel(null);
-                      router.push(buildAccountHref({ lang: option.code, panel: null }));
-                    }}
-                    className={`flex w-full items-center justify-between rounded-[16px] px-8 py-2 text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111] ${
-                      selected ? 'bg-[#f5f5f7]' : ''
-                    }`}
-                  >
-                    <span>{option.label}</span>
-                    <span className="text-[0.95rem] font-semibold uppercase text-[#6b7280]">
-                      {option.code}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      ) : null}
-      {openPanel === 'install' ? (
-        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
-          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
-            <div className="flex items-center gap-3 pb-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenPanel(null);
-                  router.push(buildAccountHref({ panel: null }));
-                }}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
-                aria-label="Zurueck"
-              >
-                <ChevronRight size={18} />
-              </button>
-              <div>
-                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Installieren</p>
-                <p className="text-[0.95rem] text-[#6a6a6a]">Alex Flughafentaxi auf diesem Geraet sichern</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="rounded-[1.55rem] border border-[#0f1722] bg-[#000000] px-5 py-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
-                <div className="flex items-center gap-4">
-                  <img
-                    src="/favtaxi.png"
-                    alt="Alex Flughafentaxi"
-                    className="h-16 w-16 rounded-[1.2rem] object-cover"
-                  />
-                  <div className="min-w-0 text-white">
-                    <p className="text-[1.14rem] font-semibold tracking-[-0.04em]">Alex Flughafentaxi</p>
-                    <p className="mt-1 text-[0.95rem] leading-6 text-white/70">
-                      Eigene App mit direktem Zugriff auf Buchung, Profil und Fahrten.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
-                <div className="flex items-start gap-4">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                    <Download size={24} strokeWidth={1.8} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[1rem] font-medium text-[#111827]">{installRowLabel}</p>
-                    <p className="mt-1 text-[0.95rem] leading-6 text-[#6a6a6a]">{installRowHint}</p>
-                    {installNotice ? (
-                      <p className="mt-2 text-[0.92rem] leading-6 text-[#6a7d96]">{installNotice}</p>
-                    ) : null}
-                  </div>
-                </div>
-
+        <AccountSlidePanel
+          title="Sprache"
+          subtitle="Waehlen Sie Ihre bevorzugte Sprache"
+          onBack={closePanelRoute}
+        >
+          <div className="flex flex-col items-start gap-8 px-2">
+            {languageOptions.map((option) => {
+              const selected = option.code === activeLanguage;
+              return (
                 <button
-                  type="button"
-                  onClick={() => void triggerInstallPrompt()}
-                  disabled={isInstalling || installState === 'installed'}
-                  className="ui-button-booking-primary mt-5 w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {installState === 'installed'
-                    ? 'Bereits installiert'
-                    : isInstalling
-                      ? 'Installiert...'
-                      : 'Jetzt installieren'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
-      {openPanel === 'favorite-add' ? (
-        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
-          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
-            <div className="flex items-center gap-3 pb-6">
-                <button
+                  key={option.code}
                   type="button"
                   onClick={() => {
                     setOpenPanel(null);
-                    setFavAddress('');
-                    setPendingFavoriteSlot(null);
+                    router.push(buildAccountHref({ lang: option.code, panel: null }));
                   }}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
-                aria-label="Zurueck"
-              >
-                <ChevronRight size={18} />
-              </button>
-              <div>
-                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Ort hinzufuegen</p>
-                <p className="text-[0.95rem] text-[#6a6a6a]">Favorit fuer schnellere Buchungen speichern</p>
+                  className={`flex w-full items-center justify-between rounded-[16px] px-8 py-2 text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111] ${
+                    selected ? 'bg-[#f5f5f7]' : ''
+                  }`}
+                >
+                  <span>{option.label}</span>
+                  <span className="text-[0.95rem] font-semibold uppercase text-[#6b7280]">
+                    {option.code}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </AccountSlidePanel>
+      ) : null}
+      {openPanel === 'install' ? (
+        <AccountSlidePanel
+          title="Installieren"
+          subtitle="Alex Flughafentaxi auf diesem Geraet sichern"
+          onBack={closePanelRoute}
+        >
+          <div className="space-y-4">
+            <div className="rounded-[1.55rem] border border-[#0f1722] bg-[#000000] px-5 py-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
+              <div className="flex items-center gap-4">
+                <img
+                  src="/favtaxi.png"
+                  alt="Alex Flughafentaxi"
+                  className="h-16 w-16 rounded-[1.2rem] object-cover"
+                />
+                <div className="min-w-0 text-white">
+                  <p className="text-[1.14rem] font-semibold tracking-[-0.04em]">Alex Flughafentaxi</p>
+                  <p className="mt-1 text-[0.95rem] leading-6 text-white/70">
+                    Eigene App mit direktem Zugriff auf Buchung, Profil und Fahrten.
+                  </p>
+                </div>
               </div>
             </div>
 
             <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
-              <form
-                action={() => {
-                  setError(null);
-                  startTransition(async () => {
-                    const parsedAddress = parseFavoriteAddressInput(favAddress);
-                    if (!parsedAddress) {
-                      setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
-                      return;
-                    }
+              <div className="flex items-start gap-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                  <Download size={24} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[1rem] font-medium text-[#111827]">{installRowLabel}</p>
+                  <p className="mt-1 text-[0.95rem] leading-6 text-[#6a6a6a]">{installRowHint}</p>
+                  {installNotice ? (
+                    <p className="mt-2 text-[0.92rem] leading-6 text-[#6a7d96]">{installNotice}</p>
+                  ) : null}
+                </div>
+              </div>
 
-                    const formData = new FormData();
-                    formData.set('city', parsedAddress.city);
-                    formData.set('zip', parsedAddress.zip);
-                    formData.set('street', parsedAddress.street);
-                    formData.set('house_number', parsedAddress.house_number);
-
-                    const res = await addFavoriteAddress(formData);
-                    if ((res as { error?: string })?.error) {
-                      setError((res as { error: string }).error);
-                      return;
-                    }
-                    const inserted = (res as { favorite?: Favorite }).favorite;
-                    if (inserted?.id) {
-                      placeFavoriteIntoSlot(inserted, pendingFavoriteSlot);
-                    }
-                    setFavAddress('');
-                    setShowFavoriteForm(false);
-                    setPendingFavoriteSlot(null);
-                    setOpenPanel(null);
-                  });
-                }}
-                className="grid grid-cols-1 gap-3"
-              >
-                <input
-                  value={favAddress}
-                  onChange={(e) => setFavAddress(e.target.value)}
-                  className="ui-input"
-                  placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
-                  disabled={isPending}
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="ui-button-booking-primary w-full justify-center"
-                >
-                  {isPending ? 'Speichert...' : 'Speichern'}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      ) : null}
-      {openPanel === 'profile-edit' ? (
-        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
-          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
-            <div className="flex items-center gap-3 pb-6">
               <button
                 type="button"
-                onClick={() => {
-                  setOpenPanel(null);
-                  router.push(buildAccountHref({ panel: null }));
-                }}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
-                aria-label="Zurueck"
+                onClick={() => void triggerInstallPrompt()}
+                disabled={isInstalling || installState === 'installed'}
+                className="ui-button-booking-primary mt-5 w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <ChevronRight size={18} />
+                {installState === 'installed'
+                  ? 'Bereits installiert'
+                  : isInstalling
+                    ? 'Installiert...'
+                    : 'Jetzt installieren'}
               </button>
-              <div>
-                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Profil bearbeiten</p>
-                <p className="text-[0.95rem] text-[#6a6a6a]">Name und Telefonnummer aktualisieren</p>
-              </div>
-            </div>
-
-            <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
-              <form
-                action={(formData) => {
-                  setError(null);
-                  startTransition(async () => {
-                    const res = await updateAccountProfile(formData);
-                    if ((res as { error?: string })?.error) {
-                      setError((res as { error: string }).error);
-                      return;
-                    }
-                    setOpenPanel(null);
-                    router.push(buildAccountHref({ panel: null }));
-                  });
-                }}
-                className="grid grid-cols-1 gap-3"
-              >
-                <input
-                  name="full_name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="ui-input"
-                  placeholder="Name"
-                  required
-                />
-                <input
-                  name="phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="ui-input"
-                  placeholder="Telefon"
-                  required
-                />
-                <input
-                  value={userEmail}
-                  readOnly
-                  aria-label="E-Mail kann nicht geaendert werden"
-                  className="ui-input cursor-not-allowed border-[#e5e7eb] bg-[#f3f4f6] text-[#8b95a7]"
-                />
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="ui-button-booking-primary w-full justify-center"
-                >
-                  {isPending ? 'Speichern...' : 'Profil speichern'}
-                </button>
-              </form>
             </div>
           </div>
-        </div>
+        </AccountSlidePanel>
+      ) : null}
+      {openPanel === 'favorite-add' ? (
+        <AccountSlidePanel
+          title="Ort hinzufuegen"
+          subtitle="Favorit fuer schnellere Buchungen speichern"
+          onBack={() => {
+            setOpenPanel(null);
+            setFavAddress('');
+            setPendingFavoriteSlot(null);
+          }}
+        >
+          <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+            <form
+              action={() => {
+                setError(null);
+                startTransition(async () => {
+                  const parsedAddress = parseFavoriteAddressInput(favAddress);
+                  if (!parsedAddress) {
+                    setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
+                    return;
+                  }
+
+                  const formData = new FormData();
+                  formData.set('city', parsedAddress.city);
+                  formData.set('zip', parsedAddress.zip);
+                  formData.set('street', parsedAddress.street);
+                  formData.set('house_number', parsedAddress.house_number);
+
+                  const res = await addFavoriteAddress(formData);
+                  if ((res as { error?: string })?.error) {
+                    setError((res as { error: string }).error);
+                    return;
+                  }
+                  const inserted = (res as { favorite?: Favorite }).favorite;
+                  if (inserted?.id) {
+                    placeFavoriteIntoSlot(inserted, pendingFavoriteSlot);
+                  }
+                  setFavAddress('');
+                  setShowFavoriteForm(false);
+                  setPendingFavoriteSlot(null);
+                  setOpenPanel(null);
+                });
+              }}
+              className="grid grid-cols-1 gap-3"
+            >
+              <input
+                value={favAddress}
+                onChange={(e) => setFavAddress(e.target.value)}
+                className="ui-input"
+                placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                disabled={isPending}
+                required
+              />
+              <button
+                type="submit"
+                disabled={isPending}
+                className="ui-button-booking-primary w-full justify-center"
+              >
+                {isPending ? 'Speichert...' : 'Speichern'}
+              </button>
+            </form>
+          </div>
+        </AccountSlidePanel>
+      ) : null}
+      {openPanel === 'profile-edit' ? (
+        <AccountSlidePanel
+          title="Profil bearbeiten"
+          subtitle="Name und Telefonnummer aktualisieren"
+          onBack={closePanelRoute}
+        >
+          <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+            <form
+              action={(formData) => {
+                setError(null);
+                startTransition(async () => {
+                  const res = await updateAccountProfile(formData);
+                  if ((res as { error?: string })?.error) {
+                    setError((res as { error: string }).error);
+                    return;
+                  }
+                  closePanelRoute();
+                });
+              }}
+              className="grid grid-cols-1 gap-3"
+            >
+              <input
+                name="full_name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="ui-input"
+                placeholder="Name"
+                required
+              />
+              <input
+                name="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="ui-input"
+                placeholder="Telefon"
+                required
+              />
+              <input
+                value={userEmail}
+                readOnly
+                aria-label="E-Mail kann nicht geaendert werden"
+                className="ui-input cursor-not-allowed border-[#e5e7eb] bg-[#f3f4f6] text-[#8b95a7]"
+              />
+              <button
+                type="submit"
+                disabled={isPending}
+                className="ui-button-booking-primary w-full justify-center"
+              >
+                {isPending ? 'Speichern...' : 'Profil speichern'}
+              </button>
+            </form>
+          </div>
+        </AccountSlidePanel>
       ) : null}
       {isLogoutConfirmOpen ? (
         <div
