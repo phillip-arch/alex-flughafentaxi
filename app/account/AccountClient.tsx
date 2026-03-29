@@ -53,8 +53,8 @@ function AccountSlidePanel({
   children: ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
-      <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
+    <div className="fixed inset-0 z-[120] h-[100dvh] overflow-hidden bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
+      <div className="app-container flex h-[100dvh] flex-col overflow-hidden animate-in slide-in-from-right-full duration-300 pt-[30px]">
         <div className="flex items-center gap-3 pb-6">
           <button
             type="button"
@@ -69,7 +69,9 @@ function AccountSlidePanel({
             <p className="text-[0.95rem] text-[#6a6a6a]">{subtitle}</p>
           </div>
         </div>
-        {children}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-8">
+          {children}
+        </div>
       </div>
     </div>
   );
