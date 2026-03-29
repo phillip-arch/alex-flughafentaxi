@@ -42,7 +42,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(buildSurfaceUrl('dispatch', pathnameWithSearch));
     }
 
-    if (isCustomerAppPath(path)) {
+    const shouldStayOnWeb = path === '/book' || path.startsWith('/book/');
+
+    if (isCustomerAppPath(path) && !shouldStayOnWeb) {
       return NextResponse.redirect(buildSurfaceUrl('app', pathnameWithSearch));
     }
   }

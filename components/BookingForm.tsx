@@ -814,6 +814,11 @@ const BookingForm = ({
             },
           }),
         );
+
+        if (getAppSurface() === 'www') {
+          window.location.assign('/book');
+          return;
+        }
       }
 
       router.push('/book');
