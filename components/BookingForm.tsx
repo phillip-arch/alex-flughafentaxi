@@ -1013,7 +1013,7 @@ const BookingForm = ({
                 )}
               <div className="-ml-2 rounded-[2.2rem] bg-transparent py-3 pl-3 pr-0 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
                 <div className="flex gap-4">
-                  <div className="flex w-6 shrink-0 flex-col items-center pt-[1.45rem] md:w-[2.1rem]">
+                  <div className="flex w-6 shrink-0 flex-col items-center pt-[calc(1.45rem+5px)] md:w-[2.1rem] md:pt-[1.45rem]">
                     <div className={`flex h-6 w-6 items-center justify-center rounded-full md:h-[2.1rem] md:w-[2.1rem] ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={9} className="md:h-[13px] md:w-[13px]" /> : <MapPin size={9} className="md:h-[13px] md:w-[13px]" />}
                     </div>
