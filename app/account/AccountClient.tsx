@@ -113,6 +113,7 @@ export default function AccountClient({
   const [bookings, setBookings] = useState<Booking[]>(initialBookings || []);
   const [favAddress, setFavAddress] = useState('');
   const [showFavoriteForm, setShowFavoriteForm] = useState(false);
+  const [pendingFavoriteSlot, setPendingFavoriteSlot] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [bookingNotice, setBookingNotice] = useState<string | null>(null);
@@ -208,6 +209,17 @@ export default function AccountClient({
       return;
     }
     setIsEditingProfile(true);
+  };
+  const placeFavoriteIntoSlot = (favorite: Favorite, slotIndex: number | null) => {
+    setFavorites((prev) => {
+      if (slotIndex === null || slotIndex < 0) {
+        return [...prev, favorite];
+      }
+
+      const next = [...prev];
+      next.splice(slotIndex, 0, favorite);
+      return next.slice(0, favoriteSlotItems.length);
+    });
   };
   const favoriteSlotItems = [
     {
@@ -690,6 +702,7 @@ export default function AccountClient({
                           type="button"
                           onClick={() => {
                             setError(null);
+                            setPendingFavoriteSlot(index);
                             if (window.innerWidth < 768) {
                               setOpenPanel('favorite-add');
                               return;
@@ -734,10 +747,11 @@ export default function AccountClient({
                         }
                         const inserted = (res as { favorite?: Favorite }).favorite;
                         if (inserted?.id) {
-                          setFavorites((prev) => [...prev, inserted]);
+                          placeFavoriteIntoSlot(inserted, pendingFavoriteSlot);
                         }
                         setFavAddress('');
                         setShowFavoriteForm(false);
+                        setPendingFavoriteSlot(null);
                       });
                     }}
                     className="mt-5 grid grid-cols-1 gap-3 border-t border-[#efebe4] pt-5"
@@ -1177,6 +1191,7 @@ export default function AccountClient({
                   onClick={() => {
                     setOpenPanel(null);
                     setFavAddress('');
+                    setPendingFavoriteSlot(null);
                   }}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
                 aria-label="Zurueck"
@@ -1213,10 +1228,11 @@ export default function AccountClient({
                     }
                     const inserted = (res as { favorite?: Favorite }).favorite;
                     if (inserted?.id) {
-                      setFavorites((prev) => [...prev, inserted]);
+                      placeFavoriteIntoSlot(inserted, pendingFavoriteSlot);
                     }
                     setFavAddress('');
                     setShowFavoriteForm(false);
+                    setPendingFavoriteSlot(null);
                     setOpenPanel(null);
                   });
                 }}
