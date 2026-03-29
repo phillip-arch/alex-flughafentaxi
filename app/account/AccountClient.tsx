@@ -622,6 +622,7 @@ export default function AccountClient({
                       onDirectionChange={setBookingDirection}
                       showStepIndicator={false}
                       showInfoTrigger
+                      isAppSurface
                       initialFavorites={favorites}
                       initialIsLoggedIn
                       initialAccountDefaults={{

@@ -88,6 +88,7 @@ type BookingFormProps = {
   onDirectionChange?: (direction: Direction) => void;
   showStepIndicator?: boolean;
   showInfoTrigger?: boolean;
+  isAppSurface?: boolean;
   initialFavorites?: FavoriteAddress[];
   initialIsLoggedIn?: boolean;
   initialAccountDefaults?: {
@@ -119,6 +120,7 @@ const BookingForm = ({
   onDirectionChange,
   showStepIndicator = true,
   showInfoTrigger = false,
+  isAppSurface: isAppSurfaceProp,
   initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
   initialAccountDefaults = EMPTY_ACCOUNT_DEFAULTS,
@@ -126,7 +128,7 @@ const BookingForm = ({
   const router = useRouter();
   const pathname = usePathname();
   const isHomepageForm = pathname === '/';
-  const isAppSurface = getAppSurface() === 'app';
+  const isAppSurface = isAppSurfaceProp ?? getAppSurface() === 'app';
   const allowExtendedDropdownSpace = !isHomepageForm;
   const supabase = supabaseBrowser();
   const [currentStep, setCurrentStep] = useState(1);
