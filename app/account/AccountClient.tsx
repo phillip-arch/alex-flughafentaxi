@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import Image from 'next/image';
 import { useEffect, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -982,6 +983,17 @@ export default function AccountClient({
                     </span>
                     <span className="text-[1rem] font-medium text-[#111827]">Konto loeschen</span>
                   </button>
+                </div>
+
+                <div className="flex justify-center pt-2">
+                  <Image
+                    src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/applogo.jpg"
+                    alt="Alex Flughafentaxi"
+                    width={72}
+                    height={72}
+                    className="h-[30px] w-auto object-contain opacity-90"
+                    priority
+                  />
                 </div>
               </div>
             </section>
