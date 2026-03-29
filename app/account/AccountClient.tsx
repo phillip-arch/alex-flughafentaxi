@@ -576,35 +576,6 @@ export default function AccountClient({
                       ) : null}
                     </div>
 
-                    <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
-                      <button
-                        type="button"
-                        onClick={() => setIsLogoutConfirmOpen(true)}
-                        className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827]"
-                      >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                          <LogOut size={24} strokeWidth={1.8} />
-                        </span>
-                        <span className="text-[1rem] font-medium text-[#111827]">Abmelden</span>
-                      </button>
-
-                      <div className="border-t border-[#efebe4]" />
-
-                      <button
-                        type="button"
-                        disabled={isDeletingAccount}
-                        onClick={() => {
-                          setError(null);
-                          setIsDeleteConfirmOpen(true);
-                        }}
-                        className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
-                          <Trash2 size={24} strokeWidth={1.8} />
-                        </span>
-                        <span className="text-[1rem] font-medium text-[#111827]">Konto loeschen</span>
-                      </button>
-                    </div>
                   </div>
                 ) : (
                   <form
@@ -807,6 +778,36 @@ export default function AccountClient({
                 </div>
 
                 {error ? <p className="text-sm text-[#d70015]">{error}</p> : null}
+
+                <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+                  <button
+                    type="button"
+                    onClick={() => setIsLogoutConfirmOpen(true)}
+                    className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827]"
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                      <LogOut size={24} strokeWidth={1.8} />
+                    </span>
+                    <span className="text-[1rem] font-medium text-[#111827]">Abmelden</span>
+                  </button>
+
+                  <div className="border-t border-[#efebe4]" />
+
+                  <button
+                    type="button"
+                    disabled={isDeletingAccount}
+                    onClick={() => {
+                      setError(null);
+                      setIsDeleteConfirmOpen(true);
+                    }}
+                    className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                      <Trash2 size={24} strokeWidth={1.8} />
+                    </span>
+                    <span className="text-[1rem] font-medium text-[#111827]">Konto loeschen</span>
+                  </button>
+                </div>
               </div>
             </section>
           ) : null}
