@@ -392,7 +392,8 @@ export default function AccountClient({
   }, [initialBookings, initialBookingsLoaded]);
 
   useEffect(() => {
-    if (activeTab === 'favoriten' && !favoritesLoaded && !favoritesLoading) {
+    const shouldLoadFavorites = activeTab === 'favoriten' || activeTab === 'profil';
+    if (shouldLoadFavorites && !favoritesLoaded && !favoritesLoading) {
       setFavoritesLoading(true);
       void loadFavoriteAddresses().then((res) => {
         if ((res as { error?: string }).error) {

@@ -50,7 +50,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
     .maybeSingle();
 
   const favoritesPromise =
-    requestedTab === 'favoriten' || requestedTab === 'start'
+    requestedTab === 'favoriten' || requestedTab === 'start' || requestedTab === 'profil'
       ? supabase
           .from('saved_addresses')
           .select('id, city, zip, street, house_number')
@@ -113,7 +113,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         initialBookings={bookingsWithReviews as any}
         initialRequestedTab={requestedTab}
         initialOpenPanel={requestedPanel}
-        initialFavoritesLoaded={requestedTab === 'favoriten' || requestedTab === 'start'}
+        initialFavoritesLoaded={requestedTab === 'favoriten' || requestedTab === 'start' || requestedTab === 'profil'}
         initialBookingsLoaded={requestedTab === 'buchungsverlauf'}
       />
     </main>
