@@ -139,6 +139,7 @@ const BookingForm = ({
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(initialFavorites);
+  const [isFavoriteListOpen, setIsFavoriteListOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
   const [accountDefaults, setAccountDefaults] = useState(initialAccountDefaults);
   const [openInlineSelect, setOpenInlineSelect] = useState<InlineSelectFieldName | null>(null);
@@ -211,6 +212,31 @@ const BookingForm = ({
   }, [openInlineSelect]);
 
   useEffect(() => {
+    if (!isFavoriteListOpen) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target?.closest('[data-favorite-list-root="true"]')) {
+        setIsFavoriteListOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsFavoriteListOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isFavoriteListOpen]);
+
+  useEffect(() => {
     if (!isInfoPanelOpen) return;
 
     const handleEscape = (event: KeyboardEvent) => {
@@ -267,6 +293,7 @@ const BookingForm = ({
       ...prev,
       street: false,
     }));
+    setIsFavoriteListOpen(false);
   };
 
   useEffect(() => {
@@ -580,30 +607,34 @@ const BookingForm = ({
     );
   };
 
-  const renderFavoriteAddressButtons = () => {
-    if (!isAppSurface || !isLoggedIn || favoriteAddresses.length === 0) return null;
+  const renderFavoriteAddressSuggestions = () => {
+    if (!isAppSurface || !isLoggedIn || favoriteAddresses.length === 0 || !isFavoriteListOpen) return null;
 
     return (
-      <div className="flex flex-wrap items-start gap-2">
+      <div className="absolute left-0 right-0 top-[calc(100%+0.55rem)] z-30 overflow-hidden rounded-[18px] border border-[#dbe7f8] bg-white shadow-[0_18px_40px_rgba(17,17,17,0.12)]">
         {favoriteAddresses.map((favorite, index) => (
           (() => {
             const Icon = FAVORITE_ADDRESS_ICONS[index] || MapPin;
+            const addressLabel = `${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`;
 
             return (
               <button
                 key={favorite.id}
                 type="button"
                 onClick={() => applyFavoriteAddress(favorite)}
-                title={`${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`}
-                aria-label={`${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`}
-                className="group flex cursor-pointer items-center justify-center rounded-full border border-transparent bg-transparent p-0 text-center text-[11px] font-medium text-[#111111] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2"
+                title={addressLabel}
+                aria-label={addressLabel}
+                className={`flex w-full items-center gap-3 px-4 py-3 text-left text-[0.95rem] font-medium text-[#111111] transition-colors hover:bg-[#f8fbff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-inset ${
+                  index > 0 ? 'border-t border-[#edf2f7]' : ''
+                }`}
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff] transition-all duration-150 group-hover:scale-105 group-hover:bg-[#dfeeff] group-active:scale-[0.97]">
-                  <Icon size={15} strokeWidth={2.2} />
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
+                  <Icon size={16} strokeWidth={2.1} />
                 </span>
+                <span className="min-w-0 truncate">{addressLabel}</span>
               </button>
-          );
-        })()
+            );
+          })()
         ))}
       </div>
     );
@@ -1039,17 +1070,24 @@ const BookingForm = ({
                         </div>
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
-                        <div className="mt-1 min-h-[3.5rem] space-y-2">
-                          {renderFavoriteAddressButtons()}
+                        <div className="mt-1 min-h-[3.5rem]">
                           <input
                             type="text"
                             name="street"
                             value={formData.street}
                             onChange={handleChange}
+                            onFocus={() => {
+                              if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
+                                setIsFavoriteListOpen(true);
+                              }
+                            }}
                             onBlur={handleBlur}
                             placeholder="Adresse eingeben"
                             className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
                           />
+                          <div className="relative" data-favorite-list-root="true">
+                            {renderFavoriteAddressSuggestions()}
+                          </div>
                           {renderExtraStopPanel()}
                         </div>
                       ) : null}
@@ -1058,17 +1096,24 @@ const BookingForm = ({
                     <div className="mt-3 min-h-[4.75rem]">
                       <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
                       {formData.direction === 'from_airport' ? (
-                        <div className="mt-1 min-h-[3.5rem] space-y-2">
-                          {renderFavoriteAddressButtons()}
+                        <div className="mt-1 min-h-[3.5rem]">
                           <input
                             type="text"
                             name="street"
                             value={formData.street}
                             onChange={handleChange}
+                            onFocus={() => {
+                              if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
+                                setIsFavoriteListOpen(true);
+                              }
+                            }}
                             onBlur={handleBlur}
                             placeholder="Adresse eingeben"
                             className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
                           />
+                          <div className="relative" data-favorite-list-root="true">
+                            {renderFavoriteAddressSuggestions()}
+                          </div>
                           {renderExtraStopPanel()}
                         </div>
                       ) : (
