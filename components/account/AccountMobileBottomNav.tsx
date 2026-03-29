@@ -37,7 +37,7 @@ export default function AccountMobileBottomNav({
       <div
         className={
           placement === 'inline'
-            ? 'w-full rounded-[1.45rem] border border-[#dbe7f8] bg-white p-2 shadow-[0_10px_24px_rgba(17,17,17,0.06)]'
+            ? 'w-full bg-transparent p-0 shadow-none'
             : 'w-full border-t border-[#dbe7f8] bg-white/98 px-4 pt-1.5 shadow-[0_-10px_30px_rgba(17,17,17,0.08)] backdrop-blur [padding-bottom:calc(env(safe-area-inset-bottom,0px)+10px)]'
         }
       >
