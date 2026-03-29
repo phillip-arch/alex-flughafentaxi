@@ -524,11 +524,11 @@ export default function AccountClient({
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
   return (
-    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-[30px] md:pb-14 md:pt-0">
+    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-[100px] md:pb-14 md:pt-0">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
           {activeTab === 'start' ? (
-            <section className="space-y-4 md:pt-[30px]">
+            <section className="space-y-4 md:pt-[100px]">
               <div className="px-1 md:px-2">
                 <div className="flex flex-col gap-4 md:gap-6">
                   <div className="hidden md:block">
@@ -555,7 +555,7 @@ export default function AccountClient({
               </div>
             </section>
           ) : (
-            <section className="hidden md:block md:pt-[30px]">
+            <section className="hidden md:block md:pt-[100px]">
               <div className="px-1 md:px-2">
                 <div className="w-full">
                   <div className="w-full">
