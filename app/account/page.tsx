@@ -104,7 +104,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-white text-[var(--color-text)]">
+    <main className="min-h-screen bg-[#f7f9fc] text-[var(--color-text)]">
       <AccountClient
         userEmail={user.email || ''}
         initialName={profile?.full_name || ''}
