@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { AccountNavIcon } from '@/components/account/AccountNavIcons';
@@ -41,7 +42,20 @@ export default function AccountMobileBottomNav({
             : 'w-full border-t border-[#dbe7f8] bg-white/98 px-4 pt-1.5 shadow-[0_-10px_30px_rgba(17,17,17,0.08)] backdrop-blur [padding-bottom:calc(env(safe-area-inset-bottom,0px)+10px)]'
         }
       >
-        <div className={placement === 'inline' ? 'ml-auto grid w-full max-w-[26rem] grid-cols-3 gap-3' : 'grid grid-cols-3 gap-3'}>
+        <div className={placement === 'inline' ? 'flex w-full items-center justify-between gap-8' : 'grid grid-cols-3 gap-3'}>
+          {placement === 'inline' ? (
+            <Link href="/account?tab=start" aria-label="Alex Flughafentaxi Home" className="shrink-0">
+              <Image
+                src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/applogo.jpg"
+                alt="Alex Flughafentaxi"
+                width={92}
+                height={92}
+                className="h-[60px] w-auto object-contain"
+                priority
+              />
+            </Link>
+          ) : null}
+          <div className={placement === 'inline' ? 'ml-auto grid w-full max-w-[26rem] grid-cols-3 gap-3' : 'grid grid-cols-3 gap-3'}>
           {items.map((item) => {
             const itemUrl = new URL(item.href, 'https://app.local');
             const currentTab = searchParams.get('tab') || '';
@@ -81,6 +95,7 @@ export default function AccountMobileBottomNav({
               </Link>
             );
           })}
+          </div>
         </div>
       </div>
     </nav>

@@ -6,6 +6,9 @@ import PwaInstallEvents from '@/components/pwa/PwaInstallEvents';
 import { getAppSurface } from '@/lib/routing/surfaces';
 import './globals.css';
 
+const APP_PHONE_ICON_URL =
+  'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/appphoneicon.jpg';
+
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
@@ -32,8 +35,8 @@ export const metadata: Metadata = {
     title: 'Alex Flughafentaxi',
   },
   icons: {
-    icon: [{ url: '/favtaxi.png', type: 'image/png' }],
-    apple: [{ url: '/favtaxi.png' }],
+    icon: [{ url: APP_PHONE_ICON_URL, type: 'image/jpeg' }],
+    apple: [{ url: APP_PHONE_ICON_URL }],
   },
   openGraph: {
     title: 'Alex Flughafentaxi',
@@ -60,7 +63,7 @@ export default function RootLayout({
     <html lang="de" className={`${inter.variable} ${archivo.variable}`}>
       <head>
         <meta name="theme-color" content="#000000" />
-        <link rel="icon" href="/favtaxi.png" type="image/png" />
+        <link rel="icon" href={APP_PHONE_ICON_URL} type="image/jpeg" />
       </head>
       <body suppressHydrationWarning className="app-shell font-sans antialiased">
         {children}

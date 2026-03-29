@@ -12,9 +12,9 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#000000',
     icons: [
       {
-        src: '/favtaxi.png',
+        src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/appphoneicon.jpg',
         sizes: '512x512',
-        type: 'image/png',
+        type: 'image/jpeg',
         purpose: 'maskable',
       },
     ],
