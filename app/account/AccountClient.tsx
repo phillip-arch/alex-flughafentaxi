@@ -1155,9 +1155,27 @@ export default function AccountClient({
         }
       />
       {openPanel === 'language' ? (
-        <div className="fixed inset-x-0 bottom-0 top-[66px] z-[120] bg-white text-[#111111] md:hidden">
-          <div className="px-8 pt-8">
-            <div className="flex flex-col items-start gap-8">
+        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
+          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
+            <div className="flex items-center gap-3 pb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenPanel(null);
+                  router.push(buildAccountHref({ panel: null }));
+                }}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
+                aria-label="Zurueck"
+              >
+                <ChevronRight size={18} />
+              </button>
+              <div>
+                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Sprache</p>
+                <p className="text-[0.95rem] text-[#6a6a6a]">Waehlen Sie Ihre bevorzugte Sprache</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-start gap-8 px-2">
               {languageOptions.map((option) => {
                 const selected = option.code === activeLanguage;
                 return (
@@ -1168,7 +1186,7 @@ export default function AccountClient({
                       setOpenPanel(null);
                       router.push(buildAccountHref({ lang: option.code, panel: null }));
                     }}
-                    className={`flex w-full items-center justify-between text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111] ${
+                    className={`flex w-full items-center justify-between rounded-[16px] px-8 py-2 text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111] ${
                       selected ? 'bg-[#f5f5f7]' : ''
                     }`}
                   >
@@ -1197,7 +1215,7 @@ export default function AccountClient({
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
                 aria-label="Zurueck"
               >
-                <ChevronLeft size={18} />
+                <ChevronRight size={18} />
               </button>
               <div>
                 <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Ort hinzufuegen</p>
@@ -1272,7 +1290,7 @@ export default function AccountClient({
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
                 aria-label="Zurueck"
               >
-                <ChevronLeft size={18} />
+                <ChevronRight size={18} />
               </button>
               <div>
                 <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Profil bearbeiten</p>

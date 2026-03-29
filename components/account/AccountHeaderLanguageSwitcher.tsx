@@ -108,7 +108,7 @@ export default function AccountHeaderLanguageSwitcher() {
           <div className="absolute right-0 top-[calc(100%+12px)] z-20 w-[280px] rounded-[24px] border border-[#e8e8ed] bg-white p-3 text-[#111111] shadow-[0_22px_60px_rgba(17,17,17,0.16)]">
             <div className="grid grid-cols-2 gap-1">
               {renderLanguageItems(
-                'flex items-center justify-between rounded-[16px] px-3 py-3 text-[15px] font-medium transition-colors hover:bg-[#f5f5f7]',
+                'flex items-center justify-between rounded-[16px] px-4 py-3.5 text-[15px] font-medium transition-colors hover:bg-[#f5f5f7]',
                 'text-[13px] font-semibold uppercase text-[#6b7280]',
               )}
             </div>
@@ -138,7 +138,7 @@ export default function AccountHeaderLanguageSwitcher() {
           <div className="px-8 pt-8">
             <div className="flex flex-col items-start gap-8">
               {renderLanguageItems(
-                'flex w-full items-center justify-between text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111]',
+                'flex w-full items-center justify-between rounded-[16px] px-8 py-2 text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111]',
                 'text-[0.95rem] font-semibold uppercase text-[#6b7280]',
               )}
             </div>
