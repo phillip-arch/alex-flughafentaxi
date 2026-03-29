@@ -1091,6 +1091,8 @@ const BookingForm = ({
                               }}
                               onBlur={handleBlur}
                               placeholder="Adresse eingeben"
+                              autoComplete="street-address"
+                              inputMode="text"
                               className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
                             />
                             {renderFavoriteAddressSuggestions()}
@@ -1122,6 +1124,8 @@ const BookingForm = ({
                               }}
                               onBlur={handleBlur}
                               placeholder="Adresse eingeben"
+                              autoComplete="street-address"
+                              inputMode="text"
                               className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
                             />
                             {renderFavoriteAddressSuggestions()}
@@ -1232,7 +1236,7 @@ const BookingForm = ({
           <div className="flex h-[100dvh] md:min-h-full md:justify-end md:p-0">
             <div className="h-[100dvh] w-full overflow-y-auto overscroll-contain animate-in slide-in-from-right-full duration-300 md:h-screen md:w-[46vw] md:min-w-[34rem] md:max-w-[48rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
               <div className="min-h-full px-6 pt-[24px] pb-8 md:px-8 md:py-8">
-              <div className="pb-6">
+              <div className="sticky top-0 z-10 -mx-6 bg-white/96 px-6 pb-4 pt-1 backdrop-blur-sm md:static md:mx-0 md:bg-transparent md:px-0 md:pb-6 md:pt-0 md:backdrop-blur-0">
                 <div className="flex items-start justify-between gap-3 md:items-center">
                   <button
                     type="button"
@@ -1251,7 +1255,9 @@ const BookingForm = ({
                     <X size={18} />
                   </button>
                 </div>
-                <div className="mt-6 min-w-0">
+              </div>
+              <div className="pb-6 pt-2 md:pt-0">
+                <div className="min-w-0">
                   <p className="text-[0.82rem] font-semibold uppercase tracking-[0.22em] text-[#1679ff]">
                     Informationen
                   </p>
