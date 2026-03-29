@@ -1071,21 +1071,26 @@ const BookingForm = ({
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem]">
-                          <input
-                            type="text"
-                            name="street"
-                            value={formData.street}
-                            onChange={handleChange}
-                            onFocus={() => {
-                              if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
-                                setIsFavoriteListOpen(true);
-                              }
-                            }}
-                            onBlur={handleBlur}
-                            placeholder="Adresse eingeben"
-                            className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
-                          />
                           <div className="relative" data-favorite-list-root="true">
+                            <input
+                              type="text"
+                              name="street"
+                              value={formData.street}
+                              onChange={handleChange}
+                              onClick={() => {
+                                if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
+                                  setIsFavoriteListOpen(true);
+                                }
+                              }}
+                              onFocus={() => {
+                                if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
+                                  setIsFavoriteListOpen(true);
+                                }
+                              }}
+                              onBlur={handleBlur}
+                              placeholder="Adresse eingeben"
+                              className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
+                            />
                             {renderFavoriteAddressSuggestions()}
                           </div>
                           {renderExtraStopPanel()}
@@ -1097,21 +1102,26 @@ const BookingForm = ({
                       <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem]">
-                          <input
-                            type="text"
-                            name="street"
-                            value={formData.street}
-                            onChange={handleChange}
-                            onFocus={() => {
-                              if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
-                                setIsFavoriteListOpen(true);
-                              }
-                            }}
-                            onBlur={handleBlur}
-                            placeholder="Adresse eingeben"
-                            className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
-                          />
                           <div className="relative" data-favorite-list-root="true">
+                            <input
+                              type="text"
+                              name="street"
+                              value={formData.street}
+                              onChange={handleChange}
+                              onClick={() => {
+                                if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
+                                  setIsFavoriteListOpen(true);
+                                }
+                              }}
+                              onFocus={() => {
+                                if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
+                                  setIsFavoriteListOpen(true);
+                                }
+                              }}
+                              onBlur={handleBlur}
+                              placeholder="Adresse eingeben"
+                              className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
+                            />
                             {renderFavoriteAddressSuggestions()}
                           </div>
                           {renderExtraStopPanel()}
