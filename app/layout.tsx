@@ -2,6 +2,7 @@ import { Archivo, Inter } from 'next/font/google';
 import { Metadata } from 'next';
 import FooterGate from '@/components/FooterGate';
 import GlobalChromeClient from '@/components/GlobalChromeClient';
+import PwaInstallEvents from '@/components/pwa/PwaInstallEvents';
 import { getAppSurface } from '@/lib/routing/surfaces';
 import './globals.css';
 
@@ -20,9 +21,20 @@ export const metadata: Metadata = {
     template: '%s | Alex Flughafentaxi',
     default: 'Ihr professioneller Flughafen Taxi Service',
   },
+  manifest: '/manifest.webmanifest',
   description:
     'Buchen Sie Ihren Flughafentransfer in Wien. Fixpreise, zuverlaessiger Service und komfortable Fahrten zum und vom Flughafen Wien.',
   metadataBase: new URL('https://flughafentaxi-wien.at'),
+  applicationName: 'Alex Flughafentaxi',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black',
+    title: 'Alex Flughafentaxi',
+  },
+  icons: {
+    icon: [{ url: '/favtaxi.png', type: 'image/png' }],
+    apple: [{ url: '/favtaxi.png' }],
+  },
   openGraph: {
     title: 'Alex Flughafentaxi',
     description: 'Zuverlaessiger Flughafentransfer in Wien.',
@@ -52,6 +64,7 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning className="app-shell font-sans antialiased">
         {children}
+        <PwaInstallEvents />
         <GlobalChromeClient surface={surface} />
         <FooterGate surface={surface} />
       </body>

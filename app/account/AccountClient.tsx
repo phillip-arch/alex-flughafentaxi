@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronRight,
   Clock3,
+  Download,
   Edit,
   Globe,
   History,
@@ -71,7 +72,23 @@ type Booking = {
 };
 
 type BookingFilter = 'all' | 'upcoming' | 'previous' | 'canceled' | 'to_airport' | 'from_airport';
-type AccountPanel = 'language' | 'delete' | 'favorite-add' | 'profile-edit' | null;
+type AccountPanel = 'language' | 'delete' | 'favorite-add' | 'profile-edit' | 'install' | null;
+type InstallState = 'hidden' | 'available' | 'installed' | 'unavailable';
+
+declare global {
+  interface BeforeInstallPromptEvent extends Event {
+    prompt: () => Promise<void>;
+    userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+  }
+
+  interface Window {
+    __aftDeferredInstallPrompt?: BeforeInstallPromptEvent | null;
+  }
+
+  interface Navigator {
+    standalone?: boolean;
+  }
+}
 
 const languageOptions = [
   { code: 'de', label: 'Deutsch' },
@@ -129,6 +146,9 @@ export default function AccountClient({
   const [openPanel, setOpenPanel] = useState<AccountPanel>(initialOpenPanel);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [installState, setInstallState] = useState<InstallState>('hidden');
+  const [isInstalling, setIsInstalling] = useState(false);
+  const [installNotice, setInstallNotice] = useState<string | null>(null);
   const [isDeletingAccount, startDeleteTransition] = useTransition();
   const [isPending, startTransition] = useTransition();
   const [favoritesLoaded, setFavoritesLoaded] = useState(initialFavoritesLoaded);
@@ -190,6 +210,44 @@ export default function AccountClient({
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isDeleteConfirmOpen]);
 
+  useEffect(() => {
+    const evaluateInstallState = () => {
+      if (typeof window === 'undefined') return;
+
+      const installed =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        Boolean(window.navigator.standalone);
+
+      if (installed) {
+        setInstallState('installed');
+        return;
+      }
+
+      if (window.__aftDeferredInstallPrompt) {
+        setInstallState('available');
+        return;
+      }
+
+      setInstallState('unavailable');
+    };
+
+    evaluateInstallState();
+
+    const handleAvailable = () => evaluateInstallState();
+    const handleInstalled = () => {
+      setInstallState('installed');
+      setInstallNotice('Alex Flughafentaxi wurde auf diesem Geraet installiert.');
+    };
+
+    window.addEventListener('aft-install-available', handleAvailable);
+    window.addEventListener('aft-install-installed', handleInstalled);
+
+    return () => {
+      window.removeEventListener('aft-install-available', handleAvailable);
+      window.removeEventListener('aft-install-installed', handleInstalled);
+    };
+  }, []);
+
   const buildAccountHref = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
@@ -209,6 +267,36 @@ export default function AccountClient({
       return;
     }
     setIsEditingProfile(true);
+  };
+
+  const triggerInstallPrompt = async () => {
+    if (typeof window === 'undefined') return;
+
+    setInstallNotice(null);
+
+    const promptEvent = window.__aftDeferredInstallPrompt;
+    if (!promptEvent) {
+      setInstallState((prev) => (prev === 'installed' ? prev : 'unavailable'));
+      setInstallNotice('Installation ist auf diesem Geraet aktuell nicht direkt verfuegbar.');
+      return;
+    }
+
+    setIsInstalling(true);
+    try {
+      await promptEvent.prompt();
+      const choice = await promptEvent.userChoice;
+
+      if (choice.outcome === 'accepted') {
+        setInstallState('installed');
+        setInstallNotice('Alex Flughafentaxi wird jetzt auf diesem Geraet installiert.');
+      } else {
+        setInstallState('unavailable');
+        setInstallNotice('Installation wurde abgebrochen.');
+      }
+    } finally {
+      window.__aftDeferredInstallPrompt = null;
+      setIsInstalling(false);
+    }
   };
   const placeFavoriteIntoSlot = (favorite: Favorite, slotIndex: number | null) => {
     setFavorites((prev) => {
@@ -373,6 +461,19 @@ export default function AccountClient({
     lastGroup.items.push(booking);
     return groups;
   }, []);
+
+  const installRowLabel =
+    installState === 'installed'
+      ? 'App installiert'
+      : installState === 'available'
+        ? 'Alex Flughafentaxi installieren'
+        : 'App auf diesem Geraet installieren';
+  const installRowHint =
+    installState === 'installed'
+      ? 'Bereits auf diesem Geraet verfuegbar'
+      : installState === 'available'
+        ? 'Mit einem Klick zum Homescreen hinzufuegen'
+        : 'Homescreen-Zugriff auf diesem Geraet einrichten';
   useEffect(() => {
     setActiveTab(initialRequestedTab);
   }, [initialRequestedTab]);
@@ -573,6 +674,32 @@ export default function AccountClient({
                           </div>
                         </div>
                       ) : null}
+                    </div>
+
+                    <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInstallNotice(null);
+                          if (window.innerWidth < 768) {
+                            router.push(buildAccountHref({ tab: 'profil', panel: 'install' }));
+                            return;
+                          }
+                          void triggerInstallPrompt();
+                        }}
+                        className="flex w-full items-start gap-4 py-3 text-left"
+                      >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                          <Download size={24} strokeWidth={1.8} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[1rem] font-medium text-[#111827]">Installieren</p>
+                          <p className="text-[0.95rem] leading-6 text-[#6a6a6a]">{installRowHint}</p>
+                          {installNotice ? (
+                            <p className="mt-1 text-[0.92rem] leading-6 text-[#6a7d96]">{installNotice}</p>
+                          ) : null}
+                        </div>
+                      </button>
                     </div>
 
                   </div>
@@ -1197,6 +1324,75 @@ export default function AccountClient({
                   </button>
                 );
               })}
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {openPanel === 'install' ? (
+        <div className="fixed inset-0 z-[120] bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
+          <div className="app-container min-h-screen animate-in slide-in-from-right-full duration-300 pt-[30px]">
+            <div className="flex items-center gap-3 pb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenPanel(null);
+                  router.push(buildAccountHref({ panel: null }));
+                }}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
+                aria-label="Zurueck"
+              >
+                <ChevronRight size={18} />
+              </button>
+              <div>
+                <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">Installieren</p>
+                <p className="text-[0.95rem] text-[#6a6a6a]">Alex Flughafentaxi auf diesem Geraet sichern</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="rounded-[1.55rem] border border-[#0f1722] bg-[#000000] px-5 py-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
+                <div className="flex items-center gap-4">
+                  <img
+                    src="/favtaxi.png"
+                    alt="Alex Flughafentaxi"
+                    className="h-16 w-16 rounded-[1.2rem] object-cover"
+                  />
+                  <div className="min-w-0 text-white">
+                    <p className="text-[1.14rem] font-semibold tracking-[-0.04em]">Alex Flughafentaxi</p>
+                    <p className="mt-1 text-[0.95rem] leading-6 text-white/70">
+                      Eigene App mit direktem Zugriff auf Buchung, Profil und Fahrten.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+                <div className="flex items-start gap-4">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                    <Download size={24} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[1rem] font-medium text-[#111827]">{installRowLabel}</p>
+                    <p className="mt-1 text-[0.95rem] leading-6 text-[#6a6a6a]">{installRowHint}</p>
+                    {installNotice ? (
+                      <p className="mt-2 text-[0.92rem] leading-6 text-[#6a7d96]">{installNotice}</p>
+                    ) : null}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => void triggerInstallPrompt()}
+                  disabled={isInstalling || installState === 'installed'}
+                  className="ui-button-booking-primary mt-5 w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {installState === 'installed'
+                    ? 'Bereits installiert'
+                    : isInstalling
+                      ? 'Installiert...'
+                      : 'Jetzt installieren'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
