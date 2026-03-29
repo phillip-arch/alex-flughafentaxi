@@ -492,7 +492,7 @@ export default function AccountClient({
                         type="button"
                         onClick={openProfileEditor}
                         aria-label="Profil bearbeiten"
-                        className="flex w-full items-start gap-4 text-left transition-colors hover:text-[#111827]"
+                        className="flex w-full items-center gap-4 text-left transition-colors hover:text-[#111827]"
                       >
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
                           <Edit size={22} strokeWidth={1.8} />
