@@ -12,7 +12,6 @@ export type FavoriteAddressRecord = {
   city: string;
   zip: string;
   street: string;
-  house_number: string;
   label: FavoriteLabel | null;
 };
 
@@ -25,16 +24,15 @@ export function getFavoriteLabelTitle(label: FavoriteLabel) {
 }
 
 export function buildStreetOptionValue(street: string, zip: string, city: string) {
-  return [zip && city ? `${zip} ${city}` : zip || city, street].filter(Boolean).join(', ');
+  return [street, zip && city ? `${zip} ${city}` : zip || city].filter(Boolean).join(', ');
 }
 
 export function formatAddressLine(
   street: string,
-  houseNumber: string,
   zip: string,
   city: string,
 ) {
-  const streetLine = [street, houseNumber].filter(Boolean).join(' ').trim();
+  const streetLine = [street].filter(Boolean).join(' ').trim();
   const cityLine = [zip, city].filter(Boolean).join(' ').trim();
   return [streetLine, cityLine].filter(Boolean).join(', ').trim();
 }

@@ -18,7 +18,6 @@ const FavoriteSchema = z.object({
   city: z.string().trim().min(2).max(80),
   zip: z.string().trim().regex(/^\d{1,4}$/),
   street: z.string().trim().min(2).max(120),
-  house_number: z.string().trim().min(1).max(20),
 });
 
 export async function loadFavoriteAddresses() {
@@ -31,7 +30,7 @@ export async function loadFavoriteAddresses() {
 
   const { data, error } = await supabaseAdmin
     .from('saved_addresses')
-    .select('id, city, zip, street, house_number, label')
+    .select('id, city, zip, street, label')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
@@ -171,7 +170,6 @@ export async function addFavoriteAddress(formData: FormData) {
     city: formData.get('city'),
     zip: formData.get('zip'),
     street: formData.get('street'),
-    house_number: formData.get('house_number'),
   });
 
   if (!parsed.success) return { error: 'Bitte Favorit korrekt eingeben.' };
@@ -194,7 +192,6 @@ export async function addFavoriteAddress(formData: FormData) {
     city: parsed.data.city,
     zip: parsed.data.zip,
     street: parsed.data.street,
-    house_number: parsed.data.house_number,
   };
 
   const favoriteQuery = existingByLabel.data?.id
@@ -205,7 +202,7 @@ export async function addFavoriteAddress(formData: FormData) {
     : supabaseAdmin.from('saved_addresses').insert(favoritePayload);
 
   const { data, error } = await favoriteQuery
-    .select('id, city, zip, street, house_number, label')
+    .select('id, city, zip, street, label')
     .single();
 
   if (error) {

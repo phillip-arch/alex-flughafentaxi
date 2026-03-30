@@ -27,7 +27,6 @@ export default async function BookingPage() {
     city: string;
     zip: string;
     street: string;
-    house_number: string;
     label: 'home' | 'office' | 'extra' | null;
   }> = [];
 
@@ -36,7 +35,7 @@ export default async function BookingPage() {
       supabase.from('profiles').select('full_name, phone').eq('id', user.id).maybeSingle(),
       supabase
         .from('saved_addresses')
-        .select('id, city, zip, street, house_number, label')
+        .select('id, city, zip, street, label')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true }),
     ]);

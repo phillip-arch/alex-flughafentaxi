@@ -10,6 +10,7 @@ import {
   buildStreetOptionValue,
   formatAddressLine,
   sortFavoriteAddresses,
+  type StreetOption,
 } from '@/lib/addresses';
 import {
   Plane, 
@@ -56,7 +57,6 @@ interface FavoriteAddress {
   city: string;
   zip: string;
   street: string;
-  house_number: string;
   label: 'home' | 'office' | 'extra' | null;
 }
 
@@ -65,12 +65,10 @@ interface ExtendedBookingInput {
   city: string;
   zip: string;
   street: string;
-  houseNumber: string;
   extraStop: boolean;
   extraStopCity: string;
   extraStopZip: string;
   extraStopStreet: string;
-  extraStopHouseNumber: string;
   flightNumber: string;
   pickupAt: string; // ISO date string
   date: string;
@@ -153,7 +151,9 @@ const BookingForm = ({
   );
   const [streetInputValue, setStreetInputValue] = useState('');
   const [extraStopStreetInputValue, setExtraStopStreetInputValue] = useState('');
-  const [isFavoriteListOpen, setIsFavoriteListOpen] = useState(false);
+  const [resolvedStreetOption, setResolvedStreetOption] = useState<StreetOption | null>(null);
+  const [resolvedExtraStopStreetOption, setResolvedExtraStopStreetOption] = useState<StreetOption | null>(null);
+  const [streetNumberWarning, setStreetNumberWarning] = useState<'street' | 'extraStopStreet' | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
   const [accountDefaults, setAccountDefaults] = useState(initialAccountDefaults);
   const [openInlineSelect, setOpenInlineSelect] = useState<InlineSelectFieldName | null>(null);
@@ -170,12 +170,10 @@ const BookingForm = ({
     city: 'Wien',
     zip: '',
     street: '',
-    houseNumber: '',
     extraStop: false,
     extraStopCity: 'Wien',
     extraStopZip: '',
     extraStopStreet: '',
-    extraStopHouseNumber: '',
     flightNumber: '',
     pickupAt: '',
     date: '',
@@ -233,31 +231,6 @@ const BookingForm = ({
   }, [openInlineSelect]);
 
   useEffect(() => {
-    if (!isFavoriteListOpen) return;
-
-    const handlePointerDown = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target?.closest('[data-favorite-list-root="true"]')) {
-        setIsFavoriteListOpen(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsFavoriteListOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isFavoriteListOpen]);
-
-  useEffect(() => {
     if (!isInfoPanelOpen) return;
 
     const handleEscape = (event: KeyboardEvent) => {
@@ -302,19 +275,23 @@ const BookingForm = ({
 
   const applyFavoriteAddress = (favorite: FavoriteAddress) => {
     const city = favorite.city.toLowerCase().includes('schwechat') ? 'Schwechat' : 'Wien';
-    setStreetInputValue(buildStreetOptionValue(favorite.street, favorite.zip, favorite.city));
+    setStreetInputValue(`${favorite.street} `);
+    setResolvedStreetOption({
+      street: favorite.street,
+      zip: favorite.zip,
+      city: favorite.city,
+    });
+    setStreetNumberWarning('street');
     setFormData((prev) => ({
       ...prev,
       city,
       zip: favorite.zip,
       street: favorite.street,
-      houseNumber: favorite.house_number,
     }));
     setTouched((prev) => ({
       ...prev,
       street: false,
     }));
-    setIsFavoriteListOpen(false);
   };
 
   useEffect(() => {
@@ -353,7 +330,7 @@ const BookingForm = ({
         supabase.from('profiles').select('full_name, phone').eq('id', user.id).maybeSingle(),
         supabase
           .from('saved_addresses')
-          .select('id, city, zip, street, house_number, label')
+          .select('id, city, zip, street, label')
           .eq('user_id', user.id)
           .order('created_at', { ascending: true }),
       ]);
@@ -404,12 +381,10 @@ const BookingForm = ({
 
   useEffect(() => {
     if (formData.street && formData.zip && !streetInputValue) {
-      setStreetInputValue(buildStreetOptionValue(formData.street, formData.zip, formData.city));
+      setStreetInputValue(formData.street);
     }
     if (formData.extraStopStreet && formData.extraStopZip && !extraStopStreetInputValue) {
-      setExtraStopStreetInputValue(
-        buildStreetOptionValue(formData.extraStopStreet, formData.extraStopZip, formData.extraStopCity),
-      );
+      setExtraStopStreetInputValue(formData.extraStopStreet);
     }
   }, [
     extraStopStreetInputValue,
@@ -482,12 +457,54 @@ const BookingForm = ({
   // Calculate price with ZIP-based surcharge when available
   const vehiclePrice = calculateVehiclePrice(basePrice, vehicleType, dbPrices);
   const totalPrice = vehiclePrice + extraStopPrice;
+  const selectedStreetOption = resolvedStreetOption;
+  const selectedExtraStopStreetOption = resolvedExtraStopStreetOption;
+  const favoriteMenuItems =
+    isAppSurface && isLoggedIn && favoriteAddresses.length > 0
+      ? favoriteAddresses.map((favorite, index) => {
+          const Icon = FAVORITE_ADDRESS_ICONS[index] || MapPin;
+          return {
+            id: favorite.id,
+            label: formatAddressLine(favorite.street, favorite.zip, favorite.city),
+            icon: <Icon size={16} strokeWidth={2.1} />,
+            onSelect: () => applyFavoriteAddress(favorite),
+          };
+        })
+      : [];
   const routeSummary =
     formData.direction === 'to_airport'
       ? `${formData.zip} ${formData.city} -> Flughafen VIE`
       : `Flughafen VIE -> ${formData.zip} ${formData.city}`;
-  const streetSummary = formatAddressLine(formData.street, formData.houseNumber, '', '') || 'Noch nicht gewaehlt';
+  const streetSummary = formData.street || 'Noch nicht gewaehlt';
   const dateSummary = [formData.date, formData.time].filter(Boolean).join(' | ') || 'Noch nicht gewaehlt';
+
+  const hasTypedStreetNumber = (rawValue: string, baseStreet: string) => {
+    const normalizedRaw = rawValue.trim().replace(/\s+/g, ' ');
+    const normalizedBase = baseStreet.trim().replace(/\s+/g, ' ');
+    if (!normalizedRaw || !normalizedBase) return false;
+    if (normalizedRaw.length <= normalizedBase.length) return false;
+    if (!normalizedRaw.toLowerCase().startsWith(normalizedBase.toLowerCase())) return false;
+
+    const suffix = normalizedRaw.slice(normalizedBase.length).trim();
+    return /^\d[\dA-Za-z/-]*$/u.test(suffix);
+  };
+
+  const validateStreetNumber = (target: 'street' | 'extraStopStreet') => {
+    const selectedOption = target === 'street' ? resolvedStreetOption : resolvedExtraStopStreetOption;
+    const rawValue = target === 'street' ? formData.street : formData.extraStopStreet;
+
+    if (!selectedOption) {
+      setStreetNumberWarning((prev) => (prev === target ? null : prev));
+      return;
+    }
+
+    if (hasTypedStreetNumber(rawValue, selectedOption.street)) {
+      setStreetNumberWarning((prev) => (prev === target ? null : prev));
+      return;
+    }
+
+    setStreetNumberWarning(target);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -507,10 +524,40 @@ const BookingForm = ({
   };
 
   const clearStreetSelection = (target: 'street' | 'extraStopStreet', rawValue: string) => {
+    const selectedOption = target === 'street' ? resolvedStreetOption : resolvedExtraStopStreetOption;
+    const normalizedValue = rawValue.replace(/\s+/g, ' ').trimStart();
+
     if (target === 'street') {
       setStreetInputValue(rawValue);
     } else {
       setExtraStopStreetInputValue(rawValue);
+    }
+
+    setStreetNumberWarning((prev) => (prev === target ? null : prev));
+
+    if (selectedOption && normalizedValue.toLowerCase().startsWith(selectedOption.street.toLowerCase())) {
+      setFormData((prev) =>
+        target === 'street'
+          ? {
+              ...prev,
+              street: rawValue,
+              zip: selectedOption.zip,
+              city: selectedOption.city,
+            }
+          : {
+              ...prev,
+              extraStopStreet: rawValue,
+              extraStopZip: selectedOption.zip,
+              extraStopCity: selectedOption.city,
+            },
+      );
+      return;
+    }
+
+    if (target === 'street') {
+      setResolvedStreetOption(null);
+    } else {
+      setResolvedExtraStopStreetOption(null);
     }
 
     setFormData((prev) =>
@@ -534,9 +581,11 @@ const BookingForm = ({
     target: 'street' | 'extraStopStreet',
     option: { street: string; zip: string; city: string },
   ) => {
-    const label = buildStreetOptionValue(option.street, option.zip, option.city);
+    const nextValue = `${option.street} `;
     if (target === 'street') {
-      setStreetInputValue(label);
+      setStreetInputValue(nextValue);
+      setResolvedStreetOption(option);
+      setStreetNumberWarning('street');
       setFormData((prev) => ({
         ...prev,
         street: option.street,
@@ -546,7 +595,9 @@ const BookingForm = ({
       return;
     }
 
-    setExtraStopStreetInputValue(label);
+    setExtraStopStreetInputValue(nextValue);
+    setResolvedExtraStopStreetOption(option);
+    setStreetNumberWarning('extraStopStreet');
     setFormData((prev) => ({
       ...prev,
       extraStopStreet: option.street,
@@ -559,6 +610,9 @@ const BookingForm = ({
     const value = formData[name];
     // Check if field is touched and empty (for string fields)
     if (touched[name] && typeof value === 'string' && !value.trim()) {
+      return true;
+    }
+    if ((name === 'street' && streetNumberWarning === 'street') || (name === 'extraStopStreet' && streetNumberWarning === 'extraStopStreet')) {
       return true;
     }
     return false;
@@ -743,44 +797,6 @@ const BookingForm = ({
     );
   };
 
-  const renderFavoriteAddressSuggestions = () => {
-    if (!isAppSurface || !isLoggedIn || favoriteAddresses.length === 0 || !isFavoriteListOpen) return null;
-
-    return (
-      <div className="absolute left-0 right-0 top-[calc(100%+0.55rem)] z-30 overflow-hidden rounded-[18px] border border-[#dbe7f8] bg-white shadow-[0_18px_40px_rgba(17,17,17,0.12)]">
-        {favoriteAddresses.map((favorite, index) => (
-          (() => {
-            const Icon = FAVORITE_ADDRESS_ICONS[index] || MapPin;
-            const addressLabel = formatAddressLine(
-              favorite.street,
-              favorite.house_number,
-              favorite.zip,
-              favorite.city,
-            );
-
-            return (
-              <button
-                key={favorite.id}
-                type="button"
-                onClick={() => applyFavoriteAddress(favorite)}
-                title={addressLabel}
-                aria-label={addressLabel}
-                className={`flex w-full items-center gap-3 px-4 py-3 text-left text-[0.95rem] font-medium text-[#111111] transition-colors hover:bg-[#f8fbff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-inset ${
-                  index > 0 ? 'border-t border-[#edf2f7]' : ''
-                }`}
-              >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
-                  <Icon size={16} strokeWidth={2.1} />
-                </span>
-                <span className="min-w-0 truncate">{addressLabel}</span>
-              </button>
-            );
-          })()
-        ))}
-      </div>
-    );
-  };
-
   const renderExtraStopPanel = () => {
     if (!formData.extraStop) return null;
 
@@ -795,25 +811,26 @@ const BookingForm = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
+        <div>
           <StreetAutocomplete
             value={extraStopStreetInputValue}
+            selectedOption={selectedExtraStopStreetOption}
             zipHint={formData.zip}
+            mobileSelectedStreetOnly
             onChange={(value) => clearStreetSelection('extraStopStreet', value)}
             onSelect={(option) => applyStreetSelection('extraStopStreet', option)}
-            onBlur={() => handleBlur({} as React.FocusEvent<HTMLInputElement>)}
+            onBlur={() => {
+              validateStreetNumber('extraStopStreet');
+              handleBlur({} as React.FocusEvent<HTMLInputElement>);
+            }}
             placeholder="Strasse auswaehlen"
             className={getInputClassName('extraStopStreet')}
           />
-          <input
-            type="text"
-            name="extraStopHouseNumber"
-            value={formData.extraStopHouseNumber}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder="Hausnummer"
-            className={getInputClassName('extraStopHouseNumber')}
-          />
+          {streetNumberWarning === 'extraStopStreet' ? (
+            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+              Bitte ergaenze die Hausnummer.
+            </div>
+          ) : null}
         </div>
       </div>
     );
@@ -872,9 +889,9 @@ const BookingForm = ({
     const requiredFields: (keyof ExtendedBookingInput)[] = [];
 
     if (step === 1) {
-      requiredFields.push('street', 'zip', 'houseNumber');
+      requiredFields.push('street', 'zip');
       if (formData.extraStop) {
-        requiredFields.push('extraStopStreet', 'extraStopZip', 'extraStopHouseNumber');
+        requiredFields.push('extraStopStreet', 'extraStopZip');
       }
     } else if (step === 2) {
       requiredFields.push('date', 'time', 'passengers', 'luggage', 'handLuggage');
@@ -988,12 +1005,10 @@ const BookingForm = ({
               city: formData.city,
               zip: formData.zip,
               street: formData.street,
-              houseNumber: formData.houseNumber,
               extraStop: formData.extraStop,
               extraStopCity: formData.extraStopCity,
               extraStopZip: formData.extraStopZip,
               extraStopStreet: formData.extraStopStreet,
-              extraStopHouseNumber: formData.extraStopHouseNumber,
             },
           }),
         );
@@ -1062,14 +1077,12 @@ const BookingForm = ({
       // Construct the pickup/destination strings based on direction
       const addressString = formatAddressLine(
         formData.street,
-        formData.houseNumber,
         formData.zip,
         formData.city,
       );
       const extraStopAddressString = formData.extraStop
         ? formatAddressLine(
             formData.extraStopStreet,
-            formData.extraStopHouseNumber,
             formData.extraStopZip,
             formData.extraStopCity,
           )
@@ -1212,8 +1225,8 @@ const BookingForm = ({
                     <p className="text-[12px] text-[#6d7075]">Abholung und Ziel festlegen.</p>
                   </div>
                 )}
-              <div className="-ml-2 rounded-[2.2rem] bg-transparent py-3 pl-3 pr-0 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
-                <div className="flex gap-3 md:gap-4">
+              <div className="rounded-[2.2rem] bg-transparent py-3 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
+                <div className="flex gap-0 md:gap-4">
                   <div className="hidden w-6 shrink-0 flex-col items-center pt-[calc(1.45rem+8px)] md:flex md:w-7 md:pt-[calc(1.45rem+8px)]">
                     <div className={`flex h-6 w-6 items-center justify-center rounded-full md:h-7 md:w-7 ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={9} className="md:h-[11px] md:w-[11px]" /> : <MapPin size={9} className="md:h-[11px] md:w-[11px]" />}
@@ -1236,33 +1249,29 @@ const BookingForm = ({
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem]">
-                          <div className="relative" data-favorite-list-root="true">
-                            <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
+                          <div className="relative">
+                            <div className="grid grid-cols-1 gap-2.5 md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
+                                selectedOption={selectedStreetOption}
                                 mobileDropdownFullWidth
+                                mobileSelectedStreetOnly
+                                menuItems={favoriteMenuItems}
                                 onChange={(value) => clearStreetSelection('street', value)}
                                 onSelect={(option) => applyStreetSelection('street', option)}
-                                onFocus={() => {
-                                  if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
-                                    setIsFavoriteListOpen(true);
-                                  }
+                                onBlur={() => {
+                                  validateStreetNumber('street');
+                                  handleBlur({} as React.FocusEvent<HTMLInputElement>);
                                 }}
-                                onBlur={() => handleBlur({} as React.FocusEvent<HTMLInputElement>)}
                                 placeholder="Strasse auswaehlen"
                                 className={getInputClassName('street')}
                               />
-                              <input
-                                type="text"
-                                name="houseNumber"
-                                value={formData.houseNumber}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                placeholder="Hausnummer"
-                                className={getInputClassName('houseNumber')}
-                              />
                             </div>
-                            {renderFavoriteAddressSuggestions()}
+                            {streetNumberWarning === 'street' ? (
+                              <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                                Bitte ergaenze die Hausnummer.
+                              </div>
+                            ) : null}
                           </div>
                           {renderExtraStopPanel()}
                         </div>
@@ -1273,33 +1282,29 @@ const BookingForm = ({
                       <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem]">
-                          <div className="relative" data-favorite-list-root="true">
-                            <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
+                          <div className="relative">
+                            <div className="grid grid-cols-1 gap-2.5 md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
+                                selectedOption={selectedStreetOption}
                                 mobileDropdownFullWidth
+                                mobileSelectedStreetOnly
+                                menuItems={favoriteMenuItems}
                                 onChange={(value) => clearStreetSelection('street', value)}
                                 onSelect={(option) => applyStreetSelection('street', option)}
-                                onFocus={() => {
-                                  if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
-                                    setIsFavoriteListOpen(true);
-                                  }
+                                onBlur={() => {
+                                  validateStreetNumber('street');
+                                  handleBlur({} as React.FocusEvent<HTMLInputElement>);
                                 }}
-                                onBlur={() => handleBlur({} as React.FocusEvent<HTMLInputElement>)}
                                 placeholder="Strasse auswaehlen"
                                 className={getInputClassName('street')}
                               />
-                              <input
-                                type="text"
-                                name="houseNumber"
-                                value={formData.houseNumber}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                placeholder="Hausnummer"
-                                className={getInputClassName('houseNumber')}
-                              />
                             </div>
-                            {renderFavoriteAddressSuggestions()}
+                            {streetNumberWarning === 'street' ? (
+                              <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                                Bitte ergaenze die Hausnummer.
+                              </div>
+                            ) : null}
                           </div>
                           {renderExtraStopPanel()}
                         </div>
@@ -1312,7 +1317,7 @@ const BookingForm = ({
                       )}
                     </div>
                   </div>
-                  <div className="-mr-1 flex shrink-0 flex-col justify-start pt-[1.35rem] md:-mr-2">
+                  <div className="hidden shrink-0 flex-col justify-start pt-[1.35rem] md:flex">
                     <button
                       type="button"
                       onClick={toggleExtraStop}

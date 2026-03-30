@@ -90,13 +90,11 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const [editDirection, setEditDirection] = useState<'to_airport' | 'from_airport' | null>(null);
   const [editStreetInput, setEditStreetInput] = useState('');
   const [editStreet, setEditStreet] = useState('');
-  const [editHouseNumber, setEditHouseNumber] = useState('');
   const [editZip, setEditZip] = useState('');
   const [editCity, setEditCity] = useState('Wien');
   const [editExtraStop, setEditExtraStop] = useState(false);
   const [editExtraStopStreetInput, setEditExtraStopStreetInput] = useState('');
   const [editExtraStopStreet, setEditExtraStopStreet] = useState('');
-  const [editExtraStopHouseNumber, setEditExtraStopHouseNumber] = useState('');
   const [editExtraStopZip, setEditExtraStopZip] = useState('');
   const [editExtraStopCity, setEditExtraStopCity] = useState('Wien');
   const [editChildSeat, setEditChildSeat] = useState(false);
@@ -671,7 +669,6 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         : editableAddressRaw,
     );
     setEditStreet(parsedPrimaryAddress?.street || editableAddressRaw);
-    setEditHouseNumber(parsedPrimaryAddress?.houseNumber || '');
     setEditZip(parsedPrimaryAddress?.zip || '');
     setEditCity(parsedPrimaryAddress?.city || 'Wien');
     const notesParsed = parseBookingNotes(booking.notes);
@@ -690,7 +687,6 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         : extractedExtraStop || '',
     );
     setEditExtraStopStreet(parsedExtraStop?.street || extractedExtraStop || '');
-    setEditExtraStopHouseNumber(parsedExtraStop?.houseNumber || '');
     setEditExtraStopZip(parsedExtraStop?.zip || '');
     setEditExtraStopCity(parsedExtraStop?.city || 'Wien');
     setEditHandLuggage(clampToRange(extractedHandLuggage, 0, 8));
@@ -733,7 +729,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const handleEditDirectionChange = (direction: 'to_airport' | 'from_airport') => {
     setEditDirection(direction);
     const prev = editForm;
-    const currentAddress = formatAddressLine(editStreet, editHouseNumber, editZip, editCity);
+    const currentAddress = formatAddressLine(editStreet, editZip, editCity);
     if (direction === 'to_airport') {
       const nextPickup = currentAddress || (String(prev.pickup || '').includes(AIRPORT_LABEL) ? '' : prev.pickup);
       setEditForm({ ...prev, pickup: nextPickup, destination: AIRPORT_LABEL });
@@ -775,13 +771,8 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     if (e) e.preventDefault();
     setSavingEdit(true);
     try {
-      const primaryAddress = formatAddressLine(editStreet, editHouseNumber, editZip, editCity);
-      const extraStopValue = formatAddressLine(
-        editExtraStopStreet,
-        editExtraStopHouseNumber,
-        editExtraStopZip,
-        editExtraStopCity,
-      );
+      const primaryAddress = formatAddressLine(editStreet, editZip, editCity);
+      const extraStopValue = formatAddressLine(editExtraStopStreet, editExtraStopZip, editExtraStopCity);
       if (!primaryAddress) {
         alert('Bitte waehlen Sie eine gueltige Adresse aus der Strassenliste.');
         return;
@@ -1165,8 +1156,6 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         editStreetInput={editStreetInput}
         handleEditStreetInputChange={handleEditStreetInputChange}
         handleEditStreetSelect={handleEditStreetSelect}
-        editHouseNumber={editHouseNumber}
-        setEditHouseNumber={setEditHouseNumber}
         editZip={editZip}
         editCity={editCity}
         editForm={editForm}
@@ -1176,8 +1165,6 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         editExtraStopStreetInput={editExtraStopStreetInput}
         handleExtraStopStreetInputChange={handleExtraStopStreetInputChange}
         handleExtraStopStreetSelect={handleExtraStopStreetSelect}
-        editExtraStopHouseNumber={editExtraStopHouseNumber}
-        setEditExtraStopHouseNumber={setEditExtraStopHouseNumber}
         editExtraStopZip={editExtraStopZip}
         editExtraStopCity={editExtraStopCity}
         isEditDatePickerOpen={isEditDatePickerOpen}

@@ -95,10 +95,9 @@ create table public.saved_addresses (
   city text not null,
   zip text not null,
   street text not null,
-  house_number text not null,
   label text check (label in ('home', 'office', 'extra')),
   created_at timestamptz default now(),
-  unique (user_id, city, zip, street, house_number)
+  unique (user_id, city, zip, street)
 );
 
 create unique index saved_addresses_user_label_unique

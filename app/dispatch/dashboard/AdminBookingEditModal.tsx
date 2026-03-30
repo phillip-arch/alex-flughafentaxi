@@ -25,8 +25,6 @@ type AdminBookingEditModalProps = {
   editStreetInput: string;
   handleEditStreetInputChange: (value: string) => void;
   handleEditStreetSelect: (option: { street: string; zip: string; city: string }) => void;
-  editHouseNumber: string;
-  setEditHouseNumber: (value: string) => void;
   editZip: string;
   editCity: string;
   editForm: any;
@@ -36,8 +34,6 @@ type AdminBookingEditModalProps = {
   editExtraStopStreetInput: string;
   handleExtraStopStreetInputChange: (value: string) => void;
   handleExtraStopStreetSelect: (option: { street: string; zip: string; city: string }) => void;
-  editExtraStopHouseNumber: string;
-  setEditExtraStopHouseNumber: (value: string) => void;
   editExtraStopZip: string;
   editExtraStopCity: string;
   isEditDatePickerOpen: boolean;
@@ -83,8 +79,6 @@ export default function AdminBookingEditModal({
   editStreetInput,
   handleEditStreetInputChange,
   handleEditStreetSelect,
-  editHouseNumber,
-  setEditHouseNumber,
   editZip,
   editCity,
   editForm,
@@ -94,8 +88,6 @@ export default function AdminBookingEditModal({
   editExtraStopStreetInput,
   handleExtraStopStreetInputChange,
   handleExtraStopStreetSelect,
-  editExtraStopHouseNumber,
-  setEditExtraStopHouseNumber,
   editExtraStopZip,
   editExtraStopCity,
   isEditDatePickerOpen,
@@ -186,21 +178,13 @@ export default function AdminBookingEditModal({
                         </div>
                       ) : (
                         <div className="mt-1 min-h-[3.25rem] space-y-2">
-                          <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
-                            <StreetAutocomplete
-                              className={BOOKING_FORM_INPUT_CLASS}
-                              placeholder="Strasse auswaehlen"
-                              value={editStreetInput}
-                              onChange={handleEditStreetInputChange}
-                              onSelect={handleEditStreetSelect}
-                            />
-                            <input
-                              className={BOOKING_FORM_INPUT_CLASS}
-                              placeholder="Hausnummer"
-                              value={editHouseNumber}
-                              onChange={(e) => setEditHouseNumber(e.target.value)}
-                            />
-                          </div>
+                          <StreetAutocomplete
+                            className={BOOKING_FORM_INPUT_CLASS}
+                            placeholder="Strasse auswaehlen"
+                            value={editStreetInput}
+                            onChange={handleEditStreetInputChange}
+                            onSelect={handleEditStreetSelect}
+                          />
                         </div>
                       )}
                     </div>
@@ -209,21 +193,13 @@ export default function AdminBookingEditModal({
                       <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
                       {editDirection === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem] space-y-2">
-                          <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
-                            <StreetAutocomplete
-                              className={BOOKING_FORM_INPUT_CLASS}
-                              placeholder="Strasse auswaehlen"
-                              value={editStreetInput}
-                              onChange={handleEditStreetInputChange}
-                              onSelect={handleEditStreetSelect}
-                            />
-                            <input
-                              className={BOOKING_FORM_INPUT_CLASS}
-                              placeholder="Hausnummer"
-                              value={editHouseNumber}
-                              onChange={(e) => setEditHouseNumber(e.target.value)}
-                            />
-                          </div>
+                          <StreetAutocomplete
+                            className={BOOKING_FORM_INPUT_CLASS}
+                            placeholder="Strasse auswaehlen"
+                            value={editStreetInput}
+                            onChange={handleEditStreetInputChange}
+                            onSelect={handleEditStreetSelect}
+                          />
                         </div>
                       ) : (
                         <div className="mt-1 flex min-h-[3.25rem] items-start pt-[0.35rem]">
@@ -266,21 +242,13 @@ export default function AdminBookingEditModal({
               {editExtraStop ? (
                 <div className="animate-in slide-in-from-top-2 fade-in space-y-4 duration-300">
                   <p className={adminEditSectionLabelClass}>Adresse Zwischenstopp</p>
-                  <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
-                    <StreetAutocomplete
-                      className={BOOKING_FORM_INPUT_CLASS}
-                      placeholder="Strasse auswaehlen"
-                      value={editExtraStopStreetInput}
-                      onChange={handleExtraStopStreetInputChange}
-                      onSelect={handleExtraStopStreetSelect}
-                    />
-                    <input
-                      className={BOOKING_FORM_INPUT_CLASS}
-                      placeholder="Hausnummer"
-                      value={editExtraStopHouseNumber}
-                      onChange={(e) => setEditExtraStopHouseNumber(e.target.value)}
-                    />
-                  </div>
+                  <StreetAutocomplete
+                    className={BOOKING_FORM_INPUT_CLASS}
+                    placeholder="Strasse auswaehlen"
+                    value={editExtraStopStreetInput}
+                    onChange={handleExtraStopStreetInputChange}
+                    onSelect={handleExtraStopStreetSelect}
+                  />
                 </div>
               ) : null}
 

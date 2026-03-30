@@ -1,14 +1,24 @@
 'use client';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import type { StreetOption } from '@/lib/addresses';
 import { buildStreetOptionValue } from '@/lib/addresses';
 
+type StreetAutocompleteMenuItem = {
+  id: string;
+  label: string;
+  onSelect: () => void;
+  icon?: ReactNode;
+};
+
 type StreetAutocompleteProps = {
   value: string;
+  selectedOption?: StreetOption | null;
   zipHint?: string;
   placeholder: string;
   className: string;
   mobileDropdownFullWidth?: boolean;
+  mobileSelectedStreetOnly?: boolean;
+  menuItems?: StreetAutocompleteMenuItem[];
   onChange: (value: string) => void;
   onSelect: (option: StreetOption) => void;
   onBlur?: () => void;
@@ -17,10 +27,13 @@ type StreetAutocompleteProps = {
 
 export default function StreetAutocomplete({
   value,
+  selectedOption = null,
   zipHint = '',
   placeholder,
   className,
   mobileDropdownFullWidth = false,
+  mobileSelectedStreetOnly = false,
+  menuItems = [],
   onChange,
   onSelect,
   onBlur,
@@ -36,9 +49,39 @@ export default function StreetAutocomplete({
   const [hasMore, setHasMore] = useState(false);
   const [offset, setOffset] = useState(0);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const trimmedValue = value.trim();
   const isZipOnlyQuery = /^\d{2,4}$/.test(trimmedValue.replace(/\s+/g, ''));
   const pageSize = isZipOnlyQuery ? 50 : 8;
+  const hasMenuItems = menuItems.length > 0;
+  const normalizedSelectedStreet = selectedOption?.street.trim().replace(/\s+/g, ' ') || '';
+  const normalizedInputValue = value.trim().replace(/\s+/g, ' ');
+  const selectedStreetSuffix =
+    normalizedSelectedStreet &&
+    normalizedInputValue.toLowerCase().startsWith(normalizedSelectedStreet.toLowerCase())
+      ? normalizedInputValue.slice(normalizedSelectedStreet.length).trim()
+      : '';
+  const hasLockedHouseNumberSuffix = /^\d[\dA-Za-z/-]*$/u.test(selectedStreetSuffix);
+  const selectedStreetLine = [selectedOption?.street || '', selectedStreetSuffix].filter(Boolean).join(' ').trim();
+  const desktopBlurValue =
+    selectedOption && !isFocused
+      ? buildStreetOptionValue(selectedStreetLine || selectedOption.street, selectedOption.zip, selectedOption.city)
+      : value;
+  const showMobileSelectedStreetOnly =
+    isMobileViewport &&
+    mobileSelectedStreetOnly &&
+    selectedOption &&
+    (value.trim() === buildStreetOptionValue(selectedOption.street, selectedOption.zip, selectedOption.city) ||
+      value.trim() === selectedOption.street.trim() ||
+      hasLockedHouseNumberSuffix);
+  const showMobileSelectedSummary = showMobileSelectedStreetOnly && !isFocused;
+  const mobileSelectedInputClasses = showMobileSelectedStreetOnly
+    ? '!h-[4.7rem] !px-4 !py-[1.3rem] text-[1rem] leading-tight md:!h-auto md:!px-4 md:!py-3 md:text-inherit md:leading-normal'
+    : '';
+  const displayValue = showMobileSelectedStreetOnly
+    ? normalizedInputValue || selectedOption.street
+    : desktopBlurValue;
 
   const selectOption = (option: StreetOption) => {
     onSelect(option);
@@ -78,7 +121,11 @@ export default function StreetAutocomplete({
         const response = await fetch(`/api/streets/search?${params.toString()}`, {
           signal: controller.signal,
         });
-        const payload = (await response.json()) as { results?: StreetOption[] };
+        const payloadText = await response.text();
+        const payload = payloadText ? (JSON.parse(payloadText) as { results?: StreetOption[] }) : {};
+        if (!response.ok) {
+          throw new Error('Street search request failed.');
+        }
         const nextResults = payload.results || [];
         setResults((prev) => {
           if (offset === 0) {
@@ -115,11 +162,25 @@ export default function StreetAutocomplete({
   }, [isOpen, isZipOnlyQuery, offset, pageSize, trimmedValue, zipHint]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const updateViewport = () => {
+      setIsMobileViewport(mediaQuery.matches);
+    };
+
+    updateViewport();
+    mediaQuery.addEventListener('change', updateViewport);
+    return () => mediaQuery.removeEventListener('change', updateViewport);
+  }, []);
+
+  useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
       const target = event.target as Node | null;
       if (rootRef.current && target && !rootRef.current.contains(target)) {
         setIsOpen(false);
         setActiveIndex(-1);
+        setIsFocused(false);
       }
     };
 
@@ -127,6 +188,7 @@ export default function StreetAutocomplete({
       if (event.key === 'Escape') {
         setIsOpen(false);
         setActiveIndex(-1);
+        setIsFocused(false);
       }
     };
 
@@ -143,77 +205,105 @@ export default function StreetAutocomplete({
       ref={rootRef}
       className={mobileDropdownFullWidth ? 'static md:relative' : 'relative'}
     >
-      <input
-        type="text"
-        value={value}
-        onChange={(event) => {
-          onChange(event.target.value);
-          setIsOpen(true);
-          setActiveIndex(-1);
-          setOffset(0);
-        }}
-        onFocus={() => {
-          onFocus?.();
-        }}
-      onKeyDown={(event) => {
-        if (!isOpen && event.key === 'ArrowDown' && trimmedValue.length >= 2) {
-          setIsOpen(true);
-          setActiveIndex(results.length > 0 ? 0 : -1);
-          setOffset(0);
-          event.preventDefault();
-          return;
-        }
+      <div className="relative">
+        <input
+          type="text"
+          value={displayValue}
+          onChange={(event) => {
+            const nextValue = event.target.value;
+            const normalizedNextValue = nextValue.trim().replace(/\s+/g, ' ');
+            const nextSuffix =
+              normalizedSelectedStreet &&
+              normalizedNextValue.toLowerCase().startsWith(normalizedSelectedStreet.toLowerCase())
+                ? normalizedNextValue.slice(normalizedSelectedStreet.length).trim()
+                : '';
+            const shouldLockSearch = /^\d[\dA-Za-z/-]*$/u.test(nextSuffix);
 
-        if (!isOpen || !results.length) {
-          if (event.key === 'Escape') {
-            setIsOpen(false);
+            onChange(nextValue);
+            setIsOpen(!shouldLockSearch);
             setActiveIndex(-1);
+            setOffset(0);
+          }}
+          onFocus={() => {
+            setIsFocused(true);
+            onFocus?.();
+          }}
+          onKeyDown={(event) => {
+            if (!isOpen && event.key === 'ArrowDown' && trimmedValue.length >= 2 && !hasLockedHouseNumberSuffix) {
+              setIsOpen(true);
+              setActiveIndex(results.length > 0 ? 0 : -1);
+              setOffset(0);
+              event.preventDefault();
+              return;
+            }
+
+            if (!isOpen || !results.length) {
+              if (event.key === 'Escape') {
+                setIsOpen(false);
+                setActiveIndex(-1);
+              }
+              return;
+            }
+
+            if (event.key === 'ArrowDown') {
+              setActiveIndex((prev) => (prev + 1) % results.length);
+              event.preventDefault();
+              return;
+            }
+
+            if (event.key === 'ArrowUp') {
+              setActiveIndex((prev) => (prev <= 0 ? results.length - 1 : prev - 1));
+              event.preventDefault();
+              return;
+            }
+
+            if (event.key === 'Enter' && activeIndex >= 0 && activeIndex < results.length) {
+              selectOption(results[activeIndex]);
+              event.preventDefault();
+              return;
+            }
+
+            if (event.key === 'Escape') {
+              setIsOpen(false);
+              setActiveIndex(-1);
+            }
+          }}
+          onBlur={() => {
+            setIsFocused(false);
+            onBlur?.();
+          }}
+          placeholder={placeholder}
+          autoComplete="street-address"
+          inputMode="text"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={isOpen}
+          aria-controls={listboxId}
+          aria-activedescendant={
+            activeIndex >= 0 && activeIndex < results.length
+              ? `${listboxId}-option-${activeIndex}`
+              : undefined
           }
-          return;
-        }
+          className={`${className} ${mobileSelectedInputClasses} ${
+            showMobileSelectedSummary
+              ? 'text-transparent caret-transparent md:text-inherit md:caret-auto'
+              : ''
+          }`}
+        />
 
-        if (event.key === 'ArrowDown') {
-          setActiveIndex((prev) => (prev + 1) % results.length);
-          event.preventDefault();
-          return;
-        }
+        {showMobileSelectedSummary ? (
+          <div className="pointer-events-none absolute inset-x-0 inset-y-0 flex flex-col justify-center px-4 md:hidden">
+            <span className="truncate text-[1.5rem] font-medium leading-tight text-[#111111]">
+              {displayValue}
+            </span>
+            <span className="mt-1 truncate text-[0.92rem] leading-tight text-[#6a7d96]">
+              {selectedOption.zip} {selectedOption.city}
+            </span>
+          </div>
+        ) : null}
+      </div>
 
-        if (event.key === 'ArrowUp') {
-          setActiveIndex((prev) => (prev <= 0 ? results.length - 1 : prev - 1));
-          event.preventDefault();
-          return;
-        }
-
-        if (event.key === 'Enter' && activeIndex >= 0 && activeIndex < results.length) {
-          selectOption(results[activeIndex]);
-          event.preventDefault();
-          return;
-        }
-
-        if (event.key === 'Escape') {
-          setIsOpen(false);
-          setActiveIndex(-1);
-        }
-      }}
-      onBlur={() => {
-        onBlur?.();
-      }}
-      placeholder={placeholder}
-      autoComplete="street-address"
-      inputMode="text"
-      role="combobox"
-      aria-autocomplete="list"
-      aria-expanded={isOpen}
-      aria-controls={listboxId}
-      aria-activedescendant={
-        activeIndex >= 0 && activeIndex < results.length
-          ? `${listboxId}-option-${activeIndex}`
-          : undefined
-      }
-      className={className}
-    />
-
-      {isOpen && (loading || trimmedValue.length >= 2) ? (
+      {(isOpen || (isFocused && !hasLockedHouseNumberSuffix)) && (hasMenuItems || loading || trimmedValue.length >= 2) ? (
         <div
           id={listboxId}
           role="listbox"
@@ -230,12 +320,46 @@ export default function StreetAutocomplete({
             mobileDropdownFullWidth ? 'left-0 right-0 md:left-0 md:right-0' : 'left-0 right-0'
           }`}
         >
+          {hasMenuItems
+            ? menuItems.map((item, index) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                  }}
+                  onClick={() => {
+                    item.onSelect();
+                    setIsOpen(false);
+                    setActiveIndex(-1);
+                    setIsFocused(false);
+                  }}
+                  className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8fbff] ${
+                    index > 0 ? 'border-t border-[#edf2f7]' : ''
+                  }`}
+                >
+                  {item.icon ? (
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#edf4ff] text-[#1679ff]">
+                      {item.icon}
+                    </span>
+                  ) : null}
+                  <span className="min-w-0 truncate text-[0.95rem] font-medium text-[#111111]">
+                    {item.label}
+                  </span>
+                </button>
+              ))
+            : null}
+          {hasMenuItems && (loading || results.length > 0 || (trimmedValue.length >= 2 && !loading)) ? (
+            <div className="border-t border-[#edf2f7]" />
+          ) : null}
           {loading ? (
             <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">Suche...</div>
           ) : !results.length ? (
-            <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">
-              Keine passenden Strassen gefunden.
-            </div>
+            trimmedValue.length >= 2 ? (
+              <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">
+                Keine passenden Strassen gefunden.
+              </div>
+            ) : null
           ) : (
             results.map((option, index) => {
               const key = `${option.zip}-${option.street}-${option.city}`;

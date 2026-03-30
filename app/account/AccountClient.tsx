@@ -94,7 +94,6 @@ type Favorite = {
   city: string;
   zip: string;
   street: string;
-  house_number: string;
   label: FavoriteLabel | null;
 };
 
@@ -178,7 +177,6 @@ export default function AccountClient({
   const [bookings, setBookings] = useState<Booking[]>(initialBookings || []);
   const [favoriteStreetInput, setFavoriteStreetInput] = useState('');
   const [favoriteStreet, setFavoriteStreet] = useState('');
-  const [favoriteHouseNumber, setFavoriteHouseNumber] = useState('');
   const [favoriteZip, setFavoriteZip] = useState('');
   const [favoriteCity, setFavoriteCity] = useState('Wien');
   const [showFavoriteForm, setShowFavoriteForm] = useState(false);
@@ -364,7 +362,6 @@ export default function AccountClient({
   const resetFavoriteForm = () => {
     setFavoriteStreetInput('');
     setFavoriteStreet('');
-    setFavoriteHouseNumber('');
     setFavoriteZip('');
     setFavoriteCity('Wien');
   };
@@ -858,12 +855,7 @@ export default function AccountClient({
                                   {getFavoriteLabelTitle(slot.key)}
                                 </p>
                                 <p className="truncate text-[0.95rem] leading-6 text-[#6a6a6a]">
-                                  {formatAddressLine(
-                                    favorite.street,
-                                    favorite.house_number,
-                                    favorite.zip,
-                                    favorite.city,
-                                  )}
+                                  {formatAddressLine(favorite.street, favorite.zip, favorite.city)}
                                 </p>
                               </div>
                             </div>
@@ -922,8 +914,8 @@ export default function AccountClient({
                       action={() => {
                         setError(null);
                         startTransition(async () => {
-                          if (!favoriteStreet.trim() || !favoriteZip || !selectedFavoriteLabel || !favoriteHouseNumber.trim()) {
-                            setError('Bitte Strasse aus der Liste waehlen und Hausnummer ausfuellen.');
+                          if (!favoriteStreet.trim() || !favoriteZip || !selectedFavoriteLabel) {
+                            setError('Bitte Strasse aus der Liste waehlen.');
                             return;
                           }
 
@@ -932,7 +924,6 @@ export default function AccountClient({
                           formData.set('city', favoriteCity);
                           formData.set('zip', favoriteZip);
                           formData.set('street', favoriteStreet);
-                          formData.set('house_number', favoriteHouseNumber.trim());
 
                           const res = await addFavoriteAddress(formData);
                           if ((res as { error?: string })?.error) {
@@ -950,28 +941,18 @@ export default function AccountClient({
                       }}
                       className="mt-5 grid grid-cols-1 gap-3 border-t border-[#efebe4] pt-5"
                     >
-                    <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 sm:grid-cols-[minmax(0,1fr)_132px] sm:gap-3">
-                      <StreetAutocomplete
-                        value={favoriteStreetInput}
-                        onChange={handleFavoriteStreetInputChange}
-                        onSelect={(option) => {
-                          setFavoriteStreetInput(buildStreetOptionValue(option.street, option.zip, option.city));
-                          setFavoriteStreet(option.street);
-                          setFavoriteZip(option.zip);
-                          setFavoriteCity(option.city);
-                        }}
-                        className="ui-input"
-                        placeholder="Strasse auswaehlen"
-                      />
-                      <input
-                        value={favoriteHouseNumber}
-                        onChange={(e) => setFavoriteHouseNumber(e.target.value)}
-                        className="ui-input"
-                        placeholder="Hausnummer"
-                        disabled={isPending}
-                        required
-                      />
-                    </div>
+                    <StreetAutocomplete
+                      value={favoriteStreetInput}
+                      onChange={handleFavoriteStreetInputChange}
+                      onSelect={(option) => {
+                        setFavoriteStreetInput(buildStreetOptionValue(option.street, option.zip, option.city));
+                        setFavoriteStreet(option.street);
+                        setFavoriteZip(option.zip);
+                        setFavoriteCity(option.city);
+                      }}
+                      className="ui-input"
+                      placeholder="Strasse auswaehlen"
+                    />
                     <button
                       type="submit"
                       disabled={isPending}
@@ -1469,8 +1450,8 @@ export default function AccountClient({
               action={() => {
                 setError(null);
                 startTransition(async () => {
-                  if (!favoriteStreet.trim() || !favoriteZip || !selectedFavoriteLabel || !favoriteHouseNumber.trim()) {
-                    setError('Bitte Strasse aus der Liste waehlen und Hausnummer ausfuellen.');
+                  if (!favoriteStreet.trim() || !favoriteZip || !selectedFavoriteLabel) {
+                    setError('Bitte Strasse aus der Liste waehlen.');
                     return;
                   }
 
@@ -1479,7 +1460,6 @@ export default function AccountClient({
                   formData.set('city', favoriteCity);
                   formData.set('zip', favoriteZip);
                   formData.set('street', favoriteStreet);
-                  formData.set('house_number', favoriteHouseNumber.trim());
 
                   const res = await addFavoriteAddress(formData);
                   if ((res as { error?: string })?.error) {
@@ -1509,14 +1489,6 @@ export default function AccountClient({
                 }}
                 className="ui-input"
                 placeholder="Strasse auswaehlen"
-              />
-              <input
-                value={favoriteHouseNumber}
-                onChange={(e) => setFavoriteHouseNumber(e.target.value)}
-                className="ui-input"
-                placeholder="Hausnummer"
-                disabled={isPending}
-                required
               />
               <button
                 type="submit"
