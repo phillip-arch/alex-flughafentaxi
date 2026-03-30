@@ -950,7 +950,7 @@ export default function AccountClient({
                       }}
                       className="mt-5 grid grid-cols-1 gap-3 border-t border-[#efebe4] pt-5"
                     >
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_132px]">
+                    <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 sm:grid-cols-[minmax(0,1fr)_132px] sm:gap-3">
                       <StreetAutocomplete
                         value={favoriteStreetInput}
                         onChange={handleFavoriteStreetInputChange}

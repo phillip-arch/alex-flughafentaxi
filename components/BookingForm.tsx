@@ -795,7 +795,7 @@ const BookingForm = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+        <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
           <StreetAutocomplete
             value={extraStopStreetInputValue}
             zipHint={formData.zip}
@@ -1213,8 +1213,8 @@ const BookingForm = ({
                   </div>
                 )}
               <div className="-ml-2 rounded-[2.2rem] bg-transparent py-3 pl-3 pr-0 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
-                <div className="flex gap-4">
-                  <div className="flex w-6 shrink-0 flex-col items-center pt-[calc(1.45rem+8px)] md:w-7 md:pt-[calc(1.45rem+8px)]">
+                <div className="flex gap-3 md:gap-4">
+                  <div className="hidden w-6 shrink-0 flex-col items-center pt-[calc(1.45rem+8px)] md:flex md:w-7 md:pt-[calc(1.45rem+8px)]">
                     <div className={`flex h-6 w-6 items-center justify-center rounded-full md:h-7 md:w-7 ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={9} className="md:h-[11px] md:w-[11px]" /> : <MapPin size={9} className="md:h-[11px] md:w-[11px]" />}
                     </div>
@@ -1237,7 +1237,7 @@ const BookingForm = ({
                       {formData.direction !== 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem]">
                           <div className="relative" data-favorite-list-root="true">
-                            <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                            <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
                                 onChange={(value) => clearStreetSelection('street', value)}
@@ -1249,7 +1249,7 @@ const BookingForm = ({
                                 }}
                                 onBlur={() => handleBlur({} as React.FocusEvent<HTMLInputElement>)}
                                 placeholder="Strasse auswaehlen"
-                                className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
+                                className={getInputClassName('street')}
                               />
                               <input
                                 type="text"
@@ -1273,7 +1273,7 @@ const BookingForm = ({
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem]">
                           <div className="relative" data-favorite-list-root="true">
-                            <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                            <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
                                 onChange={(value) => clearStreetSelection('street', value)}
@@ -1285,7 +1285,7 @@ const BookingForm = ({
                                 }}
                                 onBlur={() => handleBlur({} as React.FocusEvent<HTMLInputElement>)}
                                 placeholder="Strasse auswaehlen"
-                                className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
+                                className={getInputClassName('street')}
                               />
                               <input
                                 type="text"

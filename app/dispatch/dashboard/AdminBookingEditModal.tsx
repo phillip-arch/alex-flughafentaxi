@@ -164,8 +164,8 @@ export default function AdminBookingEditModal({
             <p className={adminEditSectionLabelClass}>Fahrt</p>
             <div className="space-y-4">
               <div className="-ml-2 rounded-[2rem] bg-transparent py-2 pl-2 pr-0 md:-mr-2 md:pr-0">
-                <div className="flex gap-4">
-                  <div className="flex w-[2.1rem] shrink-0 flex-col items-center pt-[1.25rem]">
+                <div className="flex gap-3 md:gap-4">
+                  <div className="hidden w-[2.1rem] shrink-0 flex-col items-center pt-[1.25rem] md:flex">
                     <div className="flex h-[2.1rem] w-[2.1rem] items-center justify-center rounded-full bg-[#111111] text-white">
                       {editDirection === 'from_airport' ? <PlaneLanding size={13} /> : <MapPin size={13} />}
                     </div>
@@ -186,7 +186,7 @@ export default function AdminBookingEditModal({
                         </div>
                       ) : (
                         <div className="mt-1 min-h-[3.25rem] space-y-2">
-                          <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                          <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
                             <StreetAutocomplete
                               className={BOOKING_FORM_INPUT_CLASS}
                               placeholder="Strasse auswaehlen"
@@ -209,7 +209,7 @@ export default function AdminBookingEditModal({
                       <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
                       {editDirection === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem] space-y-2">
-                          <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                          <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
                             <StreetAutocomplete
                               className={BOOKING_FORM_INPUT_CLASS}
                               placeholder="Strasse auswaehlen"
@@ -266,7 +266,7 @@ export default function AdminBookingEditModal({
               {editExtraStop ? (
                 <div className="animate-in slide-in-from-top-2 fade-in space-y-4 duration-300">
                   <p className={adminEditSectionLabelClass}>Adresse Zwischenstopp</p>
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                  <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
                     <StreetAutocomplete
                       className={BOOKING_FORM_INPUT_CLASS}
                       placeholder="Strasse auswaehlen"
