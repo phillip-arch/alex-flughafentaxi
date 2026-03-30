@@ -5,6 +5,8 @@ import { Briefcase, Calendar, ChevronLeft, Clock, ShoppingBag, Users } from 'luc
 type BookingStepTwoProps = {
   formData: any;
   error: string | null;
+  flightLookupError: string | null;
+  isLookingUpFlight: boolean;
   isDatePickerOpen: boolean;
   isTimePickerOpen: boolean;
   setIsDatePickerOpen: (value: boolean) => void;
@@ -13,6 +15,7 @@ type BookingStepTwoProps = {
   handleTimeSelect: (time: string) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   handleBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleFlightNumberBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
   getInputClassName: (name: any) => string;
   isFieldInvalid: (name: any) => boolean;
   renderInlineSelect: (name: any, label: string, options: number[], value: number | '', Icon?: any) => React.ReactNode;
@@ -28,6 +31,8 @@ type BookingStepTwoProps = {
 export default function BookingStepTwo({
   formData,
   error,
+  flightLookupError,
+  isLookingUpFlight,
   isDatePickerOpen,
   isTimePickerOpen,
   setIsDatePickerOpen,
@@ -36,6 +41,7 @@ export default function BookingStepTwo({
   handleTimeSelect,
   handleChange,
   handleBlur,
+  handleFlightNumberBlur,
   getInputClassName,
   isFieldInvalid,
   renderInlineSelect,
@@ -125,10 +131,18 @@ export default function BookingStepTwo({
             name="flightNumber"
             value={formData.flightNumber}
             onChange={handleChange}
-            onBlur={handleBlur}
+            onBlur={handleFlightNumberBlur}
             placeholder="Flugnummer (z.B. OS123)"
             className={getInputClassName('flightNumber')}
           />
+          {isLookingUpFlight ? (
+            <p className="mt-2 ml-1 text-[12px] text-[#6d7075]">Flugdaten werden geladen...</p>
+          ) : null}
+          {flightLookupError ? (
+            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+              {flightLookupError}
+            </div>
+          ) : null}
         </div>
       ) : null}
 
