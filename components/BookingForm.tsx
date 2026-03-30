@@ -121,6 +121,8 @@ const EMPTY_ACCOUNT_DEFAULTS = {
 };
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
+const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal`;
+const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal`;
 
 const BookingForm = ({
   onDirectionChange,
@@ -154,6 +156,7 @@ const BookingForm = ({
   const [resolvedStreetOption, setResolvedStreetOption] = useState<StreetOption | null>(null);
   const [resolvedExtraStopStreetOption, setResolvedExtraStopStreetOption] = useState<StreetOption | null>(null);
   const [streetNumberWarning, setStreetNumberWarning] = useState<'street' | 'extraStopStreet' | null>(null);
+  const [streetPasteWarning, setStreetPasteWarning] = useState<'street' | 'extraStopStreet' | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
   const [accountDefaults, setAccountDefaults] = useState(initialAccountDefaults);
   const [openInlineSelect, setOpenInlineSelect] = useState<InlineSelectFieldName | null>(null);
@@ -282,6 +285,7 @@ const BookingForm = ({
       city: favorite.city,
     });
     setStreetNumberWarning('street');
+    setStreetPasteWarning(null);
     setFormData((prev) => ({
       ...prev,
       city,
@@ -506,6 +510,124 @@ const BookingForm = ({
     setStreetNumberWarning(target);
   };
 
+  const parsePastedAddress = (rawValue: string) => {
+    const value = rawValue.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!value) {
+      return null;
+    }
+
+    const zipFirstMatch = value.match(/^(\d{4})\s+([^,]+),\s*(.+?)(?:\s+(\d[\dA-Za-z/-]*))?$/u);
+    if (zipFirstMatch) {
+      return {
+        streetQuery: zipFirstMatch[3].trim(),
+        zip: zipFirstMatch[1].trim(),
+        city: zipFirstMatch[2].trim(),
+        houseSuffix: String(zipFirstMatch[4] || '').trim(),
+      };
+    }
+
+    const streetFirstMatch = value.match(/^(.+?)(?:\s+(\d[\dA-Za-z/-]*))?\s*,?\s*(\d{4})\s+(.+)$/u);
+    if (streetFirstMatch) {
+      return {
+        streetQuery: streetFirstMatch[1].trim(),
+        zip: streetFirstMatch[3].trim(),
+        city: streetFirstMatch[4].trim(),
+        houseSuffix: String(streetFirstMatch[2] || '').trim(),
+      };
+    }
+
+    const houseSuffixMatch = value.match(/^(.*?)(?:\s+(\d[\dA-Za-z/-]*))$/u);
+    if (houseSuffixMatch) {
+      return {
+        streetQuery: houseSuffixMatch[1].trim(),
+        zip: '',
+        city: '',
+        houseSuffix: String(houseSuffixMatch[2] || '').trim(),
+      };
+    }
+
+    return {
+      streetQuery: value,
+      zip: '',
+      city: '',
+      houseSuffix: '',
+    };
+  };
+
+  const normalizeAddressLookupValue = (value: string) =>
+    value
+      .trim()
+      .replace(/[.,;:]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .toLocaleLowerCase('de-AT');
+
+  const handleStreetPaste = async (
+    target: 'street' | 'extraStopStreet',
+    pastedText: string,
+  ) => {
+    const parsed = parsePastedAddress(pastedText);
+    if (!parsed) {
+      return;
+    }
+
+    const params = new URLSearchParams({
+      q: parsed.streetQuery,
+      limit: '10',
+    });
+    if (parsed.zip) {
+      params.set('zip', parsed.zip);
+    }
+
+    try {
+      const response = await fetch(`/api/streets/search?${params.toString()}`);
+      const payload = (await response.json()) as { results?: StreetOption[] };
+      const normalizedStreetQuery = normalizeAddressLookupValue(parsed.streetQuery);
+      const normalizedCityQuery = normalizeAddressLookupValue(parsed.city);
+      const option = payload.results?.find((item) => {
+        const sameStreet = normalizeAddressLookupValue(item.street) === normalizedStreetQuery;
+        const sameZip = parsed.zip ? String(item.zip || '').trim() === parsed.zip : true;
+        const sameCity = parsed.city ? normalizeAddressLookupValue(item.city || '') === normalizedCityQuery : true;
+        return sameStreet && sameZip && sameCity;
+      });
+
+      if (!response.ok || !option) {
+        clearStreetSelection(target, pastedText.trim());
+        setStreetPasteWarning(target);
+        return;
+      }
+
+      const nextValue = `${option.street}${parsed.houseSuffix ? ` ${parsed.houseSuffix}` : ' '}`;
+
+      if (target === 'street') {
+        setStreetInputValue(nextValue);
+        setResolvedStreetOption(option);
+        setStreetNumberWarning(parsed.houseSuffix ? null : 'street');
+        setStreetPasteWarning(null);
+        setFormData((prev) => ({
+          ...prev,
+          street: nextValue,
+          zip: option.zip,
+          city: option.city,
+        }));
+        return;
+      }
+
+      setExtraStopStreetInputValue(nextValue);
+      setResolvedExtraStopStreetOption(option);
+      setStreetNumberWarning(parsed.houseSuffix ? null : 'extraStopStreet');
+      setStreetPasteWarning(null);
+      setFormData((prev) => ({
+        ...prev,
+        extraStopStreet: nextValue,
+        extraStopZip: option.zip,
+        extraStopCity: option.city,
+      }));
+    } catch {
+      clearStreetSelection(target, pastedText.trim());
+      setStreetPasteWarning(target);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const normalizedValue =
@@ -534,6 +656,7 @@ const BookingForm = ({
     }
 
     setStreetNumberWarning((prev) => (prev === target ? null : prev));
+    setStreetPasteWarning((prev) => (prev === target ? null : prev));
 
     if (selectedOption && normalizedValue.toLowerCase().startsWith(selectedOption.street.toLowerCase())) {
       setFormData((prev) =>
@@ -586,6 +709,7 @@ const BookingForm = ({
       setStreetInputValue(nextValue);
       setResolvedStreetOption(option);
       setStreetNumberWarning('street');
+      setStreetPasteWarning(null);
       setFormData((prev) => ({
         ...prev,
         street: option.street,
@@ -598,6 +722,7 @@ const BookingForm = ({
     setExtraStopStreetInputValue(nextValue);
     setResolvedExtraStopStreetOption(option);
     setStreetNumberWarning('extraStopStreet');
+    setStreetPasteWarning(null);
     setFormData((prev) => ({
       ...prev,
       extraStopStreet: option.street,
@@ -620,7 +745,13 @@ const BookingForm = ({
 
   const getInputClassName = (name: keyof ExtendedBookingInput) => {
     if (isFieldInvalid(name)) {
+      if (name === 'street' || name === 'extraStopStreet') {
+        return ADDRESS_FIELD_INVALID_CLASS;
+      }
       return BOOKING_FORM_INPUT_INVALID_CLASS;
+    }
+    if (name === 'street' || name === 'extraStopStreet') {
+      return ADDRESS_FIELD_CLASS;
     }
     return BOOKING_FORM_INPUT_CLASS;
   };
@@ -819,6 +950,7 @@ const BookingForm = ({
             mobileSelectedStreetOnly
             onChange={(value) => clearStreetSelection('extraStopStreet', value)}
             onSelect={(option) => applyStreetSelection('extraStopStreet', option)}
+            onPasteText={(text) => handleStreetPaste('extraStopStreet', text)}
             onBlur={() => {
               validateStreetNumber('extraStopStreet');
               handleBlur({} as React.FocusEvent<HTMLInputElement>);
@@ -829,6 +961,11 @@ const BookingForm = ({
           {streetNumberWarning === 'extraStopStreet' ? (
             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
               Bitte ergaenze die Hausnummer.
+            </div>
+          ) : null}
+          {streetPasteWarning === 'extraStopStreet' ? (
+            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+              Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
             </div>
           ) : null}
         </div>
@@ -1226,8 +1363,8 @@ const BookingForm = ({
                   </div>
                 )}
               <div className="rounded-[2.2rem] bg-transparent py-3 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
-                <div className="flex gap-0 md:gap-4">
-                  <div className="hidden w-6 shrink-0 flex-col items-center pt-[calc(1.45rem+8px)] md:flex md:w-7 md:pt-[calc(1.45rem+8px)]">
+                <div className="flex gap-3 md:gap-4">
+                  <div className="flex w-6 shrink-0 flex-col items-center pt-[calc(1.45rem+8px)] md:w-7 md:pt-[calc(1.45rem+8px)]">
                     <div className={`flex h-6 w-6 items-center justify-center rounded-full md:h-7 md:w-7 ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={9} className="md:h-[11px] md:w-[11px]" /> : <MapPin size={9} className="md:h-[11px] md:w-[11px]" />}
                     </div>
@@ -1259,6 +1396,7 @@ const BookingForm = ({
                                 menuItems={favoriteMenuItems}
                                 onChange={(value) => clearStreetSelection('street', value)}
                                 onSelect={(option) => applyStreetSelection('street', option)}
+                                onPasteText={(text) => handleStreetPaste('street', text)}
                                 onBlur={() => {
                                   validateStreetNumber('street');
                                   handleBlur({} as React.FocusEvent<HTMLInputElement>);
@@ -1270,6 +1408,11 @@ const BookingForm = ({
                             {streetNumberWarning === 'street' ? (
                               <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
                                 Bitte ergaenze die Hausnummer.
+                              </div>
+                            ) : null}
+                            {streetPasteWarning === 'street' ? (
+                              <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                                Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
                               </div>
                             ) : null}
                           </div>
@@ -1292,6 +1435,7 @@ const BookingForm = ({
                                 menuItems={favoriteMenuItems}
                                 onChange={(value) => clearStreetSelection('street', value)}
                                 onSelect={(option) => applyStreetSelection('street', option)}
+                                onPasteText={(text) => handleStreetPaste('street', text)}
                                 onBlur={() => {
                                   validateStreetNumber('street');
                                   handleBlur({} as React.FocusEvent<HTMLInputElement>);
@@ -1303,6 +1447,11 @@ const BookingForm = ({
                             {streetNumberWarning === 'street' ? (
                               <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
                                 Bitte ergaenze die Hausnummer.
+                              </div>
+                            ) : null}
+                            {streetPasteWarning === 'street' ? (
+                              <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                                Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
                               </div>
                             ) : null}
                           </div>

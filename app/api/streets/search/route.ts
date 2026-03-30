@@ -10,6 +10,50 @@ function normalizeSearchValue(value: string) {
     .toLocaleLowerCase('de-AT');
 }
 
+function extractStreetSearchQuery(value: string) {
+  const raw = value.trim();
+  if (!raw) return '';
+
+  const commaParts = raw
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const looksLikeZipCity = (part: string) => /^\d{4}\b/.test(part) || /\b(wien|schwechat|v[öo]sendorf)\b/i.test(part);
+  const stripHouseNumber = (part: string) => part.replace(/\s+\d[\dA-Za-z/-]*$/u, '').trim();
+
+  if (commaParts.length > 1) {
+    const first = commaParts[0] || '';
+    const last = commaParts.at(-1) || '';
+
+    if (looksLikeZipCity(first) && !looksLikeZipCity(last)) {
+      return normalizeSearchValue(stripHouseNumber(last));
+    }
+
+    if (!looksLikeZipCity(first) && looksLikeZipCity(last)) {
+      return normalizeSearchValue(stripHouseNumber(first));
+    }
+  }
+
+  return normalizeSearchValue(stripHouseNumber(raw));
+}
+
+function extractZipFragment(value: string) {
+  const raw = value.trim();
+  if (!raw) return '';
+
+  const explicitZipMatch =
+    raw.match(/(?:^|,\s*|\s)(\d{4})(?=\s+[A-Za-zÄÖÜäöüß]|$)/u) ||
+    raw.match(/^(\d{4})(?=\s)/u);
+
+  if (explicitZipMatch) {
+    return explicitZipMatch[1].trim();
+  }
+
+  const fallbackMatch = raw.replace(/\D/g, '').match(/^\d{2,4}/);
+  return fallbackMatch ? fallbackMatch[0] : '';
+}
+
 export async function GET(request: NextRequest) {
   try {
     const q = String(request.nextUrl.searchParams.get('q') || '').trim();
@@ -30,14 +74,10 @@ export async function GET(request: NextRequest) {
     }
 
     const normalizedQuery = normalizeSearchValue(q);
-    const commaParts = q
-      .split(',')
-      .map((part) => part.trim())
-      .filter(Boolean);
-    const streetSearchQuery = normalizeSearchValue(commaParts.at(-1) || q);
+    const streetSearchQuery = extractStreetSearchQuery(q);
     const prefixPattern = `${streetSearchQuery}%`;
     const containsPattern = `%${streetSearchQuery}%`;
-    const zipFragment = q.replace(/\D/g, '').slice(0, 4);
+    const zipFragment = extractZipFragment(q);
     const cityFragment = normalizeSearchValue(q.replace(/\d/g, ' '));
 
     let prefixQuery = supabaseAdmin

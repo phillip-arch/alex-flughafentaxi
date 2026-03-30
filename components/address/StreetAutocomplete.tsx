@@ -21,6 +21,7 @@ type StreetAutocompleteProps = {
   menuItems?: StreetAutocompleteMenuItem[];
   onChange: (value: string) => void;
   onSelect: (option: StreetOption) => void;
+  onPasteText?: (text: string) => void | Promise<void>;
   onBlur?: () => void;
   onFocus?: () => void;
 };
@@ -36,6 +37,7 @@ export default function StreetAutocomplete({
   menuItems = [],
   onChange,
   onSelect,
+  onPasteText,
   onBlur,
   onFocus,
 }: StreetAutocompleteProps) {
@@ -77,11 +79,12 @@ export default function StreetAutocomplete({
       hasLockedHouseNumberSuffix);
   const showMobileSelectedSummary = showMobileSelectedStreetOnly && !isFocused;
   const mobileSelectedInputClasses = showMobileSelectedStreetOnly
-    ? '!h-[4.7rem] !px-4 !py-[1.3rem] text-[1rem] leading-tight md:!h-auto md:!px-4 md:!py-3 md:text-inherit md:leading-normal'
+    ? '!h-[4.05rem] !px-4 !py-[0.7rem] text-[1rem] leading-tight md:!h-auto md:!px-4 md:!py-3 md:text-inherit md:leading-normal'
     : '';
-  const displayValue = showMobileSelectedStreetOnly
+  const mobileDisplayValue = showMobileSelectedSummary
     ? normalizedInputValue || selectedOption.street
-    : desktopBlurValue;
+    : value || selectedOption?.street || '';
+  const displayValue = showMobileSelectedStreetOnly ? mobileDisplayValue : desktopBlurValue;
 
   const selectOption = (option: StreetOption) => {
     onSelect(option);
@@ -228,6 +231,12 @@ export default function StreetAutocomplete({
             setIsFocused(true);
             onFocus?.();
           }}
+          onPaste={(event) => {
+            if (!onPasteText) return;
+            const text = event.clipboardData.getData('text');
+            event.preventDefault();
+            void onPasteText(text);
+          }}
           onKeyDown={(event) => {
             if (!isOpen && event.key === 'ArrowDown' && trimmedValue.length >= 2 && !hasLockedHouseNumberSuffix) {
               setIsOpen(true);
@@ -293,10 +302,10 @@ export default function StreetAutocomplete({
 
         {showMobileSelectedSummary ? (
           <div className="pointer-events-none absolute inset-x-0 inset-y-0 flex flex-col justify-center px-4 md:hidden">
-            <span className="truncate text-[1.5rem] font-medium leading-tight text-[#111111]">
+            <span className="truncate text-[18px] font-semibold tracking-[-0.03em] leading-tight text-[#111111]">
               {displayValue}
             </span>
-            <span className="mt-1 truncate text-[0.92rem] leading-tight text-[#6a7d96]">
+            <span className="mt-0.5 truncate text-[0.92rem] leading-tight text-[#6a7d96]">
               {selectedOption.zip} {selectedOption.city}
             </span>
           </div>
