@@ -26,11 +26,17 @@ export default function StreetAutocomplete({
 }: StreetAutocompleteProps) {
   const listboxId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
   const [results, setResults] = useState<StreetOption[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [offset, setOffset] = useState(0);
   const [activeIndex, setActiveIndex] = useState(-1);
   const trimmedValue = value.trim();
+  const isZipOnlyQuery = /^\d{2,4}$/.test(trimmedValue.replace(/\s+/g, ''));
+  const pageSize = isZipOnlyQuery ? 50 : 8;
 
   const selectOption = (option: StreetOption) => {
     onSelect(option);
@@ -39,33 +45,63 @@ export default function StreetAutocomplete({
   };
 
   useEffect(() => {
+    setOffset(0);
+    setHasMore(false);
+  }, [trimmedValue, zipHint, isZipOnlyQuery]);
+
+  useEffect(() => {
     if (!isOpen || trimmedValue.length < 2) {
       setResults([]);
       setLoading(false);
+      setLoadingMore(false);
       setActiveIndex(-1);
+      setHasMore(false);
       return;
     }
 
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
-      setLoading(true);
+      if (offset === 0) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
       try {
-        const params = new URLSearchParams({ q: trimmedValue, limit: '8' });
+        const params = new URLSearchParams({
+          q: trimmedValue,
+          limit: String(pageSize),
+          offset: String(offset),
+        });
         if (zipHint) params.set('zip', zipHint);
         const response = await fetch(`/api/streets/search?${params.toString()}`, {
           signal: controller.signal,
         });
         const payload = (await response.json()) as { results?: StreetOption[] };
-        setResults(payload.results || []);
-        setActiveIndex(-1);
+        const nextResults = payload.results || [];
+        setResults((prev) => {
+          if (offset === 0) {
+            return nextResults;
+          }
+
+          const seen = new Set(prev.map((item) => `${item.zip}-${item.city}-${item.street}`));
+          return [...prev, ...nextResults.filter((item) => !seen.has(`${item.zip}-${item.city}-${item.street}`))];
+        });
+        setHasMore(nextResults.length === pageSize);
+        if (offset === 0) {
+          setActiveIndex(-1);
+        }
       } catch (error) {
         if (!controller.signal.aborted) {
-          setResults([]);
-          setActiveIndex(-1);
+          if (offset === 0) {
+            setResults([]);
+            setActiveIndex(-1);
+          }
+          setHasMore(false);
         }
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);
+          setLoadingMore(false);
         }
       }
     }, 250);
@@ -74,7 +110,7 @@ export default function StreetAutocomplete({
       controller.abort();
       window.clearTimeout(timeout);
     };
-  }, [isOpen, trimmedValue, zipHint]);
+  }, [isOpen, isZipOnlyQuery, offset, pageSize, trimmedValue, zipHint]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -106,18 +142,19 @@ export default function StreetAutocomplete({
         type="text"
         value={value}
         onChange={(event) => {
-        onChange(event.target.value);
-        setIsOpen(true);
-        setActiveIndex(-1);
-      }}
-      onFocus={() => {
-        setIsOpen(true);
-        onFocus?.();
-      }}
+          onChange(event.target.value);
+          setIsOpen(true);
+          setActiveIndex(-1);
+          setOffset(0);
+        }}
+        onFocus={() => {
+          onFocus?.();
+        }}
       onKeyDown={(event) => {
         if (!isOpen && event.key === 'ArrowDown' && trimmedValue.length >= 2) {
           setIsOpen(true);
           setActiveIndex(results.length > 0 ? 0 : -1);
+          setOffset(0);
           event.preventDefault();
           return;
         }
@@ -175,7 +212,16 @@ export default function StreetAutocomplete({
         <div
           id={listboxId}
           role="listbox"
-          className="absolute left-0 right-0 top-[calc(100%+0.55rem)] z-30 overflow-hidden rounded-[18px] border border-[#dbe7f8] bg-white shadow-[0_18px_40px_rgba(17,17,17,0.12)]"
+          ref={listRef}
+          onScroll={(event) => {
+            if (!hasMore || loadingMore || loading) return;
+            const target = event.currentTarget;
+            const threshold = 32;
+            if (target.scrollTop + target.clientHeight >= target.scrollHeight - threshold) {
+              setOffset((prev) => prev + pageSize);
+            }
+          }}
+          className="absolute left-0 right-0 top-[calc(100%+0.55rem)] z-30 max-h-[18rem] overflow-y-auto overscroll-contain rounded-[18px] border border-[#dbe7f8] bg-white shadow-[0_18px_40px_rgba(17,17,17,0.12)]"
         >
           {loading ? (
             <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">Suche...</div>
@@ -214,6 +260,11 @@ export default function StreetAutocomplete({
               );
             })
           )}
+          {loadingMore ? (
+            <div className="border-t border-[#edf2f7] px-4 py-3 text-[0.92rem] text-[#6a7d96]">
+              Mehr Ergebnisse werden geladen...
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
