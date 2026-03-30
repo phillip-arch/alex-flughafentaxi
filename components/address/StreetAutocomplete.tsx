@@ -8,6 +8,7 @@ type StreetAutocompleteProps = {
   zipHint?: string;
   placeholder: string;
   className: string;
+  mobileDropdownFullWidth?: boolean;
   onChange: (value: string) => void;
   onSelect: (option: StreetOption) => void;
   onBlur?: () => void;
@@ -19,6 +20,7 @@ export default function StreetAutocomplete({
   zipHint = '',
   placeholder,
   className,
+  mobileDropdownFullWidth = false,
   onChange,
   onSelect,
   onBlur,
@@ -137,7 +139,10 @@ export default function StreetAutocomplete({
   }, []);
 
   return (
-    <div ref={rootRef} className="relative">
+    <div
+      ref={rootRef}
+      className={mobileDropdownFullWidth ? 'static md:relative' : 'relative'}
+    >
       <input
         type="text"
         value={value}
@@ -221,7 +226,9 @@ export default function StreetAutocomplete({
               setOffset((prev) => prev + pageSize);
             }
           }}
-          className="absolute left-0 right-0 top-[calc(100%+0.55rem)] z-30 max-h-[18rem] overflow-y-auto overscroll-contain rounded-[18px] border border-[#dbe7f8] bg-white shadow-[0_18px_40px_rgba(17,17,17,0.12)]"
+          className={`absolute top-[calc(100%+0.55rem)] z-30 max-h-[18rem] overflow-y-auto overscroll-contain rounded-[18px] border border-[#dbe7f8] bg-white shadow-[0_18px_40px_rgba(17,17,17,0.12)] ${
+            mobileDropdownFullWidth ? 'left-0 right-0 md:left-0 md:right-0' : 'left-0 right-0'
+          }`}
         >
           {loading ? (
             <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">Suche...</div>

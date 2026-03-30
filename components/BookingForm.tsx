@@ -1240,6 +1240,7 @@ const BookingForm = ({
                             <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
+                                mobileDropdownFullWidth
                                 onChange={(value) => clearStreetSelection('street', value)}
                                 onSelect={(option) => applyStreetSelection('street', option)}
                                 onFocus={() => {
@@ -1276,6 +1277,7 @@ const BookingForm = ({
                             <div className="grid grid-cols-[minmax(0,1fr)_92px] gap-2.5 md:grid-cols-[minmax(0,1fr)_132px] md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
+                                mobileDropdownFullWidth
                                 onChange={(value) => clearStreetSelection('street', value)}
                                 onSelect={(option) => applyStreetSelection('street', option)}
                                 onFocus={() => {
