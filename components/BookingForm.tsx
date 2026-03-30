@@ -123,6 +123,7 @@ const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal`;
+const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 
 const BookingForm = ({
   onDirectionChange,
@@ -142,6 +143,8 @@ const BookingForm = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [flightLookupError, setFlightLookupError] = useState<string | null>(null);
+  const [isLookingUpFlight, setIsLookingUpFlight] = useState(false);
   
   // Picker States
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -510,6 +513,12 @@ const BookingForm = ({
     setStreetNumberWarning(target);
   };
 
+  const isResolvedStreetComplete = (target: 'street' | 'extraStopStreet') => {
+    const selectedOption = target === 'street' ? resolvedStreetOption : resolvedExtraStopStreetOption;
+    const rawValue = target === 'street' ? formData.street : formData.extraStopStreet;
+    return Boolean(selectedOption && hasTypedStreetNumber(rawValue, selectedOption.street));
+  };
+
   const parsePastedAddress = (rawValue: string) => {
     const value = rawValue.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
     if (!value) {
@@ -634,6 +643,9 @@ const BookingForm = ({
       name === 'zip' || name === 'extraStopZip'
         ? value.replace(/\D/g, '').slice(0, 4)
         : value;
+    if (name === 'flightNumber') {
+      setFlightLookupError(null);
+    }
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
@@ -757,6 +769,7 @@ const BookingForm = ({
   };
 
   const handleDateSelect = (date: string) => {
+    setFlightLookupError(null);
     setFormData(prev => ({ ...prev, date }));
   };
 
@@ -764,8 +777,81 @@ const BookingForm = ({
     setFormData(prev => ({ ...prev, time }));
   };
 
+  const formatSelectedDateForFlightLookup = (date: string) => {
+    const [day, month, year] = date.split('.');
+    if (!day || !month || !year) return null;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+
+  const extractLookupFlightNumber = (value: string) => {
+    const normalizedValue = value.trim().toUpperCase();
+    if (!normalizedValue) return '';
+
+    const leadingMatch = normalizedValue.match(/^([A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?)(?:\s|$)/);
+    if (leadingMatch?.[1]) {
+      return leadingMatch[1];
+    }
+
+    const compactValue = normalizedValue.replace(/\s+/g, '');
+    const fallbackMatch = compactValue.match(/[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?/);
+    return fallbackMatch?.[0] ?? compactValue;
+  };
+
+  const handleFlightNumberBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    handleBlur(e);
+
+    if (formData.direction !== 'from_airport') return;
+
+    const lookupFlightNumber = extractLookupFlightNumber(e.target.value);
+    if (!lookupFlightNumber) return;
+
+    if (!FLIGHT_NUMBER_PATTERN.test(lookupFlightNumber)) {
+      setFlightLookupError('Bitte geben Sie eine gueltige Flugnummer ein, z. B. OS123.');
+      return;
+    }
+
+    const formattedDate = formatSelectedDateForFlightLookup(formData.date);
+    if (!formattedDate) {
+      setFlightLookupError('Bitte waehlen Sie zuerst das Datum, damit die Flugnummer geprueft werden kann.');
+      return;
+    }
+
+    setIsLookingUpFlight(true);
+    setFlightLookupError(null);
+
+    try {
+      const response = await fetch(
+        `/api/flight-check?flightNumber=${encodeURIComponent(lookupFlightNumber)}&date=${encodeURIComponent(formattedDate)}`,
+      );
+      const payload = (await response.json()) as {
+        error?: string;
+        flightNumber?: string;
+        origin?: string;
+        displayFlightNumber?: string;
+        scheduledArrivalTime?: string;
+      };
+
+      if (!response.ok || !payload.displayFlightNumber || !payload.scheduledArrivalTime) {
+        setFlightLookupError(payload.error || 'Flug konnte nicht gefunden werden.');
+        return;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        flightNumber: payload.displayFlightNumber ?? prev.flightNumber,
+        time: payload.scheduledArrivalTime ?? prev.time,
+      }));
+      setFlightLookupError(null);
+    } catch {
+      setFlightLookupError('Flugdaten konnten gerade nicht geladen werden. Bitte versuchen Sie es erneut.');
+    } finally {
+      setIsLookingUpFlight(false);
+    }
+  };
+
   const handleDirectionChange = (dir: Direction) => {
     setFormData(prev => ({ ...prev, direction: dir }));
+    setFlightLookupError(null);
     if (touched['direction']) {
         setTouched(prev => ({ ...prev, direction: false }));
     }
@@ -1046,6 +1132,21 @@ const BookingForm = ({
         missingFields,
         errorMessage: REQUIRED_FIELDS_ERROR,
       };
+    }
+
+    if (step === 1) {
+      const primaryAddressValid = isResolvedStreetComplete('street');
+      const extraStopAddressValid = !formData.extraStop || isResolvedStreetComplete('extraStopStreet');
+      const hasPasteWarning =
+        streetPasteWarning === 'street' || (formData.extraStop && streetPasteWarning === 'extraStopStreet');
+
+      if (!primaryAddressValid || !extraStopAddressValid || hasPasteWarning) {
+        return {
+          isValid: false,
+          missingFields: ['street'] as (keyof ExtendedBookingInput)[],
+          errorMessage: 'Bitte waehlen Sie eine gueltige Adresse aus der Liste und ergaenzen Sie die Hausnummer.',
+        };
+      }
     }
 
     if (step === 2) {
@@ -1329,6 +1430,8 @@ const BookingForm = ({
   );
 
   const shouldShowInfoTrigger = showStepIndicator || showInfoTrigger || (isAppSurface && hasMounted);
+  const formContentTopPaddingClassName =
+    !isAppSurface && showStepIndicator ? 'pt-9 md:pt-3' : 'pt-2 md:pt-3';
 
   return (
     <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] md:max-w-none relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
@@ -1347,7 +1450,7 @@ const BookingForm = ({
         </button>
       ) : null}
       <div
-        className={`px-1 pt-2 md:px-2 md:pt-3 ${
+        className={`px-1 md:px-2 ${formContentTopPaddingClassName} ${
           allowExtendedDropdownSpace ? 'pb-0 md:pb-1' : 'pb-2 md:pb-3'
         }`}
       >
@@ -1466,7 +1569,7 @@ const BookingForm = ({
                       )}
                     </div>
                   </div>
-                  <div className="hidden shrink-0 flex-col justify-start pt-[1.35rem] md:flex">
+                  <div className="flex shrink-0 flex-col justify-start pt-[1.35rem]">
                     <button
                       type="button"
                       onClick={toggleExtraStop}
@@ -1510,6 +1613,8 @@ const BookingForm = ({
             <BookingStepTwo
               formData={formData}
               error={error}
+              flightLookupError={flightLookupError}
+              isLookingUpFlight={isLookingUpFlight}
               isDatePickerOpen={isDatePickerOpen}
               isTimePickerOpen={isTimePickerOpen}
               setIsDatePickerOpen={setIsDatePickerOpen}
@@ -1518,6 +1623,7 @@ const BookingForm = ({
               handleTimeSelect={handleTimeSelect}
               handleChange={handleChange}
               handleBlur={handleBlur}
+              handleFlightNumberBlur={handleFlightNumberBlur}
               getInputClassName={getInputClassName}
               isFieldInvalid={isFieldInvalid}
               renderInlineSelect={renderInlineSelect}
