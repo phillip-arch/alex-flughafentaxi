@@ -32,6 +32,11 @@ const normalizeFlightNumber = (flightNumber: string) => flightNumber.trim().toUp
 const toDisplayTime = (value: string | null | undefined) => {
   if (!value) return null;
 
+  const localTimeMatch = value.match(/T(\d{2}):(\d{2})/);
+  if (localTimeMatch) {
+    return `${localTimeMatch[1]}:${localTimeMatch[2]}`;
+  }
+
   const parsedDate = new Date(value);
   if (Number.isNaN(parsedDate.getTime())) return null;
 
@@ -39,6 +44,7 @@ const toDisplayTime = (value: string | null | undefined) => {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
+    timeZone: 'Europe/Vienna',
   });
 };
 
