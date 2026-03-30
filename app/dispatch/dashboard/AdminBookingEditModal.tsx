@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowUpDown, Briefcase, Calendar, Check, ChevronDown, Clock, MapPin, PlaneLanding, ShoppingBag, Users, X } from 'lucide-react';
+import StreetAutocomplete from '@/components/address/StreetAutocomplete';
 import DatePicker from '@/components/DatePicker';
 import TimePicker from '@/components/TimePicker';
 import SectionIntro from '@/components/ui/SectionIntro';
@@ -21,14 +22,24 @@ type AdminBookingEditModalProps = {
   handleEditDirectionChange: (direction: 'to_airport' | 'from_airport') => void;
   editFlightNumber: string;
   setEditFlightNumber: (value: string) => void;
-  editAddress: string;
-  handleEditAddressChange: (value: string) => void;
+  editStreetInput: string;
+  handleEditStreetInputChange: (value: string) => void;
+  handleEditStreetSelect: (option: { street: string; zip: string; city: string }) => void;
+  editHouseNumber: string;
+  setEditHouseNumber: (value: string) => void;
+  editZip: string;
+  editCity: string;
   editForm: any;
   setEditForm: React.Dispatch<React.SetStateAction<any>>;
   editExtraStop: boolean;
   setEditExtraStop: (value: boolean) => void;
-  editExtraStopAddress: string;
-  handleExtraStopAddressChange: (value: string) => void;
+  editExtraStopStreetInput: string;
+  handleExtraStopStreetInputChange: (value: string) => void;
+  handleExtraStopStreetSelect: (option: { street: string; zip: string; city: string }) => void;
+  editExtraStopHouseNumber: string;
+  setEditExtraStopHouseNumber: (value: string) => void;
+  editExtraStopZip: string;
+  editExtraStopCity: string;
   isEditDatePickerOpen: boolean;
   setIsEditDatePickerOpen: (value: boolean) => void;
   isEditTimePickerOpen: boolean;
@@ -69,14 +80,24 @@ export default function AdminBookingEditModal({
   handleEditDirectionChange,
   editFlightNumber,
   setEditFlightNumber,
-  editAddress,
-  handleEditAddressChange,
+  editStreetInput,
+  handleEditStreetInputChange,
+  handleEditStreetSelect,
+  editHouseNumber,
+  setEditHouseNumber,
+  editZip,
+  editCity,
   editForm,
   setEditForm,
   editExtraStop,
   setEditExtraStop,
-  editExtraStopAddress,
-  handleExtraStopAddressChange,
+  editExtraStopStreetInput,
+  handleExtraStopStreetInputChange,
+  handleExtraStopStreetSelect,
+  editExtraStopHouseNumber,
+  setEditExtraStopHouseNumber,
+  editExtraStopZip,
+  editExtraStopCity,
   isEditDatePickerOpen,
   setIsEditDatePickerOpen,
   isEditTimePickerOpen,
@@ -165,12 +186,21 @@ export default function AdminBookingEditModal({
                         </div>
                       ) : (
                         <div className="mt-1 min-h-[3.25rem] space-y-2">
-                          <input
-                            className={BOOKING_FORM_INPUT_CLASS}
-                            placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
-                            value={editAddress}
-                            onChange={(e) => handleEditAddressChange(e.target.value)}
-                          />
+                          <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                            <StreetAutocomplete
+                              className={BOOKING_FORM_INPUT_CLASS}
+                              placeholder="Strasse auswaehlen"
+                              value={editStreetInput}
+                              onChange={handleEditStreetInputChange}
+                              onSelect={handleEditStreetSelect}
+                            />
+                            <input
+                              className={BOOKING_FORM_INPUT_CLASS}
+                              placeholder="Hausnummer"
+                              value={editHouseNumber}
+                              onChange={(e) => setEditHouseNumber(e.target.value)}
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -179,12 +209,21 @@ export default function AdminBookingEditModal({
                       <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
                       {editDirection === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem] space-y-2">
-                          <input
-                            className={BOOKING_FORM_INPUT_CLASS}
-                            placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
-                            value={editAddress}
-                            onChange={(e) => handleEditAddressChange(e.target.value)}
-                          />
+                          <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                            <StreetAutocomplete
+                              className={BOOKING_FORM_INPUT_CLASS}
+                              placeholder="Strasse auswaehlen"
+                              value={editStreetInput}
+                              onChange={handleEditStreetInputChange}
+                              onSelect={handleEditStreetSelect}
+                            />
+                            <input
+                              className={BOOKING_FORM_INPUT_CLASS}
+                              placeholder="Hausnummer"
+                              value={editHouseNumber}
+                              onChange={(e) => setEditHouseNumber(e.target.value)}
+                            />
+                          </div>
                         </div>
                       ) : (
                         <div className="mt-1 flex min-h-[3.25rem] items-start pt-[0.35rem]">
@@ -227,12 +266,21 @@ export default function AdminBookingEditModal({
               {editExtraStop ? (
                 <div className="animate-in slide-in-from-top-2 fade-in space-y-4 duration-300">
                   <p className={adminEditSectionLabelClass}>Adresse Zwischenstopp</p>
-                  <input
-                    className={BOOKING_FORM_INPUT_CLASS}
-                    placeholder="Zusatzadresse eingeben, z.B. Mustergasse 12, 1010 Wien"
-                    value={editExtraStopAddress}
-                    onChange={(e) => handleExtraStopAddressChange(e.target.value)}
-                  />
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                    <StreetAutocomplete
+                      className={BOOKING_FORM_INPUT_CLASS}
+                      placeholder="Strasse auswaehlen"
+                      value={editExtraStopStreetInput}
+                      onChange={handleExtraStopStreetInputChange}
+                      onSelect={handleExtraStopStreetSelect}
+                    />
+                    <input
+                      className={BOOKING_FORM_INPUT_CLASS}
+                      placeholder="Hausnummer"
+                      value={editExtraStopHouseNumber}
+                      onChange={(e) => setEditExtraStopHouseNumber(e.target.value)}
+                    />
+                  </div>
                 </div>
               ) : null}
 

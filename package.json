@@ -7,7 +7,9 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "lint": "echo 'linting'"
+    "lint": "echo 'linting'",
+    "import:streets": "tsx scripts/import_streets.ts",
+    "import:zip-prices": "tsx scripts/import_zip_prices.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -27,6 +29,7 @@
     "resend": "^6.9.2",
     "tailwindcss": "^4.2.1",
     "tailwindcss-animate": "^1.0.7",
+    "xlsx": "^0.18.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {

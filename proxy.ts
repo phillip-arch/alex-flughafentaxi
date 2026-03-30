@@ -7,7 +7,7 @@ import {
   isDispatchPath,
 } from '@/lib/routing/surfaces';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const surface = getAppSurface();
   const pathnameWithSearch = `${path}${request.nextUrl.search}`;
@@ -18,8 +18,6 @@ export async function middleware(request: NextRequest) {
     return nextResponse;
   };
 
-  // Fallback for Supabase recovery links that incorrectly land on "/?code=..." or "/?token_hash=...".
-  // Route them through our callback handler to complete recovery safely.
   if (path === '/') {
     const code = request.nextUrl.searchParams.get('code');
     const tokenHash = request.nextUrl.searchParams.get('token_hash');
@@ -92,7 +90,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
           response = applyRouteHeaders(NextResponse.next({
@@ -100,27 +98,15 @@ export async function middleware(request: NextRequest) {
               headers: request.headers,
             },
           }));
-          
-          // Environment-based cookie security
-          const vercelEnv = process.env.VERCEL_ENV; // 'production' | 'preview' | 'development' | undefined
-          
-          // Auto-detect AI Studio preview environment if APP_ENV not explicitly set
+
+          const vercelEnv = process.env.VERCEL_ENV;
           const appEnv =
             process.env.APP_ENV ||
             (process.env.NEXT_PUBLIC_APP_URL?.includes('.run.app') ? 'preview' : undefined);
 
           const isVercelProd = vercelEnv === 'production';
           const isIframePreview = vercelEnv === 'preview' || appEnv === 'preview';
-
-          // SameSite logic
-          // Vercel Prod -> Lax
-          // Preview (Vercel or AI Studio) -> None (for iframe support)
-          // Default -> Lax
           const sameSiteAttribute: 'lax' | 'none' = isVercelProd ? 'lax' : (isIframePreview ? 'none' : 'lax');
-
-          // Secure logic:
-          // - Local development must stay non-secure so auth cookies work on http://localhost.
-          // - Production/preview should be secure.
           const secureAttribute = process.env.NODE_ENV === 'production';
 
           cookiesToSet.forEach(({ name, value, options }) => {
@@ -132,16 +118,12 @@ export async function middleware(request: NextRequest) {
           });
         },
       },
-    }
+    },
   );
 
-  // Refresh session if expired - required for Server Components
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Protected Routes Logic
-  // 1. Protect Admin Routes
   if (path.startsWith('/dispatch')) {
-    // Allow access to login page
     if (path === '/dispatch/login') {
       if (user) {
         return NextResponse.redirect(new URL('/dispatch/dashboard', request.url));
@@ -149,9 +131,7 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    // For all other /dispatch routes
     if (!user) {
-      // Skip redirect for Server Actions (they handle their own auth)
       if (request.headers.get('next-action')) {
         return response;
       }
@@ -159,14 +139,10 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 2. Protect User Account Routes
-  if (path.startsWith('/account')) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
+  if (path.startsWith('/account') && !user) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // 3. Keep logged-in users out of auth login page
   if (path === '/login' && user) {
     return NextResponse.redirect(new URL('/account', request.url));
   }

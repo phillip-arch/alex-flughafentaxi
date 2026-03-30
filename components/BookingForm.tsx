@@ -4,8 +4,14 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import StreetAutocomplete from '@/components/address/StreetAutocomplete';
 import { getAppSurface } from '@/lib/routing/surfaces';
-import { 
+import {
+  buildStreetOptionValue,
+  formatAddressLine,
+  sortFavoriteAddresses,
+} from '@/lib/addresses';
+import {
   Plane, 
   PlaneLanding, 
   PlaneTakeoff, 
@@ -51,6 +57,7 @@ interface FavoriteAddress {
   zip: string;
   street: string;
   house_number: string;
+  label: 'home' | 'office' | 'extra' | null;
 }
 
 interface ExtendedBookingInput {
@@ -115,6 +122,7 @@ const EMPTY_ACCOUNT_DEFAULTS = {
   email: '',
 };
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
+const DEFAULT_BASE_PRICE = 38;
 
 const BookingForm = ({
   onDirectionChange,
@@ -140,11 +148,22 @@ const BookingForm = ({
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(initialFavorites);
+  const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(
+    sortFavoriteAddresses(initialFavorites),
+  );
+  const [streetInputValue, setStreetInputValue] = useState('');
+  const [extraStopStreetInputValue, setExtraStopStreetInputValue] = useState('');
   const [isFavoriteListOpen, setIsFavoriteListOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
   const [accountDefaults, setAccountDefaults] = useState(initialAccountDefaults);
   const [openInlineSelect, setOpenInlineSelect] = useState<InlineSelectFieldName | null>(null);
+  const [zipPricing, setZipPricing] = useState<{
+    city: string;
+    basePrice: number;
+    limo: number;
+    kombi: number;
+    bus: number;
+  } | null>(null);
 
   const [formData, setFormData] = useState<ExtendedBookingInput>({
     direction: 'to_airport',
@@ -283,13 +302,13 @@ const BookingForm = ({
 
   const applyFavoriteAddress = (favorite: FavoriteAddress) => {
     const city = favorite.city.toLowerCase().includes('schwechat') ? 'Schwechat' : 'Wien';
-    const formattedAddress = `${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`;
+    setStreetInputValue(buildStreetOptionValue(favorite.street, favorite.zip, favorite.city));
     setFormData((prev) => ({
       ...prev,
       city,
       zip: favorite.zip,
-      street: formattedAddress,
-      houseNumber: '',
+      street: favorite.street,
+      houseNumber: favorite.house_number,
     }));
     setTouched((prev) => ({
       ...prev,
@@ -299,7 +318,7 @@ const BookingForm = ({
   };
 
   useEffect(() => {
-    setFavoriteAddresses(initialFavorites);
+    setFavoriteAddresses(sortFavoriteAddresses(initialFavorites));
   }, [initialFavorites]);
 
   useEffect(() => {
@@ -334,7 +353,7 @@ const BookingForm = ({
         supabase.from('profiles').select('full_name, phone').eq('id', user.id).maybeSingle(),
         supabase
           .from('saved_addresses')
-          .select('id, city, zip, street, house_number')
+          .select('id, city, zip, street, house_number, label')
           .eq('user_id', user.id)
           .order('created_at', { ascending: true }),
       ]);
@@ -342,7 +361,7 @@ const BookingForm = ({
       if (!isMounted) return;
 
       if (Array.isArray(favoritesResult.data)) {
-        setFavoriteAddresses(favoritesResult.data as FavoriteAddress[]);
+        setFavoriteAddresses(sortFavoriteAddresses(favoritesResult.data as FavoriteAddress[]));
       }
 
       const defaultFullName = profileResult.data?.full_name || '';
@@ -383,8 +402,74 @@ const BookingForm = ({
     };
   }, [supabase]);
 
-  // Derived state for price (mock calculation)
-  const basePrice = 38;
+  useEffect(() => {
+    if (formData.street && formData.zip && !streetInputValue) {
+      setStreetInputValue(buildStreetOptionValue(formData.street, formData.zip, formData.city));
+    }
+    if (formData.extraStopStreet && formData.extraStopZip && !extraStopStreetInputValue) {
+      setExtraStopStreetInputValue(
+        buildStreetOptionValue(formData.extraStopStreet, formData.extraStopZip, formData.extraStopCity),
+      );
+    }
+  }, [
+    extraStopStreetInputValue,
+    formData.city,
+    formData.extraStopCity,
+    formData.extraStopStreet,
+    formData.extraStopZip,
+    formData.street,
+    formData.zip,
+    streetInputValue,
+  ]);
+
+  useEffect(() => {
+    const normalizedZip = String(formData.zip || '').trim();
+
+    if (!/^\d{4}$/.test(normalizedZip)) {
+      setZipPricing(null);
+      return;
+    }
+
+    let isActive = true;
+
+    const loadZipPricing = async () => {
+      const { data, error } = await supabase
+        .from('zip_prices')
+        .select('city, base_price, limo_price, kombi_price, bus_price')
+        .eq('zip', normalizedZip)
+        .maybeSingle();
+
+      if (!isActive) return;
+
+      if (error || !data) {
+        setZipPricing(null);
+        return;
+      }
+
+      setZipPricing({
+        city: String(data.city || '').trim() || 'Wien',
+        basePrice: Number(data.base_price ?? DEFAULT_BASE_PRICE),
+        limo: Number(data.limo_price ?? data.base_price ?? DEFAULT_BASE_PRICE),
+        kombi: Number(data.kombi_price ?? 0),
+        bus: Number(data.bus_price ?? 0),
+      });
+    };
+
+    void loadZipPricing();
+
+    return () => {
+      isActive = false;
+    };
+  }, [formData.zip, supabase]);
+
+  const dbPrices = zipPricing
+    ? {
+        limo: zipPricing.limo,
+        kombi: zipPricing.kombi,
+        bus: zipPricing.bus,
+      }
+    : undefined;
+  const basePrice = zipPricing?.basePrice ?? DEFAULT_BASE_PRICE;
   const extraStopPrice = formData.extraStop ? 10 : 0;
   
   // Determine vehicle type
@@ -394,14 +479,14 @@ const BookingForm = ({
   
   const vehicleType = determineVehicle(passengers, suitcases, handLuggage);
   
-  // Calculate price with vehicle surcharge
-  const vehiclePrice = calculateVehiclePrice(basePrice, vehicleType);
+  // Calculate price with ZIP-based surcharge when available
+  const vehiclePrice = calculateVehiclePrice(basePrice, vehicleType, dbPrices);
   const totalPrice = vehiclePrice + extraStopPrice;
   const routeSummary =
     formData.direction === 'to_airport'
       ? `${formData.zip} ${formData.city} -> Flughafen VIE`
       : `Flughafen VIE -> ${formData.zip} ${formData.city}`;
-  const streetSummary = [formData.street, formData.houseNumber].filter(Boolean).join(' ').trim() || 'Noch nicht gewaehlt';
+  const streetSummary = formatAddressLine(formData.street, formData.houseNumber, '', '') || 'Noch nicht gewaehlt';
   const dateSummary = [formData.date, formData.time].filter(Boolean).join(' | ') || 'Noch nicht gewaehlt';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -419,6 +504,55 @@ const BookingForm = ({
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     // No-op: Do not mark as touched on blur
+  };
+
+  const clearStreetSelection = (target: 'street' | 'extraStopStreet', rawValue: string) => {
+    if (target === 'street') {
+      setStreetInputValue(rawValue);
+    } else {
+      setExtraStopStreetInputValue(rawValue);
+    }
+
+    setFormData((prev) =>
+      target === 'street'
+        ? {
+            ...prev,
+            street: rawValue,
+            zip: '',
+            city: 'Wien',
+          }
+        : {
+            ...prev,
+            extraStopStreet: rawValue,
+            extraStopZip: '',
+            extraStopCity: 'Wien',
+          },
+    );
+  };
+
+  const applyStreetSelection = (
+    target: 'street' | 'extraStopStreet',
+    option: { street: string; zip: string; city: string },
+  ) => {
+    const label = buildStreetOptionValue(option.street, option.zip, option.city);
+    if (target === 'street') {
+      setStreetInputValue(label);
+      setFormData((prev) => ({
+        ...prev,
+        street: option.street,
+        zip: option.zip,
+        city: option.city,
+      }));
+      return;
+    }
+
+    setExtraStopStreetInputValue(label);
+    setFormData((prev) => ({
+      ...prev,
+      extraStopStreet: option.street,
+      extraStopZip: option.zip,
+      extraStopCity: option.city,
+    }));
   };
 
   const isFieldInvalid = (name: keyof ExtendedBookingInput) => {
@@ -617,7 +751,12 @@ const BookingForm = ({
         {favoriteAddresses.map((favorite, index) => (
           (() => {
             const Icon = FAVORITE_ADDRESS_ICONS[index] || MapPin;
-            const addressLabel = `${favorite.street} ${favorite.house_number}, ${favorite.zip} ${favorite.city}`;
+            const addressLabel = formatAddressLine(
+              favorite.street,
+              favorite.house_number,
+              favorite.zip,
+              favorite.city,
+            );
 
             return (
               <button
@@ -656,15 +795,26 @@ const BookingForm = ({
           </p>
         </div>
 
-        <input
-          type="text"
-          name="extraStopStreet"
-          value={formData.extraStopStreet}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder="Zusatzadresse eingeben"
-          className={getInputClassName('extraStopStreet')}
-        />
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+          <StreetAutocomplete
+            value={extraStopStreetInputValue}
+            zipHint={formData.zip}
+            onChange={(value) => clearStreetSelection('extraStopStreet', value)}
+            onSelect={(option) => applyStreetSelection('extraStopStreet', option)}
+            onBlur={() => handleBlur({} as React.FocusEvent<HTMLInputElement>)}
+            placeholder="Strasse auswaehlen"
+            className={getInputClassName('extraStopStreet')}
+          />
+          <input
+            type="text"
+            name="extraStopHouseNumber"
+            value={formData.extraStopHouseNumber}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="Hausnummer"
+            className={getInputClassName('extraStopHouseNumber')}
+          />
+        </div>
       </div>
     );
   };
@@ -722,9 +872,9 @@ const BookingForm = ({
     const requiredFields: (keyof ExtendedBookingInput)[] = [];
 
     if (step === 1) {
-      requiredFields.push('street');
+      requiredFields.push('street', 'zip', 'houseNumber');
       if (formData.extraStop) {
-        requiredFields.push('extraStopStreet');
+        requiredFields.push('extraStopStreet', 'extraStopZip', 'extraStopHouseNumber');
       }
     } else if (step === 2) {
       requiredFields.push('date', 'time', 'passengers', 'luggage', 'handLuggage');
@@ -910,7 +1060,20 @@ const BookingForm = ({
 
     try {
       // Construct the pickup/destination strings based on direction
-      const addressString = formData.street.trim();
+      const addressString = formatAddressLine(
+        formData.street,
+        formData.houseNumber,
+        formData.zip,
+        formData.city,
+      );
+      const extraStopAddressString = formData.extraStop
+        ? formatAddressLine(
+            formData.extraStopStreet,
+            formData.extraStopHouseNumber,
+            formData.extraStopZip,
+            formData.extraStopCity,
+          )
+        : '';
       const pickup = formData.direction === 'to_airport' ? addressString : 'Flughafen Wien (VIE)';
       const destination = formData.direction === 'to_airport' ? 'Flughafen Wien (VIE)' : addressString;
       
@@ -933,7 +1096,7 @@ const BookingForm = ({
         vehicle_type: vehicleType,
         notes: formData.notes + 
                (formData.childSeat ? ` (Kindersitze: ${formData.babySeats > 0 ? `${formData.babySeats}x Babyschale ` : ''}${formData.childSeats > 0 ? `${formData.childSeats}x Kindersitz ` : ''}${formData.boosterSeats > 0 ? `${formData.boosterSeats}x Sitzerhoehung` : ''})` : '') + 
-               (formData.extraStop ? ` (Zwischenstopp: ${formData.extraStopStreet})` : '') +
+               (formData.extraStop ? ` (Zwischenstopp: ${extraStopAddressString})` : '') +
                (formData.flightNumber ? ` (Flugnummer: ${formData.flightNumber})` : '') +
                (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Handgepaeck: ${formData.handLuggage})` : '') +
                (formData.paymentMethod
@@ -1074,27 +1237,30 @@ const BookingForm = ({
                       {formData.direction !== 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem]">
                           <div className="relative" data-favorite-list-root="true">
-                            <input
-                              type="text"
-                              name="street"
-                              value={formData.street}
-                              onChange={handleChange}
-                              onClick={() => {
-                                if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
-                                  setIsFavoriteListOpen(true);
-                                }
-                              }}
-                              onFocus={() => {
-                                if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
-                                  setIsFavoriteListOpen(true);
-                                }
-                              }}
-                              onBlur={handleBlur}
-                              placeholder="Adresse eingeben"
-                              autoComplete="street-address"
-                              inputMode="text"
-                              className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
-                            />
+                            <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                              <StreetAutocomplete
+                                value={streetInputValue}
+                                onChange={(value) => clearStreetSelection('street', value)}
+                                onSelect={(option) => applyStreetSelection('street', option)}
+                                onFocus={() => {
+                                  if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
+                                    setIsFavoriteListOpen(true);
+                                  }
+                                }}
+                                onBlur={() => handleBlur({} as React.FocusEvent<HTMLInputElement>)}
+                                placeholder="Strasse auswaehlen"
+                                className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
+                              />
+                              <input
+                                type="text"
+                                name="houseNumber"
+                                value={formData.houseNumber}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                placeholder="Hausnummer"
+                                className={getInputClassName('houseNumber')}
+                              />
+                            </div>
                             {renderFavoriteAddressSuggestions()}
                           </div>
                           {renderExtraStopPanel()}
@@ -1107,27 +1273,30 @@ const BookingForm = ({
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.5rem]">
                           <div className="relative" data-favorite-list-root="true">
-                            <input
-                              type="text"
-                              name="street"
-                              value={formData.street}
-                              onChange={handleChange}
-                              onClick={() => {
-                                if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
-                                  setIsFavoriteListOpen(true);
-                                }
-                              }}
-                              onFocus={() => {
-                                if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
-                                  setIsFavoriteListOpen(true);
-                                }
-                              }}
-                              onBlur={handleBlur}
-                              placeholder="Adresse eingeben"
-                              autoComplete="street-address"
-                              inputMode="text"
-                              className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
-                            />
+                            <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_132px]">
+                              <StreetAutocomplete
+                                value={streetInputValue}
+                                onChange={(value) => clearStreetSelection('street', value)}
+                                onSelect={(option) => applyStreetSelection('street', option)}
+                                onFocus={() => {
+                                  if (isAppSurface && isLoggedIn && favoriteAddresses.length > 0) {
+                                    setIsFavoriteListOpen(true);
+                                  }
+                                }}
+                                onBlur={() => handleBlur({} as React.FocusEvent<HTMLInputElement>)}
+                                placeholder="Strasse auswaehlen"
+                                className={`${getInputClassName('street')} w-[calc(100%+15px)] md:w-full`}
+                              />
+                              <input
+                                type="text"
+                                name="houseNumber"
+                                value={formData.houseNumber}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                placeholder="Hausnummer"
+                                className={getInputClassName('houseNumber')}
+                              />
+                            </div>
                             {renderFavoriteAddressSuggestions()}
                           </div>
                           {renderExtraStopPanel()}

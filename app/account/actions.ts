@@ -14,6 +14,7 @@ const ProfileSchema = z.object({
 });
 
 const FavoriteSchema = z.object({
+  label: z.enum(['home', 'office', 'extra']),
   city: z.string().trim().min(2).max(80),
   zip: z.string().trim().regex(/^\d{1,4}$/),
   street: z.string().trim().min(2).max(120),
@@ -30,7 +31,7 @@ export async function loadFavoriteAddresses() {
 
   const { data, error } = await supabaseAdmin
     .from('saved_addresses')
-    .select('id, city, zip, street, house_number')
+    .select('id, city, zip, street, house_number, label')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
@@ -166,6 +167,7 @@ export async function addFavoriteAddress(formData: FormData) {
   if (!user) return { error: 'Unauthorized' };
 
   const parsed = FavoriteSchema.safeParse({
+    label: formData.get('label'),
     city: formData.get('city'),
     zip: formData.get('zip'),
     street: formData.get('street'),
@@ -174,16 +176,36 @@ export async function addFavoriteAddress(formData: FormData) {
 
   if (!parsed.success) return { error: 'Bitte Favorit korrekt eingeben.' };
 
-  const { data, error } = await supabaseAdmin
+  const existingByLabel = await supabaseAdmin
     .from('saved_addresses')
-    .insert({
-      user_id: user.id,
-      city: parsed.data.city,
-      zip: parsed.data.zip,
-      street: parsed.data.street,
-      house_number: parsed.data.house_number,
-    })
-    .select('id, city, zip, street, house_number')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('label', parsed.data.label)
+    .maybeSingle();
+
+  if (existingByLabel.error) {
+    console.error('addFavoriteAddress existing lookup failed:', existingByLabel.error);
+    return { error: 'Favorit konnte nicht gespeichert werden.' };
+  }
+
+  const favoritePayload = {
+    user_id: user.id,
+    label: parsed.data.label,
+    city: parsed.data.city,
+    zip: parsed.data.zip,
+    street: parsed.data.street,
+    house_number: parsed.data.house_number,
+  };
+
+  const favoriteQuery = existingByLabel.data?.id
+    ? supabaseAdmin
+        .from('saved_addresses')
+        .update(favoritePayload)
+        .eq('id', existingByLabel.data.id)
+    : supabaseAdmin.from('saved_addresses').insert(favoritePayload);
+
+  const { data, error } = await favoriteQuery
+    .select('id, city, zip, street, house_number, label')
     .single();
 
   if (error) {

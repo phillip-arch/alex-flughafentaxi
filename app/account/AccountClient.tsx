@@ -27,9 +27,18 @@ import {
   XCircle,
 } from 'lucide-react';
 import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
+import StreetAutocomplete from '@/components/address/StreetAutocomplete';
 import BookingForm from '@/components/BookingForm';
 import { BookingDirection, BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
 import { logout } from '@/app/(auth)/actions';
+import {
+  FAVORITE_LABEL_ORDER,
+  buildStreetOptionValue,
+  formatAddressLine,
+  getFavoriteLabelTitle,
+  sortFavoriteAddresses,
+  type FavoriteLabel,
+} from '@/lib/addresses';
 import { parseBookingNotes } from '@/lib/booking/notes';
 import {
   addFavoriteAddress,
@@ -86,6 +95,7 @@ type Favorite = {
   zip: string;
   street: string;
   house_number: string;
+  label: FavoriteLabel | null;
 };
 
 type Booking = {
@@ -164,9 +174,13 @@ export default function AccountClient({
   const searchParams = useSearchParams();
   const [name, setName] = useState(initialName || '');
   const [phone, setPhone] = useState(initialPhone || '');
-  const [favorites, setFavorites] = useState<Favorite[]>(initialFavorites || []);
+  const [favorites, setFavorites] = useState<Favorite[]>(sortFavoriteAddresses(initialFavorites || []));
   const [bookings, setBookings] = useState<Booking[]>(initialBookings || []);
-  const [favAddress, setFavAddress] = useState('');
+  const [favoriteStreetInput, setFavoriteStreetInput] = useState('');
+  const [favoriteStreet, setFavoriteStreet] = useState('');
+  const [favoriteHouseNumber, setFavoriteHouseNumber] = useState('');
+  const [favoriteZip, setFavoriteZip] = useState('');
+  const [favoriteCity, setFavoriteCity] = useState('Wien');
   const [showFavoriteForm, setShowFavoriteForm] = useState(false);
   const [pendingFavoriteSlot, setPendingFavoriteSlot] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -223,6 +237,8 @@ export default function AccountClient({
   const activeLanguage = searchParams.get('lang')?.toLowerCase() || 'de';
   const activeLanguageLabel =
     languageOptions.find((option) => option.code === activeLanguage)?.label || 'Deutsch';
+  const selectedFavoriteLabel =
+    pendingFavoriteSlot !== null ? FAVORITE_LABEL_ORDER[pendingFavoriteSlot] : null;
   useEffect(() => {
     if (!isLogoutConfirmOpen) return;
 
@@ -345,32 +361,40 @@ export default function AccountClient({
       setIsInstalling(false);
     }
   };
-  const placeFavoriteIntoSlot = (favorite: Favorite, slotIndex: number | null) => {
-    setFavorites((prev) => {
-      if (slotIndex === null || slotIndex < 0) {
-        return [...prev, favorite];
-      }
+  const resetFavoriteForm = () => {
+    setFavoriteStreetInput('');
+    setFavoriteStreet('');
+    setFavoriteHouseNumber('');
+    setFavoriteZip('');
+    setFavoriteCity('Wien');
+  };
 
-      const next = [...prev];
-      next.splice(slotIndex, 0, favorite);
-      return next.slice(0, favoriteSlotItems.length);
-    });
+  const placeFavoriteIntoSlot = (favorite: Favorite) => {
+    setFavorites((prev) =>
+      sortFavoriteAddresses([
+        ...prev.filter((item) => item.label !== favorite.label),
+        favorite,
+      ]),
+    );
   };
   const favoriteSlotItems = [
     {
+      key: 'home' as const,
       title: 'Home',
       emptyLabel: 'Add Home',
       filledIcon: House,
       emptyIcon: House,
     },
     {
+      key: 'office' as const,
       title: 'Work',
       emptyLabel: 'Add Work',
       filledIcon: Building2,
       emptyIcon: Building2,
     },
     {
-      title: 'Place',
+      key: 'extra' as const,
+      title: 'Extra',
       emptyLabel: 'Add a new place',
       filledIcon: MapPin,
       emptyIcon: Plus,
@@ -443,32 +467,11 @@ export default function AccountClient({
   const getGoogleMapsUrl = (value: string) =>
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(value || '')}`;
 
-  const parseFavoriteAddressInput = (value: string) => {
-    const raw = value.trim().replace(/\s+/g, ' ');
-    const zipCityMatch = raw.match(/(\d{4})\s+([A-Za-zÄÖÜäöüß\-\s]+)$/);
-
-    if (!zipCityMatch) {
-      return null;
-    }
-
-    const zip = zipCityMatch[1];
-    const city = zipCityMatch[2].trim();
-    const beforeZipCity = raw.slice(0, zipCityMatch.index).replace(/,\s*$/, '').trim();
-    const houseNumberMatch = beforeZipCity.match(/(.+?)\s+(\d+[A-Za-z0-9\/-]*)$/);
-
-    if (!houseNumberMatch) {
-      return null;
-    }
-
-    const street = houseNumberMatch[1].trim();
-    const houseNumber = houseNumberMatch[2].trim();
-
-    return {
-      city,
-      zip,
-      street,
-      house_number: houseNumber,
-    };
+  const handleFavoriteStreetInputChange = (value: string) => {
+    setFavoriteStreetInput(value);
+    setFavoriteStreet('');
+    setFavoriteZip('');
+    setFavoriteCity('Wien');
   };
 
   const filteredBookings = bookings
@@ -495,6 +498,11 @@ export default function AccountClient({
       const bTime = new Date(b.pickup_at).getTime();
       return bookingFilter === 'upcoming' ? aTime - bTime : bTime - aTime;
     });
+  const favoritesByLabel = new Map(
+    favorites
+      .filter((favorite) => favorite.label)
+      .map((favorite) => [favorite.label as FavoriteLabel, favorite]),
+  );
 
   const groupedBookings = filteredBookings.reduce<
     { month: string; items: Booking[] }[]
@@ -530,7 +538,7 @@ export default function AccountClient({
   }, [initialOpenPanel]);
 
   useEffect(() => {
-    setFavorites(initialFavorites || []);
+    setFavorites(sortFavoriteAddresses(initialFavorites || []));
     setFavoritesLoaded(initialFavoritesLoaded);
   }, [initialFavorites, initialFavoritesLoaded]);
 
@@ -547,7 +555,9 @@ export default function AccountClient({
         if ((res as { error?: string }).error) {
           setError((res as { error: string }).error);
         } else {
-          setFavorites(((res as { favorites?: Favorite[] }).favorites || []) as Favorite[]);
+          setFavorites(
+            sortFavoriteAddresses(((res as { favorites?: Favorite[] }).favorites || []) as Favorite[]),
+          );
           setFavoritesLoaded(true);
         }
         setFavoritesLoading(false);
@@ -827,7 +837,7 @@ export default function AccountClient({
 
                   <div className="mt-4">
                     {favoriteSlotItems.map((slot, index) => {
-                      const favorite = favorites[index];
+                      const favorite = favoritesByLabel.get(slot.key);
                       const FilledIcon = slot.filledIcon;
                       const EmptyIcon = slot.emptyIcon;
 
@@ -844,9 +854,16 @@ export default function AccountClient({
                                 <FilledIcon size={24} strokeWidth={1.8} />
                               </span>
                               <div className="min-w-0">
-                                <p className="text-[1rem] font-medium text-[#111827]">{slot.title}</p>
+                                <p className="text-[1rem] font-medium text-[#111827]">
+                                  {getFavoriteLabelTitle(slot.key)}
+                                </p>
                                 <p className="truncate text-[0.95rem] leading-6 text-[#6a6a6a]">
-                                  {favorite.street} {favorite.house_number}, {favorite.city} {favorite.zip}
+                                  {formatAddressLine(
+                                    favorite.street,
+                                    favorite.house_number,
+                                    favorite.zip,
+                                    favorite.city,
+                                  )}
                                 </p>
                               </div>
                             </div>
@@ -879,6 +896,7 @@ export default function AccountClient({
                           onClick={() => {
                             setError(null);
                             setPendingFavoriteSlot(index);
+                            resetFavoriteForm();
                             if (isMobileViewport()) {
                               setOpenPanel('favorite-add');
                               return;
@@ -901,43 +919,55 @@ export default function AccountClient({
 
                   {showFavoriteForm ? (
                     <form
-                    action={() => {
-                      setError(null);
-                      startTransition(async () => {
-                        const parsedAddress = parseFavoriteAddressInput(favAddress);
-                        if (!parsedAddress) {
-                          setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
-                          return;
-                        }
+                      action={() => {
+                        setError(null);
+                        startTransition(async () => {
+                          if (!favoriteStreet.trim() || !favoriteZip || !selectedFavoriteLabel || !favoriteHouseNumber.trim()) {
+                            setError('Bitte Strasse aus der Liste waehlen und Hausnummer ausfuellen.');
+                            return;
+                          }
 
-                        const formData = new FormData();
-                        formData.set('city', parsedAddress.city);
-                        formData.set('zip', parsedAddress.zip);
-                        formData.set('street', parsedAddress.street);
-                        formData.set('house_number', parsedAddress.house_number);
+                          const formData = new FormData();
+                          formData.set('label', selectedFavoriteLabel);
+                          formData.set('city', favoriteCity);
+                          formData.set('zip', favoriteZip);
+                          formData.set('street', favoriteStreet);
+                          formData.set('house_number', favoriteHouseNumber.trim());
 
-                        const res = await addFavoriteAddress(formData);
-                        if ((res as { error?: string })?.error) {
-                          setError((res as { error: string }).error);
-                          return;
-                        }
-                        const inserted = (res as { favorite?: Favorite }).favorite;
-                        if (inserted?.id) {
-                          placeFavoriteIntoSlot(inserted, pendingFavoriteSlot);
-                        }
-                        setFavAddress('');
-                        setShowFavoriteForm(false);
-                        setPendingFavoriteSlot(null);
-                      });
-                    }}
-                    className="mt-5 grid grid-cols-1 gap-3 border-t border-[#efebe4] pt-5"
-                  >
-                    <div className="grid grid-cols-1 gap-3">
-                      <input
-                        value={favAddress}
-                        onChange={(e) => setFavAddress(e.target.value)}
+                          const res = await addFavoriteAddress(formData);
+                          if ((res as { error?: string })?.error) {
+                            setError((res as { error: string }).error);
+                            return;
+                          }
+                          const inserted = (res as { favorite?: Favorite }).favorite;
+                          if (inserted?.id) {
+                            placeFavoriteIntoSlot(inserted);
+                          }
+                          resetFavoriteForm();
+                          setShowFavoriteForm(false);
+                          setPendingFavoriteSlot(null);
+                        });
+                      }}
+                      className="mt-5 grid grid-cols-1 gap-3 border-t border-[#efebe4] pt-5"
+                    >
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_132px]">
+                      <StreetAutocomplete
+                        value={favoriteStreetInput}
+                        onChange={handleFavoriteStreetInputChange}
+                        onSelect={(option) => {
+                          setFavoriteStreetInput(buildStreetOptionValue(option.street, option.zip, option.city));
+                          setFavoriteStreet(option.street);
+                          setFavoriteZip(option.zip);
+                          setFavoriteCity(option.city);
+                        }}
                         className="ui-input"
-                        placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                        placeholder="Strasse auswaehlen"
+                      />
+                      <input
+                        value={favoriteHouseNumber}
+                        onChange={(e) => setFavoriteHouseNumber(e.target.value)}
+                        className="ui-input"
+                        placeholder="Hausnummer"
                         disabled={isPending}
                         required
                       />
@@ -1430,7 +1460,7 @@ export default function AccountClient({
           subtitle="Favorit fuer schnellere Buchungen speichern"
           onBack={() => {
             setOpenPanel(null);
-            setFavAddress('');
+            resetFavoriteForm();
             setPendingFavoriteSlot(null);
           }}
         >
@@ -1439,17 +1469,17 @@ export default function AccountClient({
               action={() => {
                 setError(null);
                 startTransition(async () => {
-                  const parsedAddress = parseFavoriteAddressInput(favAddress);
-                  if (!parsedAddress) {
-                    setError('Bitte Adresse im Format "Strasse Nr., 1234 Stadt" eingeben.');
+                  if (!favoriteStreet.trim() || !favoriteZip || !selectedFavoriteLabel || !favoriteHouseNumber.trim()) {
+                    setError('Bitte Strasse aus der Liste waehlen und Hausnummer ausfuellen.');
                     return;
                   }
 
                   const formData = new FormData();
-                  formData.set('city', parsedAddress.city);
-                  formData.set('zip', parsedAddress.zip);
-                  formData.set('street', parsedAddress.street);
-                  formData.set('house_number', parsedAddress.house_number);
+                  formData.set('label', selectedFavoriteLabel);
+                  formData.set('city', favoriteCity);
+                  formData.set('zip', favoriteZip);
+                  formData.set('street', favoriteStreet);
+                  formData.set('house_number', favoriteHouseNumber.trim());
 
                   const res = await addFavoriteAddress(formData);
                   if ((res as { error?: string })?.error) {
@@ -1458,9 +1488,9 @@ export default function AccountClient({
                   }
                   const inserted = (res as { favorite?: Favorite }).favorite;
                   if (inserted?.id) {
-                    placeFavoriteIntoSlot(inserted, pendingFavoriteSlot);
+                    placeFavoriteIntoSlot(inserted);
                   }
-                  setFavAddress('');
+                  resetFavoriteForm();
                   setShowFavoriteForm(false);
                   setPendingFavoriteSlot(null);
                   setOpenPanel(null);
@@ -1468,11 +1498,23 @@ export default function AccountClient({
               }}
               className="grid grid-cols-1 gap-3"
             >
-              <input
-                value={favAddress}
-                onChange={(e) => setFavAddress(e.target.value)}
+              <StreetAutocomplete
+                value={favoriteStreetInput}
+                onChange={handleFavoriteStreetInputChange}
+                onSelect={(option) => {
+                  setFavoriteStreetInput(buildStreetOptionValue(option.street, option.zip, option.city));
+                  setFavoriteStreet(option.street);
+                  setFavoriteZip(option.zip);
+                  setFavoriteCity(option.city);
+                }}
                 className="ui-input"
-                placeholder="Adresse eingeben, z.B. Mustergasse 12, 1010 Wien"
+                placeholder="Strasse auswaehlen"
+              />
+              <input
+                value={favoriteHouseNumber}
+                onChange={(e) => setFavoriteHouseNumber(e.target.value)}
+                className="ui-input"
+                placeholder="Hausnummer"
                 disabled={isPending}
                 required
               />

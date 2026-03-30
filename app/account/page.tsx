@@ -53,7 +53,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
     requestedTab === 'favoriten' || requestedTab === 'start' || requestedTab === 'profil'
       ? supabase
           .from('saved_addresses')
-          .select('id, city, zip, street, house_number')
+          .select('id, city, zip, street, house_number, label')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
       : Promise.resolve({ data: [] as any[] });

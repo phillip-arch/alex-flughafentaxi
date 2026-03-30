@@ -13,6 +13,11 @@ import {
   fetchBookings, fetchDrivers, addDriver, deleteDriver, 
   updateBookingStatus, updateBookingDetails, assignDriver, unassignDriver, fetchStats, fetchPassengerCountsBatch, fetchAuditLogs, searchBookings
 } from './actions';
+import {
+  buildStreetOptionValue,
+  formatAddressLine,
+  parseStructuredAddress,
+} from '@/lib/addresses';
 import { composeBookingNotes, parseBookingNotes } from '@/lib/booking/notes';
 import UnderlineTabNav from '@/components/ui/UnderlineTabNav';
 import { APP_HEADER_CLASS, APP_PAGE_BG_CLASS } from '@/components/ui/sharedStyles';
@@ -83,9 +88,17 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const [auditLogsCache, setAuditLogsCache] = useState<Record<string, any[]>>({});
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [editDirection, setEditDirection] = useState<'to_airport' | 'from_airport' | null>(null);
-  const [editAddress, setEditAddress] = useState('');
+  const [editStreetInput, setEditStreetInput] = useState('');
+  const [editStreet, setEditStreet] = useState('');
+  const [editHouseNumber, setEditHouseNumber] = useState('');
+  const [editZip, setEditZip] = useState('');
+  const [editCity, setEditCity] = useState('Wien');
   const [editExtraStop, setEditExtraStop] = useState(false);
-  const [editExtraStopAddress, setEditExtraStopAddress] = useState('');
+  const [editExtraStopStreetInput, setEditExtraStopStreetInput] = useState('');
+  const [editExtraStopStreet, setEditExtraStopStreet] = useState('');
+  const [editExtraStopHouseNumber, setEditExtraStopHouseNumber] = useState('');
+  const [editExtraStopZip, setEditExtraStopZip] = useState('');
+  const [editExtraStopCity, setEditExtraStopCity] = useState('Wien');
   const [editChildSeat, setEditChildSeat] = useState(false);
   const [editBabySeats, setEditBabySeats] = useState(0);
   const [editChildSeats, setEditChildSeats] = useState(0);
@@ -651,9 +664,19 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
           : null;
     setEditDirection(inferredDirection);
     const editableAddressRaw = inferredDirection === 'from_airport' ? destinationText : pickupText;
-    setEditAddress(editableAddressRaw);
+    const parsedPrimaryAddress = parseStructuredAddress(editableAddressRaw);
+    setEditStreetInput(
+      parsedPrimaryAddress
+        ? buildStreetOptionValue(parsedPrimaryAddress.street, parsedPrimaryAddress.zip, parsedPrimaryAddress.city)
+        : editableAddressRaw,
+    );
+    setEditStreet(parsedPrimaryAddress?.street || editableAddressRaw);
+    setEditHouseNumber(parsedPrimaryAddress?.houseNumber || '');
+    setEditZip(parsedPrimaryAddress?.zip || '');
+    setEditCity(parsedPrimaryAddress?.city || 'Wien');
     const notesParsed = parseBookingNotes(booking.notes);
     const extractedExtraStop = notesParsed.intermediateStopInfo;
+    const parsedExtraStop = parseStructuredAddress(extractedExtraStop || '');
     const extractedHandLuggage = notesParsed.handLuggageCount;
     const paymentLabel = notesParsed.paymentLabel.toLowerCase();
     const extractedFlightNumber = (booking.flight_number || notesParsed.flightNumberInfo || '').toString().trim();
@@ -661,7 +684,15 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     const childSeats = clampToRange(Number(notesParsed.childSeatCounts.child || 0), 0, 3);
     const boosterSeats = clampToRange(Number(notesParsed.childSeatCounts.booster || 0), 0, 3);
     setEditExtraStop(Boolean(extractedExtraStop));
-    setEditExtraStopAddress(extractedExtraStop || '');
+    setEditExtraStopStreetInput(
+      parsedExtraStop
+        ? buildStreetOptionValue(parsedExtraStop.street, parsedExtraStop.zip, parsedExtraStop.city)
+        : extractedExtraStop || '',
+    );
+    setEditExtraStopStreet(parsedExtraStop?.street || extractedExtraStop || '');
+    setEditExtraStopHouseNumber(parsedExtraStop?.houseNumber || '');
+    setEditExtraStopZip(parsedExtraStop?.zip || '');
+    setEditExtraStopCity(parsedExtraStop?.city || 'Wien');
     setEditHandLuggage(clampToRange(extractedHandLuggage, 0, 8));
     setEditChildSeat(Boolean(notesParsed.childSeatInfo) || babySeats > 0 || childSeats > 0 || boosterSeats > 0);
     setEditBabySeats(babySeats);
@@ -702,37 +733,63 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const handleEditDirectionChange = (direction: 'to_airport' | 'from_airport') => {
     setEditDirection(direction);
     const prev = editForm;
-    const currentAddress = String(editAddress || '').trim();
+    const currentAddress = formatAddressLine(editStreet, editHouseNumber, editZip, editCity);
     if (direction === 'to_airport') {
       const nextPickup = currentAddress || (String(prev.pickup || '').includes(AIRPORT_LABEL) ? '' : prev.pickup);
       setEditForm({ ...prev, pickup: nextPickup, destination: AIRPORT_LABEL });
-      setEditAddress(nextPickup);
       return;
     }
     const nextDestination = currentAddress || (String(prev.destination || '').includes(AIRPORT_LABEL) ? '' : prev.destination);
     setEditForm({ ...prev, pickup: AIRPORT_LABEL, destination: nextDestination });
-    setEditAddress(nextDestination);
   };
 
-  const handleEditAddressChange = (value: string) => {
-    const formatted = value;
-    setEditAddress(formatted);
-    setEditForm((prev: any) =>
-      editDirection === 'from_airport'
-        ? { ...prev, destination: formatted }
-        : { ...prev, pickup: formatted }
-    );
+  const handleEditStreetInputChange = (value: string) => {
+    setEditStreetInput(value);
+    setEditStreet(value);
+    setEditZip('');
+    setEditCity('Wien');
   };
 
-  const handleExtraStopAddressChange = (value: string) => {
-    setEditExtraStopAddress(value);
+  const handleEditStreetSelect = (option: { street: string; zip: string; city: string }) => {
+    setEditStreetInput(buildStreetOptionValue(option.street, option.zip, option.city));
+    setEditStreet(option.street);
+    setEditZip(option.zip);
+    setEditCity(option.city);
+  };
+
+  const handleExtraStopStreetInputChange = (value: string) => {
+    setEditExtraStopStreetInput(value);
+    setEditExtraStopStreet(value);
+    setEditExtraStopZip('');
+    setEditExtraStopCity('Wien');
+  };
+
+  const handleExtraStopStreetSelect = (option: { street: string; zip: string; city: string }) => {
+    setEditExtraStopStreetInput(buildStreetOptionValue(option.street, option.zip, option.city));
+    setEditExtraStopStreet(option.street);
+    setEditExtraStopZip(option.zip);
+    setEditExtraStopCity(option.city);
   };
 
   const handleSaveBookingEdit = async (e?: React.FormEvent, sendPassengerEmail = true) => {
     if (e) e.preventDefault();
     setSavingEdit(true);
     try {
-      const extraStopValue = String(editExtraStopAddress || '').trim();
+      const primaryAddress = formatAddressLine(editStreet, editHouseNumber, editZip, editCity);
+      const extraStopValue = formatAddressLine(
+        editExtraStopStreet,
+        editExtraStopHouseNumber,
+        editExtraStopZip,
+        editExtraStopCity,
+      );
+      if (!primaryAddress) {
+        alert('Bitte waehlen Sie eine gueltige Adresse aus der Strassenliste.');
+        return;
+      }
+      if (editExtraStop && !extraStopValue) {
+        alert('Bitte erfassen Sie den Zwischenstopp vollstaendig.');
+        return;
+      }
       const notesComposed = composeBookingNotes({
         baseNotes: editForm.notes,
         flightNumber: editDirection === 'from_airport' ? editFlightNumber : '',
@@ -746,6 +803,18 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
 
       const payload = {
         ...editForm,
+        pickup:
+          editDirection === 'from_airport'
+            ? AIRPORT_LABEL
+            : editDirection === 'to_airport'
+              ? primaryAddress
+              : editForm.pickup,
+        destination:
+          editDirection === 'from_airport'
+            ? primaryAddress
+            : editDirection === 'to_airport'
+              ? AIRPORT_LABEL
+              : editForm.destination,
         sendPassengerEmail,
         notes: notesComposed,
         pickup_at: (() => {
@@ -1093,14 +1162,24 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         handleEditDirectionChange={handleEditDirectionChange}
         editFlightNumber={editFlightNumber}
         setEditFlightNumber={setEditFlightNumber}
-        editAddress={editAddress}
-        handleEditAddressChange={handleEditAddressChange}
+        editStreetInput={editStreetInput}
+        handleEditStreetInputChange={handleEditStreetInputChange}
+        handleEditStreetSelect={handleEditStreetSelect}
+        editHouseNumber={editHouseNumber}
+        setEditHouseNumber={setEditHouseNumber}
+        editZip={editZip}
+        editCity={editCity}
         editForm={editForm}
         setEditForm={setEditForm}
         editExtraStop={editExtraStop}
         setEditExtraStop={setEditExtraStop}
-        editExtraStopAddress={editExtraStopAddress}
-        handleExtraStopAddressChange={handleExtraStopAddressChange}
+        editExtraStopStreetInput={editExtraStopStreetInput}
+        handleExtraStopStreetInputChange={handleExtraStopStreetInputChange}
+        handleExtraStopStreetSelect={handleExtraStopStreetSelect}
+        editExtraStopHouseNumber={editExtraStopHouseNumber}
+        setEditExtraStopHouseNumber={setEditExtraStopHouseNumber}
+        editExtraStopZip={editExtraStopZip}
+        editExtraStopCity={editExtraStopCity}
         isEditDatePickerOpen={isEditDatePickerOpen}
         setIsEditDatePickerOpen={setIsEditDatePickerOpen}
         isEditTimePickerOpen={isEditTimePickerOpen}

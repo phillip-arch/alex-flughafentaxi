@@ -13,6 +13,7 @@ type FavoriteAddress = {
   zip: string;
   street: string;
   house_number: string;
+  label: 'home' | 'office' | 'extra' | null;
 };
 
 const EMPTY_FAVORITES: FavoriteAddress[] = [];
