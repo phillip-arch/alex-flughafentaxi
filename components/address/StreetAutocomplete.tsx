@@ -59,12 +59,22 @@ export default function StreetAutocomplete({
   const hasMenuItems = menuItems.length > 0;
   const normalizedSelectedStreet = selectedOption?.street.trim().replace(/\s+/g, ' ') || '';
   const normalizedInputValue = value.trim().replace(/\s+/g, ' ');
+  const normalizedSelectedLabel = selectedOption
+    ? buildStreetOptionValue(selectedOption.street, selectedOption.zip, selectedOption.city)
+        .trim()
+        .replace(/\s+/g, ' ')
+    : '';
   const selectedStreetSuffix =
     normalizedSelectedStreet &&
     normalizedInputValue.toLowerCase().startsWith(normalizedSelectedStreet.toLowerCase())
       ? normalizedInputValue.slice(normalizedSelectedStreet.length).trim()
       : '';
   const hasLockedHouseNumberSuffix = /^\d[\dA-Za-z/-]*$/u.test(selectedStreetSuffix);
+  const matchesSelectedValue =
+    Boolean(selectedOption) &&
+    (normalizedInputValue.toLowerCase() === normalizedSelectedStreet.toLowerCase() ||
+      normalizedInputValue.toLowerCase() === normalizedSelectedLabel.toLowerCase() ||
+      hasLockedHouseNumberSuffix);
   const selectedStreetLine = [selectedOption?.street || '', selectedStreetSuffix].filter(Boolean).join(' ').trim();
   const desktopBlurValue =
     selectedOption && !isFocused
@@ -287,9 +297,9 @@ export default function StreetAutocomplete({
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={isOpen}
-          aria-controls={listboxId}
+          aria-controls={isOpen ? listboxId : undefined}
           aria-activedescendant={
-            activeIndex >= 0 && activeIndex < results.length
+            isOpen && activeIndex >= 0 && activeIndex < results.length
               ? `${listboxId}-option-${activeIndex}`
               : undefined
           }
@@ -312,7 +322,8 @@ export default function StreetAutocomplete({
         ) : null}
       </div>
 
-      {(isOpen || (isFocused && !hasLockedHouseNumberSuffix)) && (hasMenuItems || loading || trimmedValue.length >= 2) ? (
+      {(isOpen || (isFocused && !hasLockedHouseNumberSuffix && !matchesSelectedValue)) &&
+      (hasMenuItems || loading || trimmedValue.length >= 2) ? (
         <div
           id={listboxId}
           role="listbox"
