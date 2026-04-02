@@ -155,7 +155,7 @@ const heroTrustItems = ['Fixpreis garantiert', 'Puenktliche Abholung', 'Zuverlae
 const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
-  'mx-auto mt-[16px] max-w-[16ch] text-[30px] font-black leading-[1.02] tracking-[-0.04em] text-[#111111] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]';
+  'mx-auto mt-[16px] max-w-[16ch] text-[28px] font-black leading-[1.02] tracking-[-0.04em] text-[#111111] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]';
 
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
 
@@ -313,7 +313,7 @@ function HeroTrustPills() {
 
 function HeroBookingCard() {
   return (
-    <div id="hero-booking" className="relative mt-6 w-full max-w-[42rem]">
+    <div id="hero-booking" className="relative w-full max-w-[42rem]">
       <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
       <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[18px_16px_16px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
         <div className="mb-[10px] flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left">
@@ -333,7 +333,7 @@ function HeroBookingCard() {
 
 function HeroImageCard() {
   return (
-    <div className="relative mx-auto w-full max-w-[35rem] lg:mt-[1.5rem]">
+    <div className="relative mx-auto w-full max-w-[35rem] lg:mt-12">
       <div className="overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem]">
         <div className="relative h-[13.5rem] md:h-[20.5rem]">
           <Image
@@ -384,8 +384,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="mt-6 grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10">
-              <div className="text-center lg:text-left">
+            <div className="grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10">
+              <div className="mt-10 text-center lg:mt-12 lg:text-left">
                 <HeroBookingCard />
                 <HeroTrustPills />
               </div>
