@@ -152,6 +152,10 @@ const vehicleCategoryHighlights = [
 ];
 
 const heroTrustItems = ['Fixpreis garantiert', 'Puenktliche Abholung', 'Zuverlaessiger Service'];
+const heroSectionPaddingClass =
+  'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
+const heroHeadlineClass =
+  'mx-auto mt-[16px] max-w-[16ch] text-[30px] font-black leading-[1.02] tracking-[-0.04em] text-[#111111] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]';
 
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
 
@@ -277,102 +281,116 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
   );
 }
 
+function HeroTrustPills() {
+  return (
+    <div className="mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-2 lg:mx-0 lg:mt-5 lg:max-w-none lg:flex-nowrap lg:justify-start">
+      {heroTrustItems.map((item, index) => {
+        const isHighlighted = index === 2;
+
+        return (
+          <div
+            key={item}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-[12px] shadow-[0_10px_24px_rgba(17,17,17,0.045)] ${
+              isHighlighted
+                ? 'border-[#111111] bg-[#111111] text-white'
+                : 'border-[#e6edf7] bg-[#f4f8ff] text-[#111827]'
+            }`}
+          >
+            <span
+              className={`flex h-5 w-5 items-center justify-center rounded-full ${
+                isHighlighted ? 'bg-white text-[#111111]' : 'bg-[#1679FF] text-white'
+              }`}
+            >
+              <Check size={12} strokeWidth={3} />
+            </span>
+            <span className="text-[12px] font-semibold tracking-[-0.03em] md:text-[14.76px]">{item}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function HeroBookingCard() {
+  return (
+    <div id="hero-booking" className="relative mt-6 w-full max-w-[42rem]">
+      <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
+      <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[18px_16px_16px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
+        <div className="mb-[10px] flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left">
+          <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left">
+            Fahrt in wenigen Sekunden starten
+          </p>
+          <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:self-auto">
+            Schritt 1 von 3
+          </span>
+        </div>
+
+        <BookingForm showStepIndicator={false} />
+      </div>
+    </div>
+  );
+}
+
+function HeroImageCard() {
+  return (
+    <div className="relative mx-auto w-full max-w-[35rem] lg:mt-[1.5rem]">
+      <div className="overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem]">
+        <div className="relative h-[13.5rem] md:h-[20.5rem]">
+          <Image
+            src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
+            alt="Alex Flughafentaxi Wien"
+            fill
+            priority
+            fetchPriority="high"
+            className="object-cover"
+            sizes="(min-width: 1024px) 42vw, 100vw"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(17,17,17,0.08)_100%)]" />
+        </div>
+
+        <div className="grid grid-cols-1 border-t border-[#e8eef7] md:grid-cols-2">
+          <div className="px-4 py-4 md:px-5">
+            <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Wien</p>
+            <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">Schnell buchen, klarer Preis.</p>
+          </div>
+          <div className="border-t border-[#e8eef7] px-4 py-4 md:border-l md:border-t-0 md:px-5">
+            <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Flughafen</p>
+            <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">
+              Fokus auf Transfer statt allgemeiner Taxi-Seite.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <Navbar />
 
       <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
-        <div className="app-container relative pb-10 pt-[5.2rem] md:pb-12 md:pt-[7.625rem] lg:pb-14 lg:pt-[7.625rem]">
+        <div className={heroSectionPaddingClass}>
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
               <h1 className="mx-auto max-w-[22rem] text-center text-[12px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
                 Flughafentaxi Wien, Ihr professioneller Flughafen Taxi Service
               </h1>
 
-              <div className="mx-auto mt-[16px] max-w-[16ch] text-[30px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]">
+              <div className={heroHeadlineClass}>
                 <span className="block">Fixpreis zum Flughafen.</span>
                 <span className="block">Keine Ueberraschungen.</span>
               </div>
             </div>
 
             <div className="mt-6 grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10">
-            <div className="text-center lg:text-left">
-              <div id="hero-booking" className="relative mt-6 w-full max-w-[42rem]">
-                <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
-                <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[18px_16px_16px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
-                  <div className="mb-[10px] flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left">
-                    <p className="text-center text-[13px] font-black tracking-[-0.03em] text-[#111111] leading-[1.1] md:text-[18.2px] sm:text-left">
-                      Fahrt in wenigen Sekunden starten
-                    </p>
-                    <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:self-auto">
-                      Schritt 1 von 3
-                    </span>
-                  </div>
-
-                  <BookingForm showStepIndicator={false} />
-
-                </div>
+              <div className="text-center lg:text-left">
+                <HeroBookingCard />
+                <HeroTrustPills />
               </div>
 
-              <div className="mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-2 lg:mx-0 lg:mt-5 lg:max-w-none lg:flex-nowrap lg:justify-start">
-                {heroTrustItems.map((item, index) => (
-                  <div
-                    key={item}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-[12px] shadow-[0_10px_24px_rgba(17,17,17,0.045)] ${
-                      index === 2
-                        ? 'border-[#111111] bg-[#111111] text-white'
-                        : 'border-[#e6edf7] bg-[#f4f8ff] text-[#111827]'
-                    }`}
-                  >
-                    <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full ${
-                        index === 2 ? 'bg-white text-[#111111]' : 'bg-[#1679FF] text-white'
-                      }`}
-                    >
-                      <Check size={12} strokeWidth={3} />
-                    </span>
-                    <span className="text-[12px] font-semibold tracking-[-0.03em] md:text-[14.76px]">
-                      {item}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative mx-auto w-full max-w-[35rem] lg:mt-[1.5rem]">
-              <div className="overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem]">
-                <div className="relative h-[13.5rem] md:h-[20.5rem]">
-                  <Image
-                    src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
-                    alt="Alex Flughafentaxi Wien"
-                    fill
-                    priority
-                    fetchPriority="high"
-                    className="object-cover"
-                    sizes="(min-width: 1024px) 42vw, 100vw"
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(17,17,17,0.08)_100%)]" />
-                </div>
-
-                <div className="grid grid-cols-1 border-t border-[#e8eef7] md:grid-cols-2">
-                  <div className="px-4 py-4 md:px-5">
-                    <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Wien</p>
-                    <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">
-                      Schnell buchen, klarer Preis.
-                    </p>
-                  </div>
-                  <div className="border-t border-[#e8eef7] px-4 py-4 md:border-l md:border-t-0 md:px-5">
-                    <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">
-                      Flughafen
-                    </p>
-                    <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">
-                      Fokus auf Transfer statt allgemeiner Taxi-Seite.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+              <HeroImageCard />
             </div>
           </div>
         </div>
