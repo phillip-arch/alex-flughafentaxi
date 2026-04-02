@@ -283,23 +283,23 @@ export default function Home() {
       <Navbar />
 
       <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
-        <div className="app-container relative pb-10 pt-24 md:pb-12 md:pt-20 lg:pb-14 lg:pt-24">
+        <div className="app-container relative pb-10 pt-[5.2rem] md:pb-12 md:pt-20 lg:pb-14 lg:pt-24">
           <div className="mx-auto grid max-w-[104rem] gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-center lg:gap-10">
             <div className="max-w-[42rem] text-center lg:text-left">
-              <h1 className="mx-auto max-w-[22rem] text-[0.92rem] font-semibold tracking-[-0.04em] text-[#9aa7b9] md:max-w-none md:text-[1.08rem] md:leading-[1.2] lg:mx-0">
+              <h1 className="mx-auto max-w-[20rem] text-[13px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2] lg:mx-0">
                 Flughafentaxi Wien Ihr professioneller Flughafen Taxi Service
               </h1>
 
-              <div className="mx-auto mt-4 max-w-[18ch] text-[20px] font-black tracking-[-0.08em] text-[#111111] leading-[1.08] md:max-w-[17ch] md:text-[56px] md:leading-[1.02] lg:mx-0">
+              <div className="mx-auto mt-2 max-w-[16ch] text-[20px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-[17ch] md:text-[56px] md:leading-[1.02] lg:mx-0">
                 <span className="block">Fixpreis zum Flughafen.</span>
                 <span className="block">Keine Ueberraschungen.</span>
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-2 lg:flex-nowrap lg:justify-start">
+              <div className="mx-auto mt-3 flex max-w-[340px] flex-wrap items-center justify-center gap-2 lg:mx-0 lg:max-w-none lg:flex-nowrap lg:justify-start">
                 {heroTrustItems.map((item, index) => (
                   <div
                     key={item}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 shadow-[0_10px_24px_rgba(17,17,17,0.045)] ${
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-[12px] shadow-[0_10px_24px_rgba(17,17,17,0.045)] ${
                       index === 2
                         ? 'border-[#111111] bg-[#111111] text-white'
                         : 'border-[#e6edf7] bg-[#f4f8ff] text-[#111827]'
@@ -312,7 +312,7 @@ export default function Home() {
                     >
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span className="text-[0.82rem] font-semibold tracking-[-0.03em] md:text-[0.86rem]">
+                    <span className="text-[12px] font-semibold tracking-[-0.03em] md:text-[0.86rem]">
                       {item}
                     </span>
                   </div>
@@ -321,12 +321,12 @@ export default function Home() {
 
               <div id="hero-booking" className="relative mt-6 w-full max-w-[42rem]">
                 <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
-                <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-3.5 text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
-                  <div className="mb-4 flex flex-col items-start gap-3 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                    <p className="text-[1.12rem] font-black tracking-[-0.05em] text-[#111111] md:text-[1.45rem]">
+                <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[18px_16px_16px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
+                  <div className="mb-[10px] flex flex-col items-start gap-2 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                    <p className="text-[18px] font-black tracking-[-0.03em] text-[#111111] leading-[1.1] md:text-[1.45rem]">
                       Fahrt in wenigen Sekunden starten
                     </p>
-                    <span className="shrink-0 rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-3 py-1.5 text-[0.78rem] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem]">
+                    <span className="shrink-0 rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem]">
                       Schritt 1 von 3
                     </span>
                   </div>

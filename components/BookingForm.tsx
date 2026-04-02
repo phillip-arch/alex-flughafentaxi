@@ -1465,21 +1465,21 @@ const BookingForm = ({
                     <p className="text-[12px] text-[#6d7075]">Abholung und Ziel festlegen.</p>
                   </div>
                 )}
-              <div className="rounded-[2.2rem] bg-transparent py-3 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
-                <div className="flex gap-3 md:gap-4">
-                  <div className="flex w-6 shrink-0 flex-col items-center pt-[calc(1.45rem+8px)] md:w-7 md:pt-[calc(1.45rem+8px)]">
+              <div className="rounded-[2.2rem] bg-transparent py-1 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
+                <div className="flex gap-2.5 md:gap-4">
+                  <div className="flex w-6 shrink-0 flex-col items-center pt-[calc(1.2rem+8px)] md:w-7 md:pt-[calc(1.45rem+8px)]">
                     <div className={`flex h-6 w-6 items-center justify-center rounded-full md:h-7 md:w-7 ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={9} className="md:h-[11px] md:w-[11px]" /> : <MapPin size={9} className="md:h-[11px] md:w-[11px]" />}
                     </div>
-                    <div className="h-[calc(3.55rem+5px)] w-px bg-[#111111] md:h-[calc(3.55rem+5px)]" />
+                    <div className="h-[42px] w-px bg-[#111111] md:h-[calc(3.55rem+5px)]" />
                     <div className="-mt-0.9 flex h-6 w-6 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white md:-mt-[5px] md:h-7 md:w-7">
                       <Check size={9} className="md:h-[11px] md:w-[11px]" />
                     </div>
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="min-h-[4.75rem]">
-                      <p className="text-[11px] font-medium text-[#5f6975]">Abholung</p>
+                    <div className="min-h-[4.2rem]">
+                      <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">Abholung</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 flex min-h-[3.5rem] items-start pt-[0.45rem]">
                           <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
@@ -1488,9 +1488,9 @@ const BookingForm = ({
                         </div>
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
-                        <div className="mt-1 min-h-[3.5rem]">
+                        <div className="mt-1 min-h-[3.25rem]">
                           <div className="relative">
-                            <div className="grid grid-cols-1 gap-2.5 md:gap-3">
+                            <div className="grid grid-cols-1 gap-2 md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
                                 selectedOption={selectedStreetOption}
@@ -1524,12 +1524,12 @@ const BookingForm = ({
                       ) : null}
                     </div>
 
-                    <div className="mt-3 min-h-[4.75rem]">
-                      <p className="text-[11px] font-medium text-[#5f6975]">Ziel</p>
+                    <div className="mt-2.5 min-h-[4.2rem]">
+                      <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">Ziel</p>
                       {formData.direction === 'from_airport' ? (
-                        <div className="mt-1 min-h-[3.5rem]">
+                        <div className="mt-1 min-h-[3.25rem]">
                           <div className="relative">
-                            <div className="grid grid-cols-1 gap-2.5 md:gap-3">
+                            <div className="grid grid-cols-1 gap-2 md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
                                 selectedOption={selectedStreetOption}
