@@ -286,11 +286,11 @@ export default function Home() {
         <div className="app-container relative pb-10 pt-[5.2rem] md:pb-12 md:pt-[7.625rem] lg:pb-14 lg:pt-[7.625rem]">
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
-              <h1 className="mx-auto max-w-[20rem] text-center text-[12px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
+              <h1 className="mx-auto max-w-[22rem] text-center text-[12px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
                 Flughafentaxi Wien, Ihr professioneller Flughafen Taxi Service
               </h1>
 
-              <div className="mx-auto mt-[12px] max-w-[16ch] text-[30px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]">
+              <div className="mx-auto mt-[16px] max-w-[16ch] text-[30px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]">
                 <span className="block">Fixpreis zum Flughafen.</span>
                 <span className="block">Keine Ueberraschungen.</span>
               </div>
