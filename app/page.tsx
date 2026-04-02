@@ -290,7 +290,7 @@ export default function Home() {
                 Flughafentaxi Wien, Ihr professioneller Flughafen Taxi Service
               </h1>
 
-              <div className="mx-auto mt-2 max-w-[16ch] text-[30px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]">
+              <div className="mx-auto mt-[10px] max-w-[16ch] text-[30px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]">
                 <span className="block">Fixpreis zum Flughafen.</span>
                 <span className="block">Keine Ueberraschungen.</span>
               </div>
