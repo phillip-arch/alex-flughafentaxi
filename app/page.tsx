@@ -81,6 +81,78 @@ const whyUsItems = [
   },
 ];
 
+const whyUsEditorialItems = [
+  {
+    title: 'Direkter Kontakt statt Callcenter',
+    description:
+      'Sie erreichen uns schnell per Telefon, WhatsApp oder Viber und erhalten klare Rueckmeldung zu Ihrer Fahrt.',
+  },
+  {
+    title: 'Abholung mit Blick auf Ihren Flug',
+    description:
+      'Wir verfolgen Ankunftszeiten und passen die Abholung bei veraenderten Landungen entsprechend an.',
+  },
+  {
+    title: 'Sauberer Auftritt bis zur Ankunft',
+    description:
+      'Gepflegte Fahrzeuge, ruhige Fahrweise und ein planbarer Ablauf sorgen fuer einen entspannten Transfer.',
+  },
+];
+
+const whyUsStats = [
+  { value: '24/7', label: 'Erreichbar fuer Buchung und Rueckfragen' },
+  { value: 'Fixpreis', label: 'Vor Fahrtbeginn transparent abgestimmt' },
+  { value: 'Direkt', label: 'Ohne Umwege zu Hotel, Bahnhof oder Flughafen' },
+  { value: 'Flexibel', label: 'Kindersitze und Sonderwuensche auf Anfrage' },
+];
+
+const whyUsTimelineItems = [
+  {
+    step: '01',
+    title: 'Einfach anfragen',
+    description:
+      'Route, Uhrzeit und Sonderwuensche werden in wenigen Schritten uebermittelt, ohne komplizierten Buchungsprozess.',
+  },
+  {
+    step: '02',
+    title: 'Verbindlich bestaetigt',
+    description:
+      'Sie erhalten eine klare Rueckmeldung zum Preis und zur Abholung, damit vor Fahrtbeginn alles abgestimmt ist.',
+  },
+  {
+    step: '03',
+    title: 'Stressfrei ankommen',
+    description:
+      'Am Fahrtag laeuft der Transfer ruhig und planbar ab, vom Treffpunkt bis zur Ankunft am Ziel.',
+  },
+];
+
+const vehicleCategoryHighlights = [
+  {
+    title: 'Limousine',
+    audience: 'Fuer Einzelpersonen und Paare',
+    summary: 'Kompakt, schnell verfuegbar und ideal fuer klassische Transfers mit wenig Gepaeck.',
+    price: 'ab 39 EUR',
+    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
+  },
+  {
+    title: 'Kombi',
+    audience: 'Fuer Familien und Gruppen',
+    summary: 'Mehr Platz fuer Koffer, Kinderwagen oder mehrere Mitreisende ohne Komfortverlust.',
+    price: 'ab 45 EUR',
+    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
+  },
+  {
+    title: 'Bus',
+    audience: 'Fuer groessere Gruppen',
+    summary: 'Die passende Wahl, wenn mehrere Fahrgaeste gemeinsam und planbar ankommen sollen.',
+    price: 'ab 69 EUR',
+    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
+  },
+];
+
+const heroTrustItems = ['Fixpreis garantiert', 'Puenktliche Abholung', 'Zuverlaessiger Service'];
+
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
 
 const vehicleCategories: VehicleCategory[] = [
@@ -211,40 +283,111 @@ export default function Home() {
       <Navbar />
 
       <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
-        <div className="app-container relative grid gap-8 pb-10 pt-22 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-20 lg:pb-14 lg:pt-28">
-          <div className="max-w-[38rem]">
-            <div className="ui-text-block-lg mt-5 md:mt-6">
-              <h1 className="ui-heading-xl max-w-[19ch] !text-[2rem] !leading-[1.02] md:!text-[3.01rem]">
-                <span>Flughafentaxi Wien</span>
-                <br />
-                <span>Ihr professioneller Flughafen Taxi Service</span>
+        <div className="app-container relative pb-10 pt-14 md:pb-12 md:pt-18 lg:pb-14 lg:pt-24">
+          <div className="mx-auto grid max-w-[104rem] gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-center lg:gap-10">
+            <div className="max-w-[42rem] text-center lg:text-left">
+              <h1 className="mx-auto max-w-[22rem] text-[0.92rem] font-semibold tracking-[-0.04em] text-[#9aa7b9] md:max-w-none md:text-[1.08rem] md:leading-[1.2] lg:mx-0">
+                Flughafentaxi Wien Ihr professioneller Flughafen Taxi Service
               </h1>
-              <p className="ui-copy-compact max-w-[34rem]">
-                Willkommen bei Flughafentaxi Wien Alex - Ihrem 24/7 Transfer-Service vom
-                Flughafen Wien Schwechat. Wir bringen Sie puenktlich und komfortabel zu allen
-                Bahnhoefen, Hotels und Sehenswuerdigkeiten und bieten feste Preise ohne
-                Ueberraschungen.
-              </p>
-            </div>
-            <div id="hero-booking" className="relative mt-2 w-full max-w-[740px] lg:-ml-2">
-              <div className="absolute -left-8 top-12 hidden h-24 w-24 rounded-full bg-[#0a63ff]/20 blur-3xl lg:block" />
-              <div className="rounded-[2rem] bg-transparent px-0 py-2 shadow-none md:px-0 md:py-2">
-                <BookingForm showStepIndicator={false} />
+
+              <div className="mx-auto mt-4 max-w-[14ch] text-[20px] font-black tracking-[-0.08em] text-[#111111] leading-[1.08] md:max-w-[17ch] md:text-[56px] md:leading-[1.02] lg:mx-0">
+                <span className="block">Fixpreis zum Flughafen.</span>
+                <span className="block">Keine Ueberraschungen.</span>
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-2 lg:flex-nowrap lg:justify-start">
+                {heroTrustItems.map((item, index) => (
+                  <div
+                    key={item}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 shadow-[0_10px_24px_rgba(17,17,17,0.045)] ${
+                      index === 2
+                        ? 'border-[#111111] bg-[#111111] text-white'
+                        : 'border-[#e6edf7] bg-[#f4f8ff] text-[#111827]'
+                    }`}
+                  >
+                    <span
+                      className={`flex h-5 w-5 items-center justify-center rounded-full ${
+                        index === 2 ? 'bg-white text-[#111111]' : 'bg-[#1679FF] text-white'
+                      }`}
+                    >
+                      <Check size={12} strokeWidth={3} />
+                    </span>
+                    <span className="text-[0.82rem] font-semibold tracking-[-0.03em] md:text-[0.86rem]">
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div id="hero-booking" className="relative mt-6 w-full max-w-[42rem]">
+                <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
+                <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-3.5 text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
+                  <div className="mb-4 flex flex-col items-start gap-3 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                    <p className="text-[1.12rem] font-black tracking-[-0.05em] text-[#111111] md:text-[1.45rem]">
+                      Fahrt in wenigen Sekunden starten
+                    </p>
+                    <span className="shrink-0 rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-3 py-1.5 text-[0.78rem] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem]">
+                      Schritt 1 von 3
+                    </span>
+                  </div>
+
+                  <BookingForm showStepIndicator={false} />
+
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[0.8rem] font-semibold text-[#6d7f95] md:gap-x-4 md:text-[0.86rem]">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Check size={14} strokeWidth={2.8} className="text-[#6d7f95]" />
+                      Keine versteckten Kosten
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Check size={14} strokeWidth={2.8} className="text-[#6d7f95]" />
+                      Sofort startklar
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="relative w-full min-h-[360px] overflow-hidden rounded-none bg-[var(--color-bg)] lg:mt-6 lg:min-h-[590px] lg:max-w-[56rem] lg:justify-self-end">
-            <Image
-              src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
-              alt="Flughafentaxi Wien"
-              fill
-              priority
-              fetchPriority="high"
-              className="object-cover"
-              sizes="(min-width: 1024px) 50vw, 100vw"
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08)_0%,rgba(17,17,17,0.18)_100%)]" />
+            <div className="relative mx-auto w-full max-w-[35rem]">
+              <div className="overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem]">
+                <div className="relative h-[13.5rem] md:h-[20.5rem]">
+                  <Image
+                    src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
+                    alt="Alex Flughafentaxi Wien"
+                    fill
+                    priority
+                    fetchPriority="high"
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 42vw, 100vw"
+                  />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(17,17,17,0.08)_100%)]" />
+                  <div className="absolute bottom-3 left-3 right-3 rounded-[1.15rem] border border-white/55 bg-white/92 px-3.5 py-3 shadow-[0_18px_42px_rgba(17,17,17,0.1)] backdrop-blur md:bottom-5 md:left-5 md:right-auto md:max-w-[18rem] md:rounded-[1.3rem] md:px-4 md:py-3.5">
+                    <p className="text-[0.98rem] font-black tracking-[-0.04em] text-[#111111]">
+                      Flughafen Wien Transfer
+                    </p>
+                    <p className="mt-2 text-[0.88rem] leading-[1.45] text-[#62738a]">
+                      Zuverlaessiger Flughafentransfer in Wien.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 border-t border-[#e8eef7] md:grid-cols-2">
+                  <div className="px-4 py-4 md:px-5">
+                    <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Wien</p>
+                    <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">
+                      Schnell buchen, klarer Preis.
+                    </p>
+                  </div>
+                  <div className="border-t border-[#e8eef7] px-4 py-4 md:border-l md:border-t-0 md:px-5">
+                    <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">
+                      Flughafen
+                    </p>
+                    <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">
+                      Fokus auf Transfer statt allgemeiner Taxi-Seite.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -264,16 +407,16 @@ export default function Home() {
               {whyUsItems.map(({ title, description }) => (
                 <div
                   key={title}
-                  className="ui-card-surface-light mx-auto flex w-full max-w-[26.5rem] items-start gap-4 px-5 py-5 md:px-6 md:py-6"
+                  className="mx-auto flex w-full max-w-[26.5rem] items-start gap-4 rounded-[2rem] border border-[#1679FF] bg-[#1679FF] px-5 py-5 shadow-[0_18px_42px_rgba(22,121,255,0.16)] md:px-6 md:py-6"
                 >
                   <span className="ui-icon-badge-accent">
                     <Check size={22} strokeWidth={2.4} />
                   </span>
                   <div className="ui-text-block-sm gap-1.5 pt-0.5">
-                    <h3 className="text-[1.28rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.38rem]">
+                    <h3 className="text-[1.28rem] font-semibold tracking-[-0.05em] !text-white md:text-[1.38rem]">
                       {title}
                     </h3>
-                    <p className="ui-copy-sm text-[#6a7d96]">
+                    <p className="ui-copy-sm text-white/88">
                       {description}
                     </p>
                   </div>
@@ -282,6 +425,162 @@ export default function Home() {
             </div>
 
             <PrimaryBookingCta />
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell-tight-top bg-white">
+        <div className="app-container">
+          <div className={homepageSectionWidthClass}>
+            <div className="overflow-hidden rounded-[2.4rem] border border-[#dce8ff] bg-[linear-gradient(135deg,#f4f8ff_0%,#ffffff_46%,#eef5ff_100%)] shadow-[0_24px_70px_rgba(22,121,255,0.12)]">
+              <div className="grid gap-8 px-6 py-7 md:px-8 md:py-8 lg:grid-cols-[0.92fr_1.08fr] lg:gap-10 lg:px-10 lg:py-10">
+                <div className="flex flex-col gap-6">
+                  <SectionIntro
+                    eyebrow="Vorteile"
+                    title="Warum unser Flughafentaxi?"
+                    description="Eine zweite Perspektive auf denselben Service: weniger Reibung bei der Buchung, verlaessliche Kommunikation und ein klar gefuehrter Transfer vom ersten Kontakt bis zur Ankunft."
+                    className="max-w-[30rem]"
+                  />
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {whyUsStats.map(({ value, label }) => (
+                      <div
+                        key={value}
+                        className="rounded-[1.5rem] border border-white/70 bg-white/88 px-4 py-4 shadow-[0_12px_30px_rgba(17,17,17,0.05)] backdrop-blur"
+                      >
+                        <p className="text-[1.15rem] font-semibold tracking-[-0.05em] text-[#1679FF]">
+                          {value}
+                        </p>
+                        <p className="mt-2 text-[0.88rem] leading-[1.45] text-[#5b6f88]">{label}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="rounded-[1.75rem] bg-[#1679FF] px-5 py-5 text-white shadow-[0_18px_42px_rgba(22,121,255,0.22)]">
+                    <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/72">
+                      Serviceversprechen
+                    </p>
+                    <p className="mt-3 max-w-[24rem] text-[1.05rem] leading-[1.5] text-white/92">
+                      Klar kommuniziert, sauber organisiert und auf Ankunftszeiten abgestimmt.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-4">
+                  {whyUsEditorialItems.map(({ title, description }, index) => (
+                    <div
+                      key={title}
+                      className="relative overflow-hidden rounded-[1.9rem] border border-white/75 bg-white/92 px-5 py-5 shadow-[0_14px_34px_rgba(17,17,17,0.05)] backdrop-blur md:px-6 md:py-6"
+                    >
+                      <div className="absolute inset-x-0 top-0 h-1.5 bg-[linear-gradient(90deg,#1679FF_0%,#6ab0ff_100%)]" />
+                      <div className="flex items-start gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] bg-[#edf4ff] text-[#1679FF]">
+                          <Check size={22} strokeWidth={2.5} />
+                        </div>
+                        <div className="min-w-0 pt-0.5">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-[#8aa4c7]">
+                              0{index + 1}
+                            </span>
+                            <h3 className="text-[1.2rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.35rem]">
+                              {title}
+                            </h3>
+                          </div>
+                          <p className="mt-3 max-w-[34rem] text-[0.95rem] leading-[1.55] text-[#5b6f88]">
+                            {description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell-tight-top bg-white">
+        <div className="app-container">
+          <div className={homepageSectionWidthClass}>
+            <div className="overflow-hidden rounded-[2.4rem] border border-[#e8edf7] bg-[#0f1724] text-white shadow-[0_28px_80px_rgba(15,23,36,0.16)]">
+              <div className="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
+                <div className="relative px-6 py-8 md:px-8 md:py-9 lg:px-10 lg:py-10">
+                  <div className="absolute left-0 top-0 h-full w-full bg-[radial-gradient(circle_at_top_left,rgba(22,121,255,0.3),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(106,176,255,0.18),transparent_36%)]" />
+                  <div className="relative">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8dbdff] md:text-[13px]">
+                      Vorteile
+                    </p>
+                    <h2 className="mt-3 text-[2rem] font-black tracking-[-0.06em] !text-white md:text-[2.5rem]">
+                      Warum unser Flughafentaxi?
+                    </h2>
+                    <p className="mt-4 max-w-[30rem] text-[0.98rem] leading-[1.65] text-white/74">
+                      Diese Version betont den Ablauf: von der Anfrage ueber die Bestaetigung bis zur
+                      Ankunft. Dadurch wirkt der Nutzen konkreter und naeher an der echten Buchung.
+                    </p>
+
+                    <div className="mt-8 space-y-4">
+                      {whyUsTimelineItems.map(({ step, title, description }) => (
+                        <div key={step} className="flex gap-4 rounded-[1.7rem] border border-white/10 bg-white/6 px-4 py-4 backdrop-blur-sm md:px-5 md:py-5">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1679FF] text-[0.82rem] font-semibold tracking-[0.08em] text-white">
+                            {step}
+                          </div>
+                          <div>
+                            <h3 className="text-[1.15rem] font-semibold tracking-[-0.04em] !text-white md:text-[1.28rem]">
+                              {title}
+                            </h3>
+                            <p className="mt-2 text-[0.93rem] leading-[1.6] text-white/72">{description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-white/10 bg-white px-6 py-8 text-[#111827] md:px-8 md:py-9 lg:border-l lg:border-t-0 lg:px-10 lg:py-10">
+                  <div className="max-w-[28rem]">
+                    <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#1679FF]">
+                      Klarer Unterschied
+                    </p>
+                    <h3 className="mt-3 text-[1.7rem] font-black tracking-[-0.06em] text-[#111827] md:text-[2rem]">
+                      Ein Service, der nicht improvisiert wirkt.
+                    </h3>
+                    <p className="mt-4 text-[0.96rem] leading-[1.65] text-[#5b6f88]">
+                      Die Gestaltung arbeitet bewusst mit Kontrast: dunkle linke Seite fuer Fokus,
+                      helle rechte Seite fuer Lesbarkeit. So entsteht ein Abschnitt, der wie eine
+                      echte Premium-Komponente wirkt und nicht wie ein weiterer Standardblock.
+                    </p>
+                  </div>
+
+                  <div className="mt-8 grid gap-3">
+                    <div className="rounded-[1.6rem] border border-[#dce8ff] bg-[#f5f9ff] px-5 py-5">
+                      <p className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-[#7a95b8]">
+                        Kommunikation
+                      </p>
+                      <p className="mt-2 text-[1rem] font-semibold tracking-[-0.04em] text-[#111827]">
+                        Kurze Wege, klare Antworten, feste Absprachen.
+                      </p>
+                    </div>
+                    <div className="rounded-[1.6rem] border border-[#dce8ff] bg-[#f5f9ff] px-5 py-5">
+                      <p className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-[#7a95b8]">
+                        Timing
+                      </p>
+                      <p className="mt-2 text-[1rem] font-semibold tracking-[-0.04em] text-[#111827]">
+                        Abholung und Ankunft bleiben planbar, auch wenn sich Flugzeiten verschieben.
+                      </p>
+                    </div>
+                    <div className="rounded-[1.6rem] border border-[#dce8ff] bg-[#1679FF] px-5 py-5 text-white shadow-[0_18px_42px_rgba(22,121,255,0.2)]">
+                      <p className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-white/72">
+                        Ergebnis
+                      </p>
+                      <p className="mt-2 text-[1rem] font-semibold tracking-[-0.04em] !text-white">
+                        Weniger Unsicherheit vor der Fahrt und ein ruhigerer Start in die Reise.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -301,7 +600,7 @@ export default function Home() {
               {vehicleCategories.map(({ title, description, imageSrc, specs, prices }) => (
                 <div
                   key={title}
-                  className="ui-card-surface-light overflow-hidden px-5 py-5 text-[#111827] md:px-6 md:py-6"
+                  className="overflow-hidden rounded-[2rem] border border-[#1679FF] bg-[#1679FF] px-5 py-5 text-white shadow-[0_18px_42px_rgba(22,121,255,0.16)] md:px-6 md:py-6"
                 >
                   <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[16rem_minmax(0,0.95fr)_minmax(18rem,0.92fr)] lg:items-center lg:gap-8">
                     <div className="relative h-[12rem] overflow-hidden rounded-[1.5rem] border border-[#e9edf3] bg-white md:h-[13rem] lg:h-[14rem]">
@@ -316,10 +615,10 @@ export default function Home() {
 
                     <div className="flex min-w-0 flex-col justify-center gap-5">
                       <div className="ui-text-block-sm gap-1.5">
-                        <h3 className="text-[1.7rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.9rem]">
+                        <h3 className="text-[1.7rem] font-semibold tracking-[-0.05em] !text-white md:text-[1.9rem]">
                           {title}
                         </h3>
-                        <p className="ui-copy-sm max-w-[34rem] text-[#6b7280]">{description}</p>
+                        <p className="ui-copy-sm max-w-[34rem] text-white/88">{description}</p>
                       </div>
 
                       <div className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -357,6 +656,103 @@ export default function Home() {
             </div>
 
             <PrimaryBookingCta />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-8 md:py-10">
+        <div className="app-container">
+          <div className="w-full">
+            <div className="overflow-hidden rounded-[2.4rem] border border-[#d7e6ff] bg-[linear-gradient(135deg,#eff5ff_0%,#ffffff_34%,#f7fbff_100%)] shadow-[0_24px_70px_rgba(22,121,255,0.12)]">
+              <div className="px-6 py-8 md:px-8 md:py-9 lg:px-10 lg:py-10">
+                <SectionIntro
+                  eyebrow="Fahrzeugkategorien"
+                  title="Fahrzeugkategorien und Preis"
+                  description="Eine zweite Darstellung fuer denselben Inhalt: schneller Vergleich nach Einsatz, Preisniveau und Platzbedarf."
+                  align="center"
+                  className="max-w-[48rem]"
+                />
+
+                <div className="mt-8 grid gap-4 lg:grid-cols-[0.86fr_1.14fr] lg:gap-5">
+                  <div className="rounded-[2rem] bg-[#1679FF] px-5 py-6 text-white shadow-[0_20px_48px_rgba(22,121,255,0.24)] md:px-6 md:py-7">
+                    <p className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-white/72">
+                      Schnellwahl
+                    </p>
+                    <h3 className="mt-3 text-[1.7rem] font-black tracking-[-0.06em] !text-white md:text-[2rem]">
+                      Das passende Fahrzeug auf einen Blick.
+                    </h3>
+                    <p className="mt-4 max-w-[26rem] text-[0.96rem] leading-[1.65] text-white/84">
+                      Waehlbar nach Gruppengroesse, Gepaeckmenge und Preisniveau. So wird aus der
+                      Fahrtauswahl kein Ratespiel, sondern eine schnelle Entscheidung.
+                    </p>
+
+                    <div className="mt-6 space-y-3">
+                      {vehicleCategoryHighlights.map(({ title, audience, price }) => (
+                        <div
+                          key={title}
+                          className="flex items-center justify-between gap-4 rounded-[1.4rem] border border-white/16 bg-white/10 px-4 py-3 backdrop-blur-sm"
+                        >
+                          <div>
+                            <p className="text-[1rem] font-semibold tracking-[-0.04em] text-white">
+                              {title}
+                            </p>
+                            <p className="mt-1 text-[0.83rem] text-white/70">{audience}</p>
+                          </div>
+                          <span className="rounded-full bg-white px-3 py-1 text-[0.82rem] font-semibold text-[#1679FF]">
+                            {price}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {vehicleCategoryHighlights.map(({ title, audience, summary, price, imageSrc }) => (
+                      <div
+                        key={`${title}-detail`}
+                        className="flex h-full flex-col overflow-hidden rounded-[1.9rem] border border-[#dce8ff] bg-white shadow-[0_14px_34px_rgba(17,17,17,0.05)]"
+                      >
+                        <div className="relative h-[11.5rem] border-b border-[#e6eefb] bg-[linear-gradient(180deg,#f6faff_0%,#eef5ff_100%)]">
+                          <Image
+                            src={imageSrc}
+                            alt={title}
+                            fill
+                            className="object-contain p-4"
+                            sizes="(min-width: 768px) 33vw, 100vw"
+                          />
+                        </div>
+                        <div className="flex h-full flex-col px-5 py-5">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-[#8ba4c5]">
+                                {audience}
+                              </p>
+                              <h3 className="mt-3 text-[1.45rem] font-black tracking-[-0.05em] text-[#111827]">
+                                {title}
+                              </h3>
+                            </div>
+                            <span className="flex h-10 min-w-10 items-center justify-center rounded-full bg-[#edf4ff] px-3 text-[0.78rem] font-semibold text-[#1679FF]">
+                              {price}
+                            </span>
+                          </div>
+                          <p className="mt-4 text-[0.92rem] leading-[1.6] text-[#5b6f88]">{summary}</p>
+                          <div className="mt-auto pt-5">
+                            <div className="rounded-[1.2rem] border border-[#e5eefc] bg-[#f7fbff] px-4 py-3">
+                            <p className="text-[0.82rem] font-semibold uppercase tracking-[0.16em] text-[#7e97b8]">
+                              Empfehlung
+                            </p>
+                            <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#31445b]">
+                              Geeignet fuer planbare Transfers mit klarer Preisstruktur.
+                            </p>
+                          </div>
+                        </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -707,3 +1103,4 @@ export default function Home() {
     </main>
   );
 }
+
