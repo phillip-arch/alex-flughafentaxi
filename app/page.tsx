@@ -283,14 +283,14 @@ export default function Home() {
       <Navbar />
 
       <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
-        <div className="app-container relative pb-10 pt-14 md:pb-12 md:pt-18 lg:pb-14 lg:pt-24">
+        <div className="app-container relative pb-10 pt-24 md:pb-12 md:pt-20 lg:pb-14 lg:pt-24">
           <div className="mx-auto grid max-w-[104rem] gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-center lg:gap-10">
             <div className="max-w-[42rem] text-center lg:text-left">
               <h1 className="mx-auto max-w-[22rem] text-[0.92rem] font-semibold tracking-[-0.04em] text-[#9aa7b9] md:max-w-none md:text-[1.08rem] md:leading-[1.2] lg:mx-0">
                 Flughafentaxi Wien Ihr professioneller Flughafen Taxi Service
               </h1>
 
-              <div className="mx-auto mt-4 max-w-[14ch] text-[20px] font-black tracking-[-0.08em] text-[#111111] leading-[1.08] md:max-w-[17ch] md:text-[56px] md:leading-[1.02] lg:mx-0">
+              <div className="mx-auto mt-4 max-w-[18ch] text-[20px] font-black tracking-[-0.08em] text-[#111111] leading-[1.08] md:max-w-[17ch] md:text-[56px] md:leading-[1.02] lg:mx-0">
                 <span className="block">Fixpreis zum Flughafen.</span>
                 <span className="block">Keine Ueberraschungen.</span>
               </div>
