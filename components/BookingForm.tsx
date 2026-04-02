@@ -493,7 +493,7 @@ const BookingForm = ({
     if (!normalizedRaw.toLowerCase().startsWith(normalizedBase.toLowerCase())) return false;
 
     const suffix = normalizedRaw.slice(normalizedBase.length).trim();
-    return /^\d[\dA-Za-z/-]*$/u.test(suffix);
+    return /^\d[\dA-Za-z\s,/-]*$/u.test(suffix);
   };
 
   const validateStreetNumber = (target: 'street' | 'extraStopStreet') => {
@@ -519,6 +519,23 @@ const BookingForm = ({
     return Boolean(selectedOption && hasTypedStreetNumber(rawValue, selectedOption.street));
   };
 
+  const splitStreetAndHouseSuffix = (value: string) => {
+    const normalized = value.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!normalized) {
+      return { streetQuery: '', houseSuffix: '' };
+    }
+
+    const firstNumberIndex = normalized.search(/\s\d/u);
+    if (firstNumberIndex === -1) {
+      return { streetQuery: normalized, houseSuffix: '' };
+    }
+
+    return {
+      streetQuery: normalized.slice(0, firstNumberIndex).trim(),
+      houseSuffix: normalized.slice(firstNumberIndex).trim().replace(/^[,\s]+/u, ''),
+    };
+  };
+
   const parsePastedAddress = (rawValue: string) => {
     const value = rawValue.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
     if (!value) {
@@ -527,31 +544,37 @@ const BookingForm = ({
 
     const zipFirstMatch = value.match(/^(\d{4})\s+([^,]+),\s*(.+?)(?:\s+(\d[\dA-Za-z/-]*))?$/u);
     if (zipFirstMatch) {
+      const streetParts = splitStreetAndHouseSuffix(
+        `${zipFirstMatch[3].trim()} ${String(zipFirstMatch[4] || '').trim()}`.trim()
+      );
       return {
-        streetQuery: zipFirstMatch[3].trim(),
+        streetQuery: streetParts.streetQuery,
         zip: zipFirstMatch[1].trim(),
         city: zipFirstMatch[2].trim(),
-        houseSuffix: String(zipFirstMatch[4] || '').trim(),
+        houseSuffix: streetParts.houseSuffix,
       };
     }
 
     const streetFirstMatch = value.match(/^(.+?)(?:\s+(\d[\dA-Za-z/-]*))?\s*,?\s*(\d{4})\s+(.+)$/u);
     if (streetFirstMatch) {
+      const streetParts = splitStreetAndHouseSuffix(
+        `${streetFirstMatch[1].trim()} ${String(streetFirstMatch[2] || '').trim()}`.trim()
+      );
       return {
-        streetQuery: streetFirstMatch[1].trim(),
+        streetQuery: streetParts.streetQuery,
         zip: streetFirstMatch[3].trim(),
         city: streetFirstMatch[4].trim(),
-        houseSuffix: String(streetFirstMatch[2] || '').trim(),
+        houseSuffix: streetParts.houseSuffix,
       };
     }
 
-    const houseSuffixMatch = value.match(/^(.*?)(?:\s+(\d[\dA-Za-z/-]*))$/u);
-    if (houseSuffixMatch) {
+    const streetParts = splitStreetAndHouseSuffix(value);
+    if (streetParts.houseSuffix) {
       return {
-        streetQuery: houseSuffixMatch[1].trim(),
+        streetQuery: streetParts.streetQuery,
         zip: '',
         city: '',
-        houseSuffix: String(houseSuffixMatch[2] || '').trim(),
+        houseSuffix: streetParts.houseSuffix,
       };
     }
 
@@ -1481,8 +1504,8 @@ const BookingForm = ({
                     <div className="min-h-[4.2rem]">
                       <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">Abholung</p>
                       {formData.direction === 'from_airport' ? (
-                        <div className="mt-1 flex min-h-[3.5rem] items-start pt-[0.45rem]">
-                          <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
+                        <div className="mt-1 flex min-h-[3.25rem] items-center">
+                          <p className="text-[18px] font-semibold tracking-[-0.03em] leading-[1.2] text-[#111111]">
                             Flughafen Wien (VIE)
                           </p>
                         </div>
@@ -1561,15 +1584,15 @@ const BookingForm = ({
                           {renderExtraStopPanel()}
                         </div>
                       ) : (
-                        <div className="mt-1 flex min-h-[3.5rem] items-start pt-[0.45rem]">
-                          <p className="text-[18px] font-semibold tracking-[-0.03em] text-[#111111]">
+                        <div className="mt-1 flex min-h-[3.25rem] items-center">
+                          <p className="text-[18px] font-semibold tracking-[-0.03em] leading-[1.2] text-[#111111]">
                             Flughafen Wien (VIE)
                           </p>
                         </div>
                       )}
                     </div>
                   </div>
-                  <div className="flex shrink-0 flex-col justify-start pt-[1.35rem]">
+                  <div className="flex shrink-0 flex-col justify-start pt-[1.75rem]">
                     <button
                       type="button"
                       onClick={toggleExtraStop}
@@ -1581,7 +1604,7 @@ const BookingForm = ({
                     <button
                       type="button"
                       onClick={toggleDirection}
-                      className="mt-[3.1rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
+                      className="mt-[3.45rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
                       aria-label="Abholung und Ziel tauschen"
                     >
                       <ArrowUpDown size={16} className="-translate-x-[2px]" />

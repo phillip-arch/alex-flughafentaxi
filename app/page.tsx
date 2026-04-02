@@ -283,18 +283,21 @@ export default function Home() {
       <Navbar />
 
       <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
-        <div className="app-container relative pb-10 pt-[5.2rem] md:pb-12 md:pt-20 lg:pb-14 lg:pt-24">
-          <div className="mx-auto grid max-w-[104rem] gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-center lg:gap-10">
-            <div className="max-w-[42rem] text-center lg:text-left">
-              <h1 className="mx-auto max-w-[20rem] text-[13px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2] lg:mx-0">
-                Flughafentaxi Wien Ihr professioneller Flughafen Taxi Service
+        <div className="app-container relative pb-10 pt-[5.2rem] md:pb-12 md:pt-[7.625rem] lg:pb-14 lg:pt-[7.625rem]">
+          <div className="mx-auto max-w-[104rem]">
+            <div className="text-center">
+              <h1 className="mx-auto max-w-[20rem] text-[13px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
+                Flughafentaxi Wien, Ihr professioneller Flughafen Taxi Service
               </h1>
 
-              <div className="mx-auto mt-2 max-w-[16ch] text-[20px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-[17ch] md:text-[56px] md:leading-[1.02] lg:mx-0">
+              <div className="mx-auto mt-2 max-w-[16ch] text-[30px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]">
                 <span className="block">Fixpreis zum Flughafen.</span>
                 <span className="block">Keine Ueberraschungen.</span>
               </div>
+            </div>
 
+            <div className="mt-6 grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10">
+            <div className="text-center lg:text-left">
               <div className="mx-auto mt-3 flex max-w-[340px] flex-wrap items-center justify-center gap-2 lg:mx-0 lg:max-w-none lg:flex-nowrap lg:justify-start">
                 {heroTrustItems.map((item, index) => (
                   <div
@@ -312,7 +315,7 @@ export default function Home() {
                     >
                       <Check size={12} strokeWidth={3} />
                     </span>
-                    <span className="text-[12px] font-semibold tracking-[-0.03em] md:text-[0.86rem]">
+                    <span className="text-[12px] font-semibold tracking-[-0.03em] md:text-[14.76px]">
                       {item}
                     </span>
                   </div>
@@ -323,7 +326,7 @@ export default function Home() {
                 <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
                 <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[18px_16px_16px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
                   <div className="mb-[10px] flex flex-col items-start gap-2 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                    <p className="text-[18px] font-black tracking-[-0.03em] text-[#111111] leading-[1.1] md:text-[1.45rem]">
+                    <p className="text-[13px] font-black tracking-[-0.03em] text-[#111111] leading-[1.1] md:text-[18.2px]">
                       Fahrt in wenigen Sekunden starten
                     </p>
                     <span className="shrink-0 rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem]">
@@ -347,7 +350,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[35rem]">
+            <div className="relative mx-auto w-full max-w-[35rem] lg:mt-[1.5rem]">
               <div className="overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem]">
                 <div className="relative h-[13.5rem] md:h-[20.5rem]">
                   <Image
@@ -360,14 +363,6 @@ export default function Home() {
                     sizes="(min-width: 1024px) 42vw, 100vw"
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(17,17,17,0.08)_100%)]" />
-                  <div className="absolute bottom-3 left-3 right-3 rounded-[1.15rem] border border-white/55 bg-white/92 px-3.5 py-3 shadow-[0_18px_42px_rgba(17,17,17,0.1)] backdrop-blur md:bottom-5 md:left-5 md:right-auto md:max-w-[18rem] md:rounded-[1.3rem] md:px-4 md:py-3.5">
-                    <p className="text-[0.98rem] font-black tracking-[-0.04em] text-[#111111]">
-                      Flughafen Wien Transfer
-                    </p>
-                    <p className="mt-2 text-[0.88rem] leading-[1.45] text-[#62738a]">
-                      Zuverlaessiger Flughafentransfer in Wien.
-                    </p>
-                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 border-t border-[#e8eef7] md:grid-cols-2">
@@ -387,6 +382,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </div>

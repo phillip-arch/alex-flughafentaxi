@@ -19,8 +19,17 @@ function extractStreetSearchQuery(value: string) {
     .map((part) => part.trim())
     .filter(Boolean);
 
-  const looksLikeZipCity = (part: string) => /^\d{4}\b/.test(part) || /\b(wien|schwechat|v[öo]sendorf)\b/i.test(part);
-  const stripHouseNumber = (part: string) => part.replace(/\s+\d[\dA-Za-z/-]*$/u, '').trim();
+  const looksLikeZipCity = (part: string) =>
+    /^\d{4}\b/.test(part) || /\b(wien|schwechat|v[oö]sendorf)\b/i.test(part);
+
+  const stripHouseNumber = (part: string) => {
+    const normalizedPart = part.replace(/\s+/g, ' ').trim();
+    const firstNumberIndex = normalizedPart.search(/\s\d/u);
+    if (firstNumberIndex === -1) {
+      return normalizedPart;
+    }
+    return normalizedPart.slice(0, firstNumberIndex).trim();
+  };
 
   if (commaParts.length > 1) {
     const first = commaParts[0] || '';
@@ -57,7 +66,10 @@ function extractZipFragment(value: string) {
 export async function GET(request: NextRequest) {
   try {
     const q = String(request.nextUrl.searchParams.get('q') || '').trim();
-    const zip = String(request.nextUrl.searchParams.get('zip') || '').trim().replace(/\D/g, '').slice(0, 4);
+    const zip = String(request.nextUrl.searchParams.get('zip') || '')
+      .trim()
+      .replace(/\D/g, '')
+      .slice(0, 4);
     const limitRaw = Number(request.nextUrl.searchParams.get('limit') || 8);
     const offsetRaw = Number(request.nextUrl.searchParams.get('offset') || 0);
     const isZipOnlyQuery = /^\d{2,4}$/.test(q.replace(/\s+/g, ''));
@@ -99,24 +111,25 @@ export async function GET(request: NextRequest) {
       containsQuery = containsQuery.eq('zip', zip);
     }
 
-    const zipQuery =
-      zipFragment.length >= 2
-        ? supabaseAdmin
-            .from('streets')
-            .select('id, street, zip, city')
-            .like('zip', `${zipFragment}%`)
-            .order('street', { ascending: true })
-            .limit(fetchLimit)
-        : Promise.resolve({ data: [], error: null } as const);
+    const shouldRunZipFallback = isZipOnlyQuery || (!streetSearchQuery && zipFragment.length >= 2);
+    const shouldRunCityFallback = !streetSearchQuery && cityFragment.length >= 2;
 
-    const cityZipQuery =
-      cityFragment.length >= 2
-        ? supabaseAdmin
-            .from('zip_prices')
-            .select('zip, city')
-            .ilike('city', `%${cityFragment}%`)
-            .limit(Math.max(25, fetchLimit))
-        : Promise.resolve({ data: [], error: null } as const);
+    const zipQuery = shouldRunZipFallback
+      ? supabaseAdmin
+          .from('streets')
+          .select('id, street, zip, city')
+          .like('zip', `${zipFragment}%`)
+          .order('street', { ascending: true })
+          .limit(fetchLimit)
+      : Promise.resolve({ data: [], error: null } as const);
+
+    const cityZipQuery = shouldRunCityFallback
+      ? supabaseAdmin
+          .from('zip_prices')
+          .select('zip, city')
+          .ilike('city', `%${cityFragment}%`)
+          .limit(Math.max(25, fetchLimit))
+      : Promise.resolve({ data: [], error: null } as const);
 
     const [
       { data: prefixResults, error: prefixError },
@@ -139,7 +152,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const cityZips = [...new Set((cityZipMatches || []).map((item) => String(item.zip || '').trim()).filter(Boolean))];
+    const cityZips = [
+      ...new Set(
+        (cityZipMatches || [])
+          .map((item) => String(item.zip || '').trim())
+          .filter(Boolean),
+      ),
+    ];
+
     const cityStreetResults =
       cityZips.length > 0
         ? await supabaseAdmin

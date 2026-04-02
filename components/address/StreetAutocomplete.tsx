@@ -69,7 +69,11 @@ export default function StreetAutocomplete({
     normalizedInputValue.toLowerCase().startsWith(normalizedSelectedStreet.toLowerCase())
       ? normalizedInputValue.slice(normalizedSelectedStreet.length).trim()
       : '';
-  const hasLockedHouseNumberSuffix = /^\d[\dA-Za-z/-]*$/u.test(selectedStreetSuffix);
+  const matchesSelectedStreetPrefix =
+    Boolean(selectedOption) &&
+    normalizedSelectedStreet.length > 0 &&
+    normalizedInputValue.toLowerCase().startsWith(normalizedSelectedStreet.toLowerCase());
+  const hasLockedHouseNumberSuffix = /^\d[\dA-Za-z\s,/-]*$/u.test(selectedStreetSuffix);
   const matchesSelectedValue =
     Boolean(selectedOption) &&
     (normalizedInputValue.toLowerCase() === normalizedSelectedStreet.toLowerCase() ||
@@ -230,15 +234,28 @@ export default function StreetAutocomplete({
               normalizedNextValue.toLowerCase().startsWith(normalizedSelectedStreet.toLowerCase())
                 ? normalizedNextValue.slice(normalizedSelectedStreet.length).trim()
                 : '';
-            const shouldLockSearch = /^\d[\dA-Za-z/-]*$/u.test(nextSuffix);
+            const shouldLockSearch = /^\d[\dA-Za-z\s,/-]*$/u.test(nextSuffix);
 
             onChange(nextValue);
+            if (!shouldLockSearch && normalizedNextValue.length >= 2) {
+              setLoading(true);
+            }
             setIsOpen(!shouldLockSearch);
             setActiveIndex(-1);
             setOffset(0);
           }}
           onFocus={() => {
             setIsFocused(true);
+            if (matchesSelectedValue || hasLockedHouseNumberSuffix || matchesSelectedStreetPrefix) {
+              setIsOpen(false);
+              setActiveIndex(-1);
+              setOffset(0);
+            } else if (trimmedValue.length >= 2) {
+              setLoading(true);
+              setIsOpen(true);
+              setActiveIndex(-1);
+              setOffset(0);
+            }
             onFocus?.();
           }}
           onPaste={(event) => {
@@ -322,7 +339,7 @@ export default function StreetAutocomplete({
         ) : null}
       </div>
 
-      {(isOpen || (isFocused && !hasLockedHouseNumberSuffix && !matchesSelectedValue)) &&
+      {(isOpen || (isFocused && !hasLockedHouseNumberSuffix && !matchesSelectedValue && !matchesSelectedStreetPrefix)) &&
       (hasMenuItems || loading || trimmedValue.length >= 2) ? (
         <div
           id={listboxId}
