@@ -283,14 +283,14 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
 
 function HeroTrustPills() {
   return (
-    <div className="mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-2 lg:mx-0 lg:mt-5 lg:max-w-none lg:flex-nowrap lg:justify-start">
+    <div className="mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-2 lg:relative lg:top-5 lg:mx-auto lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center">
       {heroTrustItems.map((item, index) => {
         const isHighlighted = index === 2;
 
         return (
           <div
             key={item}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-[12px] shadow-[0_10px_24px_rgba(17,17,17,0.045)] ${
+            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-[11px] shadow-[0_10px_24px_rgba(17,17,17,0.045)] md:gap-1.5 md:px-3 md:py-2 md:text-[12px] ${
               isHighlighted
                 ? 'border-[#111111] bg-[#111111] text-white'
                 : 'border-[#e6edf7] bg-[#f4f8ff] text-[#111827]'
@@ -303,7 +303,7 @@ function HeroTrustPills() {
             >
               <Check size={12} strokeWidth={3} />
             </span>
-            <span className="text-[12px] font-semibold tracking-[-0.03em] md:text-[14.76px]">{item}</span>
+            <span className="text-[11px] font-semibold tracking-[-0.03em] md:text-[14.76px]">{item}</span>
           </div>
         );
       })}
@@ -315,17 +315,20 @@ function HeroBookingCard() {
   return (
     <div id="hero-booking" className="relative w-full max-w-[42rem]">
       <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
-      <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[18px_16px_16px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
-        <div className="mb-[10px] flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left">
-          <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left">
+      <div className="relative flex flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]">
+        <div className="mb-[10px] flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]">
+          <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
             Fahrt in wenigen Sekunden starten
           </p>
-          <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:self-auto">
+          <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:self-auto lg:mr-[6px]">
             Schritt 1 von 3
           </span>
         </div>
 
-        <BookingForm showStepIndicator={false} />
+        <div className="lg:flex-1">
+          <BookingForm showStepIndicator={false} />
+        </div>
+        <HeroTrustPills />
       </div>
     </div>
   );
@@ -387,7 +390,6 @@ export default function Home() {
             <div className="grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10">
               <div className="mt-10 text-center lg:mt-12 lg:text-left">
                 <HeroBookingCard />
-                <HeroTrustPills />
               </div>
 
               <HeroImageCard />

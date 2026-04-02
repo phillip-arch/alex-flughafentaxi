@@ -32,7 +32,6 @@ const contactOptions = [
 
 export default function FloatingContactButton() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isHeroVisible, setIsHeroVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
 
@@ -60,36 +59,7 @@ export default function FloatingContactButton() {
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    if (pathname !== '/') {
-      setIsHeroVisible(false);
-      return;
-    }
-
-    const heroBooking = document.getElementById('hero-booking');
-    if (!heroBooking) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsHeroVisible(entry.isIntersecting);
-      },
-      {
-        threshold: 0.2,
-      }
-    );
-
-    observer.observe(heroBooking);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [pathname]);
-
   if (pathname.startsWith('/dispatch')) {
-    return null;
-  }
-
-  if (pathname === '/' && isHeroVisible) {
     return null;
   }
 
