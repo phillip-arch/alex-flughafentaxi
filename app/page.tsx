@@ -286,7 +286,7 @@ export default function Home() {
         <div className="app-container relative pb-10 pt-[5.2rem] md:pb-12 md:pt-[7.625rem] lg:pb-14 lg:pt-[7.625rem]">
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
-              <h1 className="mx-auto max-w-[20rem] text-[13px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
+              <h1 className="mx-auto max-w-[20rem] text-[12px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
                 Flughafentaxi Wien, Ihr professioneller Flughafen Taxi Service
               </h1>
 
@@ -298,7 +298,24 @@ export default function Home() {
 
             <div className="mt-6 grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10">
             <div className="text-center lg:text-left">
-              <div className="mx-auto mt-3 flex max-w-[340px] flex-wrap items-center justify-center gap-2 lg:mx-0 lg:max-w-none lg:flex-nowrap lg:justify-start">
+              <div id="hero-booking" className="relative mt-6 w-full max-w-[42rem]">
+                <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
+                <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[18px_16px_16px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
+                  <div className="mb-[10px] flex flex-col items-start gap-2 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                    <p className="text-[13px] font-black tracking-[-0.03em] text-[#111111] leading-[1.1] md:text-[18.2px]">
+                      Fahrt in wenigen Sekunden starten
+                    </p>
+                    <span className="shrink-0 rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem]">
+                      Schritt 1 von 3
+                    </span>
+                  </div>
+
+                  <BookingForm showStepIndicator={false} />
+
+                </div>
+              </div>
+
+              <div className="mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-2 lg:mx-0 lg:mt-5 lg:max-w-none lg:flex-nowrap lg:justify-start">
                 {heroTrustItems.map((item, index) => (
                   <div
                     key={item}
@@ -320,33 +337,6 @@ export default function Home() {
                     </span>
                   </div>
                 ))}
-              </div>
-
-              <div id="hero-booking" className="relative mt-6 w-full max-w-[42rem]">
-                <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
-                <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[18px_16px_16px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
-                  <div className="mb-[10px] flex flex-col items-start gap-2 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                    <p className="text-[13px] font-black tracking-[-0.03em] text-[#111111] leading-[1.1] md:text-[18.2px]">
-                      Fahrt in wenigen Sekunden starten
-                    </p>
-                    <span className="shrink-0 rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem]">
-                      Schritt 1 von 3
-                    </span>
-                  </div>
-
-                  <BookingForm showStepIndicator={false} />
-
-                  <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[0.8rem] font-semibold text-[#6d7f95] md:gap-x-4 md:text-[0.86rem]">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Check size={14} strokeWidth={2.8} className="text-[#6d7f95]" />
-                      Keine versteckten Kosten
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <Check size={14} strokeWidth={2.8} className="text-[#6d7f95]" />
-                      Sofort startklar
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
 
