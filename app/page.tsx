@@ -286,11 +286,11 @@ export default function Home() {
         <div className="app-container relative pb-10 pt-[5.2rem] md:pb-12 md:pt-[7.625rem] lg:pb-14 lg:pt-[7.625rem]">
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
-              <h1 className="mx-auto max-w-[20rem] text-[12px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
+              <h1 className="mx-auto max-w-[20rem] text-center text-[12px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
                 Flughafentaxi Wien, Ihr professioneller Flughafen Taxi Service
               </h1>
 
-              <div className="mx-auto mt-[10px] max-w-[16ch] text-[30px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]">
+              <div className="mx-auto mt-[12px] max-w-[16ch] text-[30px] font-black tracking-[-0.04em] text-[#111111] leading-[1.02] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]">
                 <span className="block">Fixpreis zum Flughafen.</span>
                 <span className="block">Keine Ueberraschungen.</span>
               </div>
@@ -301,11 +301,11 @@ export default function Home() {
               <div id="hero-booking" className="relative mt-6 w-full max-w-[42rem]">
                 <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
                 <div className="relative overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[18px_16px_16px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-5">
-                  <div className="mb-[10px] flex flex-col items-start gap-2 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                    <p className="text-[13px] font-black tracking-[-0.03em] text-[#111111] leading-[1.1] md:text-[18.2px]">
+                  <div className="mb-[10px] flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left">
+                    <p className="text-center text-[13px] font-black tracking-[-0.03em] text-[#111111] leading-[1.1] md:text-[18.2px] sm:text-left">
                       Fahrt in wenigen Sekunden starten
                     </p>
-                    <span className="shrink-0 rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem]">
+                    <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:self-auto">
                       Schritt 1 von 3
                     </span>
                   </div>
