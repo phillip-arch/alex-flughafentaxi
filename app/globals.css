@@ -288,6 +288,10 @@ p {
     transition: background-color 160ms ease;
   }
 
+  .ui-contact-fab-anim-fade-lift {
+    animation: ui-contact-fab-fade-lift 180ms ease-out both;
+  }
+
   .ui-contact-fab-phone {
     background: #1679ff;
   }
@@ -316,6 +320,18 @@ p {
     .ui-contact-fab {
       height: 48px;
       width: 48px;
+    }
+  }
+
+  @keyframes ui-contact-fab-fade-lift {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 

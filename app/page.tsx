@@ -156,6 +156,15 @@ const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
   'mx-auto mt-[16px] max-w-[16ch] text-[28px] font-black leading-[1.02] tracking-[-0.04em] text-[#111111] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]';
+const heroGridClass = 'grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
+const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
+const heroBookingCardClass =
+  'relative flex flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
+const heroBookingHeaderClass =
+  'mb-[10px] flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
+const heroTrustPillsClass =
+  'mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-[10px] md:gap-[14px] lg:relative lg:top-5 lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center';
+const heroTrustPillTextClass = 'text-[11px] font-semibold tracking-[-0.03em] md:text-[12px]';
 
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
 
@@ -283,7 +292,7 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
 
 function HeroTrustPills() {
   return (
-    <div className="mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-2 lg:relative lg:top-5 lg:mx-auto lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center">
+    <div className={heroTrustPillsClass}>
       {heroTrustItems.map((item, index) => {
         const isHighlighted = index === 2;
 
@@ -303,7 +312,7 @@ function HeroTrustPills() {
             >
               <Check size={12} strokeWidth={3} />
             </span>
-            <span className="text-[11px] font-semibold tracking-[-0.03em] md:text-[14.76px]">{item}</span>
+            <span className={heroTrustPillTextClass}>{item}</span>
           </div>
         );
       })}
@@ -315,8 +324,8 @@ function HeroBookingCard() {
   return (
     <div id="hero-booking" className="relative w-full max-w-[42rem]">
       <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
-      <div className="relative flex flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]">
-        <div className="mb-[10px] flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]">
+      <div className={heroBookingCardClass}>
+        <div className={heroBookingHeaderClass}>
           <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
             Fahrt in wenigen Sekunden starten
           </p>
@@ -387,8 +396,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10">
-              <div className="mt-10 text-center lg:mt-12 lg:text-left">
+            <div className={heroGridClass}>
+              <div className={heroBookingColumnClass}>
                 <HeroBookingCard />
               </div>
 
