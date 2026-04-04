@@ -120,6 +120,10 @@ const EMPTY_ACCOUNT_DEFAULTS = {
 };
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
+const ROUTE_MARKER_TOP_OFFSET_CLASS = '-translate-y-1';
+const ROUTE_MARKER_BOTTOM_OFFSET_CLASS = 'translate-y-1';
+const MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'mt-[2.7875rem]';
+const DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'md:mt-[3.45rem]';
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
@@ -1465,11 +1469,11 @@ const BookingForm = ({
               <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
                 <div className="flex gap-2.5 md:gap-4">
                   <div className="flex w-5 shrink-0 flex-col items-center pt-[42px] md:w-5 md:pt-[42px]">
-                    <div className={`-translate-y-1 flex h-5 w-5 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
+                    <div className={`${ROUTE_MARKER_TOP_OFFSET_CLASS} flex h-5 w-5 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={8} /> : <MapPin size={8} />}
                     </div>
                     <div className="h-[57px] w-px bg-[#111111] md:h-[57px]" />
-                    <div className="translate-y-1 flex h-5 w-5 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white">
+                    <div className={`${ROUTE_MARKER_BOTTOM_OFFSET_CLASS} flex h-5 w-5 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white`}>
                       <Check size={8} />
                     </div>
                   </div>
@@ -1578,7 +1582,7 @@ const BookingForm = ({
                     <button
                       type="button"
                       onClick={toggleDirection}
-                      className="mt-[2.85rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:mt-[3.45rem] md:h-8 md:w-8"
+                      className={`${MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS} ${DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS} inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8`}
                       aria-label="Abholung und Ziel tauschen"
                     >
                       <ArrowUpDown size={16} className="-translate-x-[2px]" />
