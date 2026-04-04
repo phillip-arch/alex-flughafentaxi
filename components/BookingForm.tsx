@@ -1414,7 +1414,7 @@ const BookingForm = ({
     'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
 
   const StepIndicator = () => (
-    <div className="mt-2 mb-8 flex justify-end pr-2 md:mt-0 md:mb-10 md:pr-1">
+    <div className="mt-2 mb-8 flex justify-center md:mt-0 md:mb-10 md:justify-end md:pr-1">
       <button
         type="button"
         onClick={() => handleStepIndicatorClick(currentStep)}
@@ -1465,11 +1465,11 @@ const BookingForm = ({
               <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
                 <div className="flex gap-2.5 md:gap-4">
                   <div className="flex w-5 shrink-0 flex-col items-center pt-[42px] md:w-5 md:pt-[42px]">
-                    <div className={`flex h-5 w-5 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
+                    <div className={`-translate-y-1 flex h-5 w-5 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={8} /> : <MapPin size={8} />}
                     </div>
                     <div className="h-[57px] w-px bg-[#111111] md:h-[57px]" />
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white">
+                    <div className="translate-y-1 flex h-5 w-5 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white">
                       <Check size={8} />
                     </div>
                   </div>
@@ -1578,7 +1578,7 @@ const BookingForm = ({
                     <button
                       type="button"
                       onClick={toggleDirection}
-                      className="mt-[3.45rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
+                      className="mt-[2.85rem] inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:mt-[3.45rem] md:h-8 md:w-8"
                       aria-label="Abholung und Ziel tauschen"
                     >
                       <ArrowUpDown size={16} className="-translate-x-[2px]" />
