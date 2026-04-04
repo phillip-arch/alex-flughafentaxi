@@ -1472,7 +1472,7 @@ const BookingForm = ({
                     <div className={`${ROUTE_MARKER_TOP_OFFSET_CLASS} flex h-5 w-5 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
                       {formData.direction === 'from_airport' ? <PlaneLanding size={8} /> : <MapPin size={8} />}
                     </div>
-                    <div className="h-[57px] w-px bg-[#111111] md:h-[57px]" />
+                    <div className="-my-1 h-[65px] w-px bg-[#111111] md:-my-1 md:h-[65px]" />
                     <div className={`${ROUTE_MARKER_BOTTOM_OFFSET_CLASS} flex h-5 w-5 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white`}>
                       <Check size={8} />
                     </div>
@@ -1491,7 +1491,7 @@ const BookingForm = ({
                       {formData.direction !== 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="relative">
-                            <div className="grid grid-cols-1 gap-2 md:gap-3">
+                            <div className="mr-[-5px] grid grid-cols-1 gap-2 md:mr-0 md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
                                 selectedOption={selectedStreetOption}
@@ -1530,7 +1530,7 @@ const BookingForm = ({
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="relative">
-                            <div className="grid grid-cols-1 gap-2 md:gap-3">
+                            <div className="mr-[-5px] grid grid-cols-1 gap-2 md:mr-0 md:gap-3">
                               <StreetAutocomplete
                                 value={streetInputValue}
                                 selectedOption={selectedStreetOption}
