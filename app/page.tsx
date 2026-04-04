@@ -500,7 +500,7 @@ export default function Home() {
 
       <section className="section-shell-tight-top bg-white">
         <div className="app-container">
-          <div className="w-full">
+          <div className="mx-auto max-w-[104rem]">
             <SectionIntro
               eyebrow="Fahrzeugkategorien"
               title="Fahrzeugkategorien und Preis"
@@ -513,32 +513,32 @@ export default function Home() {
               {vehicleCategories.map(({ title, description, imageSrc, specs, prices }) => (
                 <div
                   key={title}
-                  className="overflow-hidden rounded-[2rem] border border-[#1679FF] bg-[#1679FF] px-5 py-5 text-white shadow-[0_18px_42px_rgba(22,121,255,0.16)] md:px-6 md:py-6"
+                  className="overflow-hidden rounded-[2rem] border border-[#e7edf5] bg-white px-5 py-5 text-[#111827] shadow-[0_16px_38px_rgba(17,17,17,0.06)] md:px-6 md:py-6"
                 >
                   <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[16rem_minmax(0,0.95fr)_minmax(18rem,0.92fr)] lg:items-center lg:gap-8">
-                    <div className="relative h-[12rem] overflow-hidden rounded-[1.5rem] border border-[#e9edf3] bg-white md:h-[13rem] lg:h-[14rem]">
+                    <div className="relative h-[12rem] overflow-hidden rounded-[1.5rem] border border-[#e9edf3] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] md:h-[13rem] lg:h-[14rem]">
                       <Image
                         src={imageSrc}
                         alt={title}
                         fill
-                        className="object-contain"
+                        className="object-contain p-4"
                         sizes="(min-width: 1024px) 16rem, 100vw"
                       />
                     </div>
 
                     <div className="flex min-w-0 flex-col justify-center gap-5">
                       <div className="ui-text-block-sm gap-1.5">
-                        <h3 className="text-[1.7rem] font-semibold tracking-[-0.05em] !text-white md:text-[1.9rem]">
+                        <h3 className="text-[1.7rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.9rem]">
                           {title}
                         </h3>
-                        <p className="ui-copy-sm max-w-[34rem] text-white/88">{description}</p>
+                        <p className="ui-copy-sm max-w-[34rem] text-[#5e6f86]">{description}</p>
                       </div>
 
                       <div className="grid grid-cols-3 gap-2 sm:gap-3">
                         {specs.map(({ icon, value }) => (
                           <div
                             key={`${title}-${icon}`}
-                            className="flex items-center justify-center gap-1.5 rounded-[0.9rem] border border-[#edf2f7] bg-white px-2 py-2 text-[#111827] sm:gap-2.5 sm:rounded-[1rem] sm:px-3 sm:py-3"
+                            className="flex items-center justify-center gap-1.5 rounded-[0.9rem] border border-[#e7edf5] bg-[#f8fbff] px-2 py-2 text-[#111827] sm:gap-2.5 sm:rounded-[1rem] sm:px-3 sm:py-3"
                           >
                             <VehicleSpecIcon icon={icon} />
                             <span className="ui-copy-sm font-semibold text-[#1f2937]">{value}</span>
@@ -547,7 +547,7 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="rounded-[1.35rem] border border-[#e8edf3] bg-[#f8fbff] px-4 py-4 md:px-5">
+                    <div className="rounded-[1.35rem] border border-[#e8edf3] bg-[#f8fbff] px-4 py-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:px-5">
                       <p className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-[#1679FF]">
                         Preisliste fuer Wien
                       </p>
