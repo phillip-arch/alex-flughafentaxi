@@ -120,8 +120,8 @@ const EMPTY_ACCOUNT_DEFAULTS = {
 };
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
-const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.4rem] !py-[0.45rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-3 md:!py-[0.55rem]`;
-const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.4rem] !py-[0.45rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-3 md:!py-[0.55rem]`;
+const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.25rem] !py-[0.45rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-3 md:!py-[0.55rem]`;
+const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.25rem] !py-[0.45rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-3 md:!py-[0.55rem]`;
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 
 const BookingForm = ({
