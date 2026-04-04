@@ -81,6 +81,44 @@ const whyUsItems = [
   },
 ];
 
+const transferFeatureRows = [
+  {
+    title: 'Fixpreis garantiert',
+    description: 'Keine zusätzlichen Gebühren. Keine Überraschungen.',
+  },
+  {
+    title: 'Direkte Abholung',
+    description: 'An Ihrer Adresse in Wien oder direkt am Flughafen Wien Schwechat.',
+  },
+  {
+    title: 'Puenktlicher Flughafentransfer',
+    description: 'Auch frueh morgens oder spaet abends zuverlaessig geplant.',
+  },
+  {
+    title: 'Komfortable Fahrzeuge',
+    description: 'Angenehme Fahrt mit ausreichend Platz fuer Gepaeck und Mitreisende.',
+  },
+] as const;
+
+const transferFeatureCards = [
+  {
+    title: 'Wien -> Flughafen Schwechat',
+    description: 'Schnell und direkt zum Abflug, ohne unnoetige Umwege.',
+  },
+  {
+    title: 'Abholung nach Landung',
+    description: 'Direkte Weiterfahrt vom Flughafen Wien zurueck in die Stadt.',
+  },
+  {
+    title: 'Fixpreis vorab bekannt',
+    description: 'Vorab kalkuliert und klar kommuniziert, ohne versteckte Kosten.',
+  },
+  {
+    title: 'Zuverlaessig geplant',
+    description: 'Verlaesslich organisiert fuer eine entspannte und puenktliche Anreise.',
+  },
+] as const;
+
 const whyUsEditorialItems = [
   {
     title: 'Direkter Kontakt statt Callcenter',
@@ -155,7 +193,7 @@ const heroTrustItems = ['Fixpreis garantiert', 'Puenktliche Abholung', 'Zuverlae
 const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
-  'mx-auto mt-[16px] max-w-[16ch] text-[28px] font-black leading-[1.02] tracking-[-0.04em] text-[#111111] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]';
+  'mx-auto mt-[16px] max-w-[19ch] text-[28px] font-black leading-[1.02] tracking-[-0.04em] text-[#111111] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]';
 const heroGridClass = 'grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
 const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
 const heroBookingCardClass =
@@ -327,7 +365,7 @@ function HeroBookingCard() {
       <div className={heroBookingCardClass}>
         <div className={heroBookingHeaderClass}>
           <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
-            Fahrt in wenigen Sekunden starten
+            In wenigen Schritten buchen
           </p>
           <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:self-auto lg:mr-[6px]">
             Schritt 1 von 3
@@ -386,7 +424,7 @@ export default function Home() {
         <div className={heroSectionPaddingClass}>
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
-              <h1 className="mx-auto max-w-[22rem] text-center text-[12px] font-medium tracking-[-0.03em] text-[#7c8593] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
+              <h1 className="mx-auto max-w-[22rem] text-center text-[12px] font-medium tracking-[-0.03em] !text-[#64748b] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
                 Flughafentaxi Wien, Ihr professioneller Flughafen Taxi Service
               </h1>
 
@@ -409,37 +447,73 @@ export default function Home() {
 
       <section className="bg-white py-14 md:py-18">
         <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <SectionIntro
-              eyebrow="Vorteile"
-              title="Warum unser Flughafentaxi?"
-              description="Klare Preise, zuverlaessige Abholung und direkter Kontakt fuer einen entspannten Transfer zum Flughafen Wien."
-              align="center"
-              className="max-w-[44rem]"
-            />
-
-            <div className="mt-10 grid gap-4 md:mt-12 md:grid-cols-2 md:gap-5">
-              {whyUsItems.map(({ title, description }) => (
-                <div
-                  key={title}
-                  className="mx-auto flex w-full max-w-[26.5rem] items-start gap-4 rounded-[2rem] border border-[#1679FF] bg-[#1679FF] px-5 py-5 shadow-[0_18px_42px_rgba(22,121,255,0.16)] md:px-6 md:py-6"
-                >
-                  <span className="ui-icon-badge-accent">
-                    <Check size={22} strokeWidth={2.4} />
-                  </span>
-                  <div className="ui-text-block-sm gap-1.5 pt-0.5">
-                    <h3 className="text-[1.28rem] font-semibold tracking-[-0.05em] !text-white md:text-[1.38rem]">
-                      {title}
-                    </h3>
-                    <p className="ui-copy-sm text-white/88">
-                      {description}
-                    </p>
-                  </div>
+          <div className="w-full">
+            <div className="grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-12">
+              <div>
+                <h2 className="max-w-[24ch] text-[2.1rem] font-black leading-[1.04] tracking-[-0.06em] text-[#111111] md:max-w-[18ch] md:text-[3rem]">
+                  Zuverlässiger Transfer zum Flughafen Wien (Schwechat)
+                </h2>
+                <div className="mt-6 max-w-[42rem] space-y-5 text-[1rem] leading-[1.7] text-[#5e6f86] md:text-[1.05rem]">
+                  <p>
+                    Mit unserem <span className="font-semibold text-[#111111]">Flughafentaxi Wien</span> Service planen Sie Ihren Transfer zum Flughafen Wien Schwechat einfach und stressfrei im Voraus. Sie profitieren von einem klar kalkulierten Fixpreis, puenktlicher Abholung und einer direkten Fahrt ohne Umwege.
+                  </p>
+                  <p>
+                    Egal ob Sie von Wien zum Flughafen fahren oder vom Flughafen abgeholt werden unser Flughafentaxi Wien bringt Sie zuverlaessig an Ihr Ziel. Ohne Wartezeiten, ohne Umsteigen und ohne versteckte Kosten.
+                  </p>
                 </div>
-              ))}
-            </div>
 
-            <PrimaryBookingCta />
+                <div className="mt-8 space-y-3">
+                  {transferFeatureRows.map(({ title, description }) => (
+                    <div
+                      key={title}
+                      className="flex items-start gap-4 rounded-[1.45rem] border border-[#e7edf5] bg-white px-5 py-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)]"
+                    >
+                      <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#111111] text-white shadow-[0_10px_22px_rgba(17,17,17,0.14)]">
+                        <Check size={20} strokeWidth={2.6} />
+                      </span>
+                      <div className="min-w-0">
+                        <strong className="block text-[1.12rem] font-semibold tracking-[-0.04em] text-[#111111]">
+                          {title}
+                        </strong>
+                        <p className="mt-1 text-[0.96rem] leading-[1.6] text-[#6b7c92]">
+                          {description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="overflow-hidden rounded-[1.7rem] border border-[#262a33] bg-[linear-gradient(180deg,#111111_0%,#232a34_100%)] px-6 py-6 text-white shadow-[0_24px_60px_rgba(17,17,17,0.18)] md:px-7 md:py-7">
+                  <p className="text-[0.82rem] font-semibold tracking-[-0.01em] text-white/58">
+                    Ihr Flughafentaxi Wien Service
+                  </p>
+                  <strong className="mt-3 block max-w-[13ch] text-[1.75rem] font-black leading-[1.15] tracking-[-0.05em] !text-white md:max-w-[15ch] md:text-[2.15rem]">
+                    Direkt zum Flughafen Wien ohne Stress und ohne Umwege
+                  </strong>
+                  <p className="mt-5 max-w-[28rem] text-[1rem] leading-[1.7] text-white/74">
+                    Klare Preise, einfache Buchung und ein verlaesslicher Transfer zum Flughafen Wien Schwechat.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {transferFeatureCards.map(({ title, description }) => (
+                    <div
+                      key={title}
+                      className="rounded-[1.45rem] border border-[#e7edf5] bg-white px-5 py-5 shadow-[0_10px_24px_rgba(17,17,17,0.04)]"
+                    >
+                      <strong className="block max-w-[16ch] text-[1.15rem] font-semibold leading-[1.35] tracking-[-0.04em] text-[#111111]">
+                        {title}
+                      </strong>
+                      <p className="mt-3 text-[0.95rem] leading-[1.65] text-[#6b7c92]">
+                        {description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
