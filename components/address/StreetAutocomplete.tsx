@@ -93,7 +93,7 @@ export default function StreetAutocomplete({
       hasLockedHouseNumberSuffix);
   const showMobileSelectedSummary = showMobileSelectedStreetOnly && !isFocused;
   const mobileSelectedInputClasses = showMobileSelectedStreetOnly
-    ? '!h-[3.15rem] !px-[0.25rem] !py-[0.45rem] text-[1rem] leading-tight md:!h-auto md:!px-3 md:!py-[0.55rem] md:text-inherit md:leading-normal'
+    ? '!h-[3.15rem] !px-[0.6rem] !py-[0.6rem] text-[1rem] leading-tight md:!h-auto md:!px-[0.6rem] md:!py-[0.6rem] md:text-inherit md:leading-normal'
     : '';
   const mobileDisplayValue = showMobileSelectedSummary
     ? normalizedInputValue || selectedOption.street
@@ -328,7 +328,7 @@ export default function StreetAutocomplete({
         />
 
         {showMobileSelectedSummary ? (
-          <div className="pointer-events-none absolute inset-x-0 inset-y-0 flex flex-col justify-center px-4 md:hidden">
+          <div className="pointer-events-none absolute inset-x-0 inset-y-0 flex flex-col justify-center px-[0.6rem] md:hidden">
             <span className="truncate text-[18px] font-semibold tracking-[-0.03em] leading-tight text-[#111111]">
               {displayValue}
             </span>
