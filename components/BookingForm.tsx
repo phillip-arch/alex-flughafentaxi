@@ -21,7 +21,6 @@ import {
   ChevronRight, 
   ChevronLeft, 
   Check, 
-  Calendar,
   Clock,
   Car,
   CreditCard,
@@ -121,8 +120,8 @@ const EMPTY_ACCOUNT_DEFAULTS = {
 };
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
-const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal`;
-const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal`;
+const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.4rem] !py-[0.45rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-3 md:!py-[0.55rem]`;
+const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.4rem] !py-[0.45rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-3 md:!py-[0.55rem]`;
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 
 const BookingForm = ({
@@ -1409,46 +1408,21 @@ const BookingForm = ({
     }
   };
 
-  const stepItems = [
-    { key: 1, label: 'Route', icon: MapPin },
-    { key: 2, label: 'Details', icon: Calendar },
-    { key: 3, label: 'Bestaetigen', icon: Check },
-  ] as const;
   const actionRowClass = 'mt-4 flex items-center gap-3';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
     'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
 
   const StepIndicator = () => (
-    <div className="mt-2 mb-8 flex flex-nowrap items-center justify-center gap-0.5 overflow-x-auto pb-1 md:mt-0 md:mb-10 md:gap-1 md:overflow-visible md:pb-0">
-      {stepItems.map((step, index) => {
-        const Icon = step.icon;
-        const isCurrent = currentStep === step.key;
-        const isComplete = currentStep > step.key;
-
-        return (
-          <React.Fragment key={step.key}>
-            <button
-              type="button"
-              onClick={() => handleStepIndicatorClick(step.key)}
-                className={`inline-flex shrink-0 items-center gap-[0.35rem] rounded-full border px-[0.57rem] py-[0.33rem] text-[10.25px] transition-all md:gap-1 md:px-3 md:py-1.5 md:text-[13px] ${
-                isCurrent
-                  ? 'border-[#1679FF] bg-[#1679FF] text-white'
-                  : isComplete
-                    ? 'border-[#1679FF] bg-[#1679FF] text-white'
-                    : 'border-[#ddd8cd] bg-white text-[#111111] hover:border-[#cbc4b6]'
-              }`}
-              aria-current={isCurrent ? 'step' : undefined}
-            >
-                <Icon size={12} strokeWidth={2.2} className="md:h-4 md:w-4" />
-                <span className="text-[10.25px] font-semibold tracking-[-0.02em] md:text-[11px]">{step.key}. {step.label}</span>
-              </button>
-              {index < stepItems.length - 1 ? (
-                <ChevronRight size={10} className="shrink-0 text-[#9f9a91] md:h-[14px] md:w-[14px]" />
-              ) : null}
-          </React.Fragment>
-        );
-      })}
+    <div className="mt-2 mb-8 flex justify-end pr-2 md:mt-0 md:mb-10 md:pr-1">
+      <button
+        type="button"
+        onClick={() => handleStepIndicatorClick(currentStep)}
+        className="inline-flex shrink-0 items-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[0.8rem] py-[0.42rem] text-[10.25px] text-[#1679ff] transition-all md:px-3.5 md:py-2 md:text-[0.84rem]"
+        aria-current="step"
+      >
+        <span className="font-semibold tracking-[-0.02em]">{`Schritt ${currentStep} von 3`}</span>
+      </button>
     </div>
   );
 

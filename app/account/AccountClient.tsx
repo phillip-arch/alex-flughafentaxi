@@ -630,7 +630,7 @@ export default function AccountClient({
                   <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
                     <BookingForm
                       onDirectionChange={setBookingDirection}
-                      showStepIndicator={false}
+                      showStepIndicator
                       showInfoTrigger
                       isAppSurface
                       initialFavorites={favorites}
