@@ -199,7 +199,7 @@ const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
 const heroBookingCardClass =
   'relative flex flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
 const heroBookingHeaderClass =
-  'mb-[10px] flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
+  'mb-[10px] flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
 const heroTrustPillsClass =
   'mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-[10px] md:gap-[14px] lg:relative lg:top-5 lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center';
 const heroTrustPillTextClass = 'text-[11px] font-semibold tracking-[-0.03em] md:text-[12px]';
