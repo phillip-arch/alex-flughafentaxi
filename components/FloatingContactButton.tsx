@@ -130,16 +130,16 @@ export default function FloatingContactButton() {
           type="button"
           onClick={() => setIsOpen(true)}
           aria-label="Open help panel"
-          className="flex items-center gap-2 rounded-full border border-[#cfe0ff] bg-white py-1.5 pl-1.5 pr-3 shadow-[0_16px_38px_rgba(17,17,17,0.14)] transition-all duration-200 hover:border-[#b9d0ff] hover:shadow-[0_18px_42px_rgba(17,17,17,0.18)]"
+          className="flex items-center gap-[0.6rem] rounded-full border border-[#cfe0ff] bg-white py-[0.45rem] pl-[0.45rem] pr-[0.9rem] shadow-[0_16px_38px_rgba(17,17,17,0.14)] transition-all duration-200 hover:border-[#b9d0ff] hover:shadow-[0_18px_42px_rgba(17,17,17,0.18)] md:gap-2 md:py-1.5 md:pl-1.5 md:pr-3"
         >
-          <span className="flex h-[2.2rem] w-[2.2rem] items-center justify-center rounded-full border border-[#cfe0ff] bg-white text-[#1f7cff] shadow-[0_8px_20px_rgba(17,17,17,0.12)]">
-            <HelpCircle size={16} strokeWidth={2.1} />
+          <span className="flex h-[2.65rem] w-[2.65rem] items-center justify-center rounded-full border border-[#cfe0ff] bg-white text-[#1f7cff] shadow-[0_8px_20px_rgba(17,17,17,0.12)] md:h-[2.2rem] md:w-[2.2rem]">
+            <HelpCircle size={19} strokeWidth={2.1} className="md:h-4 md:w-4" />
           </span>
           <span className="text-left">
-            <span className="block text-[0.72rem] font-bold tracking-[-0.03em] text-[#1b2436] md:text-[0.75rem]">
+            <span className="block text-[0.86rem] font-bold tracking-[-0.03em] text-[#1b2436] md:text-[0.75rem]">
               Need help?
             </span>
-            <span className="mt-0.5 block text-[0.62rem] text-[#6c7a92] md:text-[0.65rem]">
+            <span className="mt-0.5 block text-[0.74rem] text-[#6c7a92] md:text-[0.65rem]">
               Support & Kontakt
             </span>
           </span>
