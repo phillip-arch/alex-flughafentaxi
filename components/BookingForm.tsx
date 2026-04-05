@@ -124,7 +124,8 @@ const ROUTE_MARKER_TOP_OFFSET_CLASS = '-translate-y-1';
 const ROUTE_MARKER_BOTTOM_OFFSET_CLASS = 'translate-y-[3px]';
 const MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'mt-[2.7875rem]';
 const DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'md:mt-[3.45rem]';
-const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
+const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[#7fb3ff] focus:!bg-white focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
+const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-[#f5f5f7] !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 
@@ -1482,10 +1483,17 @@ const BookingForm = ({
                     <div className="min-h-[4.2rem]">
                       <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">Abholung</p>
                       {formData.direction === 'from_airport' ? (
-                        <div className="mt-1 flex min-h-[3.25rem] items-center">
-                          <p className="text-[18px] font-semibold tracking-[-0.03em] leading-[1.2] text-[#111111]">
-                            Flughafen Wien (VIE)
-                          </p>
+                        <div className="mt-1 min-h-[3.25rem]">
+                          <div className="mr-[-5px] md:mr-0">
+                            <div className={`flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
+                              <span className="mr-2 inline-flex shrink-0 text-[#111111]">
+                                <PlaneLanding size={18} strokeWidth={2.1} />
+                              </span>
+                              <p className="leading-[1.2] text-[#111111]">
+                                Flughafen Wien (VIE)
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
@@ -1562,10 +1570,17 @@ const BookingForm = ({
                           {renderExtraStopPanel()}
                         </div>
                       ) : (
-                        <div className="mt-1 flex min-h-[3.25rem] items-center">
-                          <p className="text-[18px] font-semibold tracking-[-0.03em] leading-[1.2] text-[#111111]">
-                            Flughafen Wien (VIE)
-                          </p>
+                        <div className="mt-1 min-h-[3.25rem]">
+                          <div className="mr-[-5px] md:mr-0">
+                            <div className={`flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
+                              <span className="mr-2 inline-flex shrink-0 text-[#111111]">
+                                <PlaneTakeoff size={18} strokeWidth={2.1} />
+                              </span>
+                              <p className="leading-[1.2] text-[#111111]">
+                                Flughafen Wien (VIE)
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1577,7 +1592,7 @@ const BookingForm = ({
                       className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
                       aria-label="Zusatzstopp hinzufuegen"
                     >
-                      <Plus size={16} className="-translate-x-[2px]" />
+                      <Plus size={19} className="-translate-x-[2px]" />
                     </button>
                     <button
                       type="button"
@@ -1585,7 +1600,7 @@ const BookingForm = ({
                       className={`${MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS} ${DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS} inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8`}
                       aria-label="Abholung und Ziel tauschen"
                     >
-                      <ArrowUpDown size={16} className="-translate-x-[2px]" />
+                      <ArrowUpDown size={19} className="-translate-x-[2px]" />
                     </button>
                   </div>
                 </div>
