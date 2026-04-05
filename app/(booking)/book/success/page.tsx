@@ -74,8 +74,8 @@ export default async function BookingSuccessPage() {
                       </p>
                     </div>
                     <p className="mt-3 text-[0.98rem] leading-7 text-[#42566f]">
-                      Bei Fragen zu Ihrer Fahrt erreichen Sie uns weiterhin schnell per Telefon,
-                      WhatsApp oder Viber.
+                      Bei Fragen zu Ihrer Fahrt erreichen Sie uns weiterhin schnell per Telefon
+                      oder WhatsApp.
                     </p>
                   </div>
                 </div>

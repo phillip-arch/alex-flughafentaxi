@@ -121,7 +121,7 @@ const EMPTY_ACCOUNT_DEFAULTS = {
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
 const ROUTE_MARKER_TOP_OFFSET_CLASS = '-translate-y-1';
-const ROUTE_MARKER_BOTTOM_OFFSET_CLASS = 'translate-y-1';
+const ROUTE_MARKER_BOTTOM_OFFSET_CLASS = 'translate-y-[7px]';
 const MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'mt-[2.7875rem]';
 const DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'md:mt-[3.45rem]';
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
@@ -1469,12 +1469,12 @@ const BookingForm = ({
               <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
                 <div className="flex gap-2.5 md:gap-4">
                   <div className="flex w-5 shrink-0 flex-col items-center pt-[42px] md:w-5 md:pt-[42px]">
-                    <div className={`${ROUTE_MARKER_TOP_OFFSET_CLASS} flex h-5 w-5 items-center justify-center rounded-full ${formData.direction === 'from_airport' ? 'bg-[#111111] text-white' : 'bg-[#111111] text-white'}`}>
-                      {formData.direction === 'from_airport' ? <PlaneLanding size={8} /> : <MapPin size={8} />}
+                    <div className={`${ROUTE_MARKER_TOP_OFFSET_CLASS} flex h-4 w-4 items-center justify-center rounded-full border-[3px] border-[#111111] bg-white`}>
+                      <span className="h-2.5 w-2.5 rounded-full bg-white" />
                     </div>
-                    <div className="-my-1 h-[65px] w-px bg-[#111111] md:-my-1 md:h-[65px]" />
-                    <div className={`${ROUTE_MARKER_BOTTOM_OFFSET_CLASS} flex h-5 w-5 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] text-white`}>
-                      <Check size={8} />
+                    <div className="-my-1 h-[68px] w-[3px] bg-[#cfd7e3] md:-my-1 md:h-[68px]" />
+                    <div className={`${ROUTE_MARKER_BOTTOM_OFFSET_CLASS} flex h-[21px] w-[21px] items-center justify-center rounded-full bg-[#e8f1ff]`}>
+                      <span className="h-[11.5px] w-[11.5px] rounded-full bg-[#1f7cff]" />
                     </div>
                   </div>
 

@@ -82,11 +82,6 @@ function buildContactButtonsHtml() {
             <img src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/whatsapp.png" alt="WhatsApp" width="72" height="72" style="display:block;width:72px;height:72px;border:0;outline:none;text-decoration:none;" />
           </a>
         </td>
-        <td style="padding:0 10px 10px 10px;text-align:center;">
-          <a href="viber://chat?number=%2B436764826069" aria-label="Viber" style="display:inline-block;text-decoration:none;">
-            <img src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/viber.png" alt="Viber" width="72" height="72" style="display:block;width:72px;height:72px;border:0;outline:none;text-decoration:none;" />
-          </a>
-        </td>
       </tr>
       <tr>
         <td style="padding:0 10px;text-align:center;font-size:13px;line-height:1.4;">
@@ -94,9 +89,6 @@ function buildContactButtonsHtml() {
         </td>
         <td style="padding:0 10px;text-align:center;font-size:13px;line-height:1.4;">
           <a href="https://wa.me/436764826069" style="color:#25d366;text-decoration:none;font-weight:600;">WhatsApp</a>
-        </td>
-        <td style="padding:0 10px;text-align:center;font-size:13px;line-height:1.4;">
-          <a href="viber://chat?number=%2B436764826069" style="color:#7360f2;text-decoration:none;font-weight:600;">Viber</a>
         </td>
       </tr>
     </table>
@@ -277,7 +269,7 @@ export function buildPassengerConfirmationEmailHtml(input: PassengerConfirmation
         </p>
         <p style="margin:0;font-size:14px;line-height:1.75;color:#111827;text-align:center;">
           Fragen zur Buchung?<br/>
-          Sie koennen Ihren Flughafentransfer bequem online buchen. Falls Sie lieber direkt sprechen oder schnell Hilfe brauchen, sind wir per Telefon, WhatsApp und Viber sofort erreichbar.
+          Sie koennen Ihren Flughafentransfer bequem online buchen. Falls Sie lieber direkt sprechen oder schnell Hilfe brauchen, sind wir per Telefon und WhatsApp sofort erreichbar.
         </p>
         ${buildContactButtonsHtml()}
       </div>

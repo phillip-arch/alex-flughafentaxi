@@ -121,14 +121,12 @@ export default function VehicleCategoryCard({
   return (
     <div
       ref={cardRef}
-      className="overflow-hidden rounded-[2rem] border border-[#e7edf5] bg-white px-5 py-5 text-[#111827] shadow-[0_16px_38px_rgba(17,17,17,0.06)] transition-all duration-300 ease-out md:px-6 md:py-6 md:hover:border-[#7fb3ff] md:hover:bg-[#f0f6ff] md:hover:shadow-[0_2px_10px_rgba(17,17,17,0.04),0_0_0_1px_rgba(127,179,255,0.18),0_10px_26px_rgba(22,121,255,0.12)]"
+      className="group overflow-hidden rounded-[2rem] border border-[#e7edf5] bg-white px-5 py-5 text-[#111827] shadow-[0_16px_38px_rgba(17,17,17,0.06)] transition-all duration-300 ease-out md:px-6 md:py-6 md:hover:border-[#7fb3ff] md:hover:bg-[#f0f6ff]"
       style={
         mobileInView
           ? {
               backgroundColor: '#f0f6ff',
               borderColor: '#7fb3ff',
-              boxShadow:
-                '0 2px 10px rgba(17,17,17,0.04), 0 0 0 1px rgba(127,179,255,0.18), 0 10px 26px rgba(22,121,255,0.12)',
             }
           : undefined
       }
@@ -139,7 +137,7 @@ export default function VehicleCategoryCard({
             src={imageSrc}
             alt={title}
             fill
-            className="object-contain p-4"
+            className="object-contain p-4 transition-transform duration-500 ease-out md:group-hover:scale-[1.04]"
             sizes="(min-width: 1024px) 16rem, 100vw"
           />
         </div>

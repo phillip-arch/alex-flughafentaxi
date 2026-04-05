@@ -12,7 +12,7 @@ import {
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
 import VehicleCategoryCard from '@/components/VehicleCategoryCard';
-import { ViberIcon, WhatsAppIcon } from '@/components/ui/ContactIcons';
+import { WhatsAppIcon } from '@/components/ui/ContactIcons';
 import SectionIntro from '@/components/ui/SectionIntro';
 
 type VehicleCategory = {
@@ -75,7 +75,7 @@ const whyUsItems = [
   {
     title: '24/7-Verfuegbarkeit',
     description:
-      'Unser Service steht rund um die Uhr an sieben Tagen der Woche bereit, erreichbar per Telefon, WhatsApp & Viber.',
+      'Unser Service steht rund um die Uhr an sieben Tagen der Woche bereit, erreichbar per Telefon und WhatsApp.',
   },
 ];
 
@@ -109,7 +109,7 @@ const whyUsEditorialItems = [
   {
     title: 'Direkter Kontakt statt Callcenter',
     description:
-      'Sie erreichen uns schnell per Telefon, WhatsApp oder Viber und erhalten klare Rueckmeldung zu Ihrer Fahrt.',
+      'Sie erreichen uns schnell per Telefon oder WhatsApp und erhalten klare Rueckmeldung zu Ihrer Fahrt.',
   },
   {
     title: 'Abholung mit Blick auf Ihren Flug',
@@ -461,7 +461,7 @@ export default function Home() {
                   <p className="text-[0.82rem] font-semibold tracking-[-0.01em] text-white/58">
                     Ihr Flughafentaxi Wien Service
                   </p>
-                  <strong className="mt-3 block max-w-[13ch] text-[1.75rem] font-black leading-[1.15] tracking-[-0.05em] !text-white md:max-w-[15ch] md:text-[2.15rem]">
+                  <strong className="mt-3 block text-[1.75rem] font-black leading-[1.15] tracking-[-0.05em] !text-white md:text-[2.15rem]">
                     Direkt zum Flughafen Wien ohne Stress und ohne Umwege
                   </strong>
                   <p className="mt-5 max-w-[28rem] text-[1rem] leading-[1.7] text-white/74">
@@ -525,8 +525,8 @@ export default function Home() {
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
               <SectionIntro
                 eyebrow="Gepaeck"
-                title="Will all my luggage fit?"
-                description="To prevent delays in getting to the airport, be sure to choose the best ride option for your cargo needs."
+                title="Passt mein gesamtes Gepäck?"
+                description="Um Verzögerungen auf dem Weg zum Flughafen zu vermeiden, wählen Sie bitte die passende Fahrzeugsoption entsprechend Ihrem Gepäckbedarf aus."
                 className="max-w-[58rem]"
               />
 
@@ -537,11 +537,13 @@ export default function Home() {
                   </span>
                   <div className="ui-text-block-sm mt-5">
                     <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827]">
-                      Suitcase
+                      Standardkoffer
                     </h3>
                     <p className="ui-copy-compact mt-3 text-[#58708d]">
-                      The guidelines here refer to the maximum size for checked luggage, which is 62
-                      linear inches or 158 linear centimeters (length + width + depth).
+                      Als Standardkoffer gilt ein aufgegebenes Gepäckstück mit einer Gesamtgröße
+                      von bis zu 158 cm (Länge + Breite + Höhe).
+                      <br />
+                      Dies entspricht den üblichen Vorgaben der meisten Fluggesellschaften.
                     </p>
                   </div>
                 </div>
@@ -552,11 +554,11 @@ export default function Home() {
                   </span>
                   <div className="ui-text-block-sm mt-5">
                     <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827]">
-                      Hand luggage
+                      Handgepäck
                     </h3>
                     <p className="ui-copy-compact mt-3 text-[#58708d]">
-                      Common hand luggage size is around 55 x 40 x 23 cm, or about 21.5 x 15.5 x 9
-                      inches, depending on the airline.
+                      Das Handgepäck hat in der Regel folgende maximale Größe: 55 × 40 × 23 cm,
+                      abhängig von der jeweiligen Fluggesellschaft.
                     </p>
                   </div>
                 </div>
@@ -570,13 +572,13 @@ export default function Home() {
         <div className="app-container">
           <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)] lg:items-center lg:gap-10">
             <div className="max-w-[44rem]">
-              <SectionIntro
-                eyebrow="Kontakt"
-                title="Fragen zur Buchung?"
-                description="Sie koennen Ihren Flughafentransfer bequem online buchen. Falls Sie lieber direkt sprechen oder schnell Hilfe brauchen, sind wir per Telefon, WhatsApp und Viber sofort erreichbar."
-                className="max-w-[34rem]"
-              />
-            </div>
+                <SectionIntro
+                  eyebrow="Kontakt"
+                  title="Fragen zur Buchung?"
+                  description="Sie koennen Ihren Flughafentransfer bequem online buchen. Falls Sie lieber direkt sprechen oder schnell Hilfe brauchen, sind wir per Telefon und WhatsApp sofort erreichbar."
+                  className="max-w-[34rem]"
+                />
+              </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-3 lg:mt-0 lg:justify-center lg:self-stretch lg:border-l lg:border-[#edf2f7] lg:pl-8">
               <a
@@ -593,14 +595,6 @@ export default function Home() {
                 className="ui-contact-fab ui-contact-fab-whatsapp"
               >
                 <WhatsAppIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
-              </a>
-
-              <a
-                href="viber://chat?number=%2B436764826069"
-                aria-label="Viber"
-                className="ui-contact-fab ui-contact-fab-viber"
-              >
-                <ViberIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
               </a>
             </div>
           </div>

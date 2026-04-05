@@ -308,14 +308,6 @@ p {
     background: #1fb959;
   }
 
-  .ui-contact-fab-viber {
-    background: #7360f2;
-  }
-
-  .ui-contact-fab-viber:hover {
-    background: #6552dc;
-  }
-
   @media (min-width: 768px) {
     .ui-contact-fab {
       height: 48px;
