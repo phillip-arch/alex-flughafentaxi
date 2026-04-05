@@ -568,42 +568,40 @@ export default function Home() {
 
       <section className="bg-white py-14 md:py-18">
         <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)] lg:items-center lg:gap-10">
-              <div className="max-w-[44rem]">
-                <SectionIntro
-                  eyebrow="Kontakt"
-                  title="Fragen zur Buchung?"
-                  description="Sie koennen Ihren Flughafentransfer bequem online buchen. Falls Sie lieber direkt sprechen oder schnell Hilfe brauchen, sind wir per Telefon, WhatsApp und Viber sofort erreichbar."
-                  className="max-w-[34rem]"
-                />
-              </div>
+          <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)] lg:items-center lg:gap-10">
+            <div className="max-w-[44rem]">
+              <SectionIntro
+                eyebrow="Kontakt"
+                title="Fragen zur Buchung?"
+                description="Sie koennen Ihren Flughafentransfer bequem online buchen. Falls Sie lieber direkt sprechen oder schnell Hilfe brauchen, sind wir per Telefon, WhatsApp und Viber sofort erreichbar."
+                className="max-w-[34rem]"
+              />
+            </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3 lg:mt-0 lg:justify-center lg:self-stretch lg:border-l lg:border-[#edf2f7] lg:pl-8">
-                <a
-                  href="tel:+436764826069"
-                  aria-label="Call"
-                  className="ui-contact-fab ui-contact-fab-phone"
-                >
-                  <Phone size={26} className="text-white md:h-[18px] md:w-[18px]" />
-                </a>
+            <div className="mt-8 flex flex-wrap items-center gap-3 lg:mt-0 lg:justify-center lg:self-stretch lg:border-l lg:border-[#edf2f7] lg:pl-8">
+              <a
+                href="tel:+436764826069"
+                aria-label="Call"
+                className="ui-contact-fab ui-contact-fab-phone"
+              >
+                <Phone size={26} className="text-white md:h-[18px] md:w-[18px]" />
+              </a>
 
-                <a
-                  href="https://wa.me/436764826069"
-                  aria-label="WhatsApp"
-                  className="ui-contact-fab ui-contact-fab-whatsapp"
-                >
-                  <WhatsAppIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
-                </a>
+              <a
+                href="https://wa.me/436764826069"
+                aria-label="WhatsApp"
+                className="ui-contact-fab ui-contact-fab-whatsapp"
+              >
+                <WhatsAppIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
+              </a>
 
-                <a
-                  href="viber://chat?number=%2B436764826069"
-                  aria-label="Viber"
-                  className="ui-contact-fab ui-contact-fab-viber"
-                >
-                  <ViberIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
-                </a>
-              </div>
+              <a
+                href="viber://chat?number=%2B436764826069"
+                aria-label="Viber"
+                className="ui-contact-fab ui-contact-fab-viber"
+              >
+                <ViberIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
+              </a>
             </div>
           </div>
         </div>
@@ -611,37 +609,35 @@ export default function Home() {
 
       <section className="bg-white py-8 md:py-10">
         <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
-              <SectionIntro
-                eyebrow="Bewertungen"
-                title="Bewertungen von Fahrgaesten."
-                description="Echte Rueckmeldungen unserer Fahrgaeste vor Ihrer Buchung."
-                className="max-w-[42rem]"
-              />
+          <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
+            <SectionIntro
+              eyebrow="Bewertungen"
+              title="Bewertungen von Fahrgaesten."
+              description="Echte Rueckmeldungen unserer Fahrgaeste vor Ihrer Buchung."
+              className="max-w-[42rem]"
+            />
 
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
-                {reviewItems.map(({ name, review }) => (
-                  <div
-                    key={name}
-                    className="rounded-[1.5rem] border border-[#e7edf5] bg-white px-5 py-5"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-[1rem] font-semibold text-[#111827]">{name}</p>
-                        <p className="mt-1 text-[0.9rem] text-[#5d6b7c]">Google Review</p>
-                      </div>
-                      <span className="rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.82rem] font-semibold text-[#1679FF]">
-                        Google
-                      </span>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {reviewItems.map(({ name, review }) => (
+                <div
+                  key={name}
+                  className="rounded-[1.5rem] border border-[#e7edf5] bg-white px-5 py-5"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[1rem] font-semibold text-[#111827]">{name}</p>
+                      <p className="mt-1 text-[0.9rem] text-[#5d6b7c]">Google Review</p>
                     </div>
-                    <p className="mt-4 text-[1rem] tracking-[0.08em] text-[#f4b400]">
-                      {'\u2605\u2605\u2605\u2605\u2605'}
-                    </p>
-                    <p className="mt-3 text-[1rem] leading-[1.65] text-[#42566f]">&quot;{review}&quot;</p>
+                    <span className="rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.82rem] font-semibold text-[#1679FF]">
+                      Google
+                    </span>
                   </div>
-                ))}
-              </div>
+                  <p className="mt-4 text-[1rem] tracking-[0.08em] text-[#f4b400]">
+                    {'\u2605\u2605\u2605\u2605\u2605'}
+                  </p>
+                  <p className="mt-3 text-[1rem] leading-[1.65] text-[#42566f]">&quot;{review}&quot;</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -739,50 +735,48 @@ export default function Home() {
 
       <section className="section-shell-tight-top bg-white">
         <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="ui-card-surface-light overflow-hidden lg:grid lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">
-              <div className="px-6 py-7 md:px-8 md:py-8">
-                <div className="ui-text-block-lg max-w-[36rem]">
-                  <SectionIntro
-                    eyebrow="Orientierung"
-                    title="Ueberblick ueber den Flughafen Wien (VIE)"
-                    description="Die wichtigsten Hinweise zu Terminals, Gates und Ihrer Ankunftszeit auf einen Blick."
-                  />
-                  <p className="ui-copy-compact text-[#6a7d96]">
-                    Der Flughafen Wien verfuegt ueber drei Eingaenge: Terminal 1 (T1), Terminal 1A
-                    (T1A) und Terminal 3 (T3). Von dort fuehren Wege zu zwei grossen
-                    Gate-Bereichen. Passagiere, die ueber Terminal 1 abfliegen, gelangen
-                    normalerweise in die Schengen-Bereiche B, C und D; Reisende ueber Terminal 3
-                    bewegen sich zu den Non-Schengen-Bereichen F und G. Bewegliche Gehwege,
-                    Rolltreppen und klare Beschilderung erleichtern die Orientierung.
-                  </p>
+          <div className="ui-card-surface-light overflow-hidden lg:grid lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">
+            <div className="px-6 py-7 md:px-8 md:py-8">
+              <div className="ui-text-block-lg max-w-[36rem]">
+                <SectionIntro
+                  eyebrow="Orientierung"
+                  title="Ueberblick ueber den Flughafen Wien (VIE)"
+                  description="Die wichtigsten Hinweise zu Terminals, Gates und Ihrer Ankunftszeit auf einen Blick."
+                />
+                <p className="ui-copy-compact text-[#6a7d96]">
+                  Der Flughafen Wien verfuegt ueber drei Eingaenge: Terminal 1 (T1), Terminal 1A
+                  (T1A) und Terminal 3 (T3). Von dort fuehren Wege zu zwei grossen
+                  Gate-Bereichen. Passagiere, die ueber Terminal 1 abfliegen, gelangen
+                  normalerweise in die Schengen-Bereiche B, C und D; Reisende ueber Terminal 3
+                  bewegen sich zu den Non-Schengen-Bereichen F und G. Bewegliche Gehwege,
+                  Rolltreppen und klare Beschilderung erleichtern die Orientierung.
+                </p>
 
-                  <div className="grid gap-4 pt-1">
-                    {airportTips.map(({ title, description }) => (
-                      <div
-                        key={title}
-                        className="rounded-[1.35rem] border border-[#e8edf3] bg-white/80 px-5 py-5"
-                      >
-                        <div className="flex flex-col gap-3">
-                          <h3 className="ui-heading-sm text-[#111827]">{title}</h3>
-                          <p className="ui-copy-compact text-[#6a7d96]">{description}</p>
-                        </div>
+                <div className="grid gap-4 pt-1">
+                  {airportTips.map(({ title, description }) => (
+                    <div
+                      key={title}
+                      className="rounded-[1.35rem] border border-[#e8edf3] bg-white/80 px-5 py-5"
+                    >
+                      <div className="flex flex-col gap-3">
+                        <h3 className="ui-heading-sm text-[#111827]">{title}</h3>
+                        <p className="ui-copy-compact text-[#6a7d96]">{description}</p>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
+            </div>
 
-              <div className="relative min-h-[260px] border-t border-[#e9edf3] lg:min-h-full lg:border-l lg:border-t-0">
-                <Image
-                  src="https://images.pexels.com/photos/358319/pexels-photo-358319.jpeg?auto=compress&cs=tinysrgb&w=1400"
-                  alt="Flughafen Wien Terminal"
-                  fill
-                  className="object-cover"
-                  sizes="(min-width: 1024px) 40vw, 100vw"
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(17,17,17,0.08)_100%)]" />
-              </div>
+            <div className="relative min-h-[260px] border-t border-[#e9edf3] lg:min-h-full lg:border-l lg:border-t-0">
+              <Image
+                src="https://images.pexels.com/photos/358319/pexels-photo-358319.jpeg?auto=compress&cs=tinysrgb&w=1400"
+                alt="Flughafen Wien Terminal"
+                fill
+                className="object-cover"
+                sizes="(min-width: 1024px) 40vw, 100vw"
+              />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(17,17,17,0.08)_100%)]" />
             </div>
           </div>
         </div>
@@ -831,29 +825,27 @@ export default function Home() {
 
       <section className="bg-white py-14 md:py-18">
         <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="ui-card-surface-light px-6 py-7 md:px-8 md:py-8">
-              <SectionIntro
-                eyebrow="Strecken"
-                title="Beliebte Strecken"
-                description="Entdecken Sie unsere detaillierten Routenbeschreibungen. Jede Seite enthaelt eine Vergleichstabelle, Tipps und FAQs."
-                className="max-w-[40rem]"
-              />
+          <div className="ui-card-surface-light px-6 py-7 md:px-8 md:py-8">
+            <SectionIntro
+              eyebrow="Strecken"
+              title="Beliebte Strecken"
+              description="Entdecken Sie unsere detaillierten Routenbeschreibungen. Jede Seite enthaelt eine Vergleichstabelle, Tipps und FAQs."
+              className="max-w-[40rem]"
+            />
 
-              <div className="mt-8 grid gap-x-10 gap-y-0 lg:grid-cols-2">
-                {popularTrips.map((trip) => (
-                  <a
-                    key={trip}
-                    href="/book"
-                    className="flex items-center justify-between gap-4 border-b border-[#e8edf3] py-3 text-[#2d3345] transition-colors hover:text-[#111827]"
-                  >
-                    <span className="text-[0.78rem] leading-[1.25] md:text-[0.82rem]">{trip}</span>
-                    <span className="flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-full bg-[#2e3445] text-white">
-                      <ChevronRight size={11} />
-                    </span>
-                  </a>
-                ))}
-              </div>
+            <div className="mt-8 grid gap-x-10 gap-y-0 lg:grid-cols-2">
+              {popularTrips.map((trip) => (
+                <a
+                  key={trip}
+                  href="/book"
+                  className="flex items-center justify-between gap-4 border-b border-[#e8edf3] py-3 text-[#2d3345] transition-colors hover:text-[#111827]"
+                >
+                  <span className="text-[0.78rem] leading-[1.25] md:text-[0.82rem]">{trip}</span>
+                  <span className="flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-full bg-[#2e3445] text-white">
+                    <ChevronRight size={11} />
+                  </span>
+                </a>
+              ))}
             </div>
           </div>
         </div>
