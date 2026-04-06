@@ -125,7 +125,7 @@ const ROUTE_MARKER_BOTTOM_OFFSET_CLASS = 'translate-y-[3px]';
 const MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'mt-[2.7875rem]';
 const DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'md:mt-[3.45rem]';
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[#7fb3ff] focus:!bg-white focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
-const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-[#f5f5f7] !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
+const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-[#f5f5f7] !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 
@@ -1464,7 +1464,7 @@ const BookingForm = ({
                 {!isHomepageForm && (
                   <div className="text-center mb-6">
                     <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Route</h2>
-                    <p className="text-[12px] text-[#6d7075]">Abholung und Ziel festlegen.</p>
+                    <p className="text-[12px] text-[#6d7075]">Abholort und Ziel eingeben</p>
                   </div>
                 )}
               <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">

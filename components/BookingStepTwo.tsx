@@ -187,7 +187,7 @@ export default function BookingStepTwo({
           <ChevronLeft size={24} />
         </button>
         <button type="button" onClick={nextStep} className={primaryActionButtonClass}>
-          Weiter
+          Preise anzeigen
         </button>
       </div>
     </div>
