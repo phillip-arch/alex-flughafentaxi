@@ -360,6 +360,8 @@ function HeroImageCard() {
             src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
             alt="Alex Flughafentaxi Wien"
             fill
+            priority
+            fetchPriority="high"
             quality={76}
             className="object-cover"
             sizes="(min-width: 1024px) 35rem, (min-width: 768px) 46vw, 92vw"

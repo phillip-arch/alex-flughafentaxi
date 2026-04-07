@@ -12,11 +12,13 @@ const APP_PHONE_ICON_URL =
 
 const inter = Inter({
   subsets: ['latin'],
+  display: 'optional',
   variable: '--font-sans',
 });
 
 const archivo = Archivo({
   subsets: ['latin'],
+  display: 'optional',
   variable: '--font-display',
 });
 
