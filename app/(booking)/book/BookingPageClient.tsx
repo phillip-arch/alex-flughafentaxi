@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import BookingForm from '@/components/BookingForm';
 import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
 import { BookingDirection, BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
@@ -33,6 +34,10 @@ export default function BookingPageClient({
 }) {
   const [direction, setDirection] = useState<BookingDirection>('to_airport');
   const isAppSurface = getAppSurface() === 'app';
+  const searchParams = useSearchParams();
+  const activeLang = searchParams.get('lang')?.toLowerCase() === 'en' ? 'en' : 'de';
+  const termsLabel = activeLang === 'en' ? 'Terms and Conditions' : 'AGB';
+  const privacyLabel = activeLang === 'en' ? 'Privacy Policy' : 'Datenschutzerklaerung';
   const initialAccountDefaults = useMemo(
     () => ({
       fullName: initialName,
@@ -80,16 +85,16 @@ export default function BookingPageClient({
               <div className="mx-auto flex w-full max-w-[1372px] flex-col gap-3 text-left">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.92rem] text-white/62">
                   <Link
-                    href="/agb?lang=de"
+                    href={`/agb?lang=${activeLang}`}
                     className="font-medium text-[#78a9ff] transition-colors hover:text-white"
                   >
-                    AGB
+                    {termsLabel}
                   </Link>
                   <Link
-                    href="/datenschutz?lang=de"
+                    href={`/datenschutz?lang=${activeLang}`}
                     className="font-medium text-[#78a9ff] transition-colors hover:text-white"
                   >
-                    Datenschutzerklaerung
+                    {privacyLabel}
                   </Link>
                   <span className="font-medium text-white/72">Flughafentaxi Alex OG</span>
                 </div>

@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ChevronRight, Clock3, Instagram, ShieldCheck, ShieldEllipsis } from 'lucide-react';
 
 function TikTokIcon({ className = '' }: { className?: string }) {
@@ -10,6 +13,9 @@ function TikTokIcon({ className = '' }: { className?: string }) {
 }
 
 export default function Footer() {
+  const searchParams = useSearchParams();
+  const activeLang = searchParams.get('lang')?.toLowerCase() === 'en' ? 'en' : 'de';
+
   return (
     <footer className="mt-auto border-t border-white/8 bg-[#000000] py-14 text-white md:py-16">
       <div className="app-container">
@@ -111,9 +117,30 @@ export default function Footer() {
               Rechtliches
             </h3>
             <ul className="mt-6 space-y-4">
-              <li className="text-[1rem] !text-white/62">Impressum</li>
-              <li className="text-[1rem] !text-white/62">Datenschutz</li>
-              <li className="text-[1rem] !text-white/62">AGB</li>
+              <li>
+                <Link
+                  href={`/impressum?lang=${activeLang}`}
+                  className="text-[1rem] !text-white/62 transition-colors hover:!text-white"
+                >
+                  Impressum
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={`/datenschutz?lang=${activeLang}`}
+                  className="text-[1rem] !text-white/62 transition-colors hover:!text-white"
+                >
+                  Datenschutz
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={`/agb?lang=${activeLang}`}
+                  className="text-[1rem] !text-white/62 transition-colors hover:!text-white"
+                >
+                  AGB
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

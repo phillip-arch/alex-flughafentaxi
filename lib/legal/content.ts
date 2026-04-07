@@ -603,7 +603,7 @@ const deContent: Record<LegalSlug, LegalPageContent> = {
 
 const enContent: Record<LegalSlug, LegalPageContent> = {
   agb: {
-    eyebrow: 'Legal',
+    eyebrow: 'Terms and Conditions',
     title: 'Terms and Conditions',
     intro:
       'The full terms and conditions will be provided here. Send the final English text later and I will replace these placeholders directly.',

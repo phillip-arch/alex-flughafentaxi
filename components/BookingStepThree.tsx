@@ -51,6 +51,8 @@ export default function BookingStepThree({
   const currentLang = searchParams.get('lang')?.toLowerCase() === 'en' ? 'en' : 'de';
   const agbHref = `/agb?lang=${currentLang}`;
   const privacyHref = `/datenschutz?lang=${currentLang}`;
+  const termsLabel = currentLang === 'en' ? 'Terms and Conditions' : 'AGB';
+  const privacyLabel = currentLang === 'en' ? 'Privacy Policy' : 'Datenschutzerklärung';
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -297,14 +299,14 @@ export default function BookingStepThree({
       <p className="mt-4 text-left text-[12px] leading-[1.5] text-[#5f6975] md:text-[13px]">
         Mit der Buchung akzeptieren Sie unsere{' '}
         <Link href={agbHref} className="font-medium !text-[#1678ff] underline underline-offset-2 hover:!text-[#0f5fcc]">
-          AGB
+          {termsLabel}
         </Link>{' '}
         und{' '}
         <Link
           href={privacyHref}
           className="font-medium !text-[#1678ff] underline underline-offset-2 hover:!text-[#0f5fcc]"
         >
-          Datenschutzerklärung
+          {privacyLabel}
         </Link>
         . Ihre Daten werden ausschließlich zur Durchführung der Fahrt verwendet.
       </p>
