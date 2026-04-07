@@ -1519,36 +1519,34 @@ const BookingForm = ({
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
-                          <div className="relative">
-                            <div className="mr-[-5px] grid grid-cols-1 gap-2 md:mr-0 md:gap-3">
-                              <StreetAutocomplete
-                                value={streetInputValue}
-                                selectedOption={selectedStreetOption}
-                                mobileDropdownFullWidth
-                                mobileSelectedStreetOnly
-                                menuItems={favoriteMenuItems}
-                                onChange={(value) => clearStreetSelection('street', value)}
-                                onSelect={(option) => applyStreetSelection('street', option)}
-                                onPasteText={(text) => handleStreetPaste('street', text)}
-                                onBlur={() => {
-                                  validateStreetNumber('street');
-                                  handleBlur({} as React.FocusEvent<HTMLInputElement>);
-                                }}
-                                placeholder="Strasse auswaehlen"
-                                className={getInputClassName('street')}
-                              />
-                            </div>
-                            {streetNumberWarning === 'street' ? (
-                              <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-                                Bitte ergaenze die Hausnummer.
-                              </div>
-                            ) : null}
-                            {streetPasteWarning === 'street' ? (
-                              <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-                                Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
-                              </div>
-                            ) : null}
+                          <div className="mr-[-5px] md:mr-0">
+                            <StreetAutocomplete
+                              value={streetInputValue}
+                              selectedOption={selectedStreetOption}
+                              mobileDropdownFullWidth
+                              mobileSelectedStreetOnly
+                              menuItems={favoriteMenuItems}
+                              onChange={(value) => clearStreetSelection('street', value)}
+                              onSelect={(option) => applyStreetSelection('street', option)}
+                              onPasteText={(text) => handleStreetPaste('street', text)}
+                              onBlur={() => {
+                                validateStreetNumber('street');
+                                handleBlur({} as React.FocusEvent<HTMLInputElement>);
+                              }}
+                              placeholder="Strasse auswaehlen"
+                              className={getInputClassName('street')}
+                            />
                           </div>
+                          {streetNumberWarning === 'street' ? (
+                            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                              Bitte ergaenze die Hausnummer.
+                            </div>
+                          ) : null}
+                          {streetPasteWarning === 'street' ? (
+                            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                              Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
+                            </div>
+                          ) : null}
                           {renderExtraStopPanel()}
                         </div>
                       ) : null}
@@ -1558,36 +1556,34 @@ const BookingForm = ({
                       <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">Ziel</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
-                          <div className="relative">
-                            <div className="mr-[-5px] grid grid-cols-1 gap-2 md:mr-0 md:gap-3">
-                              <StreetAutocomplete
-                                value={streetInputValue}
-                                selectedOption={selectedStreetOption}
-                                mobileDropdownFullWidth
-                                mobileSelectedStreetOnly
-                                menuItems={favoriteMenuItems}
-                                onChange={(value) => clearStreetSelection('street', value)}
-                                onSelect={(option) => applyStreetSelection('street', option)}
-                                onPasteText={(text) => handleStreetPaste('street', text)}
-                                onBlur={() => {
-                                  validateStreetNumber('street');
-                                  handleBlur({} as React.FocusEvent<HTMLInputElement>);
-                                }}
-                                placeholder="Strasse auswaehlen"
-                                className={getInputClassName('street')}
-                              />
-                            </div>
-                            {streetNumberWarning === 'street' ? (
-                              <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-                                Bitte ergaenze die Hausnummer.
-                              </div>
-                            ) : null}
-                            {streetPasteWarning === 'street' ? (
-                              <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-                                Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
-                              </div>
-                            ) : null}
+                          <div className="mr-[-5px] md:mr-0">
+                            <StreetAutocomplete
+                              value={streetInputValue}
+                              selectedOption={selectedStreetOption}
+                              mobileDropdownFullWidth
+                              mobileSelectedStreetOnly
+                              menuItems={favoriteMenuItems}
+                              onChange={(value) => clearStreetSelection('street', value)}
+                              onSelect={(option) => applyStreetSelection('street', option)}
+                              onPasteText={(text) => handleStreetPaste('street', text)}
+                              onBlur={() => {
+                                validateStreetNumber('street');
+                                handleBlur({} as React.FocusEvent<HTMLInputElement>);
+                              }}
+                              placeholder="Strasse auswaehlen"
+                              className={getInputClassName('street')}
+                            />
                           </div>
+                          {streetNumberWarning === 'street' ? (
+                            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                              Bitte ergaenze die Hausnummer.
+                            </div>
+                          ) : null}
+                          {streetPasteWarning === 'street' ? (
+                            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                              Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
+                            </div>
+                          ) : null}
                           {renderExtraStopPanel()}
                         </div>
                       ) : (
