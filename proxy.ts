@@ -20,7 +20,7 @@ function createNonce() {
 
 function buildContentSecurityPolicy(nonce: string) {
   const isDev = process.env.NODE_ENV !== 'production';
-  const scriptSrc = ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'"];
+  const scriptSrc = ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'", "'unsafe-inline'", 'https:', 'http:'];
 
   if (isDev) {
     scriptSrc.push("'unsafe-eval'");
