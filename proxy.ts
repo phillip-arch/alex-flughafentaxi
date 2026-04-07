@@ -58,6 +58,7 @@ export async function proxy(request: NextRequest) {
 
   const applyRouteHeaders = (nextResponse: NextResponse) => {
     nextResponse.headers.set('Content-Security-Policy', contentSecurityPolicy);
+    nextResponse.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
     nextResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     nextResponse.headers.set('X-Content-Type-Options', 'nosniff');
     nextResponse.headers.set('X-Frame-Options', 'SAMEORIGIN');
