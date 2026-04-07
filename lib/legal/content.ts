@@ -43,8 +43,8 @@ export type LegalPageContent = {
 
 const deContent: Record<LegalSlug, LegalPageContent> = {
   agb: {
-    eyebrow: 'Rechtliches',
-    title: 'Allgemeine Geschaeftsbedingungen (AGB)',
+    eyebrow: 'Allgemeine Geschaeftsbedingungen',
+    title: 'AGB',
     sections: [
       {
         title: 'Alex Flughafentaxi OG',
