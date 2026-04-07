@@ -15,6 +15,14 @@ function TikTokIcon({ className = '' }: { className?: string }) {
 export default function Footer() {
   const searchParams = useSearchParams();
   const activeLang = searchParams.get('lang')?.toLowerCase() === 'en' ? 'en' : 'de';
+  const withLang = (href: string) => {
+    const [pathWithSearch, hash = ''] = href.split('#');
+    const [path, existingSearch = ''] = pathWithSearch.split('?');
+    const params = new URLSearchParams(existingSearch);
+    params.set('lang', activeLang);
+    const nextSearch = params.toString();
+    return `${path}${nextSearch ? `?${nextSearch}` : ''}${hash ? `#${hash}` : ''}`;
+  };
 
   return (
     <footer className="mt-auto border-t border-white/8 bg-[#000000] py-14 text-white md:py-16">
@@ -37,14 +45,14 @@ export default function Footer() {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/book"
+                href={withLang('/book')}
                 className="inline-flex items-center justify-center gap-3 rounded-[1.35rem] bg-white px-6 py-4 text-[1.05rem] font-semibold tracking-[-0.02em] text-[#111111] transition-transform hover:-translate-y-[1px]"
               >
                 <span>Jetzt Fahrt sichern</span>
                 <ChevronRight size={19} />
               </Link>
               <Link
-                href="/preise"
+                href={withLang('/preise')}
                 className="inline-flex items-center justify-center rounded-[1.35rem] border border-white/10 bg-white/[0.04] px-6 py-4 text-[1.05rem] font-semibold tracking-[-0.02em] text-white/92 transition-colors hover:bg-white/[0.08]"
               >
                 Preise ansehen
@@ -90,22 +98,22 @@ export default function Footer() {
             </h3>
             <ul className="mt-6 space-y-4">
               <li>
-                <Link href="/preise" className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
+                <Link href={withLang('/preise')} className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
                   Preise
                 </Link>
               </li>
               <li>
-                <Link href="/#gebiete" className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
+                <Link href={withLang('/#gebiete')} className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
                   Gebiete
                 </Link>
               </li>
               <li>
-                <Link href="/#flotte" className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
+                <Link href={withLang('/#flotte')} className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
                   Flotte
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
+                <Link href={withLang('/faq')} className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
                   FAQ
                 </Link>
               </li>
@@ -127,7 +135,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href={`/datenschutz?lang=${activeLang}`}
+                  href={withLang('/datenschutz')}
                   className="text-[1rem] !text-white/62 transition-colors hover:!text-white"
                 >
                   Datenschutz
@@ -135,7 +143,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href={`/agb?lang=${activeLang}`}
+                  href={withLang('/agb')}
                   className="text-[1rem] !text-white/62 transition-colors hover:!text-white"
                 >
                   AGB

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronDown, Globe, Menu, User, X } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 type LanguageOption = {
   code: string;
@@ -40,10 +40,9 @@ export default function NavbarClient({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktopLangMenuOpen, setIsDesktopLangMenuOpen] = useState(false);
   const [isMobileLangMenuOpen, setIsMobileLangMenuOpen] = useState(false);
-  const [activeLang, setActiveLang] = useState('de');
-  const [urlSearch, setUrlSearch] = useState('');
-  const [urlHash, setUrlHash] = useState('');
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeLang = searchParams.get('lang')?.toLowerCase() === 'en' ? 'en' : 'de';
   const isHomePage = pathname === '/';
 
   useEffect(() => {
@@ -60,14 +59,6 @@ export default function NavbarClient({
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    setActiveLang(params.get('lang')?.toLowerCase() || 'de');
-    setUrlSearch(window.location.search);
-    setUrlHash(window.location.hash);
   }, []);
 
   useEffect(() => {
@@ -113,11 +104,20 @@ export default function NavbarClient({
 
   const navItemClass = 'text-sm font-medium text-white/72 transition-colors hover:text-white';
 
+  const withLang = (href: string) => {
+    const [pathWithSearch, hash = ''] = href.split('#');
+    const [path, existingSearch = ''] = pathWithSearch.split('?');
+    const params = new URLSearchParams(existingSearch);
+    params.set('lang', activeLang);
+    const nextSearch = params.toString();
+    return `${path}${nextSearch ? `?${nextSearch}` : ''}${hash ? `#${hash}` : ''}`;
+  };
+
   const buildLangHref = (lang: string) => {
-    const params = new URLSearchParams(urlSearch);
+    const params = new URLSearchParams(searchParams.toString());
     params.set('lang', lang);
     const nextSearch = params.toString();
-    return `${pathname}${nextSearch ? `?${nextSearch}` : ''}${urlHash}`;
+    return `${pathname}${nextSearch ? `?${nextSearch}` : ''}`;
   };
 
   const toggleMobileMenu = () => {
@@ -139,7 +139,6 @@ export default function NavbarClient({
   };
 
   const handleLanguageSelect = (languageCode: string) => {
-    setActiveLang(languageCode);
     setIsDesktopLangMenuOpen(false);
     setIsMobileLangMenuOpen(false);
     setIsMobileMenuOpen(false);
@@ -162,7 +161,7 @@ export default function NavbarClient({
     <>
       <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
         <div className="app-container flex h-[66px] items-center justify-between lg:h-[72px]">
-        <Link href="/" className="flex items-center">
+        <Link href={withLang('/')} className="flex items-center">
           <span className="relative block h-11 w-[120px] overflow-hidden lg:h-12 lg:w-[220px]">
             <Image
               src="https://web-site.website/images/aflogo.jpg"
@@ -176,7 +175,7 @@ export default function NavbarClient({
 
         <nav className="hidden items-center gap-8 lg:flex">
           {navItems.map((item) => (
-            <Link key={item.name} href={item.href} className={navItemClass}>
+            <Link key={item.name} href={withLang(item.href)} className={navItemClass}>
               {item.name}
             </Link>
           ))}
@@ -212,7 +211,7 @@ export default function NavbarClient({
           </div>
 
           {showAccountEntry ? (
-            <Link href={accountHref} className="ui-icon-button-accent -translate-y-px" aria-label="Zum Konto">
+            <Link href={withLang(accountHref)} className="ui-icon-button-accent -translate-y-px" aria-label="Zum Konto">
               <User size={18} strokeWidth={2.1} className="text-[#111111]" />
             </Link>
           ) : null}
@@ -237,7 +236,7 @@ export default function NavbarClient({
           </div>
 
           {showAccountEntry ? (
-            <Link href={accountHref} className="ui-icon-button-accent" aria-label="Zum Konto">
+            <Link href={withLang(accountHref)} className="ui-icon-button-accent" aria-label="Zum Konto">
               <User size={18} strokeWidth={2.1} className="text-[#111111]" />
             </Link>
           ) : null}
@@ -258,7 +257,7 @@ export default function NavbarClient({
       {isMobileMenuOpen ? (
         <div className="fixed inset-0 z-[80] bg-white text-[#111111] lg:hidden">
           <div className="app-container flex h-[66px] items-center justify-between bg-[#000000] text-white">
-            <Link href="/" className="flex items-center" onClick={closeMobileMenu}>
+            <Link href={withLang('/')} className="flex items-center" onClick={closeMobileMenu}>
               <span className="relative block h-11 w-[120px] overflow-hidden">
                 <Image
                   src="https://web-site.website/images/aflogo.jpg"
@@ -290,7 +289,7 @@ export default function NavbarClient({
 
               {showAccountEntry ? (
                 <Link
-                  href={accountHref}
+                  href={withLang(accountHref)}
                   onClick={closeMobileMenu}
                   className="ui-icon-button-accent"
                   aria-label="Zum Konto"
@@ -317,7 +316,7 @@ export default function NavbarClient({
               {navItems.map((item) => (
                 <Link
                   key={item.name}
-                  href={item.href}
+                  href={withLang(item.href)}
                   onClick={closeMobileMenu}
                   className="text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111]"
                 >
