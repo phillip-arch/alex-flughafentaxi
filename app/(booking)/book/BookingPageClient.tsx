@@ -1,5 +1,6 @@
 ﻿'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import BookingForm from '@/components/BookingForm';
 import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
@@ -46,11 +47,14 @@ export default function BookingPageClient({
       {!isAppSurface ? <NavbarClient /> : null}
       <section className="bg-white">
         <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-28 md:pt-28'}`}>
-          <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10">
+          <div className="grid items-start gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:gap-10">
             <section className="order-1 self-start lg:sticky lg:top-24">
-              <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
+              <div className="w-full max-w-[42rem] ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
                 <BookingForm
                   onDirectionChange={setDirection}
+                  headerTitle={!isAppSurface ? 'In wenigen Schritten buchen' : undefined}
+                  showStepOneRouteIntro={isAppSurface}
+                  showTrustPills={!isAppSurface}
                   initialFavorites={initialFavorites}
                   initialIsLoggedIn={initialIsLoggedIn}
                   initialAccountDefaults={initialAccountDefaults}
@@ -66,13 +70,31 @@ export default function BookingPageClient({
       </section>
 
       <section className="bg-white">
-        <div className="app-container pb-32 md:pb-28">
+        <div className={`app-container ${isAppSurface ? 'pb-32 md:pb-28' : 'pb-0'}`}>
           <section className="mx-auto mt-6 max-w-[57.5rem] lg:hidden">
             <BookingInfoPanel direction={direction} />
           </section>
 
           {!isAppSurface ? (
-            null
+            <section className="relative left-1/2 mt-10 w-screen -translate-x-1/2 border-t border-white/8 bg-[#111111] px-5 py-5 text-white md:mt-12 md:px-8 md:py-6">
+              <div className="mx-auto flex w-full max-w-[1372px] flex-col gap-3 text-left">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.92rem] text-white/62">
+                  <span className="font-medium text-white/72">Flughafentaxi Alex OG</span>
+                  <Link
+                    href="/agb?lang=de"
+                    className="font-medium text-[#78a9ff] transition-colors hover:text-white"
+                  >
+                    AGB
+                  </Link>
+                  <Link
+                    href="/datenschutz?lang=de"
+                    className="font-medium text-[#78a9ff] transition-colors hover:text-white"
+                  >
+                    Datenschutzerklaerung
+                  </Link>
+                </div>
+              </div>
+            </section>
           ) : null}
         </div>
       </section>

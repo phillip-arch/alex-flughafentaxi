@@ -92,6 +92,9 @@ type BookingFormProps = {
   onDirectionChange?: (direction: Direction) => void;
   showStepIndicator?: boolean;
   showInfoTrigger?: boolean;
+  headerTitle?: string;
+  showStepOneRouteIntro?: boolean;
+  showTrustPills?: boolean;
   isAppSurface?: boolean;
   initialFavorites?: FavoriteAddress[];
   initialIsLoggedIn?: boolean;
@@ -118,6 +121,11 @@ const EMPTY_ACCOUNT_DEFAULTS = {
   phone: '',
   email: '',
 };
+const BOOKING_FORM_TRUST_ITEMS = [
+  'Fixpreis garantiert',
+  'Puenktliche Abholung',
+  'Zuverlaessiger Service',
+] as const;
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
 const ROUTE_MARKER_TOP_OFFSET_CLASS = '-translate-y-1';
@@ -133,6 +141,9 @@ const BookingForm = ({
   onDirectionChange,
   showStepIndicator = true,
   showInfoTrigger = false,
+  headerTitle,
+  showStepOneRouteIntro,
+  showTrustPills = false,
   isAppSurface: isAppSurfaceProp,
   initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
@@ -142,6 +153,7 @@ const BookingForm = ({
   const pathname = usePathname();
   const isHomepageForm = pathname === '/';
   const isAppSurface = isAppSurfaceProp ?? getAppSurface() === 'app';
+  const shouldShowStepOneRouteIntro = showStepOneRouteIntro ?? !isHomepageForm;
   const allowExtendedDropdownSpace = !isHomepageForm;
   const supabase = supabaseBrowser();
   const [currentStep, setCurrentStep] = useState(1);
@@ -1419,16 +1431,14 @@ const BookingForm = ({
     'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
 
   const StepIndicator = () => (
-    <div className="mt-2 mb-8 flex justify-center md:mt-0 md:mb-10 md:justify-end md:pr-1">
-      <button
-        type="button"
-        onClick={() => handleStepIndicatorClick(currentStep)}
-        className="inline-flex shrink-0 items-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[0.8rem] py-[0.42rem] text-[10.25px] text-[#1679ff] transition-all md:px-3.5 md:py-2 md:text-[0.84rem]"
-        aria-current="step"
-      >
-        <span className="font-semibold tracking-[-0.02em]">{`Schritt ${currentStep} von 3`}</span>
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={() => handleStepIndicatorClick(currentStep)}
+      className="inline-flex shrink-0 items-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[0.8rem] py-[0.42rem] text-[10.25px] text-[#1679ff] transition-all md:px-3.5 md:py-2 md:text-[0.84rem]"
+      aria-current="step"
+    >
+      <span className="font-semibold tracking-[-0.02em]">{`Schritt ${currentStep} von 3`}</span>
+    </button>
   );
 
   const shouldShowInfoTrigger = showStepIndicator || showInfoTrigger || (isAppSurface && hasMounted);
@@ -1457,11 +1467,22 @@ const BookingForm = ({
         }`}
       >
         <form onSubmit={handleSubmit}>
-          {showStepIndicator ? <StepIndicator /> : null}
+          {headerTitle ? (
+            <div className="mb-[10px] flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]">
+              <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
+                {headerTitle}
+              </p>
+              {showStepIndicator ? <StepIndicator /> : null}
+            </div>
+          ) : showStepIndicator ? (
+            <div className="mb-8 mt-2 flex justify-center md:mb-10 md:mt-0 md:justify-end md:pr-1">
+              <StepIndicator />
+            </div>
+          ) : null}
           {/* STEP 1: LOCATION */}
             {currentStep === 1 && (
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                {!isHomepageForm && (
+                {shouldShowStepOneRouteIntro && (
                   <div className="text-center mb-6">
                     <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Route</h2>
                     <p className="text-[12px] text-[#6d7075]">Abholort und Ziel eingeben</p>
@@ -1678,6 +1699,21 @@ const BookingForm = ({
           )}
         </form>
       </div>
+      {showTrustPills && currentStep === 1 ? (
+        <div className="mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-[10px] md:gap-[14px] lg:relative lg:top-5 lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center">
+          {BOOKING_FORM_TRUST_ITEMS.map((item) => (
+            <div
+              key={item}
+              className="inline-flex items-center gap-1 rounded-full border border-[#e6edf7] bg-[#f4f8ff] px-2.5 py-1.5 text-[11px] text-[#111827] shadow-[0_10px_24px_rgba(17,17,17,0.045)] md:gap-1.5 md:px-3 md:py-2 md:text-[12px]"
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#111827] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                <Check size={12} strokeWidth={2.8} />
+              </span>
+              <span className="text-[11px] font-semibold tracking-[-0.03em] md:text-[12px]">{item}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
       {isInfoPanelOpen ? (
         <div className="fixed inset-0 z-[140] bg-white/96 text-[#111827] backdrop-blur-sm md:bg-transparent md:backdrop-blur-0">
           <div className="flex h-[100dvh] md:min-h-full md:justify-end md:p-0">

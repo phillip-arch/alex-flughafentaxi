@@ -8,6 +8,7 @@ export default function FooterGate({ surface }: { surface: 'www' | 'app' | 'disp
   if (
     surface !== 'www' ||
     pathname?.startsWith('/dispatch') ||
+    pathname === '/book' ||
     pathname === '/login' ||
     pathname === '/forgot-password' ||
     pathname === '/update-password' ||
