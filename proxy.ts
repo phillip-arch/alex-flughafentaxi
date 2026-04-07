@@ -7,9 +7,20 @@ import {
   isDispatchPath,
 } from '@/lib/routing/surfaces';
 
-function buildContentSecurityPolicy() {
+function createNonce() {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  let binary = '';
+
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+
+  return btoa(binary);
+}
+
+function buildContentSecurityPolicy(nonce: string) {
   const isDev = process.env.NODE_ENV !== 'production';
-  const scriptSrc = ["'self'", "'unsafe-inline'"];
+  const scriptSrc = ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'"];
 
   if (isDev) {
     scriptSrc.push("'unsafe-eval'");
@@ -39,7 +50,11 @@ export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const surface = getAppSurface();
   const pathnameWithSearch = `${path}${request.nextUrl.search}`;
-  const contentSecurityPolicy = buildContentSecurityPolicy();
+  const nonce = createNonce();
+  const contentSecurityPolicy = buildContentSecurityPolicy(nonce);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', contentSecurityPolicy);
 
   const applyRouteHeaders = (nextResponse: NextResponse) => {
     nextResponse.headers.set('Content-Security-Policy', contentSecurityPolicy);
@@ -112,7 +127,7 @@ export async function proxy(request: NextRequest) {
 
   let response = applyRouteHeaders(NextResponse.next({
     request: {
-      headers: request.headers,
+      headers: requestHeaders,
     },
   }));
 
@@ -130,7 +145,7 @@ export async function proxy(request: NextRequest) {
           });
           response = applyRouteHeaders(NextResponse.next({
             request: {
-              headers: request.headers,
+              headers: requestHeaders,
             },
           }));
 
@@ -187,6 +202,12 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)',
+    {
+      source: '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
   ],
 };

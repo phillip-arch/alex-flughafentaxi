@@ -1,5 +1,6 @@
 import { Archivo, Inter } from 'next/font/google';
 import { Metadata } from 'next';
+import { connection } from 'next/server';
 import FooterGate from '@/components/FooterGate';
 import GlobalChromeClient from '@/components/GlobalChromeClient';
 import PwaInstallEvents from '@/components/pwa/PwaInstallEvents';
@@ -52,11 +53,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await connection();
   const surface = getAppSurface();
 
   return (
