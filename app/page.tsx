@@ -372,12 +372,12 @@ function HeroImageCard() {
         <div className="grid grid-cols-1 border-t border-[#e8eef7] md:grid-cols-2">
           <div className="px-4 py-4 md:px-5">
             <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Wien</p>
-            <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">Schnell buchen, klarer Preis.</p>
+            <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">Schnell buchen. Fixpreis garantiert.</p>
           </div>
           <div className="border-t border-[#e8eef7] px-4 py-4 md:border-l md:border-t-0 md:px-5">
             <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Flughafen</p>
             <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">
-              Fokus auf Transfer statt allgemeiner Taxi-Seite.
+              Puenktliche Abholung am Flughafen Wien (VIE).
             </p>
           </div>
         </div>
