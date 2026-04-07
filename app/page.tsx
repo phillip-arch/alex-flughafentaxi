@@ -183,11 +183,11 @@ const heroHeadlineClass =
 const heroGridClass = 'grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
 const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
 const heroBookingCardClass =
-  'relative flex flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
+  'relative flex min-h-[31.5rem] flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] md:min-h-0 md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
 const heroBookingHeaderClass =
-  'mb-[10px] flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
+  'mb-[10px] flex min-h-[4.65rem] flex-col items-center gap-3 text-center sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
 const heroTrustPillsClass =
-  'mx-auto mt-4 flex max-w-[340px] flex-wrap items-center justify-center gap-[10px] md:gap-[14px] lg:relative lg:top-5 lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center';
+  'mx-auto mt-4 flex min-h-[5.75rem] max-w-[340px] flex-wrap items-center justify-center gap-[10px] md:min-h-0 md:gap-[14px] lg:relative lg:top-5 lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center';
 const heroTrustPillTextClass = 'text-[11px] font-semibold tracking-[-0.03em] md:text-[12px]';
 
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
@@ -342,7 +342,7 @@ function HeroBookingCard() {
           </span>
         </div>
 
-        <div className="lg:flex-1">
+        <div className="min-h-[18.75rem] lg:flex-1 lg:min-h-0">
           <BookingForm showStepIndicator={false} />
         </div>
         <HeroTrustPills />
@@ -395,7 +395,7 @@ export default function Home() {
         <div className={heroSectionPaddingClass}>
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
-              <h1 className="mx-auto max-w-[22rem] text-center text-[12px] font-medium tracking-[-0.03em] !text-[#64748b] md:max-w-none md:text-[1.08rem] md:leading-[1.2]">
+              <h1 className="mx-auto min-h-[1.15rem] max-w-[22rem] text-center text-[12px] font-medium leading-[1.2] tracking-[-0.03em] !text-[#64748b] md:min-h-0 md:max-w-none md:text-[1.08rem]">
                 Flughafentaxi Wien, Ihr professioneller Flughafen Taxi Service
               </h1>
 
