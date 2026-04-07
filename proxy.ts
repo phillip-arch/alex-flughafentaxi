@@ -40,6 +40,8 @@ function buildContentSecurityPolicy(nonce: string) {
     "frame-ancestors 'self'",
     "manifest-src 'self'",
     "media-src 'self' data: blob:",
+    "trusted-types nextjs nextjs#bundler",
+    "require-trusted-types-for 'script'",
     isDev ? '' : 'upgrade-insecure-requests',
   ]
     .filter(Boolean)
