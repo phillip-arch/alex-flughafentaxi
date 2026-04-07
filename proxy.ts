@@ -7,11 +7,46 @@ import {
   isDispatchPath,
 } from '@/lib/routing/surfaces';
 
+function buildContentSecurityPolicy() {
+  const isDev = process.env.NODE_ENV !== 'production';
+  const scriptSrc = ["'self'", "'unsafe-inline'"];
+
+  if (isDev) {
+    scriptSrc.push("'unsafe-eval'");
+  }
+
+  return [
+    "default-src 'self'",
+    `script-src ${scriptSrc.join(' ')}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://web-site.website https://images.pexels.com https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com",
+    "font-src 'self' data:",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://prod.api.market https://www.google-analytics.com https://region1.google-analytics.com",
+    "frame-src 'self' https://www.google.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'self'",
+    "manifest-src 'self'",
+    "media-src 'self' data: blob:",
+    isDev ? '' : 'upgrade-insecure-requests',
+  ]
+    .filter(Boolean)
+    .join('; ');
+}
+
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const surface = getAppSurface();
   const pathnameWithSearch = `${path}${request.nextUrl.search}`;
+  const contentSecurityPolicy = buildContentSecurityPolicy();
+
   const applyRouteHeaders = (nextResponse: NextResponse) => {
+    nextResponse.headers.set('Content-Security-Policy', contentSecurityPolicy);
+    nextResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    nextResponse.headers.set('X-Content-Type-Options', 'nosniff');
+    nextResponse.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    nextResponse.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     if (path.startsWith('/dispatch') || surface === 'dispatch') {
       nextResponse.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
     }
