@@ -79,7 +79,6 @@ export default function BookingPageClient({
             <section className="relative left-1/2 mt-10 w-screen -translate-x-1/2 border-t border-white/8 bg-[#111111] px-5 py-5 text-white md:mt-12 md:px-8 md:py-6">
               <div className="mx-auto flex w-full max-w-[1372px] flex-col gap-3 text-left">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.92rem] text-white/62">
-                  <span className="font-medium text-white/72">Flughafentaxi Alex OG</span>
                   <Link
                     href="/agb?lang=de"
                     className="font-medium text-[#78a9ff] transition-colors hover:text-white"
@@ -92,6 +91,7 @@ export default function BookingPageClient({
                   >
                     Datenschutzerklaerung
                   </Link>
+                  <span className="font-medium text-white/72">Flughafentaxi Alex OG</span>
                 </div>
               </div>
             </section>
