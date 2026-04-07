@@ -16,8 +16,11 @@ type VehicleCategoryCardProps = {
 
 const mobileVehicleCards = new Map<string, HTMLElement>();
 const mobileVehicleSubscribers = new Map<string, (isActive: boolean) => void>();
-let mobileVehicleAnimationFrame: number | null = null;
+const mobileVehicleEntries = new Map<string, IntersectionObserverEntry>();
 let mobileVehicleListenerCount = 0;
+let mobileVehicleObserver: IntersectionObserver | null = null;
+let mobileVehicleMediaQuery: MediaQueryList | null = null;
+let mobileVehicleMediaQueryCleanup: (() => void) | null = null;
 
 function syncActiveMobileVehicleCard() {
   if (typeof window === 'undefined') return;
@@ -28,20 +31,15 @@ function syncActiveMobileVehicleCard() {
     return;
   }
 
-  const viewportCenterY = window.innerHeight * 0.5;
   let activeId: string | null = null;
-  let bestDistance = Number.POSITIVE_INFINITY;
+  let bestRatio = 0;
 
-  mobileVehicleCards.forEach((card, id) => {
-    const rect = card.getBoundingClientRect();
-    const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
-    if (!isVisible) return;
-
-    const cardCenterY = rect.top + rect.height / 2;
-    const distance = Math.abs(cardCenterY - viewportCenterY);
-
-    if (distance < bestDistance) {
-      bestDistance = distance;
+  mobileVehicleEntries.forEach((entry, id) => {
+    if (!entry.isIntersecting) return;
+    if (entry.intersectionRatio > bestRatio) {
+      bestRatio = entry.intersectionRatio;
+      activeId = id;
+    } else if (entry.intersectionRatio === bestRatio && activeId === null) {
       activeId = id;
     }
   });
@@ -51,21 +49,44 @@ function syncActiveMobileVehicleCard() {
   });
 }
 
-function scheduleMobileVehicleSync() {
-  if (typeof window === 'undefined') return;
-  if (mobileVehicleAnimationFrame !== null) return;
+function ensureMobileVehicleObserver() {
+  if (typeof window === 'undefined') return null;
+  if (mobileVehicleObserver) return mobileVehicleObserver;
 
-  mobileVehicleAnimationFrame = window.requestAnimationFrame(() => {
-    mobileVehicleAnimationFrame = null;
-    syncActiveMobileVehicleCard();
-  });
+  mobileVehicleObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const id = (entry.target as HTMLElement).dataset.mobileVehicleId;
+        if (!id) return;
+        mobileVehicleEntries.set(id, entry);
+      });
+      syncActiveMobileVehicleCard();
+    },
+    {
+      threshold: [0, 0.2, 0.35, 0.5, 0.65, 0.8, 1],
+      rootMargin: '-18% 0px -18% 0px',
+    },
+  );
+
+  return mobileVehicleObserver;
 }
 
 function attachMobileVehicleListeners() {
   if (typeof window === 'undefined') return;
   if (mobileVehicleListenerCount === 0) {
-    window.addEventListener('scroll', scheduleMobileVehicleSync, { passive: true });
-    window.addEventListener('resize', scheduleMobileVehicleSync);
+    mobileVehicleMediaQuery = window.matchMedia('(max-width: 767px)');
+    const handleMediaChange = () => {
+      syncActiveMobileVehicleCard();
+    };
+
+    if (typeof mobileVehicleMediaQuery.addEventListener === 'function') {
+      mobileVehicleMediaQuery.addEventListener('change', handleMediaChange);
+      mobileVehicleMediaQueryCleanup = () =>
+        mobileVehicleMediaQuery?.removeEventListener('change', handleMediaChange);
+    } else {
+      mobileVehicleMediaQuery.addListener(handleMediaChange);
+      mobileVehicleMediaQueryCleanup = () => mobileVehicleMediaQuery?.removeListener(handleMediaChange);
+    }
   }
 
   mobileVehicleListenerCount += 1;
@@ -76,12 +97,12 @@ function detachMobileVehicleListeners() {
 
   mobileVehicleListenerCount = Math.max(0, mobileVehicleListenerCount - 1);
   if (mobileVehicleListenerCount === 0) {
-    window.removeEventListener('scroll', scheduleMobileVehicleSync);
-    window.removeEventListener('resize', scheduleMobileVehicleSync);
-    if (mobileVehicleAnimationFrame !== null) {
-      window.cancelAnimationFrame(mobileVehicleAnimationFrame);
-      mobileVehicleAnimationFrame = null;
-    }
+    mobileVehicleMediaQueryCleanup?.();
+    mobileVehicleMediaQueryCleanup = null;
+    mobileVehicleMediaQuery = null;
+    mobileVehicleObserver?.disconnect();
+    mobileVehicleObserver = null;
+    mobileVehicleEntries.clear();
   }
 }
 
@@ -106,12 +127,17 @@ export default function VehicleCategoryCard({
     const card = cardRef.current;
     if (!card || typeof window === 'undefined') return;
 
+    card.dataset.mobileVehicleId = cardId;
     mobileVehicleCards.set(cardId, card);
     mobileVehicleSubscribers.set(cardId, setMobileInView);
     attachMobileVehicleListeners();
-    scheduleMobileVehicleSync();
+    ensureMobileVehicleObserver()?.observe(card);
+    syncActiveMobileVehicleCard();
 
     return () => {
+      mobileVehicleObserver?.unobserve(card);
+      mobileVehicleEntries.delete(cardId);
+      delete card.dataset.mobileVehicleId;
       mobileVehicleCards.delete(cardId);
       mobileVehicleSubscribers.delete(cardId);
       detachMobileVehicleListeners();
