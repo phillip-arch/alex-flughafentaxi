@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DistrictPriceTable from '@/components/DistrictPriceTable';
 import { districtPricingRows } from '@/lib/pricing/districtPricing';
 import type { ViennaDistrictMapGeometry } from '@/lib/maps/viennaDistricts';
@@ -16,11 +16,54 @@ type TestMapClientProps = {
 
 export default function TestMapClient({ mapGeometry }: TestMapClientProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [isMobileMapExpanded, setIsMobileMapExpanded] = useState(false);
+  const layoutRef = useRef<HTMLDivElement | null>(null);
+  const mapSectionRef = useRef<HTMLElement | null>(null);
   const mapAspectRatio = `${SVG_WIDTH} / ${mapGeometry.svgHeight}`;
 
+  useEffect(() => {
+    const updateExpandedState = () => {
+      if (window.innerWidth >= 640) {
+        setIsMobileMapExpanded(false);
+        return;
+      }
+
+      const layoutElement = layoutRef.current;
+      const mapElement = mapSectionRef.current;
+
+      if (!layoutElement || !mapElement) {
+        setIsMobileMapExpanded(false);
+        return;
+      }
+
+      const stickyTop = 12;
+      const layoutRect = layoutElement.getBoundingClientRect();
+      const mapHeight = mapElement.getBoundingClientRect().height;
+      const shouldExpand = layoutRect.top <= stickyTop && layoutRect.bottom > mapHeight + stickyTop;
+
+      setIsMobileMapExpanded(shouldExpand);
+    };
+
+    updateExpandedState();
+    window.addEventListener('scroll', updateExpandedState, { passive: true });
+    window.addEventListener('resize', updateExpandedState);
+
+    return () => {
+      window.removeEventListener('scroll', updateExpandedState);
+      window.removeEventListener('resize', updateExpandedState);
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col items-start gap-8 lg:flex-row">
-      <section className="sticky top-3 z-10 ml-[calc(50%-50vw)] w-screen max-w-none overflow-hidden border-y border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] sm:ml-0 sm:w-full sm:max-w-full sm:rounded-[1.5rem] sm:border sm:top-3 lg:top-5 lg:w-[54.7%]">
+    <div ref={layoutRef} className="flex flex-col items-start gap-8 lg:flex-row">
+      <section
+        ref={mapSectionRef}
+        className={`sticky top-3 z-10 overflow-hidden rounded-[1.5rem] border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-[width,margin] duration-200 lg:top-5 lg:w-[54.7%] ${
+          isMobileMapExpanded
+            ? 'ml-[calc(50%-50vw+8px)] w-[calc(100vw-16px)] max-w-none'
+            : 'w-full'
+        }`}
+      >
         <div
           className="relative w-full overflow-hidden bg-[#f8fafc] md:min-h-[26rem]"
           style={{ aspectRatio: mapAspectRatio }}
