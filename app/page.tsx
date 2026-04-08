@@ -268,12 +268,17 @@ const localizedHomeMediaContent: Record<
       eyebrow: string;
       title: string;
       description: string;
+      lead: string;
+      detailTitle: string;
       options: Array<{
         key: 'babySeat' | 'childSeat' | 'boosterSeat';
         title: string;
+        specs: string;
         description: string;
         imageAlt: string;
       }>;
+      disclaimerTitle: string;
+      disclaimer: string;
     };
   }
 > = {
@@ -285,35 +290,44 @@ const localizedHomeMediaContent: Record<
     },
     childSeatSection: {
       eyebrow: 'Kindersitze',
-      title: 'Sicherheit & Komfort: Unsere Kindersitz-Optionen',
+      title: 'Sicher reisen mit Alex Flughafentaxi Wien',
       description:
-        'Alex Flughafentaxi Wien bietet kostenlose, zertifizierte Kindersitze fuer alle Transfers vom und zum Flughafen an. Da Sicherheit bei unserem Flughafentaxi an erster Stelle steht, helfen wir dir hier, den richtigen Sitz fuer deine Reise zu waehlen.',
+        'Wenn Sie ein Flughafentaxi Wien fuer Ihre Familie suchen, hat Sicherheit oberste Prioritaet. Alex Flughafentaxi bietet daher ausschliesslich zertifizierte und regelmaessig gepruefte Rueckhaltesysteme an, um Ihnen eine entspannte Fahrt zum Fixpreis zu ermoeglichen.',
+      lead:
+        'Vertrauen Sie auf Alex Flughafentaxi - wir bringen Ihre gesamte Familie sicher, puenktlich und komfortabel ans Ziel.',
+      detailTitle: 'Detaillierte Spezifikationen unserer Sitze:',
       options: [
         {
           key: 'babySeat',
           title: 'Babyschale',
+          specs: '0-13 kg - Fuer Neugeborene & Saeuglinge.',
           description:
-            'Ideal fuer Neugeborene und Saeuglinge. Gruppe 0+, fuer Babys von 0 bis 13 kg (ca. 0-15 Monate). Immer rueckwaertsgerichtet montiert, um den empfindlichen Nacken optimal zu schuetzen. Wir verwenden nur hochwertige, gepolsterte Schalen, damit dein Baby in unserem Flughafentaxi Wien sicher aufgehoben ist.',
+            'Gruppe 0+: Diese Sitze sind fuer Neugeborene ab dem ersten Tag konzipiert. Die Montage erfolgt grundsaetzlich rueckwaertsgerichtet, um den empfindlichen Nackenbereich bei Bremsmanoevern optimal zu schuetzen. Ein Muss fuer den ersten sicheren Transfer in unserem Flughafentaxi.',
           imageAlt:
             'Kostenlose Babyschale im Alex Flughafentaxi Wien fuer den sicheren Baby-Transfer.',
         },
         {
           key: 'childSeat',
           title: 'Kindersitz',
+          specs: '9-18 kg - Sicherer Halt fuer Kleinkinder.',
           description:
-            'Ideal fuer Kleinkinder. Gruppe 1/2, fuer Kinder von 9 bis 18 kg (ca. 1-4 Jahre). Ausgestattet mit einem stabilen 5-Punkt-Gurtsystem. Diese Sitze bieten exzellenten Seitenaufprallschutz und eine ergonomische Position, damit die Fahrt im Flughafentaxi fuer die Kleinen entspannt bleibt.',
+            'Gruppe 1/2: Sobald Ihr Kind stabil sitzen kann, kommt unser Kleinkindsitz zum Einsatz. Mit einem robusten 5-Punkt-Gurtsystem und verstaerktem Seitenaufprallschutz sorgt er fuer maximale Stabilitaet waehrend der Fahrt im Flughafentaxi Wien.',
           imageAlt:
             'Zertifizierter Kindersitz fuer Kleinkinder im Alex Flughafentaxi - Sicherheit an erster Stelle.',
         },
         {
           key: 'boosterSeat',
           title: 'Sitzerhoehung',
+          specs: '15-36 kg - Optimale Gurtfuehrung fuer Schulkinder.',
           description:
-            'Ideal fuer aeltere Kinder. Gruppe 2/3, fuer Kinder von 15 bis 36 kg (ca. 4-12 Jahre, bis 135/150 cm Koerpergroesse). Die Sitzerhoehung sorgt dafuer, dass der fahrzeugeigene 3-Punkt-Gurt korrekt ueber Schulter und Becken verlaeuft, um Verletzungen zu vermeiden. So reisen auch groessere Kinder sicher mit Alex Flughafentaxi Wien.',
+            'Gruppe 2/3: Fuer aeltere Kinder bis ca. 12 Jahre (oder 150 cm) stellen wir ergonomische Erhoehungen bereit. Diese sorgen dafuer, dass der Sicherheitsgurt des Fahrzeugs korrekt ueber Schulter und Becken verlaeuft, was bei einem herkoemmlichen Transfer entscheidend fuer den Schutz ist.',
           imageAlt:
             'Kostenlose Sitzerhoehung fuer aeltere Kinder bei einer Fahrt mit Alex Flughafentaxi Wien.',
         },
       ],
+      disclaimerTitle: 'Hinweis fuer Ihr Flughafentaxi Wien:',
+      disclaimer:
+        'Bitte geben Sie im Buchungsformular die exakte Anzahl und Art der benoetigten Kindersitze (Babyschale, Kindersitz oder Sitzerhoehung) an. Nur bei Vorab-Information koennen wir die Verfuegbarkeit und eine gesetzeskonforme, sichere Fahrt garantieren. Bitte beachten Sie auch die maximale Gepaeckkapazitaet Ihres gewaehlten Fahrzeugs.',
     },
   },
   en: {
@@ -324,35 +338,44 @@ const localizedHomeMediaContent: Record<
     },
     childSeatSection: {
       eyebrow: 'Child Seats',
-      title: 'Safety & Comfort: Our Child Seat Options',
+      title: 'Travel safely with Alex airport taxi Vienna',
       description:
-        'Alex Flughafentaxi Wien offers free, certified child seats for all transfers to and from the airport. Because safety comes first in our airport taxi service, we help you choose the right seat for your trip here.',
+        'If you are looking for an airport taxi in Vienna for your family, safety comes first. Alex Flughafentaxi therefore provides only certified, regularly checked child restraint systems to ensure a relaxed ride at a fixed price.',
+      lead:
+        'Trust Alex Flughafentaxi to bring your whole family safely, on time and in comfort to the destination.',
+      detailTitle: 'Detailed seat specifications:',
       options: [
         {
           key: 'babySeat',
           title: 'Baby Seat',
+          specs: '0-13 kg - For newborns & infants.',
           description:
-            'Ideal for newborns and infants. Group 0+, for babies from 0 to 13 kg (approx. 0-15 months). Always installed rear-facing to protect the sensitive neck area. We use high-quality, padded baby seats so your baby rides safely in our Vienna airport taxi.',
+            'Group 0+: These seats are designed for newborns from day one. Installation is always rear-facing to protect the sensitive neck area during braking. A must for the first safe transfer in our airport taxi.',
           imageAlt:
             'Free baby seat in Alex airport taxi Vienna for a safe baby transfer.',
         },
         {
           key: 'childSeat',
           title: 'Child Seat',
+          specs: '9-18 kg - Secure hold for toddlers.',
           description:
-            'Ideal for toddlers. Group 1/2, for children from 9 to 18 kg (approx. 1-4 years). Equipped with a stable 5-point harness. These seats offer excellent side-impact protection and an ergonomic position so the ride stays comfortable for little passengers.',
+            'Group 1/2: Once your child can sit steadily, our toddler seat is used. With a robust 5-point harness and reinforced side-impact protection, it provides maximum stability during the ride.',
           imageAlt:
             'Certified child seat for toddlers in Alex airport taxi Vienna - safety comes first.',
         },
         {
           key: 'boosterSeat',
           title: 'Booster Seat',
+          specs: '15-36 kg - Optimal belt positioning for school kids.',
           description:
-            'Ideal for older children. Group 2/3, for children from 15 to 36 kg (approx. 4-12 years, up to 135/150 cm). The booster seat ensures the vehicle seat belt runs correctly across the shoulder and hips to help avoid injuries.',
+            'Group 2/3: For older children up to approx. 12 years (or 150 cm), we provide ergonomic boosters. They ensure that the vehicle seat belt runs correctly over the shoulder and hips, which is crucial for protection.',
           imageAlt:
             'Free booster seat for older children during a ride with Alex airport taxi Vienna.',
         },
       ],
+      disclaimerTitle: 'Important for your Vienna airport taxi:',
+      disclaimer:
+        'Please enter the exact number and type of child seats required in the booking form (baby seat, child seat or booster seat). Only with advance notice can we guarantee availability and a legally compliant, safe ride. Please also note the maximum luggage capacity of your chosen vehicle.',
     },
   },
 };
@@ -640,7 +663,7 @@ export default async function Home({
 
       <section className="bg-white py-8 md:py-10">
         <div className="app-container">
-          <div className={homepageSectionWidthClass}>
+          <div className="mx-auto max-w-[104rem]">
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
               <SectionIntro
                 eyebrow="Gepaeck"
@@ -688,23 +711,31 @@ export default async function Home({
                   eyebrow={localizedMediaContent.childSeatSection.eyebrow}
                   title={localizedMediaContent.childSeatSection.title}
                   description={localizedMediaContent.childSeatSection.description}
-                  className="max-w-[52rem]"
+                  className="max-w-[62rem]"
                 />
+
+                <p className="mt-5 max-w-[62rem] text-[1rem] leading-[1.75] text-[#58708d] md:text-[1.05rem]">
+                  {localizedMediaContent.childSeatSection.lead}
+                </p>
+
+                <p className="mt-8 text-[0.92rem] font-semibold uppercase tracking-[0.14em] text-[#1679FF]">
+                  {localizedMediaContent.childSeatSection.detailTitle}
+                </p>
 
                 <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3 md:gap-6">
                   {localizedMediaContent.childSeatSection.options.map(
-                    ({ key, title, description, imageAlt }) => (
+                    ({ key, title, specs, description, imageAlt }) => (
                     <div
                       key={key}
                       className="overflow-hidden rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] shadow-[0_10px_24px_rgba(17,17,17,0.04)]"
                     >
-                      <div className="relative h-[13rem] bg-white">
+                      <div className="relative aspect-[6/7] bg-white">
                         <Image
                           src={childSeatImageSources[key]}
                           alt={imageAlt}
                           fill
                           className="object-cover"
-                          sizes="(min-width: 1280px) 18rem, (min-width: 768px) 45vw, 100vw"
+                          sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw"
                         />
                       </div>
                       <div className="px-6 py-6">
@@ -712,12 +743,24 @@ export default async function Home({
                           <h3 className="text-[1.45rem] font-semibold tracking-[-0.05em] text-[#111827]">
                             {title}
                           </h3>
+                          <p className="text-[0.95rem] font-semibold tracking-[-0.02em] text-[#111827]">
+                            {specs}
+                          </p>
                           <p className="ui-copy-compact text-[#58708d]">{description}</p>
                         </div>
-                        </div>
                       </div>
-                    ),
+                    </div>
+                  ),
                   )}
+                </div>
+
+                <div className="mt-8 rounded-[1.5rem] border border-[#dbe7f8] bg-[#f4f8ff] px-5 py-5 md:px-6 md:py-6">
+                  <p className="text-[0.95rem] font-semibold tracking-[-0.02em] text-[#111827]">
+                    {localizedMediaContent.childSeatSection.disclaimerTitle}
+                  </p>
+                  <p className="mt-3 text-[0.98rem] leading-[1.7] text-[#58708d]">
+                    {localizedMediaContent.childSeatSection.disclaimer}
+                  </p>
                 </div>
               </div>
             </div>
