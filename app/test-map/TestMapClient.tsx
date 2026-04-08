@@ -22,7 +22,7 @@ export default function TestMapClient({ mapGeometry }: TestMapClientProps) {
     <div className="flex flex-col items-start gap-8 lg:flex-row">
       <section className="sticky top-3 z-10 w-full overflow-hidden rounded-[1.5rem] border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] lg:top-5 lg:w-[58%]">
         <div
-          className="relative w-full overflow-hidden bg-[#f8fafc] md:min-h-[26rem]"
+          className="relative w-full overflow-hidden bg-[#f8fafc] py-[10px] md:min-h-[26rem]"
           style={{ aspectRatio: mapAspectRatio }}
         >
           {mapGeometry.features.length > 0 ? (
