@@ -8,15 +8,16 @@ import { SVG_WIDTH } from '@/lib/maps/viennaDistricts';
 
 const MOBILE_BREAKPOINT = 640;
 const MOBILE_STICKY_TOP_OFFSET = 12;
+const MOBILE_EXPANDED_SIDE_GUTTER = 12;
 const DESKTOP_MAP_WIDTH = 'lg:w-[54.7%]';
 const DESKTOP_TABLE_WIDTH = 'lg:w-[45.3%]';
 const MAP_SECTION_BASE_CLASS =
-  'sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-[width,margin,border-radius,top] duration-200';
+  'sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] will-change-[width,margin,border-radius,top,transform] transition-[width,margin,border-radius,top,transform] duration-300 ease-out';
 const MAP_SECTION_EXPANDED_CLASS =
-  'top-0 ml-[calc(50%-50vw)] w-screen max-w-none rounded-none border-x-0';
+  `top-0 ml-[calc(50%-50vw+${MOBILE_EXPANDED_SIDE_GUTTER}px)] w-[calc(100vw-${MOBILE_EXPANDED_SIDE_GUTTER * 2}px)] max-w-none rounded-none`;
 const MAP_SECTION_COLLAPSED_CLASS = 'top-3 w-full rounded-[1.5rem]';
 const MAP_SVG_BASE_CLASS =
-  'absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
+  'absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
 const MAP_SVG_COLLAPSED_CLASS = 'scale-[1.08]';
 const MAP_SVG_EXPANDED_CLASS = 'scale-100';
 const DEFAULT_COLLAPSED_TOP_CLASS = 'top-3 lg:top-5';
@@ -105,7 +106,9 @@ export default function DistrictMapPriceExplorer({
     <div ref={layoutRef} className="flex flex-col items-start gap-8 lg:flex-row">
       <section ref={mapSectionRef} className={mapSectionClassName}>
         <div
-          className="relative w-full overflow-hidden bg-[#f8fafc] md:min-h-[26rem]"
+          className={`relative w-full overflow-hidden bg-[#f8fafc] transition-[min-height] duration-300 ease-out ${
+            isMobileMapExpanded ? 'min-h-[23rem]' : ''
+          } md:min-h-[26rem]`}
           style={{ aspectRatio: mapAspectRatio }}
         >
           {mapGeometry.features.length > 0 ? (
