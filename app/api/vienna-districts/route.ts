@@ -33,6 +33,14 @@ function pushPolygonBounds(polygon: PolygonCoordinates, bounds: [number, number,
   });
 }
 
+function rewindPolygon(polygon: PolygonCoordinates): PolygonCoordinates {
+  return polygon.map((ring) => [...ring].reverse());
+}
+
+function rewindMultiPolygon(multiPolygon: MultiPolygonCoordinates): MultiPolygonCoordinates {
+  return multiPolygon.map((polygon) => rewindPolygon(polygon));
+}
+
 export async function GET() {
   const response = await fetch(DISTRICTS_URL, {
     next: { revalidate: 60 * 60 * 24 },
@@ -57,7 +65,7 @@ export async function GET() {
     if (!beznr || !geometryType || !coordinates) return null;
 
     if (geometryType === 'Polygon') {
-      const polygon = coordinates as PolygonCoordinates;
+      const polygon = rewindPolygon(coordinates as PolygonCoordinates);
       pushPolygonBounds(polygon, bounds);
 
       return {
@@ -71,7 +79,7 @@ export async function GET() {
     }
 
     if (geometryType === 'MultiPolygon') {
-      const multiPolygon = coordinates as MultiPolygonCoordinates;
+      const multiPolygon = rewindMultiPolygon(coordinates as MultiPolygonCoordinates);
       multiPolygon.forEach((polygon) => {
         pushPolygonBounds(polygon, bounds);
       });
