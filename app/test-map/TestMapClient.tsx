@@ -20,7 +20,7 @@ export default function TestMapClient({ mapGeometry }: TestMapClientProps) {
 
   return (
     <div className="flex flex-col items-start gap-8 lg:flex-row">
-      <section className="sticky top-3 left-1/2 z-10 w-screen max-w-none -translate-x-1/2 overflow-hidden border-y border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] sm:left-auto sm:w-full sm:max-w-full sm:translate-x-0 sm:rounded-[1.5rem] sm:border sm:top-3 lg:top-5 lg:w-[54.7%]">
+      <section className="sticky top-3 z-10 ml-[calc(50%-50vw)] w-screen max-w-none overflow-hidden border-y border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] sm:ml-0 sm:w-full sm:max-w-full sm:rounded-[1.5rem] sm:border sm:top-3 lg:top-5 lg:w-[54.7%]">
         <div
           className="relative w-full overflow-hidden bg-[#f8fafc] md:min-h-[26rem]"
           style={{ aspectRatio: mapAspectRatio }}
