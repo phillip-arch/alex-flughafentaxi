@@ -12,9 +12,9 @@ const MOBILE_EXPANDED_SIDE_GUTTER = 12;
 const DESKTOP_MAP_WIDTH = 'lg:w-[54.7%]';
 const DESKTOP_TABLE_WIDTH = 'lg:w-[45.3%]';
 const MAP_SECTION_BASE_CLASS =
-  'sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] will-change-[width,margin,border-radius,top,transform] transition-[width,margin,border-radius,top,transform] duration-300 ease-out';
+  'sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] will-change-[width,left,transform,border-radius,top] transition-[width,left,transform,border-radius,top] duration-300 ease-out';
 const MAP_SECTION_EXPANDED_CLASS =
-  `top-0 ml-[calc(50%-50vw+${MOBILE_EXPANDED_SIDE_GUTTER}px)] w-[calc(100vw-${MOBILE_EXPANDED_SIDE_GUTTER * 2}px)] max-w-none rounded-none`;
+  `left-1/2 top-0 w-[calc(100vw-${MOBILE_EXPANDED_SIDE_GUTTER * 2}px)] max-w-none -translate-x-1/2 rounded-none`;
 const MAP_SECTION_COLLAPSED_CLASS = 'top-3 w-full rounded-[1.5rem]';
 const MAP_SVG_BASE_CLASS =
   'absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
