@@ -86,7 +86,7 @@ export default function PriceTable() {
             {vehicleColumns.map((column) => (
               <div
                 key={`legend-${column.key}`}
-                className="flex items-center justify-between rounded-[1.15rem] border border-[#e7edf5] bg-[#f8fbff] px-4 py-3"
+              className="flex items-center justify-between rounded-[1rem] border border-[#e7edf5] bg-[#f8fbff] px-4 py-3"
               >
                 <span className="text-[0.82rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
                   {column.shortLabel}
@@ -106,7 +106,7 @@ export default function PriceTable() {
             ))}
           </div>
 
-          <div className="mt-8 overflow-hidden rounded-[1.75rem] border border-[#e7edf5] bg-white shadow-[0_10px_24px_rgba(17,17,17,0.035)]">
+          <div className="mt-8 overflow-hidden rounded-[0.9rem] border border-[#e7edf5] bg-white shadow-[0_10px_24px_rgba(17,17,17,0.035)]">
             <table className="w-full table-fixed border-collapse text-left">
               <thead className="bg-[#111111] text-white md:bg-[#f8fbff] md:text-inherit">
                 <tr className="border-b border-[#e7edf5]">
