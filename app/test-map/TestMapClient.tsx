@@ -20,9 +20,9 @@ export default function TestMapClient({ mapGeometry }: TestMapClientProps) {
 
   return (
     <div className="flex flex-col items-start gap-8 lg:flex-row">
-      <section className="sticky top-3 z-10 w-full overflow-hidden rounded-[1.5rem] border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] lg:top-5 lg:w-1/2">
+      <section className="sticky top-3 z-10 w-full overflow-hidden rounded-[1.5rem] border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] lg:top-5 lg:w-[58%]">
         <div
-          className="relative min-h-[22rem] w-full overflow-hidden bg-[#f8fafc] md:min-h-[26rem] lg:min-h-[34rem]"
+          className="relative min-h-[22rem] w-full overflow-hidden bg-[#f8fafc] md:min-h-[26rem]"
           style={{ aspectRatio: mapAspectRatio }}
         >
           {mapGeometry.features.length > 0 ? (
@@ -75,7 +75,7 @@ export default function TestMapClient({ mapGeometry }: TestMapClientProps) {
         </div>
       </section>
 
-      <section className="w-full lg:w-1/2">
+      <section className="w-full lg:w-[42%]">
         <DistrictPriceTable activeId={activeId} onActiveIdChange={setActiveId} />
 
         <p className="mt-4 px-2 text-[10px] leading-relaxed text-[#9ca3af]">

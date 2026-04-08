@@ -1,3 +1,5 @@
+'use client';
+
 import { Briefcase, ShoppingBag, Users } from 'lucide-react';
 import { districtPricingRows, getDistrictPrice } from '@/lib/pricing/districtPricing';
 
