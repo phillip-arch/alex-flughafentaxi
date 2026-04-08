@@ -58,10 +58,10 @@ export default function TestMapClient({ mapGeometry }: TestMapClientProps) {
     <div ref={layoutRef} className="flex flex-col items-start gap-8 lg:flex-row">
       <section
         ref={mapSectionRef}
-        className={`sticky top-3 z-10 overflow-hidden rounded-[1.5rem] border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-[width,margin] duration-200 lg:top-5 lg:w-[54.7%] ${
+        className={`sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-[width,margin,border-radius,top] duration-200 lg:top-5 lg:w-[54.7%] ${
           isMobileMapExpanded
-            ? 'ml-[calc(50%-50vw)] w-screen max-w-none'
-            : 'w-full'
+            ? 'top-0 ml-[calc(50%-50vw)] w-screen max-w-none rounded-none border-x-0'
+            : 'top-3 w-full rounded-[1.5rem]'
         }`}
       >
         <div
@@ -71,8 +71,8 @@ export default function TestMapClient({ mapGeometry }: TestMapClientProps) {
           {mapGeometry.features.length > 0 ? (
             <svg
               viewBox={`0 0 ${SVG_WIDTH} ${mapGeometry.svgHeight}`}
-              className={`absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full md:scale-x-[1.08] md:scale-y-100 ${
-                isMobileMapExpanded ? 'scale-[1.14]' : 'scale-[1.08]'
+              className={`absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full ${
+                isMobileMapExpanded ? 'scale-100' : 'scale-[1.08]'
               }`}
               style={{ transformOrigin: 'center center' }}
               role="img"
