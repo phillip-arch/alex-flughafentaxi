@@ -16,7 +16,7 @@ const MAP_SECTION_BASE_CLASS =
 const MAP_SECTION_EXPANDED_CLASS = 'top-0 max-w-none rounded-none';
 const MAP_SECTION_COLLAPSED_CLASS = 'top-3 w-full rounded-[1.5rem]';
 const MAP_SVG_BASE_CLASS =
-  'absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
+  'absolute inset-x-0 top-[6px] bottom-[6px] h-[calc(100%-12px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
 const MAP_SVG_COLLAPSED_CLASS = 'scale-[1.08]';
 const MAP_SVG_EXPANDED_CLASS = 'scale-[1.04]';
 const DEFAULT_COLLAPSED_TOP_CLASS = 'top-3 lg:top-5';
@@ -95,7 +95,7 @@ export default function DistrictMapPriceExplorer({
       <section ref={mapSectionRef} className={mapSectionClassName} style={mapSectionStyle}>
         <div
           className={`relative w-full overflow-hidden bg-[#f8fafc] transition-[min-height] duration-300 ease-out ${
-            isMobileViewport ? 'min-h-[20rem]' : ''
+            isMobileViewport ? 'min-h-[17.5rem]' : ''
           } md:min-h-[26rem]`}
           style={{ aspectRatio: mapAspectRatio }}
         >
