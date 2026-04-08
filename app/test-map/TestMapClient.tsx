@@ -71,7 +71,7 @@ export default function TestMapClient({ mapGeometry }: TestMapClientProps) {
           {mapGeometry.features.length > 0 ? (
             <svg
               viewBox={`0 0 ${SVG_WIDTH} ${mapGeometry.svgHeight}`}
-              className={`absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full ${
+              className={`absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)] ${
                 isMobileMapExpanded ? 'scale-100' : 'scale-[1.08]'
               }`}
               style={{ transformOrigin: 'center center' }}
