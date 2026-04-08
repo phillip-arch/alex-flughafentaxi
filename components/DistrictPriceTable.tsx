@@ -47,31 +47,7 @@ export default function DistrictPriceTable({
 }: DistrictPriceTableProps) {
   return (
     <>
-      <div className="grid gap-3 md:hidden">
-        {vehicleColumns.map((column) => (
-          <div
-            key={`legend-${column.key}`}
-            className="flex items-center justify-between rounded-[1rem] border border-[#e7edf5] bg-[#f8fbff] px-4 py-3"
-          >
-            <span className="text-[0.82rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
-              {column.shortLabel}
-            </span>
-            <div className="flex items-center gap-3">
-              {column.specs.map(({ icon: Icon, value }, index) => (
-                <span
-                  key={`legend-${column.key}-${index}`}
-                  className="inline-flex items-center gap-1 text-[0.78rem] font-semibold text-[#111827]"
-                >
-                  <Icon size={13} className="text-[#1679FF]" />
-                  <span>{value}</span>
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-8 overflow-hidden rounded-[0.9rem] border border-[#e7edf5] bg-white shadow-[0_10px_24px_rgba(17,17,17,0.035)] md:mt-0">
+      <div className="mt-4 overflow-hidden rounded-[0.9rem] border border-[#e7edf5] bg-white shadow-[0_10px_24px_rgba(17,17,17,0.035)] md:mt-0">
         <table className="w-full table-fixed border-collapse text-left">
           <thead className="bg-[#111111] text-white md:bg-[#f8fbff] md:text-inherit">
             <tr className="border-b border-[#e7edf5]">

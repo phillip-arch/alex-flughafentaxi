@@ -33,50 +33,6 @@ type DistrictMapPriceExplorerProps = {
   expandedTopClassName?: string;
 };
 
-function useMobileStickyExpansion(
-  layoutRef: React.RefObject<HTMLDivElement | null>,
-  mapSectionRef: React.RefObject<HTMLElement | null>,
-  stickyTopOffset: number,
-) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  useEffect(() => {
-    const updateExpandedState = () => {
-      if (window.innerWidth >= MOBILE_BREAKPOINT) {
-        setIsExpanded(false);
-        return;
-      }
-
-      const layoutElement = layoutRef.current;
-      const mapElement = mapSectionRef.current;
-
-      if (!layoutElement || !mapElement) {
-        setIsExpanded(false);
-        return;
-      }
-
-      const layoutRect = layoutElement.getBoundingClientRect();
-      const mapHeight = mapElement.getBoundingClientRect().height;
-      const shouldExpand =
-        layoutRect.top <= stickyTopOffset &&
-        layoutRect.bottom > mapHeight + stickyTopOffset;
-
-      setIsExpanded(shouldExpand);
-    };
-
-    updateExpandedState();
-    window.addEventListener('scroll', updateExpandedState, { passive: true });
-    window.addEventListener('resize', updateExpandedState);
-
-    return () => {
-      window.removeEventListener('scroll', updateExpandedState);
-      window.removeEventListener('resize', updateExpandedState);
-    };
-  }, [layoutRef, mapSectionRef, stickyTopOffset]);
-
-  return isExpanded;
-}
-
 export default function DistrictMapPriceExplorer({
   mapGeometry,
   mobileStickyTopOffset = MOBILE_STICKY_TOP_OFFSET,
@@ -84,19 +40,18 @@ export default function DistrictMapPriceExplorer({
   expandedTopClassName = DEFAULT_EXPANDED_TOP_CLASS,
 }: DistrictMapPriceExplorerProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [mobileExpandedShift, setMobileExpandedShift] = useState(0);
   const layoutRef = useRef<HTMLDivElement | null>(null);
   const mapSectionRef = useRef<HTMLElement | null>(null);
-  const isMobileMapExpanded = useMobileStickyExpansion(
-    layoutRef,
-    mapSectionRef,
-    mobileStickyTopOffset,
-  );
   const mapAspectRatio = `${SVG_WIDTH} / ${mapGeometry.svgHeight}`;
 
   useEffect(() => {
-    const updateMobileExpandedShift = () => {
-      if (window.innerWidth >= MOBILE_BREAKPOINT) {
+    const updateMobileLayout = () => {
+      const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+      setIsMobileViewport(isMobile);
+
+      if (!isMobile) {
         setMobileExpandedShift(0);
         return;
       }
@@ -112,23 +67,23 @@ export default function DistrictMapPriceExplorer({
       setMobileExpandedShift(MOBILE_EXPANDED_SIDE_GUTTER - layoutRect.left);
     };
 
-    updateMobileExpandedShift();
-    window.addEventListener('resize', updateMobileExpandedShift);
+    updateMobileLayout();
+    window.addEventListener('resize', updateMobileLayout);
 
     return () => {
-      window.removeEventListener('resize', updateMobileExpandedShift);
+      window.removeEventListener('resize', updateMobileLayout);
     };
   }, []);
 
   const mapSectionClassName = `${MAP_SECTION_BASE_CLASS} ${DESKTOP_MAP_WIDTH} ${
-    isMobileMapExpanded ? MAP_SECTION_EXPANDED_CLASS : MAP_SECTION_COLLAPSED_CLASS
+    isMobileViewport ? MAP_SECTION_EXPANDED_CLASS : MAP_SECTION_COLLAPSED_CLASS
   } ${
-    isMobileMapExpanded ? expandedTopClassName : collapsedTopClassName
+    isMobileViewport ? expandedTopClassName : collapsedTopClassName
   }`;
   const mapSvgClassName = `${MAP_SVG_BASE_CLASS} ${
-    isMobileMapExpanded ? MAP_SVG_EXPANDED_CLASS : MAP_SVG_COLLAPSED_CLASS
+    isMobileViewport ? MAP_SVG_EXPANDED_CLASS : MAP_SVG_COLLAPSED_CLASS
   }`;
-  const mapSectionStyle = isMobileMapExpanded
+  const mapSectionStyle = isMobileViewport
     ? {
         width: `calc(100vw - ${MOBILE_EXPANDED_SIDE_GUTTER * 2}px)`,
         transform: `translateX(${mobileExpandedShift}px)`,
@@ -140,7 +95,7 @@ export default function DistrictMapPriceExplorer({
       <section ref={mapSectionRef} className={mapSectionClassName} style={mapSectionStyle}>
         <div
           className={`relative w-full overflow-hidden bg-[#f8fafc] transition-[min-height] duration-300 ease-out ${
-            isMobileMapExpanded ? 'min-h-[23rem]' : ''
+            isMobileViewport ? 'min-h-[20rem]' : ''
           } md:min-h-[26rem]`}
           style={{ aspectRatio: mapAspectRatio }}
         >
