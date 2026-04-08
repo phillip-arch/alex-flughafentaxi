@@ -106,12 +106,8 @@ export default function TestMapPage() {
         </header>
 
         <div className="flex flex-col items-start gap-8 lg:flex-row">
-          <section className="w-full rounded-[1.5rem] border border-[#e5e7eb] bg-white p-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] lg:sticky lg:top-5 lg:w-1/2">
-            <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.16em] text-[#9ca3af]">
-              Interaktive Karte
-            </h2>
-
-            <div className="relative overflow-hidden rounded-[1.2rem] border border-[#e5e7eb] bg-[#f8fafc]">
+          <section className="sticky top-3 z-10 w-full rounded-[1.5rem] border border-[#e5e7eb] bg-white p-3 shadow-[0_10px_24px_rgba(17,17,17,0.04)] lg:top-5 lg:w-1/2 lg:p-4">
+            <div className="relative overflow-hidden rounded-[1.1rem] bg-[#f8fafc]">
               {mapGeometry ? (
                 <svg
                   viewBox={`0 0 ${SVG_WIDTH} ${mapGeometry.svgHeight}`}
@@ -144,9 +140,10 @@ export default function TestMapPage() {
                           y={feature.center.y}
                           textAnchor="middle"
                           dominantBaseline="central"
-                          className="pointer-events-none select-none fill-[#111111] text-[20px] font-bold"
+                          className="pointer-events-none select-none fill-[#111111] text-[20px] font-bold transition-all duration-200"
                           style={{
                             fill: isActive ? '#ffffff' : '#111111',
+                            fontSize: isActive ? '26px' : '20px',
                           }}
                         >
                           {feature.beznr}
@@ -156,15 +153,11 @@ export default function TestMapPage() {
                   })}
                 </svg>
               ) : (
-                <div className="flex min-h-[28rem] items-center justify-center px-6 py-12 text-center text-sm text-[#6b7280]">
+                <div className="flex min-h-[28rem] items-center justify-center px-4 py-10 text-center text-sm text-[#6b7280]">
                   {mapError ?? 'Bezirkskarte wird geladen ...'}
                 </div>
               )}
             </div>
-
-            <p className="mt-4 text-center text-xs italic text-[#9ca3af]">
-              {activeId ? `Bezirk ${activeId} ausgewaehlt` : 'Bezirk in der Liste oder Karte beruehren'}
-            </p>
           </section>
 
           <section className="w-full lg:w-1/2">
