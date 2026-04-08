@@ -8,7 +8,7 @@ import { SVG_WIDTH } from '@/lib/maps/viennaDistricts';
 
 const MOBILE_BREAKPOINT = 640;
 const MOBILE_STICKY_TOP_OFFSET = 12;
-const MOBILE_EXPANDED_SIDE_GUTTER = 12;
+const MOBILE_EXPANDED_SIDE_GUTTER = 0;
 const DESKTOP_MAP_WIDTH = 'lg:w-[54.7%]';
 const DESKTOP_TABLE_WIDTH = 'lg:w-[45.3%]';
 const MAP_SECTION_BASE_CLASS =
