@@ -1,6 +1,8 @@
 import { geoCentroid, geoMercator, geoPath } from 'd3-geo';
 import viennaDistrictsSource from '@/lib/maps/data/vienna-districts-source.json';
 const SVG_WIDTH = 1000;
+const MAP_FIT_PADDING = 4;
+const MAP_SCALE_BOOST = 1.08;
 
 type PolygonCoordinates = number[][][];
 type MultiPolygonCoordinates = number[][][][];
@@ -135,11 +137,12 @@ export async function getViennaDistrictMapGeometry() {
 
   const projection = geoMercator().fitExtent(
     [
-      [-18, -18],
-      [SVG_WIDTH + 18, svgHeight + 18],
+      [MAP_FIT_PADDING, MAP_FIT_PADDING],
+      [SVG_WIDTH - MAP_FIT_PADDING, svgHeight - MAP_FIT_PADDING],
     ],
     featureCollection as never,
   );
+  projection.scale(projection.scale() * MAP_SCALE_BOOST);
   const pathGenerator = geoPath(projection);
 
   return {
