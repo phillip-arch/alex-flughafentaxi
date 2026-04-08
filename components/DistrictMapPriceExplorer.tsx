@@ -19,6 +19,8 @@ const MAP_SVG_BASE_CLASS =
   'absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
 const MAP_SVG_COLLAPSED_CLASS = 'scale-[1.08]';
 const MAP_SVG_EXPANDED_CLASS = 'scale-100';
+const DEFAULT_COLLAPSED_TOP_CLASS = 'top-3 lg:top-5';
+const DEFAULT_EXPANDED_TOP_CLASS = 'top-0 lg:top-5';
 
 const districtByBezNr = new Map(
   districtPricingRows.map((district) => [String((Number(district.id) - 1000) / 10), district]),
@@ -26,11 +28,15 @@ const districtByBezNr = new Map(
 
 type DistrictMapPriceExplorerProps = {
   mapGeometry: ViennaDistrictMapGeometry;
+  mobileStickyTopOffset?: number;
+  collapsedTopClassName?: string;
+  expandedTopClassName?: string;
 };
 
 function useMobileStickyExpansion(
   layoutRef: React.RefObject<HTMLDivElement | null>,
   mapSectionRef: React.RefObject<HTMLElement | null>,
+  stickyTopOffset: number,
 ) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -52,8 +58,8 @@ function useMobileStickyExpansion(
       const layoutRect = layoutElement.getBoundingClientRect();
       const mapHeight = mapElement.getBoundingClientRect().height;
       const shouldExpand =
-        layoutRect.top <= MOBILE_STICKY_TOP_OFFSET &&
-        layoutRect.bottom > mapHeight + MOBILE_STICKY_TOP_OFFSET;
+        layoutRect.top <= stickyTopOffset &&
+        layoutRect.bottom > mapHeight + stickyTopOffset;
 
       setIsExpanded(shouldExpand);
     };
@@ -66,21 +72,30 @@ function useMobileStickyExpansion(
       window.removeEventListener('scroll', updateExpandedState);
       window.removeEventListener('resize', updateExpandedState);
     };
-  }, [layoutRef, mapSectionRef]);
+  }, [layoutRef, mapSectionRef, stickyTopOffset]);
 
   return isExpanded;
 }
 
 export default function DistrictMapPriceExplorer({
   mapGeometry,
+  mobileStickyTopOffset = MOBILE_STICKY_TOP_OFFSET,
+  collapsedTopClassName = DEFAULT_COLLAPSED_TOP_CLASS,
+  expandedTopClassName = DEFAULT_EXPANDED_TOP_CLASS,
 }: DistrictMapPriceExplorerProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const layoutRef = useRef<HTMLDivElement | null>(null);
   const mapSectionRef = useRef<HTMLElement | null>(null);
-  const isMobileMapExpanded = useMobileStickyExpansion(layoutRef, mapSectionRef);
+  const isMobileMapExpanded = useMobileStickyExpansion(
+    layoutRef,
+    mapSectionRef,
+    mobileStickyTopOffset,
+  );
   const mapAspectRatio = `${SVG_WIDTH} / ${mapGeometry.svgHeight}`;
   const mapSectionClassName = `${MAP_SECTION_BASE_CLASS} ${DESKTOP_MAP_WIDTH} ${
     isMobileMapExpanded ? MAP_SECTION_EXPANDED_CLASS : MAP_SECTION_COLLAPSED_CLASS
+  } ${
+    isMobileMapExpanded ? expandedTopClassName : collapsedTopClassName
   }`;
   const mapSvgClassName = `${MAP_SVG_BASE_CLASS} ${
     isMobileMapExpanded ? MAP_SVG_EXPANDED_CLASS : MAP_SVG_COLLAPSED_CLASS
