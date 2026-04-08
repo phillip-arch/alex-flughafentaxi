@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import LegalDocument from '@/components/legal/LegalDocument';
-import { getLegalContent, normalizeLegalLocale } from '@/lib/legal/content';
+import { getLegalContent } from '@/lib/legal/content';
+import { buildAbsoluteMetadata } from '@/lib/seo/metadata';
 
 export async function generateMetadata({
   searchParams,
@@ -8,10 +9,7 @@ export async function generateMetadata({
   searchParams: Promise<{ lang?: string }>;
 }): Promise<Metadata> {
   const params = await searchParams;
-  const locale = normalizeLegalLocale(params?.lang);
-  return {
-    title: locale === 'en' ? 'Terms and Conditions' : 'AGB',
-  };
+  return buildAbsoluteMetadata('agb', params?.lang);
 }
 
 export default async function AgbPage({

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -11,9 +12,20 @@ import {
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
+import PriceTable from '@/components/PriceTable';
 import VehicleCategoryCard from '@/components/VehicleCategoryCard';
+import { buildAbsoluteMetadata } from '@/lib/seo/metadata';
 import { WhatsAppIcon } from '@/components/ui/ContactIcons';
 import SectionIntro from '@/components/ui/SectionIntro';
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  return buildAbsoluteMetadata('home', params?.lang);
+}
 
 type VehicleCategory = {
   title: string;
@@ -519,6 +531,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <PriceTable />
 
       <section className="bg-white py-8 md:py-10">
         <div className="app-container">
