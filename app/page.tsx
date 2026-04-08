@@ -334,7 +334,7 @@ function HeroBookingCard() {
           </span>
         </div>
 
-        <div className="min-h-[18.75rem] lg:flex-1 lg:min-h-0">
+        <div className="min-h-0 lg:flex-1 lg:min-h-0">
           <BookingForm showStepIndicator={false} />
         </div>
         <HeroTrustPills />
