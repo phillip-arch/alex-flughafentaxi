@@ -18,7 +18,7 @@ const MAP_SECTION_COLLAPSED_CLASS = 'top-3 w-full rounded-[1.5rem]';
 const MAP_SVG_BASE_CLASS =
   'absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
 const MAP_SVG_COLLAPSED_CLASS = 'scale-[1.08]';
-const MAP_SVG_EXPANDED_CLASS = 'scale-100';
+const MAP_SVG_EXPANDED_CLASS = 'scale-[1.04]';
 const DEFAULT_COLLAPSED_TOP_CLASS = 'top-3 lg:top-5';
 const DEFAULT_EXPANDED_TOP_CLASS = 'top-0 lg:top-5';
 
