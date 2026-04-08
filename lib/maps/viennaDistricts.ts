@@ -43,6 +43,9 @@ export type ViennaDistrictMapGeometry = {
   }>;
 };
 
+let featureCollectionPromise: Promise<ViennaDistrictFeatureCollection> | null = null;
+let mapGeometryPromise: Promise<ViennaDistrictMapGeometry> | null = null;
+
 function getBezNr(properties: Record<string, unknown> | undefined) {
   const rawValue = properties?.BEZNR ?? properties?.beznr ?? properties?.BEZ;
   const numericValue = Number(rawValue);
@@ -70,7 +73,7 @@ function rewindMultiPolygon(multiPolygon: MultiPolygonCoordinates): MultiPolygon
   return multiPolygon.map((polygon) => rewindPolygon(polygon));
 }
 
-export async function getViennaDistrictFeatureCollection() {
+function buildViennaDistrictFeatureCollection(): ViennaDistrictFeatureCollection {
   const payload = viennaDistrictsSource as { features?: RawFeature[] };
   const bounds: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
   const features: ViennaDistrictFeature[] = [];
@@ -123,9 +126,14 @@ export async function getViennaDistrictFeatureCollection() {
   };
 }
 
-export async function getViennaDistrictMapGeometry() {
-  const featureCollection = await getViennaDistrictFeatureCollection();
+export function getViennaDistrictFeatureCollection() {
+  featureCollectionPromise ??= Promise.resolve(buildViennaDistrictFeatureCollection());
+  return featureCollectionPromise;
+}
 
+function buildViennaDistrictMapGeometry(
+  featureCollection: ViennaDistrictFeatureCollection,
+): ViennaDistrictMapGeometry {
   if (featureCollection.features.length === 0) {
     return { svgHeight: 640, features: [] };
   }
@@ -155,6 +163,14 @@ export async function getViennaDistrictMapGeometry() {
       };
     }),
   };
+}
+
+export async function getViennaDistrictMapGeometry() {
+  mapGeometryPromise ??= getViennaDistrictFeatureCollection().then((featureCollection) =>
+    buildViennaDistrictMapGeometry(featureCollection),
+  );
+
+  return mapGeometryPromise;
 }
 
 export { SVG_WIDTH };
