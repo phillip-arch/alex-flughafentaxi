@@ -17,8 +17,8 @@ type MapFeature = {
     BEZNR: string;
   };
   geometry: {
-    type: 'MultiPolygon';
-    coordinates: number[][][][];
+    type: 'Polygon' | 'MultiPolygon';
+    coordinates: number[][][] | number[][][][];
   };
 };
 
