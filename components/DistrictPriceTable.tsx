@@ -71,7 +71,7 @@ export default function DistrictPriceTable({
         ))}
       </div>
 
-      <div className="mt-8 overflow-hidden rounded-[0.9rem] border border-[#e7edf5] bg-white shadow-[0_10px_24px_rgba(17,17,17,0.035)]">
+      <div className="mt-8 overflow-hidden rounded-[0.9rem] border border-[#e7edf5] bg-white shadow-[0_10px_24px_rgba(17,17,17,0.035)] md:mt-0">
         <table className="w-full table-fixed border-collapse text-left">
           <thead className="bg-[#111111] text-white md:bg-[#f8fbff] md:text-inherit">
             <tr className="border-b border-[#e7edf5]">
