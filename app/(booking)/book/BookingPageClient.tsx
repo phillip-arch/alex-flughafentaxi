@@ -64,7 +64,9 @@ export default function BookingPageClient({
                   initialIsLoggedIn={initialIsLoggedIn}
                   initialAccountDefaults={initialAccountDefaults}
                 />
-                {!isAppSurface ? <BookingTrustPills /> : null}
+                {!isAppSurface ? (
+                  <BookingTrustPills className="mx-auto mt-3 flex min-h-[5.75rem] max-w-[340px] flex-wrap items-center justify-center gap-[10px] md:min-h-0 md:gap-[14px] lg:relative lg:top-5 lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center" />
+                ) : null}
               </div>
             </section>
 

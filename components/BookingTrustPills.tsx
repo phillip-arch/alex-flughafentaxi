@@ -2,19 +2,25 @@
 
 import { Check } from 'lucide-react';
 
+type BookingTrustPillsProps = {
+  className?: string;
+};
+
 const BOOKING_TRUST_ITEMS = [
   'Fixpreis garantiert',
   'Puenktliche Abholung',
   'Zuverlaessiger Service',
 ] as const;
 
-const BOOKING_TRUST_PILLS_CLASS =
+const DEFAULT_BOOKING_TRUST_PILLS_CLASS =
   'mx-auto mt-4 flex min-h-[5.75rem] max-w-[340px] flex-wrap items-center justify-center gap-[10px] md:min-h-0 md:gap-[14px] lg:relative lg:top-5 lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center';
 const BOOKING_TRUST_PILL_TEXT_CLASS = 'text-[11px] font-semibold tracking-[-0.03em] md:text-[12px]';
 
-export default function BookingTrustPills() {
+export default function BookingTrustPills({
+  className = DEFAULT_BOOKING_TRUST_PILLS_CLASS,
+}: BookingTrustPillsProps) {
   return (
-    <div className={BOOKING_TRUST_PILLS_CLASS}>
+    <div className={className}>
       {BOOKING_TRUST_ITEMS.map((item) => (
         <div
           key={item}
