@@ -36,6 +36,8 @@ type VehicleCategory = {
   prices: { district: string; price: string }[];
 };
 
+type HomeLang = 'de' | 'en';
+
 const faqItems = [
   {
     question: 'Wie erkenne ich meinen Fahrer?',
@@ -248,6 +250,113 @@ const vehicleCategories: VehicleCategory[] = [
   },
 ];
 
+const childSeatImageSources = {
+  babySeat: '/alex-flughafentaxi-wien-babyschale-gratis.jpg',
+  childSeat: '/alex-flughafentaxi-wien-kindersitz-sicherheit.jpg',
+  boosterSeat: '/alex-flughafentaxi-wien-sitzerhoehung-gratis.jpg',
+} as const;
+
+const localizedHomeMediaContent: Record<
+  HomeLang,
+  {
+    vehicleImageAlts: {
+      limousine: string;
+      kombi: string;
+      bus: string;
+    };
+    childSeatSection: {
+      eyebrow: string;
+      title: string;
+      description: string;
+      options: Array<{
+        key: 'babySeat' | 'childSeat' | 'boosterSeat';
+        title: string;
+        description: string;
+        imageAlt: string;
+      }>;
+    };
+  }
+> = {
+  de: {
+    vehicleImageAlts: {
+      limousine: 'Alex Flughafentaxi Wien Limousine Fixpreis',
+      kombi: 'Alex Flughafentaxi Wien Kombi fuer viel Gepaeck',
+      bus: 'Alex Flughafentaxi Wien Bus fuer Gruppen und viel Gepaeck',
+    },
+    childSeatSection: {
+      eyebrow: 'Kindersitze',
+      title: 'Sicherheit & Komfort: Unsere Kindersitz-Optionen',
+      description:
+        'Alex Flughafentaxi Wien bietet kostenlose, zertifizierte Kindersitze fuer alle Transfers vom und zum Flughafen an. Da Sicherheit bei unserem Flughafentaxi an erster Stelle steht, helfen wir dir hier, den richtigen Sitz fuer deine Reise zu waehlen.',
+      options: [
+        {
+          key: 'babySeat',
+          title: 'Babyschale',
+          description:
+            'Ideal fuer Neugeborene und Saeuglinge. Gruppe 0+, fuer Babys von 0 bis 13 kg (ca. 0-15 Monate). Immer rueckwaertsgerichtet montiert, um den empfindlichen Nacken optimal zu schuetzen. Wir verwenden nur hochwertige, gepolsterte Schalen, damit dein Baby in unserem Flughafentaxi Wien sicher aufgehoben ist.',
+          imageAlt:
+            'Kostenlose Babyschale im Alex Flughafentaxi Wien fuer den sicheren Baby-Transfer.',
+        },
+        {
+          key: 'childSeat',
+          title: 'Kindersitz',
+          description:
+            'Ideal fuer Kleinkinder. Gruppe 1/2, fuer Kinder von 9 bis 18 kg (ca. 1-4 Jahre). Ausgestattet mit einem stabilen 5-Punkt-Gurtsystem. Diese Sitze bieten exzellenten Seitenaufprallschutz und eine ergonomische Position, damit die Fahrt im Flughafentaxi fuer die Kleinen entspannt bleibt.',
+          imageAlt:
+            'Zertifizierter Kindersitz fuer Kleinkinder im Alex Flughafentaxi - Sicherheit an erster Stelle.',
+        },
+        {
+          key: 'boosterSeat',
+          title: 'Sitzerhoehung',
+          description:
+            'Ideal fuer aeltere Kinder. Gruppe 2/3, fuer Kinder von 15 bis 36 kg (ca. 4-12 Jahre, bis 135/150 cm Koerpergroesse). Die Sitzerhoehung sorgt dafuer, dass der fahrzeugeigene 3-Punkt-Gurt korrekt ueber Schulter und Becken verlaeuft, um Verletzungen zu vermeiden. So reisen auch groessere Kinder sicher mit Alex Flughafentaxi Wien.',
+          imageAlt:
+            'Kostenlose Sitzerhoehung fuer aeltere Kinder bei einer Fahrt mit Alex Flughafentaxi Wien.',
+        },
+      ],
+    },
+  },
+  en: {
+    vehicleImageAlts: {
+      limousine: 'Alex airport taxi Vienna limousine fixed price',
+      kombi: 'Alex airport taxi Vienna estate car for extra luggage',
+      bus: 'Alex airport taxi Vienna minibus for groups and extra luggage',
+    },
+    childSeatSection: {
+      eyebrow: 'Child Seats',
+      title: 'Safety & Comfort: Our Child Seat Options',
+      description:
+        'Alex Flughafentaxi Wien offers free, certified child seats for all transfers to and from the airport. Because safety comes first in our airport taxi service, we help you choose the right seat for your trip here.',
+      options: [
+        {
+          key: 'babySeat',
+          title: 'Baby Seat',
+          description:
+            'Ideal for newborns and infants. Group 0+, for babies from 0 to 13 kg (approx. 0-15 months). Always installed rear-facing to protect the sensitive neck area. We use high-quality, padded baby seats so your baby rides safely in our Vienna airport taxi.',
+          imageAlt:
+            'Free baby seat in Alex airport taxi Vienna for a safe baby transfer.',
+        },
+        {
+          key: 'childSeat',
+          title: 'Child Seat',
+          description:
+            'Ideal for toddlers. Group 1/2, for children from 9 to 18 kg (approx. 1-4 years). Equipped with a stable 5-point harness. These seats offer excellent side-impact protection and an ergonomic position so the ride stays comfortable for little passengers.',
+          imageAlt:
+            'Certified child seat for toddlers in Alex airport taxi Vienna - safety comes first.',
+        },
+        {
+          key: 'boosterSeat',
+          title: 'Booster Seat',
+          description:
+            'Ideal for older children. Group 2/3, for children from 15 to 36 kg (approx. 4-12 years, up to 135/150 cm). The booster seat ensures the vehicle seat belt runs correctly across the shoulder and hips to help avoid injuries.',
+          imageAlt:
+            'Free booster seat for older children during a ride with Alex airport taxi Vienna.',
+        },
+      ],
+    },
+  },
+};
+
 const popularTrips = [
   'Von Terminal 1 Vienna Airport nach Wien Hauptbahnhof',
   'Von Stephansplatz nach Terminal 3 Vienna Airport',
@@ -378,7 +487,15 @@ function HeroImageCard() {
   );
 }
 
-export default function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}) {
+  const params = await searchParams;
+  const activeLang: HomeLang = params?.lang?.toLowerCase() === 'en' ? 'en' : 'de';
+  const localizedMediaContent = localizedHomeMediaContent[activeLang];
+
   return (
     <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <Navbar />
@@ -501,6 +618,13 @@ export default function Home() {
                   title={title}
                   description={description}
                   imageSrc={imageSrc}
+                  imageAlt={
+                    title === 'Limousine'
+                      ? localizedMediaContent.vehicleImageAlts.limousine
+                      : title === 'Kombi'
+                        ? localizedMediaContent.vehicleImageAlts.kombi
+                        : localizedMediaContent.vehicleImageAlts.bus
+                  }
                   specs={specs}
                   prices={prices}
                 />
@@ -556,6 +680,44 @@ export default function Home() {
                       abhängig von der jeweiligen Fluggesellschaft.
                     </p>
                   </div>
+                </div>
+              </div>
+
+              <div className="mt-10 border-t border-[#e6edf7] pt-10">
+                <SectionIntro
+                  eyebrow={localizedMediaContent.childSeatSection.eyebrow}
+                  title={localizedMediaContent.childSeatSection.title}
+                  description={localizedMediaContent.childSeatSection.description}
+                  className="max-w-[52rem]"
+                />
+
+                <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3 md:gap-6">
+                  {localizedMediaContent.childSeatSection.options.map(
+                    ({ key, title, description, imageAlt }) => (
+                    <div
+                      key={key}
+                      className="overflow-hidden rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] shadow-[0_10px_24px_rgba(17,17,17,0.04)]"
+                    >
+                      <div className="relative h-[13rem] bg-white">
+                        <Image
+                          src={childSeatImageSources[key]}
+                          alt={imageAlt}
+                          fill
+                          className="object-cover"
+                          sizes="(min-width: 1280px) 18rem, (min-width: 768px) 45vw, 100vw"
+                        />
+                      </div>
+                      <div className="px-6 py-6">
+                        <div className="ui-text-block-sm gap-2">
+                          <h3 className="text-[1.45rem] font-semibold tracking-[-0.05em] text-[#111827]">
+                            {title}
+                          </h3>
+                          <p className="ui-copy-compact text-[#58708d]">{description}</p>
+                        </div>
+                        </div>
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
             </div>

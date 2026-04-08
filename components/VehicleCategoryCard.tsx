@@ -10,6 +10,7 @@ type VehicleCategoryCardProps = {
   title: string;
   description: string;
   imageSrc: string;
+  imageAlt?: string;
   specs: { icon: VehicleSpecIconName; value: string }[];
   prices: { district: string; price: string }[];
 };
@@ -116,6 +117,7 @@ export default function VehicleCategoryCard({
   title,
   description,
   imageSrc,
+  imageAlt,
   specs,
   prices,
 }: VehicleCategoryCardProps) {
@@ -161,7 +163,7 @@ export default function VehicleCategoryCard({
         <div className="relative h-[12rem] overflow-hidden rounded-[1.5rem] border border-[#e9edf3] bg-white md:h-[13rem] lg:h-[14rem]">
           <Image
             src={imageSrc}
-            alt={title}
+            alt={imageAlt ?? title}
             fill
             className="object-contain p-4 transition-transform duration-500 ease-out md:group-hover:scale-[1.04]"
             sizes="(min-width: 1024px) 16rem, 100vw"
