@@ -11,6 +11,7 @@ import {
   ShoppingBag,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
+import BookingTrustPills from '@/components/BookingTrustPills';
 import Navbar from '@/components/Navbar';
 import PriceTable from '@/components/PriceTable';
 import VehicleCategoryCard from '@/components/VehicleCategoryCard';
@@ -187,7 +188,6 @@ const vehicleCategoryHighlights = [
   },
 ];
 
-const heroTrustItems = ['Fixpreis garantiert', 'Puenktliche Abholung', 'Zuverlaessiger Service'];
 const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
@@ -198,10 +198,6 @@ const heroBookingCardClass =
   'relative flex min-h-[31.5rem] flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] md:min-h-0 md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
 const heroBookingHeaderClass =
   'mb-[10px] flex min-h-[4.65rem] flex-col items-center gap-3 text-center sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
-const heroTrustPillsClass =
-  'mx-auto mt-4 flex min-h-[5.75rem] max-w-[340px] flex-wrap items-center justify-center gap-[10px] md:min-h-0 md:gap-[14px] lg:relative lg:top-5 lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center';
-const heroTrustPillTextClass = 'text-[11px] font-semibold tracking-[-0.03em] md:text-[12px]';
-
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
 
 const vehicleCategories: VehicleCategory[] = [
@@ -321,23 +317,7 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
 }
 
 function HeroTrustPills() {
-  return (
-    <div className={heroTrustPillsClass}>
-      {heroTrustItems.map((item) => {
-        return (
-          <div
-            key={item}
-            className="inline-flex items-center gap-1 rounded-full border border-[#e6edf7] bg-[#f4f8ff] px-2.5 py-1.5 text-[11px] text-[#111827] shadow-[0_10px_24px_rgba(17,17,17,0.045)] md:gap-1.5 md:px-3 md:py-2 md:text-[12px]"
-          >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#111827] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-              <Check size={12} strokeWidth={2.8} />
-            </span>
-            <span className={heroTrustPillTextClass}>{item}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return <BookingTrustPills />;
 }
 
 function HeroBookingCard() {

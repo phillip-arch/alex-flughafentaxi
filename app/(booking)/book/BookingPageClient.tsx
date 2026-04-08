@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import BookingForm from '@/components/BookingForm';
+import BookingTrustPills from '@/components/BookingTrustPills';
 import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
 import { BookingDirection, BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
 import NavbarClient from '@/components/NavbarClient';
@@ -59,11 +60,11 @@ export default function BookingPageClient({
                   onDirectionChange={setDirection}
                   headerTitle={!isAppSurface ? 'In wenigen Schritten buchen' : undefined}
                   showStepOneRouteIntro={isAppSurface}
-                  showTrustPills={!isAppSurface}
                   initialFavorites={initialFavorites}
                   initialIsLoggedIn={initialIsLoggedIn}
                   initialAccountDefaults={initialAccountDefaults}
                 />
+                {!isAppSurface ? <BookingTrustPills /> : null}
               </div>
             </section>
 
