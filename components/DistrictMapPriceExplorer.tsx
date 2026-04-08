@@ -13,8 +13,7 @@ const DESKTOP_MAP_WIDTH = 'lg:w-[54.7%]';
 const DESKTOP_TABLE_WIDTH = 'lg:w-[45.3%]';
 const MAP_SECTION_BASE_CLASS =
   'sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] will-change-[width,left,transform,border-radius,top] transition-[width,left,transform,border-radius,top] duration-300 ease-out';
-const MAP_SECTION_EXPANDED_CLASS =
-  `left-1/2 top-0 w-[calc(100vw-${MOBILE_EXPANDED_SIDE_GUTTER * 2}px)] max-w-none -translate-x-1/2 rounded-none`;
+const MAP_SECTION_EXPANDED_CLASS = 'top-0 max-w-none rounded-none';
 const MAP_SECTION_COLLAPSED_CLASS = 'top-3 w-full rounded-[1.5rem]';
 const MAP_SVG_BASE_CLASS =
   'absolute inset-x-0 top-[10px] bottom-[10px] h-[calc(100%-20px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
@@ -85,6 +84,7 @@ export default function DistrictMapPriceExplorer({
   expandedTopClassName = DEFAULT_EXPANDED_TOP_CLASS,
 }: DistrictMapPriceExplorerProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [mobileExpandedShift, setMobileExpandedShift] = useState(0);
   const layoutRef = useRef<HTMLDivElement | null>(null);
   const mapSectionRef = useRef<HTMLElement | null>(null);
   const isMobileMapExpanded = useMobileStickyExpansion(
@@ -93,6 +93,33 @@ export default function DistrictMapPriceExplorer({
     mobileStickyTopOffset,
   );
   const mapAspectRatio = `${SVG_WIDTH} / ${mapGeometry.svgHeight}`;
+
+  useEffect(() => {
+    const updateMobileExpandedShift = () => {
+      if (window.innerWidth >= MOBILE_BREAKPOINT) {
+        setMobileExpandedShift(0);
+        return;
+      }
+
+      const layoutElement = layoutRef.current;
+
+      if (!layoutElement) {
+        setMobileExpandedShift(0);
+        return;
+      }
+
+      const layoutRect = layoutElement.getBoundingClientRect();
+      setMobileExpandedShift(MOBILE_EXPANDED_SIDE_GUTTER - layoutRect.left);
+    };
+
+    updateMobileExpandedShift();
+    window.addEventListener('resize', updateMobileExpandedShift);
+
+    return () => {
+      window.removeEventListener('resize', updateMobileExpandedShift);
+    };
+  }, []);
+
   const mapSectionClassName = `${MAP_SECTION_BASE_CLASS} ${DESKTOP_MAP_WIDTH} ${
     isMobileMapExpanded ? MAP_SECTION_EXPANDED_CLASS : MAP_SECTION_COLLAPSED_CLASS
   } ${
@@ -101,10 +128,16 @@ export default function DistrictMapPriceExplorer({
   const mapSvgClassName = `${MAP_SVG_BASE_CLASS} ${
     isMobileMapExpanded ? MAP_SVG_EXPANDED_CLASS : MAP_SVG_COLLAPSED_CLASS
   }`;
+  const mapSectionStyle = isMobileMapExpanded
+    ? {
+        width: `calc(100vw - ${MOBILE_EXPANDED_SIDE_GUTTER * 2}px)`,
+        transform: `translateX(${mobileExpandedShift}px)`,
+      }
+    : undefined;
 
   return (
     <div ref={layoutRef} className="flex flex-col items-start gap-8 lg:flex-row">
-      <section ref={mapSectionRef} className={mapSectionClassName}>
+      <section ref={mapSectionRef} className={mapSectionClassName} style={mapSectionStyle}>
         <div
           className={`relative w-full overflow-hidden bg-[#f8fafc] transition-[min-height] duration-300 ease-out ${
             isMobileMapExpanded ? 'min-h-[23rem]' : ''
