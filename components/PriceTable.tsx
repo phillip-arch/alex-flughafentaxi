@@ -7,7 +7,7 @@ export default async function PriceTable() {
   return (
     <section className="bg-white py-8 md:py-10">
       <div className="app-container">
-        <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
+        <div className="px-0 py-0 md:rounded-[1.55rem] md:border md:border-[#e9edf3] md:bg-[#fbfbfc] md:px-8 md:py-10 md:shadow-[0_8px_22px_rgba(17,17,17,0.045)]">
           <DistrictMapPriceExplorer
             mapGeometry={mapGeometry}
             mobileStickyTopOffset={78}
