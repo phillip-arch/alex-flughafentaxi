@@ -81,7 +81,13 @@ export default function TestMapPage() {
     const heightRatio = (bounds[1][1] - bounds[0][1]) / Math.max(bounds[1][0] - bounds[0][0], 1);
     const svgHeight = Math.max(640, SVG_WIDTH * heightRatio);
 
-    const projection = geoMercator().fitSize([SVG_WIDTH, svgHeight], featureCollection as never);
+    const projection = geoMercator().fitExtent(
+      [
+        [-18, -18],
+        [SVG_WIDTH + 18, svgHeight + 18],
+      ],
+      featureCollection as never,
+    );
     const pathGenerator = geoPath(projection);
 
     const features = mapData.features.map((feature) => {
@@ -106,12 +112,12 @@ export default function TestMapPage() {
         </header>
 
         <div className="flex flex-col items-start gap-8 lg:flex-row">
-          <section className="sticky top-3 z-10 w-full rounded-[1.5rem] border border-[#e5e7eb] bg-white p-3 shadow-[0_10px_24px_rgba(17,17,17,0.04)] lg:top-5 lg:w-1/2 lg:p-4">
-            <div className="relative overflow-hidden rounded-[1.1rem] bg-[#f8fafc]">
+          <section className="sticky top-3 z-10 w-full overflow-hidden rounded-[1.5rem] border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] lg:top-5 lg:w-1/2">
+            <div className="relative aspect-[25/16] w-full overflow-hidden bg-[#f8fafc]">
               {mapGeometry ? (
                 <svg
                   viewBox={`0 0 ${SVG_WIDTH} ${mapGeometry.svgHeight}`}
-                  className="h-auto w-full"
+                  className="absolute inset-0 h-full w-full"
                   role="img"
                   aria-label="Wiener Bezirkskarte"
                 >
@@ -153,7 +159,7 @@ export default function TestMapPage() {
                   })}
                 </svg>
               ) : (
-                <div className="flex min-h-[28rem] items-center justify-center px-4 py-10 text-center text-sm text-[#6b7280]">
+                <div className="absolute inset-0 flex items-center justify-center px-4 py-10 text-center text-sm text-[#6b7280]">
                   {mapError ?? 'Bezirkskarte wird geladen ...'}
                 </div>
               )}
