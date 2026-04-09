@@ -279,6 +279,9 @@ const childSeatImageSources = {
   boosterSeat: '/alex-flughafentaxi-wien-sitzerhoehung-gratis.jpg',
 } as const;
 
+const childSeatMobileHeaderGapClass = 'gap-4';
+const childSeatDesktopBodyGapClass = 'md:mt-5';
+
 const localizedHomeMediaContent: Record<
   HomeLang,
   {
@@ -783,19 +786,28 @@ export default async function Home({
                           />
                           <div className="shrink-0 pt-1 text-left md:pt-0 md:text-center">
                             <ChildSeatWeightChip weightRange={seat.weightRange} />
-                            <p className="mt-3 max-w-[10rem] text-[0.8rem] font-medium tracking-[-0.02em] text-[#111827] md:hidden">
-                              {seat.ageLabel}
-                            </p>
+                            <div className={`mt-4 flex max-w-[10rem] flex-col ${childSeatMobileHeaderGapClass} md:hidden`}>
+                              <h4 className="pr-2 text-[1.1rem] font-semibold leading-[1.08] tracking-[-0.04em] text-[#111827]">
+                                {seat.title}
+                              </h4>
+                              <p className="text-[0.8rem] font-medium leading-[1.4] tracking-[-0.02em] text-[#111827]">
+                                {seat.ageLabel}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                        <div className="min-w-0 mx-auto w-full max-w-full rounded-[1.35rem] border border-[#edf2f8] bg-white px-4 py-4 sm:px-5 sm:py-5 md:mx-0 md:max-w-none">
-                          <h4 className="pr-2 text-[1.25rem] font-semibold tracking-[-0.04em] text-[#111827] sm:text-[1.32rem]">
+                        <div className="min-w-0 mx-auto w-full max-w-full rounded-[1.35rem] border border-[#edf2f8] bg-white px-4 py-4 sm:px-5 sm:py-5 md:mx-0 md:max-w-none md:px-6 md:py-6">
+                          <h4 className="hidden pr-2 text-[1.25rem] font-semibold tracking-[-0.04em] text-[#111827] md:block md:text-[1.32rem]">
                             {seat.title}
                           </h4>
-                          <p className="mt-4 hidden text-[0.98rem] font-medium text-[#111827] md:block">
+                          <p
+                            className={`mt-4 hidden text-[0.98rem] font-medium text-[#111827] ${childSeatDesktopBodyGapClass} md:block`}
+                          >
                             {seat.ageLabel}
                           </p>
-                          <p className="ui-copy-compact mt-4 leading-[1.78] text-[#58708d]">
+                          <p
+                            className={`ui-copy-compact mt-4 leading-[1.78] text-[#58708d] ${childSeatDesktopBodyGapClass}`}
+                          >
                             {seat.description}
                           </p>
                         </div>
