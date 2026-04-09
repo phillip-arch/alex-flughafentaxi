@@ -14,7 +14,7 @@ const MOBILE_MAP_SECTION_CLASS = 'w-full max-w-full rounded-none';
 const NON_MOBILE_MAP_SECTION_CLASS = 'sm:left-auto sm:w-full sm:translate-x-0 sm:rounded-[1.5rem]';
 const MAP_SVG_BASE_CLASS =
   'absolute inset-x-0 top-[6px] bottom-[6px] h-[calc(100%-12px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
-const MAP_SVG_SCALE_CLASS = 'scale-100 sm:scale-[1.08]';
+const MAP_SVG_SCALE_CLASS = 'scale-[1.07] sm:scale-[1.08]';
 const DEFAULT_DESKTOP_TOP_CLASS = 'sm:top-3 lg:top-5';
 const DEFAULT_MOBILE_TOP_CLASS = 'top-0';
 

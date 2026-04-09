@@ -821,18 +821,18 @@ export default async function Home({
                 </div>
 
                 <div className="mt-8 rounded-[1.5rem] border border-[#dbe7f8] bg-[#f4f8ff] px-5 py-5 md:px-6 md:py-6">
-                  <div className="flex items-start gap-4">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)]">
-                      <Info size={20} strokeWidth={2.2} />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-[0.95rem] font-semibold tracking-[-0.02em] text-[#111827]">
+                  <div className="grid gap-4 md:flex md:items-start">
+                    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-4 md:flex md:items-start">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)]">
+                        <Info size={20} strokeWidth={2.2} />
+                      </span>
+                      <p className="pt-1 text-[0.95rem] font-semibold tracking-[-0.02em] text-[#111827] md:pt-0">
                         {localizedMediaContent.childSeatSection.disclaimerTitle}
                       </p>
-                      <p className="mt-3 text-[0.98rem] leading-[1.7] text-[#58708d]">
-                        {localizedMediaContent.childSeatSection.disclaimer}
-                      </p>
                     </div>
+                    <p className="text-[0.98rem] leading-[1.7] text-[#58708d] md:mt-3 md:min-w-0">
+                      {localizedMediaContent.childSeatSection.disclaimer}
+                    </p>
                   </div>
                 </div>
 
