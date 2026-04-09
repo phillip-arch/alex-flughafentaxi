@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -38,6 +39,25 @@ type VehicleCategory = {
 };
 
 type HomeLang = 'de' | 'en';
+type ChildSeatKey = 'babySeat' | 'childSeat' | 'boosterSeat';
+type ChildSeatOption = {
+  key: ChildSeatKey;
+  title: string;
+  weightRange: string;
+  ageLabel: string;
+  description: string;
+  imageAlt: string;
+};
+type ChildSeatSectionContent = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  lead: string;
+  detailTitle: string;
+  options: ChildSeatOption[];
+  disclaimerTitle: string;
+  disclaimer: string;
+};
 
 const faqItems = [
   {
@@ -263,10 +283,12 @@ const childSeatImageSources = {
 const childSeatCardClass =
   'rounded-[1.75rem] border border-[#e6edf7] bg-[linear-gradient(180deg,#fbfdff_0%,#f5f9ff_100%)] p-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:p-5';
 const childSeatImageFrameClass =
-  'relative w-[5.6rem] shrink-0 overflow-hidden rounded-[1.1rem] border border-[#dbe7f8] bg-white shadow-[0_8px_18px_rgba(17,17,17,0.05)] sm:w-[6.4rem]';
-const childSeatHeaderStackClass = 'min-w-0 flex-1';
-const childSeatHeaderContentClass = 'mt-3 flex flex-col gap-3';
-const childSeatBodyClass = 'mt-5 rounded-[1.2rem] border border-[#e6edf7] bg-white/92 px-4 py-4';
+  'relative mx-auto h-[9.5rem] w-[8rem] overflow-hidden rounded-[0.9rem] border border-[#dbe7f8] bg-white shadow-[0_8px_18px_rgba(17,17,17,0.05)] sm:h-[10.5rem] sm:w-[9rem]';
+const childSeatImageInnerClass = 'relative h-full w-full';
+const childSeatWeightPillClass =
+  'absolute right-2 top-2 z-10 inline-flex whitespace-nowrap rounded-full border border-[#dbe7f8] bg-white/94 px-2.5 py-1 text-[0.8rem] font-semibold tracking-[-0.01em] text-[#111827] shadow-[0_8px_18px_rgba(17,17,17,0.08)] backdrop-blur-sm';
+const childSeatHeaderContentClass = 'mt-3 flex flex-col gap-2';
+const childSeatBodyClass = 'mt-4 rounded-[1.2rem] border border-[#e6edf7] bg-white/92 px-4 py-4';
 
 const localizedHomeMediaContent: Record<
   HomeLang,
@@ -276,23 +298,7 @@ const localizedHomeMediaContent: Record<
       kombi: string;
       bus: string;
     };
-    childSeatSection: {
-      eyebrow: string;
-      title: string;
-      description: string;
-      lead: string;
-      detailTitle: string;
-      options: Array<{
-        key: 'babySeat' | 'childSeat' | 'boosterSeat';
-        title: string;
-        weightRange: string;
-        ageLabel: string;
-        description: string;
-        imageAlt: string;
-      }>;
-      disclaimerTitle: string;
-      disclaimer: string;
-    };
+    childSeatSection: ChildSeatSectionContent;
   }
 > = {
   de: {
@@ -428,6 +434,70 @@ const reviewItems = [
     review: 'Very reliable. WhatsApp support was fast and helpful.',
   },
 ];
+
+function ChildSeatWeightChip({ weightRange }: { weightRange: string }) {
+  return (
+    <span className="inline-flex whitespace-nowrap rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.82rem] font-semibold tracking-[-0.01em] text-[#111827] shadow-[0_8px_18px_rgba(17,17,17,0.06)]">
+      {weightRange}
+    </span>
+  );
+}
+
+function ChildSeatPreviewImage({
+  seat,
+  frameClassName,
+  imageClassName = 'object-contain p-[12%]',
+  pillClassName = 'absolute right-2 top-2 z-10',
+}: {
+  seat: ChildSeatOption;
+  frameClassName: string;
+  imageClassName?: string;
+  pillClassName?: string;
+}) {
+  return (
+    <div className={frameClassName}>
+      <div className={pillClassName}>
+        <ChildSeatWeightChip weightRange={seat.weightRange} />
+      </div>
+      <div className="relative h-full w-full">
+        <Image
+          src={childSeatImageSources[seat.key]}
+          alt={seat.imageAlt}
+          fill
+          className={`${imageClassName} transition-transform duration-500 ease-out group-hover:scale-[1.06]`}
+          sizes="(min-width: 1280px) 24vw, (min-width: 768px) 36vw, 100vw"
+        />
+      </div>
+    </div>
+  );
+}
+
+function ChildSeatVariantShell({
+  label,
+  title,
+  description,
+  children,
+}: {
+  label: string;
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-[2rem] border border-[#e6edf7] bg-[linear-gradient(180deg,#ffffff_0%,#f7fbff_100%)] px-5 py-6 shadow-[0_14px_40px_rgba(17,17,17,0.04)] md:px-7 md:py-8">
+      <div className="max-w-[44rem]">
+        <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#1679FF]">
+          {label}
+        </p>
+        <h3 className="mt-3 text-[1.65rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[2rem]">
+          {title}
+        </h3>
+        <p className="mt-3 text-[1rem] leading-[1.72] text-[#58708d]">{description}</p>
+      </div>
+      <div className="mt-7">{children}</div>
+    </section>
+  );
+}
 
 const terminalPickupInfo = [
   {
@@ -742,34 +812,26 @@ export default async function Home({
                       key={key}
                       className={`group ${childSeatCardClass}`}
                     >
-                      <div className="flex items-start gap-4">
-                        <div className={childSeatImageFrameClass}>
-                          <div className="relative aspect-[6/7]">
-                            <Image
-                              src={childSeatImageSources[key]}
-                              alt={imageAlt}
-                              fill
-                              className="object-contain p-[10%] transition-transform duration-500 ease-out group-hover:scale-[1.08]"
-                              sizes="(min-width: 1024px) 6.4rem, 5.6rem"
-                            />
-                          </div>
+                      <div className={childSeatImageFrameClass}>
+                        <p className={childSeatWeightPillClass}>{weightRange}</p>
+                        <div className={childSeatImageInnerClass}>
+                          <Image
+                            src={childSeatImageSources[key]}
+                            alt={imageAlt}
+                            fill
+                            className="object-contain p-[14%] transition-transform duration-500 ease-out group-hover:scale-[1.08]"
+                            sizes="(min-width: 1280px) 28vw, (min-width: 768px) 44vw, 100vw"
+                          />
                         </div>
+                      </div>
 
-                        <div className={childSeatHeaderStackClass}>
-                          <div className="flex justify-end">
-                            <p className="inline-flex whitespace-nowrap rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.86rem] font-semibold tracking-[-0.01em] text-[#111827]">
-                              {weightRange}
-                            </p>
-                          </div>
-                          <div className={childSeatHeaderContentClass}>
-                            <h3 className="text-[1.4rem] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827]">
-                              {title}
-                            </h3>
-                            <p className="text-[0.95rem] font-medium tracking-[-0.02em] text-[#111827]">
-                              {ageLabel}
-                            </p>
-                          </div>
-                        </div>
+                      <div className={childSeatHeaderContentClass}>
+                        <h3 className="text-[1.4rem] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827]">
+                          {title}
+                        </h3>
+                        <p className="text-[0.95rem] font-medium tracking-[-0.02em] text-[#111827]">
+                          {ageLabel}
+                        </p>
                       </div>
 
                       <div className={childSeatBodyClass}>
@@ -787,6 +849,50 @@ export default async function Home({
                   <p className="mt-3 text-[0.98rem] leading-[1.7] text-[#58708d]">
                     {localizedMediaContent.childSeatSection.disclaimer}
                   </p>
+                </div>
+
+                <div className="mt-12 space-y-8 border-t border-[#e6edf7] pt-12">
+                  <ChildSeatVariantShell
+                    label={activeLang === 'en' ? 'Variation 2' : 'Variante 2'}
+                    title={activeLang === 'en' ? 'Feature strip with soft surfaces' : 'Feature-Strip mit weichen Flaechen'}
+                    description={
+                      activeLang === 'en'
+                        ? 'A broader visual strip that gives each seat more horizontal breathing room and keeps the image central.'
+                        : 'Ein breiterer Aufbau mit mehr horizontaler Luft pro Sitz und klarer Bildfuehrung.'
+                    }
+                  >
+                    <div className="space-y-4">
+                      {localizedMediaContent.childSeatSection.options.map((seat) => (
+                        <article
+                          key={`strip-${seat.key}`}
+                          className="group rounded-[1.75rem] border border-[#e6edf7] bg-[#fbfdff] p-4 md:p-5"
+                        >
+                          <div className="grid gap-4 md:grid-cols-[8rem_minmax(0,1fr)] md:items-center">
+                            <ChildSeatPreviewImage
+                              seat={seat}
+                              frameClassName="relative mx-auto h-[8rem] w-[6.75rem] overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white"
+                              imageClassName="object-contain p-[13%]"
+                              pillClassName="hidden"
+                            />
+                            <div className="rounded-[1.35rem] border border-[#edf2f8] bg-white px-4 py-4">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <h4 className="text-[1.25rem] font-semibold tracking-[-0.04em] text-[#111827]">
+                                  {seat.title}
+                                </h4>
+                                <ChildSeatWeightChip weightRange={seat.weightRange} />
+                              </div>
+                              <p className="mt-3 text-[0.98rem] font-medium text-[#111827]">
+                                {seat.ageLabel}
+                              </p>
+                              <p className="mt-3 text-[0.97rem] leading-[1.72] text-[#58708d]">
+                                {seat.description}
+                              </p>
+                            </div>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </ChildSeatVariantShell>
                 </div>
               </div>
             </div>
@@ -822,6 +928,60 @@ export default async function Home({
               >
                 <WhatsAppIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
               </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-shell-tight-top bg-white">
+        <div className="app-container">
+          <div className={homepageSectionWidthClass}>
+            <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
+              <SectionIntro
+                eyebrow="Terminal 3"
+                title="Terminal 3 map"
+                description="Orientierung fuer die Abholung am Flughafen Wien."
+                className="max-w-[42rem]"
+              />
+
+              <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-[#e9edf3] bg-white">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1331.7548403878466!2d16.56207266809108!3d48.11969249664487!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476c54530fff4bc5%3A0xf4c32d1659fb4805!2sVIE%20Terminal%203%2C%201300%20Schwechat!5e0!3m2!1sen!2sat!4v1774133487794!5m2!1sen!2sat"
+                  title="Google Maps Karte fuer den Abholpunkt am Flughafen Wien"
+                  width="600"
+                  height="450"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="h-[360px] w-full md:h-[450px]"
+                />
+              </div>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {terminalPickupInfo.map(({ title, description, linkLabel, linkHref }) => (
+                  <div
+                    key={title}
+                    className="rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5"
+                  >
+                    <div className="ui-text-block-sm gap-3">
+                      <h3 className="ui-heading-md text-[#111827]">{title}</h3>
+                      <p className="ui-copy-compact text-[#6a7d96]">{description}</p>
+                      {linkLabel && linkHref ? (
+                        <a
+                          href={linkHref}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="ui-copy-compact inline-flex items-center gap-2 font-semibold text-[#1679FF] transition-colors hover:text-[#0f5fcc]"
+                        >
+                          <MapPin size={16} className="ui-icon-accent" />
+                          {linkLabel}
+                        </a>
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -893,60 +1053,6 @@ export default async function Home({
                     Fahrt buchen
                   </Link>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-shell-tight-top bg-white">
-        <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
-              <SectionIntro
-                eyebrow="Terminal 3"
-                title="Terminal 3 map"
-                description="Orientierung fuer die Abholung am Flughafen Wien."
-                className="max-w-[42rem]"
-              />
-
-              <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-[#e9edf3] bg-white">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1331.7548403878466!2d16.56207266809108!3d48.11969249664487!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476c54530fff4bc5%3A0xf4c32d1659fb4805!2sVIE%20Terminal%203%2C%201300%20Schwechat!5e0!3m2!1sen!2sat!4v1774133487794!5m2!1sen!2sat"
-                  title="Google Maps Karte fuer den Abholpunkt am Flughafen Wien"
-                  width="600"
-                  height="450"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="h-[360px] w-full md:h-[450px]"
-                />
-              </div>
-
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {terminalPickupInfo.map(({ title, description, linkLabel, linkHref }) => (
-                  <div
-                    key={title}
-                    className="rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5"
-                  >
-                    <div className="ui-text-block-sm gap-3">
-                      <h3 className="ui-heading-md text-[#111827]">{title}</h3>
-                      <p className="ui-copy-compact text-[#6a7d96]">{description}</p>
-                      {linkLabel && linkHref ? (
-                        <a
-                          href={linkHref}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="ui-copy-compact inline-flex items-center gap-2 font-semibold text-[#1679FF] transition-colors hover:text-[#0f5fcc]"
-                        >
-                          <MapPin size={16} className="ui-icon-accent" />
-                          {linkLabel}
-                        </a>
-                      ) : null}
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           </div>
