@@ -1,5 +1,5 @@
-import DistrictMapPriceExplorer from '@/components/DistrictMapPriceExplorer';
 import { getViennaDistrictMapGeometry } from '@/lib/maps/viennaDistricts';
+import PriceTableExplorerClient from '@/components/PriceTableExplorerClient';
 
 export default async function PriceTable() {
   const mapGeometry = await getViennaDistrictMapGeometry();
@@ -16,12 +16,7 @@ export default async function PriceTable() {
               Alle Preise inkl. MwSt. zum oder vom Flughafen Wien.
             </p>
           </div>
-          <DistrictMapPriceExplorer
-            mapGeometry={mapGeometry}
-            mobileTopClassName="top-[66px]"
-            desktopTopClassName="sm:top-[78px] lg:top-[88px]"
-            lazyMountMap
-          />
+          <PriceTableExplorerClient mapGeometry={mapGeometry} />
         </div>
       </div>
     </section>
