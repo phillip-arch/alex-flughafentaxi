@@ -29,6 +29,7 @@ export async function generateMetadata({
 }
 
 type VehicleCategory = {
+  key: 'limousine' | 'kombi' | 'bus';
   title: string;
   description: string;
   imageSrc: string;
@@ -204,6 +205,7 @@ const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
 
 const vehicleCategories: VehicleCategory[] = [
   {
+    key: 'limousine',
     title: 'Limousine',
     description: 'Preiswerte Option fuer Alleinreisende oder Paare',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
@@ -219,6 +221,7 @@ const vehicleCategories: VehicleCategory[] = [
     ],
   },
   {
+    key: 'kombi',
     title: 'Kombi',
     description: 'Ideal fuer Gruppen & Familien - mehr Platz fuer Gepaeck.',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
@@ -234,6 +237,7 @@ const vehicleCategories: VehicleCategory[] = [
     ],
   },
   {
+    key: 'bus',
     title: 'Bus',
     description: 'Ideal fuer groessere Gruppen - viel Platz fuer Fahrgaeste und Gepaeck.',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
@@ -256,6 +260,14 @@ const childSeatImageSources = {
   boosterSeat: '/alex-flughafentaxi-wien-sitzerhoehung-gratis.jpg',
 } as const;
 
+const childSeatCardClass =
+  'rounded-[1.75rem] border border-[#e6edf7] bg-[linear-gradient(180deg,#fbfdff_0%,#f5f9ff_100%)] p-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:p-5';
+const childSeatImageFrameClass =
+  'relative w-[5.6rem] shrink-0 overflow-hidden rounded-[1.1rem] border border-[#dbe7f8] bg-white shadow-[0_8px_18px_rgba(17,17,17,0.05)] sm:w-[6.4rem]';
+const childSeatHeaderStackClass = 'min-w-0 flex-1';
+const childSeatHeaderContentClass = 'mt-3 flex flex-col gap-3';
+const childSeatBodyClass = 'mt-5 rounded-[1.2rem] border border-[#e6edf7] bg-white/92 px-4 py-4';
+
 const localizedHomeMediaContent: Record<
   HomeLang,
   {
@@ -273,7 +285,8 @@ const localizedHomeMediaContent: Record<
       options: Array<{
         key: 'babySeat' | 'childSeat' | 'boosterSeat';
         title: string;
-        specs: string;
+        weightRange: string;
+        ageLabel: string;
         description: string;
         imageAlt: string;
       }>;
@@ -300,7 +313,8 @@ const localizedHomeMediaContent: Record<
         {
           key: 'babySeat',
           title: 'Babyschale',
-          specs: '0-13 kg - Fuer Neugeborene & Saeuglinge.',
+          weightRange: '0-13 kg',
+          ageLabel: 'Fuer Neugeborene & Saeuglinge.',
           description:
             'Gruppe 0+: Diese Sitze sind fuer Neugeborene ab dem ersten Tag konzipiert. Die Montage erfolgt grundsaetzlich rueckwaertsgerichtet, um den empfindlichen Nackenbereich bei Bremsmanoevern optimal zu schuetzen. Ein Muss fuer den ersten sicheren Transfer in unserem Flughafentaxi.',
           imageAlt:
@@ -309,7 +323,8 @@ const localizedHomeMediaContent: Record<
         {
           key: 'childSeat',
           title: 'Kindersitz',
-          specs: '9-18 kg - Sicherer Halt fuer Kleinkinder.',
+          weightRange: '9-18 kg',
+          ageLabel: 'Sicherer Halt fuer Kleinkinder.',
           description:
             'Gruppe 1/2: Sobald Ihr Kind stabil sitzen kann, kommt unser Kleinkindsitz zum Einsatz. Mit einem robusten 5-Punkt-Gurtsystem und verstaerktem Seitenaufprallschutz sorgt er fuer maximale Stabilitaet waehrend der Fahrt im Flughafentaxi Wien.',
           imageAlt:
@@ -318,7 +333,8 @@ const localizedHomeMediaContent: Record<
         {
           key: 'boosterSeat',
           title: 'Sitzerhoehung',
-          specs: '15-36 kg - Optimale Gurtfuehrung fuer Schulkinder.',
+          weightRange: '15-36 kg',
+          ageLabel: 'Optimale Gurtfuehrung fuer Schulkinder.',
           description:
             'Gruppe 2/3: Fuer aeltere Kinder bis ca. 12 Jahre (oder 150 cm) stellen wir ergonomische Erhoehungen bereit. Diese sorgen dafuer, dass der Sicherheitsgurt des Fahrzeugs korrekt ueber Schulter und Becken verlaeuft, was bei einem herkoemmlichen Transfer entscheidend fuer den Schutz ist.',
           imageAlt:
@@ -348,7 +364,8 @@ const localizedHomeMediaContent: Record<
         {
           key: 'babySeat',
           title: 'Baby Seat',
-          specs: '0-13 kg - For newborns & infants.',
+          weightRange: '0-13 kg',
+          ageLabel: 'For newborns & infants.',
           description:
             'Group 0+: These seats are designed for newborns from day one. Installation is always rear-facing to protect the sensitive neck area during braking. A must for the first safe transfer in our airport taxi.',
           imageAlt:
@@ -357,7 +374,8 @@ const localizedHomeMediaContent: Record<
         {
           key: 'childSeat',
           title: 'Child Seat',
-          specs: '9-18 kg - Secure hold for toddlers.',
+          weightRange: '9-18 kg',
+          ageLabel: 'Secure hold for toddlers.',
           description:
             'Group 1/2: Once your child can sit steadily, our toddler seat is used. With a robust 5-point harness and reinforced side-impact protection, it provides maximum stability during the ride.',
           imageAlt:
@@ -366,7 +384,8 @@ const localizedHomeMediaContent: Record<
         {
           key: 'boosterSeat',
           title: 'Booster Seat',
-          specs: '15-36 kg - Optimal belt positioning for school kids.',
+          weightRange: '15-36 kg',
+          ageLabel: 'Optimal belt positioning for school kids.',
           description:
             'Group 2/3: For older children up to approx. 12 years (or 150 cm), we provide ergonomic boosters. They ensure that the vehicle seat belt runs correctly over the shoulder and hips, which is crucial for protection.',
           imageAlt:
@@ -635,19 +654,13 @@ export default async function Home({
             />
 
             <div className="mt-10 space-y-5">
-              {vehicleCategories.map(({ title, description, imageSrc, specs, prices }) => (
+              {vehicleCategories.map(({ key, title, description, imageSrc, specs, prices }) => (
                 <VehicleCategoryCard
-                  key={title}
+                  key={key}
                   title={title}
                   description={description}
                   imageSrc={imageSrc}
-                  imageAlt={
-                    title === 'Limousine'
-                      ? localizedMediaContent.vehicleImageAlts.limousine
-                      : title === 'Kombi'
-                        ? localizedMediaContent.vehicleImageAlts.kombi
-                        : localizedMediaContent.vehicleImageAlts.bus
-                  }
+                  imageAlt={localizedMediaContent.vehicleImageAlts[key]}
                   specs={specs}
                   prices={prices}
                 />
@@ -722,32 +735,45 @@ export default async function Home({
                   {localizedMediaContent.childSeatSection.detailTitle}
                 </p>
 
-                <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3 md:gap-6">
+                <div className="mt-8 grid gap-5 lg:grid-cols-3 md:gap-6">
                   {localizedMediaContent.childSeatSection.options.map(
-                    ({ key, title, specs, description, imageAlt }) => (
+                    ({ key, title, weightRange, ageLabel, description, imageAlt }) => (
                     <div
                       key={key}
-                      className="overflow-hidden rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] shadow-[0_10px_24px_rgba(17,17,17,0.04)]"
+                      className={`group ${childSeatCardClass}`}
                     >
-                      <div className="relative aspect-[6/7] bg-white">
-                        <Image
-                          src={childSeatImageSources[key]}
-                          alt={imageAlt}
-                          fill
-                          className="object-cover"
-                          sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw"
-                        />
-                      </div>
-                      <div className="px-6 py-6">
-                        <div className="ui-text-block-sm gap-2">
-                          <h3 className="text-[1.45rem] font-semibold tracking-[-0.05em] text-[#111827]">
-                            {title}
-                          </h3>
-                          <p className="text-[0.95rem] font-semibold tracking-[-0.02em] text-[#111827]">
-                            {specs}
-                          </p>
-                          <p className="ui-copy-compact text-[#58708d]">{description}</p>
+                      <div className="flex items-start gap-4">
+                        <div className={childSeatImageFrameClass}>
+                          <div className="relative aspect-[6/7]">
+                            <Image
+                              src={childSeatImageSources[key]}
+                              alt={imageAlt}
+                              fill
+                              className="object-contain p-[10%] transition-transform duration-500 ease-out group-hover:scale-[1.08]"
+                              sizes="(min-width: 1024px) 6.4rem, 5.6rem"
+                            />
+                          </div>
                         </div>
+
+                        <div className={childSeatHeaderStackClass}>
+                          <div className="flex justify-end">
+                            <p className="inline-flex whitespace-nowrap rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.86rem] font-semibold tracking-[-0.01em] text-[#111827]">
+                              {weightRange}
+                            </p>
+                          </div>
+                          <div className={childSeatHeaderContentClass}>
+                            <h3 className="text-[1.4rem] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827]">
+                              {title}
+                            </h3>
+                            <p className="text-[0.95rem] font-medium tracking-[-0.02em] text-[#111827]">
+                              {ageLabel}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={childSeatBodyClass}>
+                        <p className="text-[0.98rem] leading-[1.72] text-[#58708d]">{description}</p>
                       </div>
                     </div>
                   ),
