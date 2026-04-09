@@ -540,11 +540,19 @@ function HeroImageCard() {
             src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
             alt="Alex Flughafentaxi Wien"
             fill
+            quality={68}
+            className="object-cover md:hidden"
+            sizes="92vw"
+          />
+          <Image
+            src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
+            alt="Alex Flughafentaxi Wien"
+            fill
             priority
             fetchPriority="high"
             quality={76}
-            className="object-cover"
-            sizes="(min-width: 1024px) 35rem, (min-width: 768px) 46vw, 92vw"
+            className="hidden object-cover md:block"
+            sizes="(max-width: 767px) 1px, (min-width: 1024px) 35rem, 46vw"
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(17,17,17,0.08)_100%)]" />
         </div>

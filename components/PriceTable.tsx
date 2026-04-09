@@ -8,11 +8,19 @@ export default async function PriceTable() {
     <section className="bg-white py-8 md:py-10">
       <div className="app-container">
         <div className="px-0 py-0 md:rounded-[1.55rem] md:border md:border-[#e9edf3] md:bg-[#fbfbfc] md:px-8 md:py-10 md:shadow-[0_8px_22px_rgba(17,17,17,0.045)]">
+          <div className="mb-6 px-6 pt-6 text-center md:mb-8 md:px-0 md:pt-0">
+            <h2 className="text-[1.65rem] font-black tracking-[-0.05em] text-[#111111] md:text-[2.2rem]">
+              Fixpreis-Uebersicht fuer alle Wiener Bezirke
+            </h2>
+            <p className="mt-3 text-[0.98rem] text-[#5f6975] md:text-[1.05rem]">
+              Alle Preise inkl. MwSt. zum oder vom Flughafen Wien.
+            </p>
+          </div>
           <DistrictMapPriceExplorer
             mapGeometry={mapGeometry}
-            mobileStickyTopOffset={78}
-            collapsedTopClassName="top-[78px] lg:top-[88px]"
-            expandedTopClassName="top-[66px] lg:top-[72px]"
+            mobileTopClassName="top-[66px]"
+            desktopTopClassName="sm:top-[78px] lg:top-[88px]"
+            lazyMountMap
           />
         </div>
       </div>

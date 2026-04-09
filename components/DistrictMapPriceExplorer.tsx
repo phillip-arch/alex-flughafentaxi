@@ -6,21 +6,18 @@ import { districtPricingRows } from '@/lib/pricing/districtPricing';
 import type { ViennaDistrictMapGeometry } from '@/lib/maps/viennaDistricts';
 import { SVG_WIDTH } from '@/lib/maps/viennaDistricts';
 
-const MOBILE_BREAKPOINT = 640;
-const MOBILE_STICKY_TOP_OFFSET = 12;
-const MOBILE_EXPANDED_SIDE_GUTTER = 0;
 const DESKTOP_MAP_WIDTH = 'lg:w-[54.7%]';
 const DESKTOP_TABLE_WIDTH = 'lg:w-[45.3%]';
 const MAP_SECTION_BASE_CLASS =
-  'sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] will-change-[width,left,transform,border-radius,top] transition-[width,left,transform,border-radius,top] duration-300 ease-out';
-const MAP_SECTION_EXPANDED_CLASS = 'top-0 max-w-none rounded-none';
-const MAP_SECTION_COLLAPSED_CLASS = 'top-3 w-full rounded-[1.5rem]';
+  'sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)]';
+const MOBILE_MAP_SECTION_CLASS =
+  'left-1/2 w-screen max-w-none -translate-x-1/2 rounded-none';
+const NON_MOBILE_MAP_SECTION_CLASS = 'sm:left-auto sm:w-full sm:translate-x-0 sm:rounded-[1.5rem]';
 const MAP_SVG_BASE_CLASS =
   'absolute inset-x-0 top-[6px] bottom-[6px] h-[calc(100%-12px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
-const MAP_SVG_COLLAPSED_CLASS = 'scale-[1.08]';
-const MAP_SVG_EXPANDED_CLASS = 'scale-[1.04]';
-const DEFAULT_COLLAPSED_TOP_CLASS = 'top-3 lg:top-5';
-const DEFAULT_EXPANDED_TOP_CLASS = 'top-0 lg:top-5';
+const MAP_SVG_SCALE_CLASS = 'scale-[1.04] sm:scale-[1.08]';
+const DEFAULT_DESKTOP_TOP_CLASS = 'sm:top-3 lg:top-5';
+const DEFAULT_MOBILE_TOP_CLASS = 'top-0';
 
 const districtByBezNr = new Map(
   districtPricingRows.map((district) => [String((Number(district.id) - 1000) / 10), district]),
@@ -28,78 +25,58 @@ const districtByBezNr = new Map(
 
 type DistrictMapPriceExplorerProps = {
   mapGeometry: ViennaDistrictMapGeometry;
-  mobileStickyTopOffset?: number;
-  collapsedTopClassName?: string;
-  expandedTopClassName?: string;
+  mobileTopClassName?: string;
+  desktopTopClassName?: string;
+  lazyMountMap?: boolean;
 };
 
 export default function DistrictMapPriceExplorer({
   mapGeometry,
-  mobileStickyTopOffset = MOBILE_STICKY_TOP_OFFSET,
-  collapsedTopClassName = DEFAULT_COLLAPSED_TOP_CLASS,
-  expandedTopClassName = DEFAULT_EXPANDED_TOP_CLASS,
+  mobileTopClassName = DEFAULT_MOBILE_TOP_CLASS,
+  desktopTopClassName = DEFAULT_DESKTOP_TOP_CLASS,
+  lazyMountMap = false,
 }: DistrictMapPriceExplorerProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [isMobileViewport, setIsMobileViewport] = useState(false);
-  const [mobileExpandedShift, setMobileExpandedShift] = useState(0);
-  const layoutRef = useRef<HTMLDivElement | null>(null);
+  const [shouldRenderMap, setShouldRenderMap] = useState(!lazyMountMap);
   const mapSectionRef = useRef<HTMLElement | null>(null);
   const mapAspectRatio = `${SVG_WIDTH} / ${mapGeometry.svgHeight}`;
 
   useEffect(() => {
-    const updateMobileLayout = () => {
-      const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
-      setIsMobileViewport(isMobile);
+    if (!lazyMountMap || shouldRenderMap) return;
 
-      if (!isMobile) {
-        setMobileExpandedShift(0);
-        return;
-      }
+    const mapSectionElement = mapSectionRef.current;
+    if (!mapSectionElement) return;
 
-      const layoutElement = layoutRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0]?.isIntersecting) return;
 
-      if (!layoutElement) {
-        setMobileExpandedShift(0);
-        return;
-      }
+        setShouldRenderMap(true);
+        observer.disconnect();
+      },
+      {
+        rootMargin: '300px 0px',
+      },
+    );
 
-      const layoutRect = layoutElement.getBoundingClientRect();
-      setMobileExpandedShift(MOBILE_EXPANDED_SIDE_GUTTER - layoutRect.left);
-    };
-
-    updateMobileLayout();
-    window.addEventListener('resize', updateMobileLayout);
+    observer.observe(mapSectionElement);
 
     return () => {
-      window.removeEventListener('resize', updateMobileLayout);
+      observer.disconnect();
     };
-  }, []);
+  }, [lazyMountMap, shouldRenderMap]);
 
-  const mapSectionClassName = `${MAP_SECTION_BASE_CLASS} ${DESKTOP_MAP_WIDTH} ${
-    isMobileViewport ? MAP_SECTION_EXPANDED_CLASS : MAP_SECTION_COLLAPSED_CLASS
-  } ${
-    isMobileViewport ? expandedTopClassName : collapsedTopClassName
-  }`;
-  const mapSvgClassName = `${MAP_SVG_BASE_CLASS} ${
-    isMobileViewport ? MAP_SVG_EXPANDED_CLASS : MAP_SVG_COLLAPSED_CLASS
-  }`;
-  const mapSectionStyle = isMobileViewport
-    ? {
-        width: `calc(100vw - ${MOBILE_EXPANDED_SIDE_GUTTER * 2}px)`,
-        transform: `translateX(${mobileExpandedShift}px)`,
-      }
-    : undefined;
+  const mapSectionClassName = `${MAP_SECTION_BASE_CLASS} ${MOBILE_MAP_SECTION_CLASS} ${NON_MOBILE_MAP_SECTION_CLASS} ${DESKTOP_MAP_WIDTH} ${mobileTopClassName} ${desktopTopClassName}`;
+  const mapSvgClassName = `${MAP_SVG_BASE_CLASS} ${MAP_SVG_SCALE_CLASS}`;
 
   return (
-    <div ref={layoutRef} className="flex flex-col items-start gap-8 lg:flex-row">
-      <section ref={mapSectionRef} className={mapSectionClassName} style={mapSectionStyle}>
+    <div className="flex flex-col items-start gap-8 lg:flex-row">
+      <section ref={mapSectionRef} className={mapSectionClassName}>
         <div
-          className={`relative w-full overflow-hidden bg-[#f8fafc] transition-[min-height] duration-300 ease-out ${
-            isMobileViewport ? 'min-h-[17.5rem]' : ''
-          } md:min-h-[26rem]`}
+          className="relative min-h-[17.5rem] w-full overflow-hidden bg-[#f8fafc] md:min-h-[26rem]"
           style={{ aspectRatio: mapAspectRatio }}
         >
-          {mapGeometry.features.length > 0 ? (
+          {shouldRenderMap && mapGeometry.features.length > 0 ? (
             <svg
               viewBox={`0 0 ${SVG_WIDTH} ${mapGeometry.svgHeight}`}
               className={mapSvgClassName}
@@ -142,9 +119,13 @@ export default function DistrictMapPriceExplorer({
                 );
               })}
             </svg>
-          ) : (
+          ) : shouldRenderMap ? (
             <div className="absolute inset-0 flex items-center justify-center px-4 py-10 text-center text-sm text-[#6b7280]">
               Die Bezirkskarte konnte nicht geladen werden.
+            </div>
+          ) : (
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,#f4f7fb_0%,#eef3f9_100%)]">
+              <div className="absolute inset-x-[8%] top-[12%] h-[76%] rounded-[1.2rem] border border-[#dbe4f0] bg-white/60" />
             </div>
           )}
         </div>
