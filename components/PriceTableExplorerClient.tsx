@@ -9,7 +9,7 @@ const DynamicDistrictMapPriceExplorer = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex flex-col items-start gap-8 lg:flex-row">
-        <section className="sticky left-1/2 top-[66px] z-10 w-screen max-w-none -translate-x-1/2 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] sm:left-auto sm:top-[78px] sm:w-full sm:translate-x-0 sm:rounded-[1.5rem] lg:w-[54.7%] lg:top-[88px]">
+        <section className="sticky top-[66px] z-10 w-full max-w-full overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)] sm:top-[78px] sm:w-full sm:rounded-[1.5rem] lg:w-[54.7%] lg:top-[88px]">
           <div className="relative min-h-[17.5rem] w-full overflow-hidden bg-[linear-gradient(180deg,#f4f7fb_0%,#eef3f9_100%)] md:min-h-[26rem]">
             <div className="absolute inset-x-[8%] top-[12%] h-[76%] rounded-[1.2rem] border border-[#dbe4f0] bg-white/60" />
           </div>

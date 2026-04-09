@@ -577,8 +577,9 @@ export default async function Home({
   const localizedMediaContent = localizedHomeMediaContent[activeLang];
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
+    <>
       <Navbar />
+      <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
 
       <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
         <div className={heroSectionPaddingClass}>
@@ -1117,11 +1118,8 @@ export default async function Home({
           </div>
         </div>
       </section>
-
-
-
-
-    </main>
+      </main>
+    </>
   );
 }
 

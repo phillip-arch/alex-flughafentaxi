@@ -10,8 +10,7 @@ const DESKTOP_MAP_WIDTH = 'lg:w-[54.7%]';
 const DESKTOP_TABLE_WIDTH = 'lg:w-[45.3%]';
 const MAP_SECTION_BASE_CLASS =
   'sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)]';
-const MOBILE_MAP_SECTION_CLASS =
-  'left-1/2 w-screen max-w-none -translate-x-1/2 rounded-none';
+const MOBILE_MAP_SECTION_CLASS = 'w-full max-w-full rounded-none';
 const NON_MOBILE_MAP_SECTION_CLASS = 'sm:left-auto sm:w-full sm:translate-x-0 sm:rounded-[1.5rem]';
 const MAP_SVG_BASE_CLASS =
   'absolute inset-x-0 top-[6px] bottom-[6px] h-[calc(100%-12px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
