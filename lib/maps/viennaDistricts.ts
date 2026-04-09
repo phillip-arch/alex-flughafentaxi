@@ -1,4 +1,5 @@
 import { geoCentroid, geoMercator, geoPath } from 'd3-geo';
+import { districtPricingRows } from '@/lib/pricing/districtPricing';
 import viennaDistrictsSource from '@/lib/maps/data/vienna-districts-source.json';
 const SVG_WIDTH = 1000;
 const MAP_FIT_PADDING = 4;
@@ -13,6 +14,13 @@ type RawFeature = {
     coordinates?: unknown;
   };
 };
+
+const districtIdByNormalizedName = new Map(
+  districtPricingRows.map((district) => [normalizeDistrictName(district.name), district.id]),
+);
+
+districtIdByNormalizedName.set('rudolfsheimfuenfhaus', '1150');
+districtIdByNormalizedName.set('rudolfsheimfunfhaus', '1150');
 
 export type ViennaDistrictFeature = {
   type: 'Feature';
@@ -47,11 +55,37 @@ let featureCollectionPromise: Promise<ViennaDistrictFeatureCollection> | null = 
 let mapGeometryPromise: Promise<ViennaDistrictMapGeometry> | null = null;
 
 function getBezNr(properties: Record<string, unknown> | undefined) {
+  const districtName = properties?.name;
+
+  if (typeof districtName === 'string') {
+    const districtId = districtIdByNormalizedName.get(normalizeDistrictName(districtName));
+
+    if (districtId) {
+      return String((Number(districtId) - 1000) / 10);
+    }
+  }
+
   const rawValue = properties?.BEZNR ?? properties?.beznr ?? properties?.BEZ;
   const numericValue = Number(rawValue);
 
   if (!Number.isFinite(numericValue)) return null;
   return String(numericValue);
+}
+
+function normalizeDistrictName(value: string) {
+  return value
+    .replace(/[Ää]/g, 'ae')
+    .replace(/[Öö]/g, 'oe')
+    .replace(/[Üü]/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/Ã¤/g, 'ae')
+    .replace(/Ã¶/g, 'oe')
+    .replace(/Ã¼/g, 'ue')
+    .replace(/ÃŸ/g, 'ss')
+    .replace(/[^a-z0-9]+/gi, '')
+    .toLowerCase();
 }
 
 function pushPolygonBounds(polygon: PolygonCoordinates, bounds: [number, number, number, number]) {
