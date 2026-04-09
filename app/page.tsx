@@ -771,26 +771,31 @@ export default async function Home({
                   {localizedMediaContent.childSeatSection.options.map((seat) => (
                     <article
                       key={`seat-${seat.key}`}
-                      className="group rounded-[1.75rem] border border-[#e6edf7] bg-[#fbfdff] p-4 md:p-5"
+                      className="group w-full max-w-full overflow-hidden rounded-[1.75rem] border border-[#e6edf7] bg-[#fbfdff] p-4 md:p-5"
                     >
                       <div className="grid gap-4 md:grid-cols-[8rem_minmax(0,1fr)] md:items-center">
-                        <div className="flex flex-col items-center gap-3">
-                          <ChildSeatWeightChip weightRange={seat.weightRange} />
+                        <div className="flex w-full max-w-full items-start justify-center gap-3 md:flex-col md:items-center">
                           <ChildSeatPreviewImage
                             seat={seat}
-                            frameClassName="relative mx-auto h-[8rem] w-[6.75rem] overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white"
-                            imageClassName="object-contain p-[13%]"
+                            frameClassName="relative h-[10.25rem] w-[min(13.5rem,calc(100vw-9rem))] max-w-full overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white sm:h-[10.75rem] sm:w-[14.5rem] md:h-[8rem] md:w-[6.75rem]"
+                            imageClassName="object-contain px-[5%] py-[9%]"
                             pillClassName="hidden"
                           />
+                          <div className="shrink-0 pt-1 text-left md:pt-0 md:text-center">
+                            <ChildSeatWeightChip weightRange={seat.weightRange} />
+                            <p className="mt-3 max-w-[10rem] text-[0.8rem] font-medium tracking-[-0.02em] text-[#111827] md:hidden">
+                              {seat.ageLabel}
+                            </p>
+                          </div>
                         </div>
-                        <div className="rounded-[1.35rem] border border-[#edf2f8] bg-white px-4 py-4 sm:px-5 sm:py-5">
+                        <div className="min-w-0 mx-auto w-full max-w-full rounded-[1.35rem] border border-[#edf2f8] bg-white px-4 py-4 sm:px-5 sm:py-5 md:mx-0 md:max-w-none">
                           <h4 className="pr-2 text-[1.25rem] font-semibold tracking-[-0.04em] text-[#111827] sm:text-[1.32rem]">
                             {seat.title}
                           </h4>
-                          <p className="mt-4 text-[0.98rem] font-medium text-[#111827]">
+                          <p className="mt-4 hidden text-[0.98rem] font-medium text-[#111827] md:block">
                             {seat.ageLabel}
                           </p>
-                          <p className="mt-4 text-[0.97rem] leading-[1.78] text-[#58708d]">
+                          <p className="ui-copy-compact mt-4 leading-[1.78] text-[#58708d]">
                             {seat.description}
                           </p>
                         </div>
