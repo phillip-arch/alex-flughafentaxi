@@ -215,7 +215,8 @@ const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
   'mx-auto mt-[16px] max-w-[19ch] text-[30px] font-black leading-[1.02] tracking-[-0.04em] text-[#111111] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]';
-const heroGridClass = 'grid gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
+const heroGridClass =
+  'grid gap-[2.3125rem] lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
 const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
 const heroBookingCardClass =
   'relative flex min-h-[31.5rem] flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] md:min-h-0 md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
@@ -540,19 +541,11 @@ function HeroImageCard() {
             src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
             alt="Alex Flughafentaxi Wien"
             fill
-            quality={68}
-            className="object-cover md:hidden"
-            sizes="92vw"
-          />
-          <Image
-            src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
-            alt="Alex Flughafentaxi Wien"
-            fill
             priority
             fetchPriority="high"
-            quality={76}
-            className="hidden object-cover md:block"
-            sizes="(max-width: 767px) 1px, (min-width: 1024px) 35rem, 46vw"
+            quality={72}
+            className="object-cover"
+            sizes="(min-width: 1024px) 35rem, (min-width: 768px) 46vw, 92vw"
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(17,17,17,0.08)_100%)]" />
         </div>
