@@ -6,6 +6,7 @@ import {
   ChevronDown,
   ChevronRight,
   Briefcase,
+  Info,
   MapPin,
   Phone,
   ShoppingBag,
@@ -280,7 +281,8 @@ const childSeatImageSources = {
 } as const;
 
 const childSeatMobileHeaderGapClass = 'gap-4';
-const childSeatDesktopBodyGapClass = 'md:mt-5';
+const childSeatDesktopSubtitleGapClass = 'md:mt-4';
+const childSeatDesktopDescriptionGapClass = 'md:mt-5';
 
 const localizedHomeMediaContent: Record<
   HomeLang,
@@ -777,17 +779,17 @@ export default async function Home({
                       className="group w-full max-w-full overflow-hidden rounded-[1.75rem] border border-[#e6edf7] bg-[#fbfdff] p-4 md:p-5"
                     >
                       <div className="grid gap-4 md:grid-cols-[8rem_minmax(0,1fr)] md:items-center">
-                        <div className="flex w-full max-w-full items-start justify-center gap-3 md:flex-col md:items-center">
+                        <div className="grid w-full max-w-full grid-cols-[minmax(0,8rem)_minmax(0,1fr)] items-start gap-2 md:flex md:flex-col md:items-center">
                           <ChildSeatPreviewImage
                             seat={seat}
-                            frameClassName="relative h-[10.25rem] w-[min(13.5rem,calc(100vw-9rem))] max-w-full overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white sm:h-[10.75rem] sm:w-[14.5rem] md:h-[8rem] md:w-[6.75rem]"
-                            imageClassName="object-contain px-[5%] py-[9%]"
+                            frameClassName="relative h-[10.25rem] w-full max-w-[8rem] overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white sm:h-[10.75rem] sm:max-w-[8.5rem] md:h-[8rem] md:w-[6.75rem] md:max-w-none"
+                            imageClassName="object-contain px-0 py-[9%]"
                             pillClassName="hidden"
                           />
-                          <div className="shrink-0 pt-1 text-left md:pt-0 md:text-center">
+                          <div className="min-w-0 pt-1 text-left md:pt-0 md:text-center">
                             <ChildSeatWeightChip weightRange={seat.weightRange} />
-                            <div className={`mt-4 flex max-w-[10rem] flex-col ${childSeatMobileHeaderGapClass} md:hidden`}>
-                              <h4 className="pr-2 text-[1.1rem] font-semibold leading-[1.08] tracking-[-0.04em] text-[#111827]">
+                            <div className={`mt-4 flex max-w-full flex-col ${childSeatMobileHeaderGapClass} md:hidden`}>
+                              <h4 className="pr-2 text-[1rem] font-semibold leading-[1.08] tracking-[-0.04em] text-[#111827]">
                                 {seat.title}
                               </h4>
                               <p className="text-[0.8rem] font-medium leading-[1.4] tracking-[-0.02em] text-[#111827]">
@@ -801,12 +803,12 @@ export default async function Home({
                             {seat.title}
                           </h4>
                           <p
-                            className={`mt-4 hidden text-[0.98rem] font-medium text-[#111827] ${childSeatDesktopBodyGapClass} md:block`}
+                            className={`mt-4 hidden text-[0.98rem] font-medium text-[#111827] ${childSeatDesktopSubtitleGapClass} md:block`}
                           >
                             {seat.ageLabel}
                           </p>
                           <p
-                            className={`ui-copy-compact mt-4 leading-[1.78] text-[#58708d] ${childSeatDesktopBodyGapClass}`}
+                            className={`ui-copy-compact mt-4 leading-[1.78] text-[#58708d] ${childSeatDesktopDescriptionGapClass}`}
                           >
                             {seat.description}
                           </p>
@@ -817,12 +819,19 @@ export default async function Home({
                 </div>
 
                 <div className="mt-8 rounded-[1.5rem] border border-[#dbe7f8] bg-[#f4f8ff] px-5 py-5 md:px-6 md:py-6">
-                  <p className="text-[0.95rem] font-semibold tracking-[-0.02em] text-[#111827]">
-                    {localizedMediaContent.childSeatSection.disclaimerTitle}
-                  </p>
-                  <p className="mt-3 text-[0.98rem] leading-[1.7] text-[#58708d]">
-                    {localizedMediaContent.childSeatSection.disclaimer}
-                  </p>
+                  <div className="flex items-start gap-4">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)]">
+                      <Info size={20} strokeWidth={2.2} />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[0.95rem] font-semibold tracking-[-0.02em] text-[#111827]">
+                        {localizedMediaContent.childSeatSection.disclaimerTitle}
+                      </p>
+                      <p className="mt-3 text-[0.98rem] leading-[1.7] text-[#58708d]">
+                        {localizedMediaContent.childSeatSection.disclaimer}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
               </div>
