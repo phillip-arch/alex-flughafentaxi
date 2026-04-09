@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -280,16 +279,6 @@ const childSeatImageSources = {
   boosterSeat: '/alex-flughafentaxi-wien-sitzerhoehung-gratis.jpg',
 } as const;
 
-const childSeatCardClass =
-  'rounded-[1.75rem] border border-[#e6edf7] bg-[linear-gradient(180deg,#fbfdff_0%,#f5f9ff_100%)] p-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:p-5';
-const childSeatImageFrameClass =
-  'relative mx-auto h-[9.5rem] w-[8rem] overflow-hidden rounded-[0.9rem] border border-[#dbe7f8] bg-white shadow-[0_8px_18px_rgba(17,17,17,0.05)] sm:h-[10.5rem] sm:w-[9rem]';
-const childSeatImageInnerClass = 'relative h-full w-full';
-const childSeatWeightPillClass =
-  'absolute right-2 top-2 z-10 inline-flex whitespace-nowrap rounded-full border border-[#dbe7f8] bg-white/94 px-2.5 py-1 text-[0.8rem] font-semibold tracking-[-0.01em] text-[#111827] shadow-[0_8px_18px_rgba(17,17,17,0.08)] backdrop-blur-sm';
-const childSeatHeaderContentClass = 'mt-3 flex flex-col gap-2';
-const childSeatBodyClass = 'mt-4 rounded-[1.2rem] border border-[#e6edf7] bg-white/92 px-4 py-4';
-
 const localizedHomeMediaContent: Record<
   HomeLang,
   {
@@ -469,33 +458,6 @@ function ChildSeatPreviewImage({
         />
       </div>
     </div>
-  );
-}
-
-function ChildSeatVariantShell({
-  label,
-  title,
-  description,
-  children,
-}: {
-  label: string;
-  title: string;
-  description: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="rounded-[2rem] border border-[#e6edf7] bg-[linear-gradient(180deg,#ffffff_0%,#f7fbff_100%)] px-5 py-6 shadow-[0_14px_40px_rgba(17,17,17,0.04)] md:px-7 md:py-8">
-      <div className="max-w-[44rem]">
-        <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-[#1679FF]">
-          {label}
-        </p>
-        <h3 className="mt-3 text-[1.65rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[2rem]">
-          {title}
-        </h3>
-        <p className="mt-3 text-[1rem] leading-[1.72] text-[#58708d]">{description}</p>
-      </div>
-      <div className="mt-7">{children}</div>
-    </section>
   );
 }
 
@@ -805,41 +767,36 @@ export default async function Home({
                   {localizedMediaContent.childSeatSection.detailTitle}
                 </p>
 
-                <div className="mt-8 grid gap-5 lg:grid-cols-3 md:gap-6">
-                  {localizedMediaContent.childSeatSection.options.map(
-                    ({ key, title, weightRange, ageLabel, description, imageAlt }) => (
-                    <div
-                      key={key}
-                      className={`group ${childSeatCardClass}`}
+                <div className="mt-8 space-y-4">
+                  {localizedMediaContent.childSeatSection.options.map((seat) => (
+                    <article
+                      key={`seat-${seat.key}`}
+                      className="group rounded-[1.75rem] border border-[#e6edf7] bg-[#fbfdff] p-4 md:p-5"
                     >
-                      <div className={childSeatImageFrameClass}>
-                        <p className={childSeatWeightPillClass}>{weightRange}</p>
-                        <div className={childSeatImageInnerClass}>
-                          <Image
-                            src={childSeatImageSources[key]}
-                            alt={imageAlt}
-                            fill
-                            className="object-contain p-[14%] transition-transform duration-500 ease-out group-hover:scale-[1.08]"
-                            sizes="(min-width: 1280px) 28vw, (min-width: 768px) 44vw, 100vw"
+                      <div className="grid gap-4 md:grid-cols-[8rem_minmax(0,1fr)] md:items-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <ChildSeatWeightChip weightRange={seat.weightRange} />
+                          <ChildSeatPreviewImage
+                            seat={seat}
+                            frameClassName="relative mx-auto h-[8rem] w-[6.75rem] overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white"
+                            imageClassName="object-contain p-[13%]"
+                            pillClassName="hidden"
                           />
                         </div>
+                        <div className="rounded-[1.35rem] border border-[#edf2f8] bg-white px-4 py-4 sm:px-5 sm:py-5">
+                          <h4 className="pr-2 text-[1.25rem] font-semibold tracking-[-0.04em] text-[#111827] sm:text-[1.32rem]">
+                            {seat.title}
+                          </h4>
+                          <p className="mt-4 text-[0.98rem] font-medium text-[#111827]">
+                            {seat.ageLabel}
+                          </p>
+                          <p className="mt-4 text-[0.97rem] leading-[1.78] text-[#58708d]">
+                            {seat.description}
+                          </p>
+                        </div>
                       </div>
-
-                      <div className={childSeatHeaderContentClass}>
-                        <h3 className="text-[1.4rem] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827]">
-                          {title}
-                        </h3>
-                        <p className="text-[0.95rem] font-medium tracking-[-0.02em] text-[#111827]">
-                          {ageLabel}
-                        </p>
-                      </div>
-
-                      <div className={childSeatBodyClass}>
-                        <p className="text-[0.98rem] leading-[1.72] text-[#58708d]">{description}</p>
-                      </div>
-                    </div>
-                  ),
-                  )}
+                    </article>
+                  ))}
                 </div>
 
                 <div className="mt-8 rounded-[1.5rem] border border-[#dbe7f8] bg-[#f4f8ff] px-5 py-5 md:px-6 md:py-6">
@@ -851,49 +808,6 @@ export default async function Home({
                   </p>
                 </div>
 
-                <div className="mt-12 space-y-8 border-t border-[#e6edf7] pt-12">
-                  <ChildSeatVariantShell
-                    label={activeLang === 'en' ? 'Variation 2' : 'Variante 2'}
-                    title={activeLang === 'en' ? 'Feature strip with soft surfaces' : 'Feature-Strip mit weichen Flaechen'}
-                    description={
-                      activeLang === 'en'
-                        ? 'A broader visual strip that gives each seat more horizontal breathing room and keeps the image central.'
-                        : 'Ein breiterer Aufbau mit mehr horizontaler Luft pro Sitz und klarer Bildfuehrung.'
-                    }
-                  >
-                    <div className="space-y-4">
-                      {localizedMediaContent.childSeatSection.options.map((seat) => (
-                        <article
-                          key={`strip-${seat.key}`}
-                          className="group rounded-[1.75rem] border border-[#e6edf7] bg-[#fbfdff] p-4 md:p-5"
-                        >
-                          <div className="grid gap-4 md:grid-cols-[8rem_minmax(0,1fr)] md:items-center">
-                            <ChildSeatPreviewImage
-                              seat={seat}
-                              frameClassName="relative mx-auto h-[8rem] w-[6.75rem] overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white"
-                              imageClassName="object-contain p-[13%]"
-                              pillClassName="hidden"
-                            />
-                            <div className="rounded-[1.35rem] border border-[#edf2f8] bg-white px-4 py-4">
-                              <div className="flex flex-wrap items-center gap-3">
-                                <h4 className="text-[1.25rem] font-semibold tracking-[-0.04em] text-[#111827]">
-                                  {seat.title}
-                                </h4>
-                                <ChildSeatWeightChip weightRange={seat.weightRange} />
-                              </div>
-                              <p className="mt-3 text-[0.98rem] font-medium text-[#111827]">
-                                {seat.ageLabel}
-                              </p>
-                              <p className="mt-3 text-[0.97rem] leading-[1.72] text-[#58708d]">
-                                {seat.description}
-                              </p>
-                            </div>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </ChildSeatVariantShell>
-                </div>
               </div>
             </div>
           </div>
