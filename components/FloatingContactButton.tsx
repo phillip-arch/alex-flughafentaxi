@@ -62,12 +62,12 @@ export default function FloatingContactButton() {
           <div className="mx-auto mb-3 h-1.5 w-16 rounded-full bg-[#cfd7e3] md:hidden" />
 
           <div className="flex items-start justify-between gap-3">
-            <div className="max-w-[15rem]">
+            <div className="flex max-w-[15rem] flex-col gap-[10px]">
               <h2 className="text-[1.35rem] font-black tracking-[-0.05em] text-[#1b2436] md:text-[1.45rem]">
-                How can we help?
+                Wie koennen wir helfen?
               </h2>
-              <p className="mt-2 text-[0.8rem] leading-[1.5] text-[#67758d] md:text-[0.82rem]">
-                We&apos;re here if you need assistance with your ride or booking.
+              <p className="text-[0.8rem] leading-[1.5] text-[#67758d] md:text-[0.82rem]">
+                Wir sind fuer Sie da, wenn Sie Hilfe bei Ihrer Fahrt oder Buchung brauchen.
               </p>
             </div>
 
@@ -91,10 +91,10 @@ export default function FloatingContactButton() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[0.88rem] font-bold tracking-[-0.03em] text-[#1b2436] md:text-[0.92rem]">
-                  Call us
+                  Rufen Sie uns an
                 </span>
                 <span className="mt-0.5 block text-[0.76rem] text-[#6c7a92] md:text-[0.8rem]">
-                  Available 24/7
+                  Rund um die Uhr erreichbar
                 </span>
               </span>
               <ArrowRight size={22} className="shrink-0 text-[#8b97ab]" strokeWidth={1.9} />
@@ -109,10 +109,10 @@ export default function FloatingContactButton() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[0.88rem] font-bold tracking-[-0.03em] text-[#1b2436] md:text-[0.92rem]">
-                  Contact via WhatsApp
+                  Kontakt per WhatsApp
                 </span>
                 <span className="mt-0.5 block text-[0.76rem] text-[#6c7a92] md:text-[0.8rem]">
-                  Quick response
+                  Schnelle Antwort
                 </span>
               </span>
               <ArrowRight size={22} className="shrink-0 text-[#8b97ab]" strokeWidth={1.9} />
@@ -120,7 +120,7 @@ export default function FloatingContactButton() {
           </div>
 
           <div className="mt-4 rounded-[1.2rem] border border-[#e7edf5] bg-[#f5f8fd] px-4 py-3 text-[0.76rem] text-[#6a7891] md:text-[0.8rem]">
-            We usually respond within 2–5 minutes.
+            Wir antworten normalerweise innerhalb von 2 bis 5 Minuten.
           </div>
         </div>
       ) : null}
@@ -130,16 +130,16 @@ export default function FloatingContactButton() {
           type="button"
           onClick={() => setIsOpen(true)}
           aria-label="Open help panel"
-          className="flex items-center gap-[0.6rem] rounded-full border border-[#cfe0ff] bg-white py-[0.45rem] pl-[0.45rem] pr-[0.9rem] shadow-[0_16px_38px_rgba(17,17,17,0.14)] transition-all duration-200 hover:border-[#b9d0ff] hover:shadow-[0_18px_42px_rgba(17,17,17,0.18)] md:gap-2 md:py-1.5 md:pl-1.5 md:pr-3"
+          className="flex items-center gap-[0.66rem] rounded-full border border-[#cfe0ff] bg-white py-[0.5rem] pl-[0.5rem] pr-[1rem] shadow-[0_16px_38px_rgba(17,17,17,0.14)] transition-all duration-200 hover:border-[#b9d0ff] hover:shadow-[0_18px_42px_rgba(17,17,17,0.18)] md:gap-[0.55rem] md:py-[0.5rem] md:pl-[0.5rem] md:pr-[1rem]"
         >
-          <span className="flex h-[2.65rem] w-[2.65rem] items-center justify-center rounded-full border border-[#cfe0ff] bg-white text-[#1f7cff] shadow-[0_8px_20px_rgba(17,17,17,0.12)] md:h-[2.2rem] md:w-[2.2rem]">
-            <HelpCircle size={19} strokeWidth={2.1} className="md:h-4 md:w-4" />
+          <span className="flex h-[2.9rem] w-[2.9rem] items-center justify-center rounded-full border border-[#cfe0ff] bg-white text-[#1f7cff] shadow-[0_8px_20px_rgba(17,17,17,0.12)] md:h-[2.4rem] md:w-[2.4rem]">
+            <HelpCircle size={21} strokeWidth={2.1} className="md:h-[17px] md:w-[17px]" />
           </span>
           <span className="text-left">
-            <span className="block text-[0.86rem] font-bold tracking-[-0.03em] text-[#1b2436] md:text-[0.75rem]">
-              Need help?
+            <span className="block text-[0.95rem] font-bold tracking-[-0.03em] text-[#1b2436] md:text-[0.82rem]">
+              Brauchen Sie Hilfe?
             </span>
-            <span className="mt-0.5 block text-[0.74rem] text-[#6c7a92] md:text-[0.65rem]">
+            <span className="mt-0.5 block text-[0.8rem] text-[#6c7a92] md:text-[0.72rem]">
               Support & Kontakt
             </span>
           </span>
