@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import DistrictPriceTable from '@/components/DistrictPriceTable';
-import { districtPricingRows } from '@/lib/pricing/districtPricing';
+import { districtPricingRows, getDistrictPrice } from '@/lib/pricing/districtPricing';
 import type { ViennaDistrictMapGeometry } from '@/lib/maps/viennaDistricts';
 import { SVG_WIDTH } from '@/lib/maps/viennaDistricts';
 
@@ -20,6 +20,36 @@ const DEFAULT_MOBILE_TOP_CLASS = 'top-0';
 const DISTRICT_LABEL_OFFSETS: Record<string, { x: number; y: number }> = {
   '17': { x: -8, y: 6 },
 };
+const DISTRICT_DRIVE_TIMES: Record<string, string> = {
+  '1010': '~25 min',
+  '1020': '~20 min',
+  '1030': '~20 min',
+  '1040': '~25 min',
+  '1050': '~25 min',
+  '1060': '~30 min',
+  '1070': '~30 min',
+  '1080': '~30 min',
+  '1090': '~30 min',
+  '1100': '~25 min',
+  '1110': '~15 min',
+  '1120': '~30 min',
+  '1130': '~35 min',
+  '1140': '~40 min',
+  '1150': '~30 min',
+  '1160': '~35 min',
+  '1170': '~35 min',
+  '1180': '~35 min',
+  '1190': '~35 min',
+  '1200': '~25 min',
+  '1210': '~30 min',
+  '1220': '~25 min',
+  '1230': '~30 min',
+};
+const TOOLTIP_WIDTH = 252;
+const TOOLTIP_HEIGHT = 142;
+const TOOLTIP_OFFSET = 18;
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 const districtByBezNr = new Map(
   districtPricingRows.map((district) => [String((Number(district.id) - 1000) / 10), district]),
@@ -70,6 +100,23 @@ export default function DistrictMapPriceExplorer({
 
   const mapSectionClassName = `${MAP_SECTION_BASE_CLASS} ${MOBILE_MAP_SECTION_CLASS} ${NON_MOBILE_MAP_SECTION_CLASS} ${DESKTOP_MAP_WIDTH} ${mobileTopClassName} ${desktopTopClassName}`;
   const mapSvgClassName = `${MAP_SVG_BASE_CLASS} ${MAP_SVG_SCALE_CLASS}`;
+  const activeFeature = activeId
+    ? mapGeometry.features.find((feature) => districtByBezNr.get(feature.beznr)?.id === activeId)
+    : null;
+  const activeDistrict = activeId ? districtPricingRows.find((district) => district.id === activeId) : null;
+  const shouldPlaceTooltipLeft = activeFeature?.beznr === '22';
+  const tooltipX = activeFeature
+    ? clamp(
+        shouldPlaceTooltipLeft
+          ? activeFeature.center.x - TOOLTIP_WIDTH - TOOLTIP_OFFSET
+          : activeFeature.center.x + TOOLTIP_OFFSET,
+        12,
+        SVG_WIDTH - TOOLTIP_WIDTH - 12,
+      )
+    : 0;
+  const tooltipY = activeFeature
+    ? clamp(activeFeature.center.y - TOOLTIP_HEIGHT - TOOLTIP_OFFSET, 12, mapGeometry.svgHeight - TOOLTIP_HEIGHT - 12)
+    : 0;
 
   return (
     <div className="flex flex-col items-start gap-8 lg:flex-row">
@@ -101,8 +148,17 @@ export default function DistrictMapPriceExplorer({
                       strokeWidth={isActive ? 3.2 : 2.2}
                       vectorEffect="non-scaling-stroke"
                       className="cursor-pointer transition-all duration-200"
+                      tabIndex={0}
+                      role="button"
+                      aria-label={
+                        matchingDistrict
+                          ? `${matchingDistrict.id} ${matchingDistrict.name}, ${DISTRICT_DRIVE_TIMES[matchingDistrict.id] ?? 'estimated time unavailable'}, Sedan ${getDistrictPrice(matchingDistrict.group, 'limo')} EUR, Station Wagon ${getDistrictPrice(matchingDistrict.group, 'kombi')} EUR, Minivan ${getDistrictPrice(matchingDistrict.group, 'van')} EUR`
+                          : undefined
+                      }
                       onMouseEnter={() => matchingDistrict && setActiveId(matchingDistrict.id)}
                       onMouseLeave={() => setActiveId(null)}
+                      onFocus={() => matchingDistrict && setActiveId(matchingDistrict.id)}
+                      onBlur={() => setActiveId(null)}
                       onClick={() => matchingDistrict && setActiveId(matchingDistrict.id)}
                     />
                     <text
@@ -121,6 +177,29 @@ export default function DistrictMapPriceExplorer({
                   </g>
                 );
               })}
+              {activeFeature && activeDistrict ? (
+                <foreignObject
+                  x={tooltipX}
+                  y={tooltipY}
+                  width={TOOLTIP_WIDTH}
+                  height={TOOLTIP_HEIGHT}
+                  className="pointer-events-none overflow-visible"
+                >
+                  <div className="rounded-[1rem] border border-[#dbe7f8] bg-white/95 px-4 py-3 text-left shadow-[0_18px_45px_rgba(17,24,39,0.18)] backdrop-blur-sm">
+                    <p className="text-[20px] font-black leading-tight tracking-[-0.03em] text-[#111827]">
+                      📍 {activeDistrict.id} {activeDistrict.name}
+                    </p>
+                    <p className="mt-1.5 text-[20px] font-semibold leading-tight text-[#5f6975]">
+                      ⏱️ {DISTRICT_DRIVE_TIMES[activeDistrict.id] ?? '~30 min'}
+                    </p>
+                    <p className="mt-2 whitespace-nowrap text-[20px] font-black leading-tight tracking-[-0.03em] text-[#111827]">
+                      {getDistrictPrice(activeDistrict.group, 'limo')}€ <span className="text-[#9ca3af]">|</span>{' '}
+                      {getDistrictPrice(activeDistrict.group, 'kombi')}€ <span className="text-[#9ca3af]">|</span>{' '}
+                      {getDistrictPrice(activeDistrict.group, 'van')}€
+                    </p>
+                  </div>
+                </foreignObject>
+              ) : null}
             </svg>
           ) : shouldRenderMap ? (
             <div className="absolute inset-0 flex items-center justify-center px-4 py-10 text-center text-sm text-[#6b7280]">
@@ -137,10 +216,12 @@ export default function DistrictMapPriceExplorer({
       <section className={`w-full ${DESKTOP_TABLE_WIDTH}`}>
         <DistrictPriceTable activeId={activeId} onActiveIdChange={setActiveId} />
 
-        <p className="mt-4 px-2 text-[10px] leading-relaxed text-[#9ca3af]">
-          * Fixpreisgarantie gilt fuer Fahrten von oder nach Flughafen Wien (VIE). Inklusive 10
-          Min. Wartezeit und Kindersitz auf Anfrage.
-        </p>
+        <div className="pt-6">
+          <p className="px-2 text-[10px] leading-relaxed text-[#111111]">
+            Please note: The travel times shown on the map are estimates. The actual driving time may vary
+            depending on traffic, time of day, and weather conditions. Please plan your departure time accordingly.
+          </p>
+        </div>
       </section>
     </div>
   );

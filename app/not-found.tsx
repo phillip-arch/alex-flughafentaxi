@@ -61,7 +61,7 @@ export default function NotFound() {
                     href="/book"
                     className="inline-flex items-center justify-center rounded-[var(--radius-field)] border border-[#dbe7f8] bg-white px-7 py-4 text-[1.0625rem] font-medium leading-none text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]"
                   >
-                    Fahrt buchen
+                    Book Now
                   </Link>
                 </div>
               </div>

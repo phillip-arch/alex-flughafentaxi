@@ -6,8 +6,8 @@ import { districtPricingRows, getDistrictPrice } from '@/lib/pricing/districtPri
 const vehicleColumns = [
   {
     key: 'limo',
-    label: 'Limousine',
-    shortLabel: 'Limo',
+    label: 'Sedan',
+    shortLabel: 'Sedan',
     specs: [
       { icon: Users, value: '2' },
       { icon: Briefcase, value: '2' },
@@ -16,8 +16,8 @@ const vehicleColumns = [
   },
   {
     key: 'kombi',
-    label: 'Kombi',
-    shortLabel: 'Kombi',
+    label: 'Station Wagon',
+    shortLabel: 'Wagon',
     specs: [
       { icon: Users, value: '4' },
       { icon: Briefcase, value: '4' },
@@ -27,7 +27,7 @@ const vehicleColumns = [
   {
     key: 'van',
     label: 'Minivan',
-    shortLabel: 'Van',
+    shortLabel: 'Minivan',
     specs: [
       { icon: Users, value: '8' },
       { icon: Briefcase, value: '8' },
@@ -52,7 +52,7 @@ export default function DistrictPriceTable({
           <thead className="bg-[#111111] text-white md:bg-[#f8fbff] md:text-inherit">
             <tr className="border-b border-[#e7edf5]">
               <th className="w-[34%] px-2 py-2 text-left text-[0.65rem] font-semibold uppercase tracking-[0.08em] text-white md:w-auto md:px-6 md:py-4 md:text-[0.9rem] md:normal-case md:tracking-[-0.02em] md:text-[#5f6975]">
-                Bezirk / PLZ
+                District / ZIP
               </th>
               {vehicleColumns.map((column) => (
                 <th
@@ -61,7 +61,7 @@ export default function DistrictPriceTable({
                 >
                   <div className="flex flex-col items-center gap-2">
                     <span className="md:hidden">{column.shortLabel}</span>
-                    <span className="hidden md:inline">{column.label}</span>
+                    <span className="hidden whitespace-nowrap md:inline md:text-[13.4px]">{column.label}</span>
                     <div className="hidden items-center justify-center gap-2 text-[#5f6975] md:flex">
                       {column.specs.map(({ icon: Icon, value }, index) => (
                         <span

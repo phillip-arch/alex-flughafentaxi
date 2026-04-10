@@ -56,13 +56,13 @@ export default function BookingStepTwo({
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="text-center mb-8">
-        <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Wann?</h2>
-        <p className="text-[12px] text-[#6d7075]">Datum und Uhrzeit waehlen.</p>
+        <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">When?</h2>
+        <p className="text-[12px] text-[#6d7075]">Choose date and time.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">Datum</label>
+          <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">Date</label>
           <div className="relative">
             <input
               type="text"
@@ -92,7 +92,7 @@ export default function BookingStepTwo({
         </div>
         <div>
           <label className="block text-[12px] font-medium uppercase tracking-wide text-[#6d7075] mb-2 ml-1">
-            {formData.direction === 'from_airport' ? 'Landezeit' : 'Zeit'}
+            {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
           </label>
           <div className="relative">
             <input
@@ -125,18 +125,18 @@ export default function BookingStepTwo({
 
       {formData.direction === 'from_airport' ? (
         <div>
-          <p className="mb-3 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Flugdetails</p>
+          <p className="mb-3 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Flight details</p>
           <input
             type="text"
             name="flightNumber"
             value={formData.flightNumber}
             onChange={handleChange}
             onBlur={handleFlightNumberBlur}
-            placeholder="Flugnummer (z.B. OS123)"
+            placeholder="Flight number (e.g. OS123)"
             className={getInputClassName('flightNumber')}
           />
           {isLookingUpFlight ? (
-            <p className="mt-2 ml-1 text-[12px] text-[#6d7075]">Flugdaten werden geladen...</p>
+            <p className="mt-2 ml-1 text-[12px] text-[#6d7075]">Loading flight data...</p>
           ) : null}
           {flightLookupError ? (
             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
@@ -147,17 +147,17 @@ export default function BookingStepTwo({
       ) : null}
 
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        {renderInlineSelect('passengers', 'Personen', [1, 2, 3, 4, 5, 6, 7, 8], formData.passengers, Users)}
-        {renderInlineSelect('luggage', 'Koffer', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.luggage, Briefcase)}
-        {renderInlineSelect('handLuggage', 'Handgepaeck', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.handLuggage, ShoppingBag)}
+        {renderInlineSelect('passengers', 'Passengers', [1, 2, 3, 4, 5, 6, 7, 8], formData.passengers, Users)}
+        {renderInlineSelect('luggage', 'Suitcases', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.luggage, Briefcase)}
+        {renderInlineSelect('handLuggage', 'Hand luggage', [0, 1, 2, 3, 4, 5, 6, 7, 8], formData.handLuggage, ShoppingBag)}
       </div>
 
       <div className="flex flex-col gap-4 rounded-[var(--radius-field)] bg-[#f5f5f7] p-4 md:p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="text-[#1d1d1f]">
-              <p className="font-medium text-[15px]">Kindersitz benoetigt?</p>
-              <p className="text-[13px] text-[#86868b]">Kostenlos inklusive</p>
+              <p className="font-medium text-[15px]">Need a child seat?</p>
+              <p className="text-[13px] text-[#86868b]">Included free of charge</p>
             </div>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -168,9 +168,9 @@ export default function BookingStepTwo({
 
         {formData.childSeat ? (
           <div className="grid grid-cols-3 gap-3 border-t border-[#d2d2d7]/30 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
-            {renderInlineSelect('babySeats', 'Babyschale', [0, 1, 2, 3], formData.babySeats)}
-            {renderInlineSelect('childSeats', 'Kindersitz', [0, 1, 2, 3], formData.childSeats)}
-            {renderInlineSelect('boosterSeats', 'Sitzerhoehung', [0, 1, 2, 3], formData.boosterSeats)}
+            {renderInlineSelect('babySeats', 'Baby seat', [0, 1, 2, 3], formData.babySeats)}
+            {renderInlineSelect('childSeats', 'Child seat', [0, 1, 2, 3], formData.childSeats)}
+            {renderInlineSelect('boosterSeats', 'Booster seat', [0, 1, 2, 3], formData.boosterSeats)}
           </div>
         ) : null}
       </div>
@@ -187,7 +187,7 @@ export default function BookingStepTwo({
           <ChevronLeft size={24} />
         </button>
         <button type="button" onClick={nextStep} className={primaryActionButtonClass}>
-          Preise anzeigen
+          Show prices
         </button>
       </div>
     </div>

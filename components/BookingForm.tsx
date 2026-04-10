@@ -94,6 +94,7 @@ type BookingFormProps = {
   showInfoTrigger?: boolean;
   headerTitle?: string;
   showStepOneRouteIntro?: boolean;
+  heroEnglishCopy?: boolean;
   isAppSurface?: boolean;
   initialFavorites?: FavoriteAddress[];
   initialIsLoggedIn?: boolean;
@@ -137,6 +138,7 @@ const BookingForm = ({
   showInfoTrigger = false,
   headerTitle,
   showStepOneRouteIntro,
+  heroEnglishCopy = false,
   isAppSurface: isAppSurfaceProp,
   initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
@@ -148,6 +150,18 @@ const BookingForm = ({
   const isAppSurface = isAppSurfaceProp ?? getAppSurface() === 'app';
   const shouldShowStepOneRouteIntro = showStepOneRouteIntro ?? !isHomepageForm;
   const allowExtendedDropdownSpace = true;
+  const copy = {
+    stepLabel: (step: number) => `Step ${step} of 3`,
+    routeTitle: 'Route',
+    routeDescription: 'Enter pickup and destination',
+    pickupLabel: 'Pickup',
+    destinationLabel: 'Destination',
+    airportLabel: 'Vienna Airport (VIE)',
+    streetPlaceholder: 'Select street',
+    swapRouteLabel: 'Swap pickup and destination',
+    addStopLabel: 'Add extra stop',
+    nextLabel: 'Next',
+  };
   const supabase = supabaseBrowser();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -210,7 +224,7 @@ const BookingForm = ({
   });
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const REQUIRED_FIELDS_ERROR = 'Bitte fuellen Sie alle erforderlichen Felder aus.';
+  const REQUIRED_FIELDS_ERROR = 'Please fill in all required fields.';
 
   useEffect(() => {
     onDirectionChange?.(formData.direction);
@@ -866,13 +880,13 @@ const BookingForm = ({
     if (!lookupFlightNumber) return;
 
     if (!FLIGHT_NUMBER_PATTERN.test(lookupFlightNumber)) {
-      setFlightLookupError('Bitte geben Sie eine gueltige Flugnummer ein, z. B. OS123.');
+      setFlightLookupError('Please enter a valid flight number, e.g. OS123.');
       return;
     }
 
     const formattedDate = formatSelectedDateForFlightLookup(formData.date);
     if (!formattedDate) {
-      setFlightLookupError('Bitte waehlen Sie zuerst das Datum, damit die Flugnummer geprueft werden kann.');
+      setFlightLookupError('Please select the date first so the flight number can be checked.');
       return;
     }
 
@@ -892,7 +906,7 @@ const BookingForm = ({
       };
 
       if (!response.ok || !payload.displayFlightNumber || !payload.scheduledArrivalTime) {
-        setFlightLookupError(payload.error || 'Flug konnte nicht gefunden werden.');
+        setFlightLookupError(payload.error || 'Flight could not be found.');
         return;
       }
 
@@ -903,7 +917,7 @@ const BookingForm = ({
       }));
       setFlightLookupError(null);
     } catch {
-      setFlightLookupError('Flugdaten konnten gerade nicht geladen werden. Bitte versuchen Sie es erneut.');
+      setFlightLookupError('Flight data could not be loaded right now. Please try again.');
     } finally {
       setIsLookingUpFlight(false);
     }
@@ -1101,17 +1115,17 @@ const BookingForm = ({
               validateStreetNumber('extraStopStreet');
               handleBlur({} as React.FocusEvent<HTMLInputElement>);
             }}
-            placeholder="Strasse auswaehlen"
+            placeholder={copy.streetPlaceholder}
             className={getInputClassName('extraStopStreet')}
           />
           {streetNumberWarning === 'extraStopStreet' ? (
             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-              Bitte ergaenze die Hausnummer.
+              Please add the street number.
             </div>
           ) : null}
           {streetPasteWarning === 'extraStopStreet' ? (
             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-              Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
+              Address could not be recognized clearly. Please choose from the list.
             </div>
           ) : null}
         </div>
@@ -1164,8 +1178,8 @@ const BookingForm = ({
     }
 
     return isNightTime
-      ? 'Fuer Fahrten zwischen 22:00 und 07:00 Uhr ist eine Vorlaufzeit von 8 Stunden erforderlich.'
-      : 'Kurzfristige Buchungen sind nur bis 3 Stunden vor Abholung moeglich.';
+      ? 'For rides between 22:00 and 07:00, booking at least 8 hours in advance is required.'
+      : 'Short-notice bookings are only possible up to 3 hours before pickup.';
   };
 
   const getStepValidation = (step: number) => {
@@ -1204,7 +1218,7 @@ const BookingForm = ({
         return {
           isValid: false,
           missingFields: ['street'] as (keyof ExtendedBookingInput)[],
-          errorMessage: 'Bitte waehlen Sie eine gueltige Adresse aus der Liste und ergaenzen Sie die Hausnummer.',
+          errorMessage: 'Please choose a valid address from the list and add the street number.',
         };
       }
     }
@@ -1387,8 +1401,8 @@ const BookingForm = ({
             formData.extraStopCity,
           )
         : '';
-      const pickup = formData.direction === 'to_airport' ? addressString : 'Flughafen Wien (VIE)';
-      const destination = formData.direction === 'to_airport' ? 'Flughafen Wien (VIE)' : addressString;
+      const pickup = formData.direction === 'to_airport' ? addressString : 'Vienna Airport (VIE)';
+      const destination = formData.direction === 'to_airport' ? 'Vienna Airport (VIE)' : addressString;
       
       // Combine date and time
       // Parse DD.MM.YYYY
@@ -1408,19 +1422,19 @@ const BookingForm = ({
         luggage: formData.luggage,
         vehicle_type: vehicleType,
         notes: formData.notes + 
-               (formData.childSeat ? ` (Kindersitze: ${formData.babySeats > 0 ? `${formData.babySeats}x Babyschale ` : ''}${formData.childSeats > 0 ? `${formData.childSeats}x Kindersitz ` : ''}${formData.boosterSeats > 0 ? `${formData.boosterSeats}x Sitzerhoehung` : ''})` : '') + 
-               (formData.extraStop ? ` (Zwischenstopp: ${extraStopAddressString})` : '') +
-               (formData.flightNumber ? ` (Flugnummer: ${formData.flightNumber})` : '') +
-               (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Handgepaeck: ${formData.handLuggage})` : '') +
+               (formData.childSeat ? ` (Child seats: ${formData.babySeats > 0 ? `${formData.babySeats}x baby seat ` : ''}${formData.childSeats > 0 ? `${formData.childSeats}x child seat ` : ''}${formData.boosterSeats > 0 ? `${formData.boosterSeats}x booster seat` : ''})` : '') + 
+               (formData.extraStop ? ` (Extra stop: ${extraStopAddressString})` : '') +
+               (formData.flightNumber ? ` (Flight number: ${formData.flightNumber})` : '') +
+               (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Hand luggage: ${formData.handLuggage})` : '') +
                (formData.paymentMethod
-                 ? ` (Zahlung: ${
+                 ? ` (Payment: ${
                      formData.paymentMethod === 'cash'
-                       ? 'Barzahlung'
+                       ? 'Cash'
                        : formData.paymentMethod === 'card'
-                         ? 'Kreditkarte'
+                         ? 'Credit card'
                          : formData.paymentMethod === 'voucher'
-                           ? 'Lieferschein'
-                           : 'Gratis'
+                           ? 'Voucher'
+                           : 'Free'
                    })`
                  : ''),
         _zip: formData.zip,
@@ -1429,7 +1443,7 @@ const BookingForm = ({
 
       // 1. Validate (Basic check)
       if (!formData.fullName || !formData.email || !formData.phone) {
-        throw new Error('Bitte fuellen Sie alle Kontaktfelder aus.');
+        throw new Error('Please fill in all contact fields.');
       }
 
       // 2. Submit via Server Action (handles token generation and emails)
@@ -1442,7 +1456,7 @@ const BookingForm = ({
       router.push('/book/success');
       
     } catch (err: any) {
-      setError(err.message || 'Ein Fehler ist aufgetreten.');
+      setError(err.message || 'An error occurred.');
     } finally {
       setLoading(false);
     }
@@ -1460,7 +1474,7 @@ const BookingForm = ({
       className="inline-flex shrink-0 items-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[0.8rem] py-[0.42rem] text-[10.25px] text-[#1679ff] transition-all md:px-3.5 md:py-2 md:text-[0.84rem]"
       aria-current="step"
     >
-      <span className="font-semibold tracking-[-0.02em]">{`Schritt ${currentStep} von 3`}</span>
+      <span className="font-semibold tracking-[-0.02em]">{copy.stepLabel(currentStep)}</span>
     </button>
   );
 
@@ -1473,7 +1487,7 @@ const BookingForm = ({
       {shouldShowInfoTrigger ? (
         <button
           type="button"
-          aria-label="Informationen"
+          aria-label="Information"
           onClick={() => setIsInfoPanelOpen(true)}
           className={`absolute z-10 inline-flex items-center justify-center text-[#1679ff] transition-colors hover:text-[#0a63ff] ${
             isAppSurface
@@ -1507,8 +1521,8 @@ const BookingForm = ({
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
                 {shouldShowStepOneRouteIntro && (
                   <div className="text-center mb-6">
-                    <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">Route</h2>
-                    <p className="text-[12px] text-[#6d7075]">Abholort und Ziel eingeben</p>
+                    <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
+                    <p className="text-[12px] text-[#6d7075]">{copy.routeDescription}</p>
                   </div>
                 )}
               <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
@@ -1525,7 +1539,7 @@ const BookingForm = ({
 
                   <div className="min-w-0 flex-1">
                     <div className="min-h-[4.2rem]">
-                      <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">Abholung</p>
+                      <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">{copy.pickupLabel}</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="mr-[-5px] md:mr-0">
@@ -1534,7 +1548,7 @@ const BookingForm = ({
                                 <PlaneLanding size={18} strokeWidth={2.1} />
                               </span>
                               <p className="leading-[1.2] text-[#111111]">
-                                Flughafen Wien (VIE)
+                                {copy.airportLabel}
                               </p>
                             </div>
                           </div>
@@ -1556,18 +1570,18 @@ const BookingForm = ({
                                 validateStreetNumber('street');
                                 handleBlur({} as React.FocusEvent<HTMLInputElement>);
                               }}
-                              placeholder="Strasse auswaehlen"
+                              placeholder={copy.streetPlaceholder}
                               className={getInputClassName('street')}
                             />
                           </div>
                           {streetNumberWarning === 'street' ? (
                             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-                              Bitte ergaenze die Hausnummer.
+                              Please add the street number.
                             </div>
                           ) : null}
                           {streetPasteWarning === 'street' ? (
                             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-                              Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
+                              Address could not be recognized clearly. Please choose from the list.
                             </div>
                           ) : null}
                           {renderExtraStopPanel()}
@@ -1576,7 +1590,7 @@ const BookingForm = ({
                     </div>
 
                     <div className="mt-2.5 min-h-[4.2rem]">
-                      <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">Ziel</p>
+                      <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">{copy.destinationLabel}</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="mr-[-5px] md:mr-0">
@@ -1593,18 +1607,18 @@ const BookingForm = ({
                                 validateStreetNumber('street');
                                 handleBlur({} as React.FocusEvent<HTMLInputElement>);
                               }}
-                              placeholder="Strasse auswaehlen"
+                              placeholder={copy.streetPlaceholder}
                               className={getInputClassName('street')}
                             />
                           </div>
                           {streetNumberWarning === 'street' ? (
                             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-                              Bitte ergaenze die Hausnummer.
+                              Please add the street number.
                             </div>
                           ) : null}
                           {streetPasteWarning === 'street' ? (
                             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-                              Adresse konnte nicht eindeutig erkannt werden. Bitte aus der Liste waehlen.
+                              Address could not be recognized clearly. Please choose from the list.
                             </div>
                           ) : null}
                           {renderExtraStopPanel()}
@@ -1617,7 +1631,7 @@ const BookingForm = ({
                                 <PlaneTakeoff size={18} strokeWidth={2.1} />
                               </span>
                               <p className="leading-[1.2] text-[#111111]">
-                                Flughafen Wien (VIE)
+                                {copy.airportLabel}
                               </p>
                             </div>
                           </div>
@@ -1630,7 +1644,7 @@ const BookingForm = ({
                       type="button"
                       onClick={toggleExtraStop}
                       className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
-                      aria-label="Zusatzstopp hinzufuegen"
+                      aria-label={copy.addStopLabel}
                     >
                       <Plus size={19} className="-translate-x-[2px]" />
                     </button>
@@ -1638,7 +1652,7 @@ const BookingForm = ({
                       type="button"
                       onClick={toggleDirection}
                       className={`${MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS} ${DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS} inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8`}
-                      aria-label="Abholung und Ziel tauschen"
+                      aria-label={copy.swapRouteLabel}
                     >
                       <ArrowUpDown size={19} className="-translate-x-[2px]" />
                     </button>
@@ -1659,7 +1673,7 @@ const BookingForm = ({
                     onClick={nextStep}
                     className={primaryActionButtonClass}
                   >
-                  Weiter
+                  {copy.nextLabel}
                 </button>
               </div>
             </div>
@@ -1729,7 +1743,7 @@ const BookingForm = ({
                     type="button"
                     onClick={() => setIsInfoPanelOpen(false)}
                     className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827] md:hidden"
-                    aria-label="Zurueck"
+                    aria-label="Back"
                   >
                     <ChevronRight size={18} />
                   </button>
@@ -1737,7 +1751,7 @@ const BookingForm = ({
                     type="button"
                     onClick={() => setIsInfoPanelOpen(false)}
                     className="hidden md:inline-flex md:h-11 md:w-11 md:items-center md:justify-center md:rounded-full md:border md:border-[#e5e7eb] md:bg-white md:text-[#111827]"
-                    aria-label="Schliessen"
+                    aria-label="Close"
                   >
                     <X size={18} />
                   </button>
@@ -1746,13 +1760,13 @@ const BookingForm = ({
               <div className="pb-6 pt-2 md:pt-0">
                 <div className="min-w-0">
                   <p className="text-[0.82rem] font-semibold uppercase tracking-[0.22em] text-[#1679ff]">
-                    Informationen
+                    Information
                   </p>
                   <h2 className="mt-3 text-[2.2rem] font-semibold leading-[0.98] tracking-[-0.06em] text-[#111827] md:max-w-[11ch] md:text-[4rem]">
-                    Informationen zum Flughafentransfer
+                    Airport Transfer Information
                   </h2>
                   <p className="mt-4 max-w-[44rem] text-[1.02rem] leading-8 text-[#6a7d96] md:text-[1.12rem]">
-                    Alle wichtigen Hinweise fuer Ankunft, Vorlaufzeit und Zahlung direkt neben der Buchung.
+                    All important details about arrival, booking lead time, and payment next to your booking.
                   </p>
                 </div>
               </div>
@@ -1760,40 +1774,40 @@ const BookingForm = ({
               <div className="space-y-4 md:space-y-5">
                 <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
                   <p className="text-[0.82rem] font-semibold uppercase tracking-[0.22em] text-[#1679ff]">
-                    Abholung am Flughafen
+                    Airport pickup
                   </p>
                   <h3 className="mt-2 text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
-                    Wo Sie Ihren Fahrer treffen
+                    Where to meet your driver
                   </h3>
                   <ul className="mt-4 space-y-2 text-[1rem] leading-8 text-[#6a6a6a]">
-                    <li>• Der Fahrer wartet in der Ankunftshalle</li>
-                    <li>• Namensschild mit Ihrem Buchungsnamen</li>
-                    <li>• Kostenlose Wartezeit inklusive</li>
+                    <li>• Your driver waits in the arrivals hall</li>
+                    <li>• Name sign with your booking name</li>
+                    <li>• Free waiting time included</li>
                   </ul>
                 </div>
 
                 <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
                   <h3 className="text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
-                    Mindestvorlauf fuer Buchungen
+                    Minimum booking lead time
                   </h3>
                   <div className="mt-4 space-y-2 text-[1rem] leading-8 text-[#6a6a6a]">
-                    <p>07:00-22:00 - mindestens 3h vorher buchen</p>
-                    <p>22:00-07:00 - mindestens 8h vorher buchen</p>
+                    <p>07:00-22:00 - book at least 3h in advance</p>
+                    <p>22:00-07:00 - book at least 8h in advance</p>
                   </div>
                 </div>
 
                 <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
                   <h3 className="text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
-                    Kindersitze
+                    Child seats
                   </h3>
                   <p className="mt-3 text-[1rem] leading-8 text-[#6a6a6a]">
-                    Auf Wunsch direkt waehrend der Buchung waehlbar.
+                    Available on request directly during booking.
                   </p>
                 </div>
 
                 <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
                   <h3 className="text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
-                    Zahlungsarten
+                    Payment methods
                   </h3>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     {['Bar', 'Visa', 'Mastercard', 'Apple Pay'].map((method) => (
@@ -1812,9 +1826,9 @@ const BookingForm = ({
 
                 <div className="flex flex-wrap gap-3 pb-8 md:pb-2">
                   {[
-                    { label: 'Fixpreis', icon: Check },
-                    { label: 'Kostenlose Wartezeit', icon: Clock },
-                    { label: 'Flugtracking', icon: PlaneLanding },
+                    { label: 'Fixed price', icon: Check },
+                    { label: 'Free waiting time', icon: Clock },
+                    { label: 'Flight tracking', icon: PlaneLanding },
                   ].map(({ label, icon: Icon }) => (
                     <div
                       key={label}

@@ -116,28 +116,28 @@ const whyUsItems = [
 ];
 
 const transferFeatureRows = [
-  'Fixpreis garantiert',
-  'Direkte Abholung',
-  'Puenktlicher Transfer',
-  'Komfortable Fahrzeuge',
+  'Fixed price guaranteed',
+  'Direct pickup',
+  'On-time transfer',
+  'Comfortable vehicles',
 ] as const;
 
 const transferFeatureCards = [
   {
-    title: 'Wien -> Flughafen Schwechat',
-    description: 'Schnell und direkt zum Abflug, ohne unnoetige Umwege.',
+    title: 'Vienna -> Schwechat Airport',
+    description: 'Fast and direct to your departure, without unnecessary detours.',
   },
   {
-    title: 'Abholung nach Landung',
-    description: 'Direkte Weiterfahrt vom Flughafen Wien zurueck in die Stadt.',
+    title: 'Pickup after landing',
+    description: 'Direct onward travel from Vienna Airport back into the city.',
   },
   {
-    title: 'Fixpreis vorab bekannt',
-    description: 'Vorab kalkuliert und klar kommuniziert, ohne versteckte Kosten.',
+    title: 'Fixed price known in advance',
+    description: 'Calculated and clearly communicated before your ride, with no hidden costs.',
   },
   {
-    title: 'Zuverlaessig geplant',
-    description: 'Verlaesslich organisiert fuer eine entspannte und puenktliche Anreise.',
+    title: 'Reliably planned',
+    description: 'Dependably organized for a relaxed and punctual journey.',
   },
 ] as const;
 
@@ -214,9 +214,9 @@ const vehicleCategoryHighlights = [
 const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
-  'mx-auto mt-[16px] max-w-[24ch] text-center text-[30px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:mt-4 md:max-w-none md:text-[40px] md:leading-[0.98] md:tracking-[-0.055em] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor]';
+  'mx-auto mt-[16px] max-w-[24ch] text-center text-[30px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:mt-4 md:max-w-none md:text-[40px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor]';
 const heroGridClass =
-  'grid gap-[4.375rem] lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
+  'grid gap-[4.375rem] lg:grid-cols-[0.94fr_0.78fr] lg:items-stretch lg:gap-10';
 const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
 const heroBookingCardClass =
   'relative flex min-h-[31.5rem] flex-col overflow-visible rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] md:min-h-0 md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
@@ -227,8 +227,8 @@ const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
 const vehicleCategories: VehicleCategory[] = [
   {
     key: 'limousine',
-    title: 'Limousine',
-    description: 'Preiswerte Option fuer Alleinreisende oder Paare',
+    title: 'Sedan',
+    description: 'Affordable option for solo travelers or couples',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
     specs: [
       { icon: 'users', value: '2' },
@@ -236,15 +236,15 @@ const vehicleCategories: VehicleCategory[] = [
       { icon: 'shoppingBag', value: '2' },
     ],
     prices: [
-      { district: '1. - 10. Bezirk', price: '42 EUR' },
-      { district: '11. Bezirk', price: '39 EUR' },
-      { district: '12. - 23. Bezirk', price: '45 EUR' },
+      { district: '1st - 10th district', price: '42 EUR' },
+      { district: '11th district', price: '39 EUR' },
+      { district: '12th - 23rd district', price: '45 EUR' },
     ],
   },
   {
     key: 'kombi',
-    title: 'Kombi',
-    description: 'Ideal fuer Gruppen & Familien - mehr Platz fuer Gepaeck.',
+    title: 'Station Wagon',
+    description: 'Ideal for groups and families - more room for luggage.',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
     specs: [
       { icon: 'users', value: '4' },
@@ -252,15 +252,15 @@ const vehicleCategories: VehicleCategory[] = [
       { icon: 'shoppingBag', value: '4' },
     ],
     prices: [
-      { district: '1. - 10. Bezirk', price: '48 EUR' },
-      { district: '11. Bezirk', price: '45 EUR' },
-      { district: '12. - 23. Bezirk', price: '51 EUR' },
+      { district: '1st - 10th district', price: '48 EUR' },
+      { district: '11th district', price: '45 EUR' },
+      { district: '12th - 23rd district', price: '51 EUR' },
     ],
   },
   {
     key: 'bus',
-    title: 'Bus',
-    description: 'Ideal fuer groessere Gruppen - viel Platz fuer Fahrgaeste und Gepaeck.',
+    title: 'Minivan',
+    description: 'Ideal for larger groups - plenty of space for passengers and luggage.',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
     specs: [
       { icon: 'users', value: '8' },
@@ -268,9 +268,9 @@ const vehicleCategories: VehicleCategory[] = [
       { icon: 'shoppingBag', value: '8' },
     ],
     prices: [
-      { district: '1. - 10. Bezirk', price: '72 EUR' },
-      { district: '11. Bezirk', price: '69 EUR' },
-      { district: '12. - 23. Bezirk', price: '75 EUR' },
+      { district: '1st - 10th district', price: '72 EUR' },
+      { district: '11th district', price: '69 EUR' },
+      { district: '12th - 23rd district', price: '75 EUR' },
     ],
   },
 ];
@@ -499,14 +499,14 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
   return (
     <div className={className}>
       <Link href="/book" className="ui-button-booking-primary">
-        Fahrt buchen
+        Book Now
       </Link>
     </div>
   );
 }
 
 function HeroTrustPills() {
-  return <BookingTrustPills />;
+  return <BookingTrustPills items={['Fixed price guaranteed', 'On-time pickup', 'Reliable service']} />;
 }
 
 function HeroBookingCard() {
@@ -516,15 +516,15 @@ function HeroBookingCard() {
       <div className={heroBookingCardClass}>
         <div className={heroBookingHeaderClass}>
           <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
-            In wenigen Schritten buchen
+            Book in just a few steps
           </p>
           <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:self-auto lg:mr-[6px]">
-            Schritt 1 von 3
+            Step 1 of 3
           </span>
         </div>
 
         <div className="min-h-0 lg:flex-1 lg:min-h-0">
-          <BookingForm showStepIndicator={false} />
+          <BookingForm showStepIndicator={false} heroEnglishCopy />
         </div>
         <HeroTrustPills />
       </div>
@@ -534,9 +534,9 @@ function HeroBookingCard() {
 
 function HeroImageCard() {
   return (
-    <div className="relative mx-auto w-full max-w-[35rem] lg:mt-12">
-      <div className="overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem]">
-        <div className="relative h-[13.5rem] md:h-[20.5rem]">
+    <div className="relative mx-auto w-full max-w-[35rem] lg:mt-12 lg:h-[calc(100%-3rem)]">
+      <div className="flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem]">
+        <div className="relative h-[13.5rem] md:h-[20.5rem] lg:min-h-0 lg:flex-1">
           <Image
             src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
             alt="Alex Flughafentaxi Wien"
@@ -552,13 +552,13 @@ function HeroImageCard() {
 
         <div className="grid grid-cols-1 border-t border-[#e8eef7] md:grid-cols-2">
           <div className="px-4 py-4 md:px-5">
-            <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Wien</p>
-            <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">Schnell buchen. Fixpreis garantiert.</p>
+            <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Vienna</p>
+            <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">Book quickly. Fixed price guaranteed.</p>
           </div>
           <div className="border-t border-[#e8eef7] px-4 py-4 md:border-l md:border-t-0 md:px-5">
-            <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Flughafen</p>
+            <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Airport</p>
             <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">
-              Puenktliche Abholung am Flughafen Wien (VIE).
+              On-time pickup at Vienna Airport (VIE).
             </p>
           </div>
         </div>
@@ -586,10 +586,10 @@ export default async function Home({
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
               <h1 className={heroHeadlineClass}>
-                <span className="block">Flughafentaxi Wien</span>
+                <span className="block">Vienna Airport Taxi</span>
                 <span className="block">
-                  Puenktlich zum Fixpreis,
-                  <span className="block md:inline">ohne Ueberraschungen</span>
+                  On time at a fixed price,{' '}
+                  <span className="block md:inline">no surprises</span>
                 </span>
               </h1>
             </div>
@@ -611,17 +611,17 @@ export default async function Home({
             <div className="grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-12">
               <div>
                 <h2 className="max-w-[630px] text-[24px] font-black leading-[1.04] tracking-[-0.06em] text-[#111111] md:text-[32px]">
-                  Zuverlässiger Transfer zum Flughafen Wien (Schwechat)
+                  Reliable transfer to Vienna Airport (Schwechat)
                 </h2>
                 <div className="mt-6 max-w-[42rem] space-y-6 text-[1rem] leading-[1.8] text-[#5e6f86] md:text-[1.05rem]">
                   <p>
-                    Mit unserem <span className="font-semibold text-[#111111]">Flughafentaxi Wien</span> Service planen Sie Ihren Transfer zum Flughafen Wien Schwechat einfach und stressfrei im Voraus.
+                    With Alex and his team, you can plan your <span className="font-semibold text-[#111111]">Vienna airport taxi</span> transfer easily and stress-free in advance.
                     <br />
                     <br />
-                    Sie profitieren von einem klar kalkulierten Fixpreis, puenktlicher Abholung und einer direkten Fahrt ohne Umwege.
+                    You benefit from a clearly calculated fixed price, on-time pickup, and a direct ride without detours.
                   </p>
                   <p>
-                    Egal ob Sie von Wien zum Flughafen fahren oder vom Flughafen abgeholt werden unser Flughafentaxi Wien bringt Sie zuverlaessig an Ihr Ziel. Ohne Wartezeiten, ohne Umsteigen und ohne versteckte Kosten.
+                    Whether you are travelling from Vienna to the airport or being picked up after landing, our Vienna airport taxi gets you reliably to your destination. No waiting, no transfers and no hidden costs.
                   </p>
                 </div>
 
@@ -649,13 +649,13 @@ export default async function Home({
               <div className="grid gap-4">
                 <div className="overflow-hidden rounded-[1.7rem] border border-[#262a33] bg-[linear-gradient(180deg,#111111_0%,#232a34_100%)] px-6 py-6 text-white shadow-[0_24px_60px_rgba(17,17,17,0.18)] md:px-7 md:py-7">
                   <p className="text-[0.82rem] font-semibold tracking-[-0.01em] text-white/58">
-                    Ihr Flughafentaxi Wien Service
+                    Your Vienna airport taxi service
                   </p>
                   <strong className="mt-3 block text-[1.75rem] font-black leading-[1.15] tracking-[-0.05em] !text-white md:text-[2.15rem]">
-                    Direkt zum Flughafen Wien ohne Stress und ohne Umwege
+                    Directly to Vienna Airport without stress or detours
                   </strong>
                   <p className="mt-5 max-w-[28rem] text-[1rem] leading-[1.7] text-white/74">
-                    Klare Preise, einfache Buchung und ein verlaesslicher Transfer zum Flughafen Wien Schwechat.
+                    Clear prices, simple booking and a reliable transfer to Vienna Airport Schwechat.
                   </p>
                 </div>
 
@@ -684,9 +684,9 @@ export default async function Home({
         <div className="app-container">
           <div className="mx-auto max-w-[104rem]">
             <SectionIntro
-              eyebrow="Fahrzeugkategorien"
-              title="Fahrzeugkategorien und Preis"
-              description="Unsere Fahrzeuge passen zu jedem Bedarf. Vergleichen Sie Platzangebot und Fixpreise fuer Wien auf einen Blick."
+              eyebrow="Vehicle categories"
+              title="Vienna Airport Taxi Prices & Vehicles"
+              description="Our vehicles fit every need. Compare space, luggage capacity, and fixed prices for Vienna at a glance."
               align="center"
               className="max-w-[46rem]"
             />
@@ -991,7 +991,7 @@ export default async function Home({
                 </div>
                 <div className="mt-8">
                   <Link href="/book" className="ui-button-booking-primary">
-                    Fahrt buchen
+                    Book Now
                   </Link>
                 </div>
               </div>

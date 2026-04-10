@@ -63,7 +63,7 @@ export default function VehicleCategoryCard({
 
         <div className="rounded-[1.35rem] border border-[#e8edf3] bg-[#f8fbff] px-4 py-4 shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:px-5">
           <p className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-[#1679FF]">
-            Preisliste fuer Wien
+            Price list for Vienna
           </p>
           <div className="mt-3 space-y-2.5">
             {prices.map(({ district, price }) => (

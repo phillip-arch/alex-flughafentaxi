@@ -2,6 +2,7 @@ import { Check } from 'lucide-react';
 
 type BookingTrustPillsProps = {
   className?: string;
+  items?: readonly string[];
 };
 
 const BOOKING_TRUST_ITEMS = [
@@ -16,10 +17,11 @@ const BOOKING_TRUST_PILL_TEXT_CLASS = 'text-[11px] font-semibold tracking-[-0.03
 
 export default function BookingTrustPills({
   className = DEFAULT_BOOKING_TRUST_PILLS_CLASS,
+  items = BOOKING_TRUST_ITEMS,
 }: BookingTrustPillsProps) {
   return (
     <div className={className}>
-      {BOOKING_TRUST_ITEMS.map((item) => (
+      {items.map((item) => (
         <div
           key={item}
           className="inline-flex items-center gap-1 rounded-full border border-[#e6edf7] bg-[#f4f8ff] px-2.5 py-1.5 text-[11px] text-[#111827] shadow-[0_10px_24px_rgba(17,17,17,0.045)] md:gap-1.5 md:px-3 md:py-2 md:text-[12px]"
