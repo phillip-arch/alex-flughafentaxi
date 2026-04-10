@@ -220,7 +220,7 @@ export default function StreetAutocomplete({
   return (
     <div
       ref={rootRef}
-      className={mobileDropdownFullWidth ? 'static md:relative' : 'relative'}
+      className="relative"
     >
       <div className="relative">
         <input
