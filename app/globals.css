@@ -101,6 +101,11 @@ h6 {
   line-height: 0.98;
 }
 
+h1 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
 p {
   margin: 0;
 }

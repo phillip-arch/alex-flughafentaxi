@@ -214,7 +214,7 @@ const vehicleCategoryHighlights = [
 const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
-  'mx-auto mt-[16px] max-w-[19ch] text-[30px] font-black leading-[1.02] tracking-[-0.04em] text-[#111111] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]';
+  'mx-auto mt-[16px] max-w-[18ch] text-[20px] font-black leading-[0.98] tracking-[-0.055em] text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.012em_0_currentColor] md:mt-4 md:max-w-none md:text-[40px] md:leading-[0.98]';
 const heroGridClass =
   'grid gap-[4.375rem] lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
 const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
@@ -577,22 +577,18 @@ export default async function Home({
   const localizedMediaContent = localizedHomeMediaContent[activeLang];
 
   return (
-    <>
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
       <Navbar />
-      <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
+      <main>
 
       <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
         <div className={heroSectionPaddingClass}>
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
-              <h1 className="mx-auto min-h-[1.15rem] max-w-[22rem] text-center text-[12px] font-medium leading-[1.2] tracking-[-0.03em] !text-[#64748b] md:min-h-0 md:max-w-none md:text-[1.08rem]">
-                Flughafentaxi Wien, Ihr professioneller Flughafen Taxi Service
+              <h1 className={heroHeadlineClass}>
+                <span className="block">Flughafentaxi Wien</span>
+                <span className="block">Puenktlich zum Fixpreis, ohne Ueberraschungen</span>
               </h1>
-
-              <div className={heroHeadlineClass}>
-                <span className="block">Fixpreis zum Flughafen.</span>
-                <span className="block">Keine Ueberraschungen.</span>
-              </div>
             </div>
 
             <div className={heroGridClass}>
@@ -725,7 +721,7 @@ export default async function Home({
               />
 
               <div className="mt-8 grid gap-5 md:grid-cols-2 md:gap-6">
-                <div className="rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-6 py-7 md:px-8 md:py-8">
+                <div className="rounded-[1.75rem] border border-[#e6edf7] bg-[#F0F6FF] px-6 py-7 md:px-8 md:py-8">
                   <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)]">
                     <Briefcase size={24} strokeWidth={2.2} />
                   </span>
@@ -742,7 +738,7 @@ export default async function Home({
                   </div>
                 </div>
 
-                <div className="rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-6 py-7 md:px-8 md:py-8">
+                <div className="rounded-[1.75rem] border border-[#e6edf7] bg-[#F0F6FF] px-6 py-7 md:px-8 md:py-8">
                   <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)]">
                     <ShoppingBag size={24} strokeWidth={2.2} />
                   </span>
@@ -778,7 +774,7 @@ export default async function Home({
                   {localizedMediaContent.childSeatSection.options.map((seat) => (
                     <article
                       key={`seat-${seat.key}`}
-                      className="group w-full max-w-full overflow-hidden rounded-[1.75rem] border border-[#e6edf7] bg-[#fbfdff] p-4 md:p-5"
+                      className="group w-full max-w-full overflow-hidden rounded-[1.75rem] border border-[#e6edf7] bg-[#F0F6FF] p-4 md:p-5"
                     >
                       <div className="grid gap-4 md:grid-cols-[8rem_minmax(0,1fr)] md:items-center">
                         <div className="grid w-full max-w-full grid-cols-[minmax(0,8rem)_minmax(0,1fr)] items-start gap-2 md:flex md:flex-col md:items-center">
@@ -1119,7 +1115,7 @@ export default async function Home({
         </div>
       </section>
       </main>
-    </>
+    </div>
   );
 }
 
