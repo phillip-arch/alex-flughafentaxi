@@ -17,6 +17,9 @@ const MAP_SVG_BASE_CLASS =
 const MAP_SVG_SCALE_CLASS = 'scale-[1.07] sm:scale-[1.08]';
 const DEFAULT_DESKTOP_TOP_CLASS = 'sm:top-3 lg:top-5';
 const DEFAULT_MOBILE_TOP_CLASS = 'top-0';
+const DISTRICT_LABEL_OFFSETS: Record<string, { x: number; y: number }> = {
+  '17': { x: -8, y: 6 },
+};
 
 const districtByBezNr = new Map(
   districtPricingRows.map((district) => [String((Number(district.id) - 1000) / 10), district]),
@@ -86,6 +89,7 @@ export default function DistrictMapPriceExplorer({
               {mapGeometry.features.map((feature) => {
                 const matchingDistrict = districtByBezNr.get(feature.beznr);
                 const isActive = matchingDistrict?.id === activeId;
+                const labelOffset = DISTRICT_LABEL_OFFSETS[feature.beznr] ?? { x: 0, y: 0 };
 
                 return (
                   <g key={feature.beznr}>
@@ -102,8 +106,8 @@ export default function DistrictMapPriceExplorer({
                       onClick={() => matchingDistrict && setActiveId(matchingDistrict.id)}
                     />
                     <text
-                      x={feature.center.x}
-                      y={feature.center.y}
+                      x={feature.center.x + labelOffset.x}
+                      y={feature.center.y + labelOffset.y}
                       textAnchor="middle"
                       dominantBaseline="central"
                       className="pointer-events-none select-none fill-[#111111] text-[20px] font-bold transition-all duration-200"

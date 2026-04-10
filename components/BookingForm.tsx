@@ -147,7 +147,7 @@ const BookingForm = ({
   const isHomepageForm = pathname === '/';
   const isAppSurface = isAppSurfaceProp ?? getAppSurface() === 'app';
   const shouldShowStepOneRouteIntro = showStepOneRouteIntro ?? !isHomepageForm;
-  const allowExtendedDropdownSpace = !isHomepageForm;
+  const allowExtendedDropdownSpace = true;
   const supabase = supabaseBrowser();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -269,6 +269,8 @@ const BookingForm = ({
       const parsed = JSON.parse(raw) as {
         formData?: Partial<ExtendedBookingInput>;
         currentStep?: number;
+        selectedStreetOption?: StreetOption | null;
+        selectedExtraStopStreetOption?: StreetOption | null;
       };
 
       if (parsed.formData) {
@@ -276,6 +278,32 @@ const BookingForm = ({
           ...prev,
           ...parsed.formData,
         }));
+
+        const restoredStreet = String(parsed.formData.street || '').trim();
+        const restoredZip = String(parsed.formData.zip || '').trim();
+        const restoredCity = String(parsed.formData.city || '').trim();
+        if (restoredStreet && restoredZip) {
+          setStreetInputValue(restoredStreet);
+          setResolvedStreetOption({
+            street: parsed.selectedStreetOption?.street || splitStreetAndHouseSuffix(restoredStreet).streetQuery,
+            zip: restoredZip,
+            city: restoredCity || 'Wien',
+          });
+        }
+
+        const restoredExtraStopStreet = String(parsed.formData.extraStopStreet || '').trim();
+        const restoredExtraStopZip = String(parsed.formData.extraStopZip || '').trim();
+        const restoredExtraStopCity = String(parsed.formData.extraStopCity || '').trim();
+        if (restoredExtraStopStreet && restoredExtraStopZip) {
+          setExtraStopStreetInputValue(restoredExtraStopStreet);
+          setResolvedExtraStopStreetOption({
+            street:
+              parsed.selectedExtraStopStreetOption?.street ||
+              splitStreetAndHouseSuffix(restoredExtraStopStreet).streetQuery,
+            zip: restoredExtraStopZip,
+            city: restoredExtraStopCity || 'Wien',
+          });
+        }
       }
 
       if (parsed.currentStep && parsed.currentStep >= 1 && parsed.currentStep <= 3) {
@@ -1280,6 +1308,8 @@ const BookingForm = ({
               extraStopZip: formData.extraStopZip,
               extraStopStreet: formData.extraStopStreet,
             },
+            selectedStreetOption: resolvedStreetOption,
+            selectedExtraStopStreetOption: resolvedExtraStopStreetOption,
           }),
         );
 

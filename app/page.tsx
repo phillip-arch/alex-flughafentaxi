@@ -219,7 +219,7 @@ const heroGridClass =
   'grid gap-[4.375rem] lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
 const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
 const heroBookingCardClass =
-  'relative flex min-h-[31.5rem] flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] md:min-h-0 md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
+  'relative flex min-h-[31.5rem] flex-col overflow-visible rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] md:min-h-0 md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
 const heroBookingHeaderClass =
   'mb-[10px] flex min-h-[4.65rem] flex-col items-center gap-3 text-center sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
