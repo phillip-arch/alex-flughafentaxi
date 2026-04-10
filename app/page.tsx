@@ -216,7 +216,7 @@ const heroSectionPaddingClass =
 const heroHeadlineClass =
   'mx-auto mt-[16px] max-w-[19ch] text-[30px] font-black leading-[1.02] tracking-[-0.04em] text-[#111111] md:mt-4 md:max-w-none md:text-[55px] md:leading-[1.02]';
 const heroGridClass =
-  'grid gap-[2.3125rem] lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
+  'grid gap-[2.5rem] lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
 const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
 const heroBookingCardClass =
   'relative flex min-h-[31.5rem] flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] md:min-h-0 md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
