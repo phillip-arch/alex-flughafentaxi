@@ -214,7 +214,7 @@ const vehicleCategoryHighlights = [
 const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
-  'mx-auto mt-[16px] max-w-[24ch] text-[20px] font-black leading-[0.98] tracking-[-0.055em] text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.012em_0_currentColor] md:mt-4 md:max-w-none md:text-[40px] md:leading-[0.98]';
+  'mx-auto mt-[16px] max-w-[24ch] text-center text-[30px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:mt-4 md:max-w-none md:text-[40px] md:leading-[0.98] md:tracking-[-0.055em] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor]';
 const heroGridClass =
   'grid gap-[4.375rem] lg:grid-cols-[0.94fr_0.78fr] lg:items-start lg:gap-10';
 const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
@@ -587,7 +587,10 @@ export default async function Home({
             <div className="text-center">
               <h1 className={heroHeadlineClass}>
                 <span className="block">Flughafentaxi Wien</span>
-                <span className="block">Puenktlich zum Fixpreis, ohne Ueberraschungen</span>
+                <span className="block">
+                  Puenktlich zum Fixpreis,
+                  <span className="block md:inline">ohne Ueberraschungen</span>
+                </span>
               </h1>
             </div>
 
