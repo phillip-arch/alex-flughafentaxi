@@ -70,7 +70,7 @@ function AccountSlidePanel({
             type="button"
             onClick={onBack}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
-            aria-label="Zurueck"
+            aria-label="Back"
           >
             <ChevronRight size={18} />
           </button>
@@ -191,6 +191,7 @@ export default function AccountClient({
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('upcoming');
   const [activeTab, setActiveTab] = useState<AccountTab>(initialRequestedTab);
   const [bookingDirection, setBookingDirection] = useState<BookingDirection>('to_airport');
+  const [meetAndGreet, setMeetAndGreet] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
   const [openPanel, setOpenPanel] = useState<AccountPanel>(initialOpenPanel);
@@ -226,7 +227,7 @@ export default function AccountClient({
       .formatToParts(new Date())
       .find((part) => part.type === 'hour')?.value ?? '0',
   );
-  const greetingBase = currentHour < 11 ? 'Guten Morgen' : currentHour < 18 ? 'Guten Tag' : 'Guten Abend';
+  const greetingBase = currentHour < 11 ? 'Good morning' : currentHour < 18 ? 'Good afternoon' : 'Good evening';
   const greetingLabel = firstName ? `${greetingBase} ${firstName}!` : `${greetingBase}!`;
   const accountSecondaryButtonClass =
     'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#dbe7f8] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]';
@@ -516,16 +517,16 @@ export default function AccountClient({
 
   const installRowLabel =
     installState === 'installed'
-      ? 'App installiert'
+      ? 'App installed'
       : installState === 'available'
-        ? 'Alex Flughafentaxi installieren'
-        : 'App auf diesem Geraet installieren';
+        ? 'Install Alex Flughafentaxi'
+        : 'Install app on this device';
   const installRowHint =
     installState === 'installed'
-      ? 'Bereits auf diesem Geraet verfuegbar'
+      ? 'Already available on this device'
       : installState === 'available'
-        ? 'Mit einem Klick zum Homescreen hinzufuegen'
-        : 'Homescreen-Zugriff auf diesem Geraet einrichten';
+        ? 'Add it to your home screen with one tap'
+        : 'Set up home screen access on this device';
   useEffect(() => {
     setActiveTab(initialRequestedTab);
   }, [initialRequestedTab]);
@@ -596,7 +597,7 @@ export default function AccountClient({
                       {greetingLabel}
                     </h1>
                     <p className="text-[1rem] leading-[1.6] text-[#6a7d96] md:text-[1.05rem]">
-                      Hier kannst du deine naechste Fahrt buchen.
+                      Book your next ride here.
                     </p>
                   </div>
                   <div className="md:hidden">
@@ -630,6 +631,8 @@ export default function AccountClient({
                   <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
                     <BookingForm
                       onDirectionChange={setBookingDirection}
+                      meetAndGreetSelected={meetAndGreet}
+                      onMeetAndGreetChange={setMeetAndGreet}
                       showStepIndicator
                       showInfoTrigger
                       isAppSurface
@@ -644,7 +647,10 @@ export default function AccountClient({
                   </div>
                 </section>
                 <aside className="hidden min-w-0 self-start md:block">
-                  <BookingInfoPanel direction={bookingDirection} />
+                  <BookingInfoPanel
+                    direction={bookingDirection}
+                    meetAndGreet={meetAndGreet}
+                  />
                 </aside>
               </div>
 

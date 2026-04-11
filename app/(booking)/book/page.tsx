@@ -5,8 +5,8 @@ import { getAppSurface } from '@/lib/routing/surfaces';
 import BookingPageClient from './BookingPageClient';
 
 export const metadata: Metadata = {
-  title: 'Fahrt buchen',
-  description: 'Buchen Sie Ihren Flughafentransfer in Wien in nur wenigen Schritten.',
+  title: 'Book a ride',
+  description: 'Book your Vienna airport transfer in just a few steps.',
 };
 
 export default async function BookingPage() {

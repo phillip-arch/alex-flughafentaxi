@@ -79,6 +79,7 @@ interface ExtendedBookingInput {
   babySeats: number;
   childSeats: number;
   boosterSeats: number;
+  meetAndGreet: boolean;
   fullName: string;
   email: string;
   phone: string;
@@ -98,6 +99,8 @@ type BookingFormProps = {
   isAppSurface?: boolean;
   initialFavorites?: FavoriteAddress[];
   initialIsLoggedIn?: boolean;
+  meetAndGreetSelected?: boolean;
+  onMeetAndGreetChange?: (checked: boolean) => void;
   initialAccountDefaults?: {
     fullName: string;
     phone: string;
@@ -128,7 +131,7 @@ const ROUTE_MARKER_BOTTOM_OFFSET_CLASS = 'translate-y-[3px]';
 const MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'mt-[2.7875rem]';
 const DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'md:mt-[3.45rem]';
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[#7fb3ff] focus:!bg-white focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
-const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-[#f5f5f7] !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
+const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-white !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 
@@ -142,6 +145,8 @@ const BookingForm = ({
   isAppSurface: isAppSurfaceProp,
   initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
+  meetAndGreetSelected,
+  onMeetAndGreetChange,
   initialAccountDefaults = EMPTY_ACCOUNT_DEFAULTS,
 }: BookingFormProps) => {
   const router = useRouter();
@@ -214,6 +219,7 @@ const BookingForm = ({
     babySeats: 0,
     childSeats: 0,
     boosterSeats: 0,
+    meetAndGreet: false,
     fullName: '',
     email: '',
     phone: '',
@@ -229,6 +235,19 @@ const BookingForm = ({
   useEffect(() => {
     onDirectionChange?.(formData.direction);
   }, [formData.direction, onDirectionChange]);
+
+  useEffect(() => {
+    if (typeof meetAndGreetSelected !== 'boolean') return;
+    setFormData((prev) =>
+      prev.meetAndGreet === meetAndGreetSelected ? prev : { ...prev, meetAndGreet: meetAndGreetSelected },
+    );
+  }, [meetAndGreetSelected]);
+
+  useEffect(() => {
+    if (formData.direction === 'from_airport' || !formData.meetAndGreet) return;
+    setFormData((prev) => ({ ...prev, meetAndGreet: false }));
+    onMeetAndGreetChange?.(false);
+  }, [formData.direction, formData.meetAndGreet, onMeetAndGreetChange]);
 
   useEffect(() => {
     setHasMounted(true);
@@ -504,6 +523,7 @@ const BookingForm = ({
     : undefined;
   const basePrice = zipPricing?.basePrice ?? DEFAULT_BASE_PRICE;
   const extraStopPrice = formData.extraStop ? 10 : 0;
+  const meetAndGreetPrice = formData.direction === 'from_airport' && formData.meetAndGreet ? 6 : 0;
   
   // Determine vehicle type
   const passengers = typeof formData.passengers === 'number' ? formData.passengers : 0;
@@ -514,7 +534,7 @@ const BookingForm = ({
   
   // Calculate price with ZIP-based surcharge when available
   const vehiclePrice = calculateVehiclePrice(basePrice, vehicleType, dbPrices);
-  const totalPrice = vehiclePrice + extraStopPrice;
+  const totalPrice = vehiclePrice + extraStopPrice + meetAndGreetPrice;
   const selectedStreetOption = resolvedStreetOption;
   const selectedExtraStopStreetOption = resolvedExtraStopStreetOption;
   const favoriteMenuItems =
@@ -531,10 +551,10 @@ const BookingForm = ({
       : [];
   const routeSummary =
     formData.direction === 'to_airport'
-      ? `${formData.zip} ${formData.city} -> Flughafen VIE`
-      : `Flughafen VIE -> ${formData.zip} ${formData.city}`;
-  const streetSummary = formData.street || 'Noch nicht gewaehlt';
-  const dateSummary = [formData.date, formData.time].filter(Boolean).join(' | ') || 'Noch nicht gewaehlt';
+      ? `${formData.zip} ${formData.city} -> Vienna Airport (VIE)`
+      : `Vienna Airport (VIE) -> ${formData.zip} ${formData.city}`;
+  const streetSummary = formData.street || 'Not selected yet';
+  const dateSummary = [formData.date, formData.time].filter(Boolean).join(' | ') || 'Not selected yet';
 
   const hasTypedStreetNumber = (rawValue: string, baseStreet: string) => {
     const normalizedRaw = rawValue.trim().replace(/\s+/g, ' ');
@@ -984,7 +1004,7 @@ const BookingForm = ({
   const displayValue = value === '' ? '--' : value;
 
     return (
-      <div className={`flex flex-col items-center justify-center rounded-[14px] bg-[#f5f5f7] ${compact ? 'gap-1.5 p-2.5 md:gap-[0.3rem] md:p-2' : 'gap-2 p-3.5 md:gap-[0.4rem] md:p-[0.7rem]'} md:rounded-2xl`}>
+      <div className={`flex flex-col items-center justify-center rounded-[14px] border border-[#d2d2d7] bg-white ${compact ? 'gap-1.5 p-2.5 md:gap-[0.3rem] md:p-2' : 'gap-2 p-3.5 md:gap-[0.4rem] md:p-[0.7rem]'} md:rounded-2xl`}>
         <span className={`font-medium uppercase text-[#86868b] ${compact ? 'text-[11px]' : 'text-[13px]'}`}>{label}</span>
         <div className="ui-field-surface flex h-12 w-full items-center justify-between gap-2 rounded-[14px] border border-[#d2d2d7] px-2 md:h-[2.4rem] md:gap-[0.4rem] md:px-[0.4rem] md:rounded-full">
           <button
@@ -1071,7 +1091,7 @@ const BookingForm = ({
                       className={`rounded-[12px] px-3 py-2 text-left text-[15px] transition-colors md:px-[0.8rem] md:py-[0.4rem] md:text-[12px] ${
                         selected
                           ? 'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] font-medium text-[#0a63ff]'
-                          : 'text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                          : 'text-[#1d1d1f] hover:bg-white'
                       }`}
                       role="option"
                       aria-selected={selected}
@@ -1095,10 +1115,10 @@ const BookingForm = ({
       <div className="animate-in fade-in slide-in-from-top-2 rounded-[1.35rem] border border-[#dbe7f8] bg-white p-3.5 shadow-[0_10px_28px_rgba(17,17,17,0.04)] duration-300">
         <div className="mb-3 flex flex-col gap-1">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1679ff]">
-            Zusatzstopp
+            Extra stop
           </p>
           <p className="text-[12px] text-[#6a7d96]">
-            +10 EUR Aufpreis fuer eine weitere Adresse.
+            +10 EUR surcharge for an additional address.
           </p>
         </div>
 
@@ -1256,6 +1276,12 @@ const BookingForm = ({
     }
   };
 
+  const handleMeetAndGreetChange = (checked: boolean) => {
+    if (formData.direction !== 'from_airport') return;
+    setFormData((prev) => ({ ...prev, meetAndGreet: checked }));
+    onMeetAndGreetChange?.(checked);
+  };
+
   const handleBookingForMyselfToggle = (checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
@@ -1321,6 +1347,7 @@ const BookingForm = ({
               extraStopCity: formData.extraStopCity,
               extraStopZip: formData.extraStopZip,
               extraStopStreet: formData.extraStopStreet,
+              meetAndGreet: formData.meetAndGreet,
             },
             selectedStreetOption: resolvedStreetOption,
             selectedExtraStopStreetOption: resolvedExtraStopStreetOption,
@@ -1424,6 +1451,9 @@ const BookingForm = ({
         notes: formData.notes + 
                (formData.childSeat ? ` (Child seats: ${formData.babySeats > 0 ? `${formData.babySeats}x baby seat ` : ''}${formData.childSeats > 0 ? `${formData.childSeats}x child seat ` : ''}${formData.boosterSeats > 0 ? `${formData.boosterSeats}x booster seat` : ''})` : '') + 
                (formData.extraStop ? ` (Extra stop: ${extraStopAddressString})` : '') +
+               (formData.direction === 'from_airport' && formData.meetAndGreet
+                 ? ' (Meet & Greet: Driver waits inside with a name sign)'
+                 : '') +
                (formData.flightNumber ? ` (Flight number: ${formData.flightNumber})` : '') +
                (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Hand luggage: ${formData.handLuggage})` : '') +
                (formData.paymentMethod
@@ -1439,6 +1469,7 @@ const BookingForm = ({
                  : ''),
         _zip: formData.zip,
         _extraStop: formData.extraStop,
+        _meetAndGreet: formData.direction === 'from_airport' && formData.meetAndGreet,
       };
 
       // 1. Validate (Basic check)
@@ -1694,6 +1725,7 @@ const BookingForm = ({
               handleChange={handleChange}
               handleBlur={handleBlur}
               handleFlightNumberBlur={handleFlightNumberBlur}
+              handleMeetAndGreetChange={handleMeetAndGreetChange}
               getInputClassName={getInputClassName}
               isFieldInvalid={isFieldInvalid}
               renderInlineSelect={renderInlineSelect}

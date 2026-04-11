@@ -22,8 +22,8 @@ export default function AccountMobileBottomNav({
     href: string;
   }> = [
     { id: 'start', label: 'Home', href: '/account?tab=start' },
-    { id: 'fahrten', label: 'Fahrten', href: '/account?tab=buchungsverlauf' },
-    { id: 'profil', label: 'Profil', href: '/account?tab=profil' },
+    { id: 'fahrten', label: 'Rides', href: '/account?tab=buchungsverlauf' },
+    { id: 'profil', label: 'Profile', href: '/account?tab=profil' },
   ];
 
   return (

@@ -42,14 +42,14 @@ export default async function BookingSuccessPage() {
 
                 <div className="mt-14 flex flex-col items-center gap-6">
                   <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1679FF]">
-                    Buchung erfolgreich
+                    Booking successful
                   </p>
                   <h1 className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[2.6rem]">
-                    Vielen Dank fuer Ihre Buchung
+                    Thank you for your booking
                   </h1>
                   <p className="max-w-[34rem] text-[1rem] leading-8 text-[#5d6b7c] md:text-[1.06rem]">
-                    Wir haben Ihnen eine Bestaetigungs-E-Mail gesendet. Unser Team prueft Ihre Anfrage
-                    und meldet sich bei Bedarf mit allen weiteren Details.
+                    We have sent you a confirmation email. Our team will review your request
+                    and contact you if any further details are needed.
                   </p>
                 </div>
 
@@ -58,24 +58,24 @@ export default async function BookingSuccessPage() {
                     <div className="flex items-center gap-2 text-[#1679FF]">
                       <Mail size={18} />
                       <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">
-                        Bestaetigung
+                        Confirmation
                       </p>
                     </div>
                     <p className="mt-3 text-[0.98rem] leading-7 text-[#42566f]">
-                      Bitte pruefen Sie Ihr E-Mail-Postfach. Dort finden Sie Ihre Buchungsbestaetigung
-                      und alle relevanten Transferdaten.
+                      Please check your email inbox. You will find your booking confirmation
+                      and all relevant transfer details there.
                     </p>
                   </div>
                   <div className="rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5 text-left">
                     <div className="flex items-center gap-2 text-[#1679FF]">
                       <ShieldCheck size={18} />
                       <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">
-                        Naechster Schritt
+                        Next step
                       </p>
                     </div>
                     <p className="mt-3 text-[0.98rem] leading-7 text-[#42566f]">
-                      Bei Fragen zu Ihrer Fahrt erreichen Sie uns weiterhin schnell per Telefon
-                      oder WhatsApp.
+                      If you have questions about your ride, you can still reach us quickly by phone
+                      or WhatsApp.
                     </p>
                   </div>
                 </div>
@@ -85,14 +85,14 @@ export default async function BookingSuccessPage() {
                     href={bookAnotherRideHref}
                     className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#000000] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#232325] hover:text-white visited:text-white"
                   >
-                    <span className="text-white">Weitere Fahrt buchen</span>
+                    <span className="text-white">Book another ride</span>
                     <ArrowRight size={17} className="text-white" />
                   </Link>
                   <Link
                     href={returnHomeHref}
                     className="inline-flex items-center justify-center rounded-[var(--radius-field)] border border-[#dbe7f8] bg-white px-7 py-4 text-[1.0625rem] font-medium leading-none text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]"
                   >
-                    {isLoggedIn ? 'Zu Mein Konto' : 'Zur Startseite'}
+                    {isLoggedIn ? 'Go to my account' : 'Back to homepage'}
                   </Link>
                 </div>
               </div>

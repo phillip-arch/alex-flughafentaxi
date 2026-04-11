@@ -39,14 +39,14 @@ export default async function ConfirmBookingPage({
                   </div>
                   <div className="mt-14 flex flex-col items-center gap-6">
                     <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#d70015]">
-                      Fehler
+                      Error
                     </p>
                     <h1 className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[2.6rem]">
-                      Link ungueltig
+                      Invalid link
                     </h1>
                     <p className="max-w-[34rem] text-[1rem] leading-8 text-[#5d6b7c] md:text-[1.06rem]">
-                      Der Bestaetigungslink ist ungueltig oder fehlt. Bitte oeffnen Sie den Link aus
-                      Ihrer E-Mail erneut oder kehren Sie zur Startseite zurueck.
+                      The confirmation link is invalid or missing. Please open the link from
+                      your email again or return to the homepage.
                     </p>
                   </div>
 
@@ -55,7 +55,7 @@ export default async function ConfirmBookingPage({
                       href="/"
                       className="inline-flex items-center justify-center rounded-[var(--radius-field)] bg-[#000000] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#232325] hover:text-white visited:text-white"
                     >
-                      <span className="text-white">Zur Startseite</span>
+                      <span className="text-white">Back to homepage</span>
                     </Link>
                   </div>
                 </div>

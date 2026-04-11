@@ -6,9 +6,9 @@ type BookingTrustPillsProps = {
 };
 
 const BOOKING_TRUST_ITEMS = [
-  'Fixpreis garantiert',
-  'Puenktliche Abholung',
-  'Zuverlaessiger Service',
+  'Fixed price guaranteed',
+  'On-time pickup',
+  'Reliable service',
 ] as const;
 
 const DEFAULT_BOOKING_TRUST_PILLS_CLASS =

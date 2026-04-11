@@ -34,11 +34,12 @@ export default function BookingPageClient({
   initialIsLoggedIn?: boolean;
 }) {
   const [direction, setDirection] = useState<BookingDirection>('to_airport');
+  const [meetAndGreet, setMeetAndGreet] = useState(false);
   const isAppSurface = getAppSurface() === 'app';
   const searchParams = useSearchParams();
-  const activeLang = searchParams.get('lang')?.toLowerCase() === 'en' ? 'en' : 'de';
-  const termsLabel = activeLang === 'en' ? 'Terms and Conditions' : 'AGB';
-  const privacyLabel = activeLang === 'en' ? 'Privacy Policy' : 'Datenschutzerklaerung';
+  const activeLang = searchParams.get('lang')?.toLowerCase() === 'de' ? 'de' : 'en';
+  const termsLabel = 'Terms and Conditions';
+  const privacyLabel = 'Privacy Policy';
   const initialAccountDefaults = useMemo(
     () => ({
       fullName: initialName,
@@ -58,7 +59,9 @@ export default function BookingPageClient({
               <div className="w-full max-w-[42rem] ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
                 <BookingForm
                   onDirectionChange={setDirection}
-                  headerTitle={!isAppSurface ? 'In wenigen Schritten buchen' : undefined}
+                  meetAndGreetSelected={meetAndGreet}
+                  onMeetAndGreetChange={setMeetAndGreet}
+                  headerTitle={!isAppSurface ? 'Book in just a few steps' : undefined}
                   showStepOneRouteIntro={isAppSurface}
                   initialFavorites={initialFavorites}
                   initialIsLoggedIn={initialIsLoggedIn}
@@ -71,7 +74,10 @@ export default function BookingPageClient({
             </section>
 
             <aside className="order-3 hidden self-start lg:order-2 lg:sticky lg:top-24 lg:block">
-              <BookingInfoPanel direction={direction} />
+              <BookingInfoPanel
+                direction={direction}
+                meetAndGreet={meetAndGreet}
+              />
             </aside>
           </div>
         </div>
@@ -80,7 +86,10 @@ export default function BookingPageClient({
       <section className="bg-white">
         <div className={`app-container ${isAppSurface ? 'pb-32 md:pb-28' : 'pb-0'}`}>
           <section className="mx-auto mt-6 max-w-[57.5rem] lg:hidden">
-            <BookingInfoPanel direction={direction} />
+            <BookingInfoPanel
+              direction={direction}
+              meetAndGreet={meetAndGreet}
+            />
           </section>
 
           {!isAppSurface ? (

@@ -394,7 +394,7 @@ export default function StreetAutocomplete({
           ) : !results.length ? (
             trimmedValue.length >= 2 ? (
               <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">
-                Keine passenden Strassen gefunden.
+                No matching streets found.
               </div>
             ) : null
           ) : (

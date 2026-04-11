@@ -44,12 +44,12 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
               <CheckCircle2 size={38} />
             </div>
           }
-          eyebrow={alreadyConfirmed ? 'Bereits bestaetigt' : 'Buchung bestaetigt'}
-          title={alreadyConfirmed ? 'Diese Fahrt ist bereits bestaetigt' : 'Vielen Dank fuer Ihre Bestaetigung'}
+          eyebrow={alreadyConfirmed ? 'Already confirmed' : 'Booking confirmed'}
+          title={alreadyConfirmed ? 'This ride is already confirmed' : 'Thank you for your confirmation'}
           description={
             alreadyConfirmed
-              ? message || 'Sie haben diese Buchung bereits bestaetigt.'
-              : 'Ihre Fahrt wurde erfolgreich bestaetigt. Unser Team plant nun die weiteren Schritte fuer Ihren Transfer.'
+              ? message || 'You have already confirmed this booking.'
+              : 'Your ride has been confirmed successfully. Our team is now planning the next steps for your transfer.'
           }
         />
       );
@@ -62,12 +62,12 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
             <CheckCircle2 size={38} />
           </div>
         }
-        eyebrow={alreadyConfirmed ? 'Bereits bestaetigt' : 'Buchung bestaetigt'}
-        title={alreadyConfirmed ? 'Diese Fahrt ist bereits bestaetigt' : 'Vielen Dank fuer Ihre Bestaetigung'}
+        eyebrow={alreadyConfirmed ? 'Already confirmed' : 'Booking confirmed'}
+        title={alreadyConfirmed ? 'This ride is already confirmed' : 'Thank you for your confirmation'}
         description={
           alreadyConfirmed
-            ? message || 'Sie haben diese Buchung bereits bestaetigt.'
-            : 'Ihre Fahrt wurde erfolgreich bestaetigt. Unser Team plant nun die weiteren Schritte fuer Ihren Transfer.'
+            ? message || 'You have already confirmed this booking.'
+            : 'Your ride has been confirmed successfully. Our team is now planning the next steps for your transfer.'
         }
       >
         <div className="mt-8 grid w-full gap-4 md:grid-cols-2">
@@ -78,21 +78,21 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
               </div>
               <p className="mt-3 text-[0.98rem] leading-7 text-[#42566f]">
                 {alreadyConfirmed
-                  ? 'Es ist keine weitere Aktion erforderlich. Die Fahrt bleibt bestaetigt.'
-                  : 'Ihre Bestaetigung wurde erfolgreich gespeichert und intern weitergegeben.'}
+                  ? 'No further action is required. The ride remains confirmed.'
+                  : 'Your confirmation has been saved successfully and shared internally.'}
               </p>
             </div>
             <div className="rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5 text-left">
               <div className="flex items-center gap-2 text-[#1679FF]">
                 <ShieldCheck size={18} />
-                <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">Referenz</p>
+                <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">Reference</p>
               </div>
               <p className="mt-3 text-[0.98rem] leading-7 text-[#42566f]">
                 {driverId
-                  ? 'Die Fahrerbestaetigung wurde fuer diese Fahrt verarbeitet.'
+                  ? 'The driver confirmation has been processed for this ride.'
                   : reference
-                    ? `Buchungsnummer: ${reference}`
-                    : 'Die Bestaetigung wurde Ihrer Buchung zugeordnet.'}
+                    ? `Booking number: ${reference}`
+                    : 'The confirmation has been assigned to your booking.'}
               </p>
             </div>
           </div>
@@ -102,7 +102,7 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
             href="/"
             className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#000000] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#232325] hover:text-white visited:text-white"
           >
-            <span className="text-white">Zur Startseite</span>
+            <span className="text-white">Back to homepage</span>
             <ArrowRight size={17} className="text-white" />
           </Link>
         </div>
@@ -118,9 +118,9 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
             <XCircle size={38} />
           </div>
         }
-        eyebrow="Fehler"
+        eyebrow="Error"
         eyebrowClassName="text-[#d70015]"
-        title="Bestaetigung nicht moeglich"
+        title="Confirmation not possible"
         description={message}
       >
         <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
@@ -128,7 +128,7 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
             href="/"
             className="inline-flex items-center justify-center rounded-[var(--radius-field)] bg-[#000000] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#232325] hover:text-white visited:text-white"
           >
-            <span className="text-white">Zur Startseite</span>
+            <span className="text-white">Back to homepage</span>
           </Link>
         </div>
       </ConfirmStatusCard>
@@ -142,9 +142,9 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
           <ShieldCheck size={38} />
         </div>
       }
-      eyebrow="Bestaetigung"
-      title="Fahrt bestaetigen"
-      description="Bitte klicken Sie auf den Button unten, um Ihre Fahrt verbindlich zu bestaetigen."
+      eyebrow="Confirmation"
+      title="Confirm ride"
+      description="Please click the button below to confirm your ride."
     >
       <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <button
@@ -155,11 +155,11 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
             {status === 'loading' ? (
               <>
                 <Loader2 className="animate-spin text-white" size={17} />
-                <span className="text-white">Wird bestaetigt...</span>
+                <span className="text-white">Confirming...</span>
               </>
             ) : (
               <>
-                <span className="text-white">Jetzt bestaetigen</span>
+                <span className="text-white">Confirm now</span>
                 <ArrowRight size={17} className="text-white" />
               </>
             )}

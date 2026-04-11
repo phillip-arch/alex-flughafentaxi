@@ -71,6 +71,7 @@ const BookingSchema = z.object({
   notes: z.string().optional(),
   _zip: z.string().optional(),
   _extraStop: z.boolean().optional(),
+  _meetAndGreet: z.boolean().optional(),
 });
 
 export async function createBooking(payload: any) {
@@ -87,7 +88,7 @@ export async function createBooking(payload: any) {
     return { error: validated.error.issues[0]?.message || 'Ungültige Eingabe' };
   }
   
-  const { _zip, _extraStop, ...bookingData } = validated.data;
+  const { _zip, _extraStop, _meetAndGreet, ...bookingData } = validated.data;
 
   // 2. Rate Limiting (Spam Protection)
   const headersList = await headers();
@@ -173,7 +174,8 @@ export async function createBooking(payload: any) {
 
   const vehiclePrice = calculateVehiclePrice(basePrice, bookingData.vehicle_type as VehicleType, dbPrices);
   const extraStopPrice = _extraStop ? 10 : 0;
-  const finalPrice = vehiclePrice + extraStopPrice;
+  const meetAndGreetPrice = _meetAndGreet && /flughafen/i.test(bookingData.pickup) ? 6 : 0;
+  const finalPrice = vehiclePrice + extraStopPrice + meetAndGreetPrice;
 
   // Generate unique tokens and references
   const confirm_token = crypto.randomUUID();

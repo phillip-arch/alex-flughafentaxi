@@ -13,51 +13,63 @@ import SectionIntro from '@/components/ui/SectionIntro';
 export type BookingDirection = 'to_airport' | 'from_airport' | null;
 
 const paymentItems = [
-  { label: 'Bar', icon: Wallet },
+  { label: 'Cash', icon: Wallet },
   { label: 'Visa', icon: CreditCard },
   { label: 'Mastercard', icon: CreditCard },
   { label: 'Apple Pay', icon: CreditCard },
 ];
 
 const trustItems = [
-  { label: 'Fixpreis', icon: ShieldCheck },
-  { label: 'Kostenlose Wartezeit', icon: TimerReset },
-  { label: 'Flugtracking', icon: PlaneTakeoff },
-  { label: 'Professionelle Fahrer', icon: BadgeCheck },
+  { label: 'Fixed price', icon: ShieldCheck },
+  { label: 'Free waiting time', icon: TimerReset },
+  { label: 'Flight tracking', icon: PlaneTakeoff },
+  { label: 'Professional drivers', icon: BadgeCheck },
 ];
 
-function getInfoBlock(direction: BookingDirection) {
+function getInfoBlock(direction: BookingDirection, meetAndGreet: boolean) {
   if (direction === 'from_airport') {
     return {
-      title: 'Abholung am Flughafen',
-      body: 'Wo Sie Ihren Fahrer treffen',
-      items: [
-        'Der Fahrer wartet in der Ankunftshalle',
-        'Namensschild mit Ihrem Buchungsnamen',
-        'Kostenlose Wartezeit inklusive',
-      ],
+      title: 'Airport pickup',
+      body: meetAndGreet ? 'Meet & Greet selected' : 'Where to meet your driver',
+      items: meetAndGreet
+        ? [
+            'Driver waits inside with a name sign',
+            'Meeting point is inside the arrivals area',
+            'Flight tracking and free waiting time included',
+          ]
+        : [
+            'Pickup at the agreed airport meeting point',
+            'Flight tracking included',
+            'Free waiting time included',
+          ],
     };
   }
 
   return {
-    title: 'Fahrt zum Flughafen',
-    body: 'Empfohlene Ankunftszeit',
+    title: 'Ride to the airport',
+    body: 'Recommended arrival time',
     items: [
-      '2 Stunden fuer Europa-Fluege',
-      '3 Stunden fuer internationale Fluege',
+      '2 hours before European flights',
+      '3 hours before international flights',
     ],
   };
 }
 
-export function BookingInfoPanel({ direction }: { direction: BookingDirection }) {
-  const infoBlock = getInfoBlock(direction);
+export function BookingInfoPanel({
+  direction,
+  meetAndGreet = false,
+}: {
+  direction: BookingDirection;
+  meetAndGreet?: boolean;
+}) {
+  const infoBlock = getInfoBlock(direction, meetAndGreet);
 
   return (
     <section className="ui-card-surface-light px-5 py-5 md:px-6 md:py-6">
       <SectionIntro
-        eyebrow="Informationen"
-        title="Informationen zum Flughafentransfer"
-        description="Alle wichtigen Hinweise fuer Ankunft, Vorlaufzeit und Zahlung direkt neben der Buchung."
+        eyebrow="Information"
+        title="Airport transfer information"
+        description="All key details about arrival, lead time, and payment right next to your booking."
         className="max-w-none md:max-w-[34rem]"
       />
 
@@ -68,26 +80,26 @@ export function BookingInfoPanel({ direction }: { direction: BookingDirection })
         <p className="mt-2 text-sm font-medium text-[var(--color-text)]">{infoBlock.body}</p>
         <div className="ui-copy mt-3 space-y-2 text-sm leading-6">
           {infoBlock.items.map((item) => (
-            <p key={item}>• {item}</p>
+            <p key={item}>- {item}</p>
           ))}
         </div>
       </div>
 
       <div className="mt-4 rounded-[1.4rem] border border-[#e8edf3] bg-white px-4 py-4 md:px-5">
-        <p className="text-sm font-semibold text-[var(--color-text)]">Mindestvorlauf fuer Buchungen</p>
+        <p className="text-sm font-semibold text-[var(--color-text)]">Minimum booking lead time</p>
         <div className="ui-copy mt-3 space-y-1 text-sm leading-6">
-          <p>22:00–07:00 → mindestens 3h vorher buchen</p>
-          <p>07:00-22:00 → mindestens 8h vorher buchen</p>
+          <p>22:00-07:00 - book at least 3h in advance</p>
+          <p>07:00-22:00 - book at least 8h in advance</p>
         </div>
       </div>
 
       <div className="mt-4 rounded-[1.4rem] border border-[#e8edf3] bg-white px-4 py-4 md:px-5">
-        <p className="text-sm font-semibold text-[var(--color-text)]">Kindersitze</p>
-        <p className="ui-copy mt-2 text-sm leading-6">Auf Wunsch direkt waehrend der Buchung waehlbar.</p>
+        <p className="text-sm font-semibold text-[var(--color-text)]">Child seats</p>
+        <p className="ui-copy mt-2 text-sm leading-6">Available on request directly during booking.</p>
       </div>
 
       <div className="mt-4 rounded-[1.4rem] border border-[#e8edf3] bg-white px-4 py-4 md:px-5">
-        <p className="text-sm font-semibold text-[var(--color-text)]">Zahlungsarten</p>
+        <p className="text-sm font-semibold text-[var(--color-text)]">Payment methods</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
           {paymentItems.map(({ label, icon: Icon }) => (
             <div

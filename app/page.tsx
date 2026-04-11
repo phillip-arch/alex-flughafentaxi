@@ -61,34 +61,34 @@ type ChildSeatSectionContent = {
 
 const faqItems = [
   {
-    question: 'Wie erkenne ich meinen Fahrer?',
+    question: 'How do I recognize my driver?',
     answer:
-      'Der Fahrer holt Sie puenktlich am Terminal ab. Eine persoenliche Abholung mit Namensschild ist gegen Aufpreis moeglich.',
+      'Your driver picks you up on time at the terminal. Personal pickup with a name sign is available for an additional fee.',
   },
   {
-    question: 'Sind Kindersitze verfuegbar?',
+    question: 'Are child seats available?',
     answer:
-      'Ja, bitte geben Sie den Bedarf bei der Buchung an. Wir stellen Babyschalen und Sitzkissen kostenlos zur Verfuegung.',
+      'Yes. Please tell us what you need when booking. We provide baby seats and booster seats free of charge.',
   },
   {
-    question: 'Koennen Haustiere mitfahren?',
+    question: 'Can pets travel with me?',
     answer:
-      'Haustiere reisen in geeigneten Transportboxen mit; geben Sie uns vorab Bescheid.',
+      'Pets can travel in suitable transport boxes. Please let us know in advance.',
   },
   {
-    question: 'Gibt es Zusatzkosten bei Verspaetungen?',
+    question: 'Are there extra costs for delays?',
     answer:
-      'Wir ueberwachen Ihren Flug und passen die Abholzeit an. Bei unverschuldeten Verspaetungen entstehen keine Zusatzkosten.',
+      'We monitor your flight and adjust the pickup time. There are no extra costs for delays outside your control.',
   },
   {
-    question: 'Kann ich auch vom Hotel zum Flughafen buchen?',
+    question: 'Can I also book from my hotel to the airport?',
     answer:
-      'Ja, unser Service gilt in beide Richtungen. Geben Sie bei der Buchung Ihre Abholadresse an.',
+      'Yes, our service works in both directions. Enter your pickup address when booking.',
   },
   {
-    question: 'Welche Zahlungsmethoden gibt es?',
+    question: 'Which payment methods are available?',
     answer:
-      'Sie koennen bar, per Karte oder per Mobile Pay zahlen und erhalten eine digitale Rechnung.',
+      'You can pay by cash, card, or mobile payment and receive a digital invoice.',
   },
 ];
 
@@ -303,48 +303,48 @@ const localizedHomeMediaContent: Record<
       bus: 'Alex Flughafentaxi Wien Bus fuer Gruppen und viel Gepaeck',
     },
     childSeatSection: {
-      eyebrow: 'Kindersitze',
-      title: 'Sicher reisen mit Alex Flughafentaxi Wien',
+      eyebrow: 'Child Seats',
+      title: 'Travel safely with Alex Airport Taxi Vienna',
       description:
-        'Wenn Sie ein Flughafentaxi Wien fuer Ihre Familie suchen, hat Sicherheit oberste Prioritaet. Alex Flughafentaxi bietet daher ausschliesslich zertifizierte und regelmaessig gepruefte Rueckhaltesysteme an, um Ihnen eine entspannte Fahrt zum Fixpreis zu ermoeglichen.',
+        'If you are looking for an airport taxi in Vienna for your family, safety comes first. Alex Airport Taxi provides only certified, regularly checked child restraint systems so you can travel comfortably at a fixed price.',
       lead:
-        'Vertrauen Sie auf Alex Flughafentaxi - wir bringen Ihre gesamte Familie sicher, puenktlich und komfortabel ans Ziel.',
-      detailTitle: 'Detaillierte Spezifikationen unserer Sitze:',
+        'Trust Alex Airport Taxi to bring your whole family safely, on time, and comfortably to your destination.',
+      detailTitle: 'Detailed seat specifications:',
       options: [
         {
           key: 'babySeat',
-          title: 'Babyschale',
+          title: 'Baby Seat',
           weightRange: '0-13 kg',
-          ageLabel: 'Fuer Neugeborene & Saeuglinge.',
+          ageLabel: 'For newborns & infants.',
           description:
-            'Gruppe 0+: Diese Sitze sind fuer Neugeborene ab dem ersten Tag konzipiert. Die Montage erfolgt grundsaetzlich rueckwaertsgerichtet, um den empfindlichen Nackenbereich bei Bremsmanoevern optimal zu schuetzen. Ein Muss fuer den ersten sicheren Transfer in unserem Flughafentaxi.',
+            'Group 0+: These seats are designed for newborns from day one. They are installed rear-facing to protect the sensitive neck area during braking. Essential for a safe first transfer in our airport taxi.',
           imageAlt:
-            'Kostenlose Babyschale im Alex Flughafentaxi Wien fuer den sicheren Baby-Transfer.',
+            'Free baby seat in Alex Airport Taxi Vienna for a safe baby transfer.',
         },
         {
           key: 'childSeat',
-          title: 'Kindersitz',
+          title: 'Child Seat',
           weightRange: '9-18 kg',
-          ageLabel: 'Sicherer Halt fuer Kleinkinder.',
+          ageLabel: 'Secure support for toddlers.',
           description:
-            'Gruppe 1/2: Sobald Ihr Kind stabil sitzen kann, kommt unser Kleinkindsitz zum Einsatz. Mit einem robusten 5-Punkt-Gurtsystem und verstaerktem Seitenaufprallschutz sorgt er fuer maximale Stabilitaet waehrend der Fahrt im Flughafentaxi Wien.',
+            'Group 1/2: Once your child can sit steadily, we use our toddler seat. With a robust 5-point harness and reinforced side-impact protection, it provides maximum stability during the ride.',
           imageAlt:
-            'Zertifizierter Kindersitz fuer Kleinkinder im Alex Flughafentaxi - Sicherheit an erster Stelle.',
+            'Certified child seat for toddlers in Alex Airport Taxi Vienna - safety comes first.',
         },
         {
           key: 'boosterSeat',
-          title: 'Sitzerhoehung',
+          title: 'Booster Seat',
           weightRange: '15-36 kg',
-          ageLabel: 'Optimale Gurtfuehrung fuer Schulkinder.',
+          ageLabel: 'Optimal belt positioning for school-age children.',
           description:
-            'Gruppe 2/3: Fuer aeltere Kinder bis ca. 12 Jahre (oder 150 cm) stellen wir ergonomische Erhoehungen bereit. Diese sorgen dafuer, dass der Sicherheitsgurt des Fahrzeugs korrekt ueber Schulter und Becken verlaeuft, was bei einem herkoemmlichen Transfer entscheidend fuer den Schutz ist.',
+            'Group 2/3: For older children up to approx. 12 years old (or 150 cm), we provide ergonomic booster seats. They help position the vehicle seat belt correctly over the shoulder and pelvis, which is essential for protection.',
           imageAlt:
-            'Kostenlose Sitzerhoehung fuer aeltere Kinder bei einer Fahrt mit Alex Flughafentaxi Wien.',
+            'Free booster seat for older children during a ride with Alex Airport Taxi Vienna.',
         },
       ],
-      disclaimerTitle: 'Hinweis fuer Ihr Flughafentaxi Wien:',
+      disclaimerTitle: '',
       disclaimer:
-        'Bitte geben Sie im Buchungsformular die exakte Anzahl und Art der benoetigten Kindersitze (Babyschale, Kindersitz oder Sitzerhoehung) an. Nur bei Vorab-Information koennen wir die Verfuegbarkeit und eine gesetzeskonforme, sichere Fahrt garantieren. Bitte beachten Sie auch die maximale Gepaeckkapazitaet Ihres gewaehlten Fahrzeugs.',
+        'Please enter the exact number and type of child seats required in the booking form (baby seat, child seat, or booster seat). Only with advance information can we guarantee availability and a legally compliant, safe ride. Please also note the maximum luggage capacity of your selected vehicle.',
     },
   },
   en: {
@@ -717,9 +717,9 @@ export default async function Home({
           <div className="mx-auto max-w-[104rem]">
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
               <SectionIntro
-                eyebrow="Gepaeck"
-                title="Passt mein gesamtes Gepäck?"
-                description="Um Verzögerungen auf dem Weg zum Flughafen zu vermeiden, wählen Sie bitte die passende Fahrzeugsoption entsprechend Ihrem Gepäckbedarf aus."
+                eyebrow="Luggage"
+                title="Will all my luggage fit?"
+                description="To avoid delays on the way to the airport, please choose the right vehicle option for your luggage needs."
                 className="max-w-[58rem]"
               />
 
@@ -730,13 +730,13 @@ export default async function Home({
                   </span>
                   <div className="ui-text-block-sm mt-5">
                     <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827]">
-                      Standardkoffer
+                      Standard Suitcase
                     </h3>
                     <p className="ui-copy-compact mt-3 text-[#58708d]">
-                      Als Standardkoffer gilt ein aufgegebenes Gepäckstück mit einer Gesamtgröße
-                      von bis zu 158 cm (Länge + Breite + Höhe).
+                      A standard suitcase is checked luggage with a total size of up to 158 cm
+                      (length + width + height).
                       <br />
-                      Dies entspricht den üblichen Vorgaben der meisten Fluggesellschaften.
+                      This matches the usual requirements of most airlines.
                     </p>
                   </div>
                 </div>
@@ -747,11 +747,11 @@ export default async function Home({
                   </span>
                   <div className="ui-text-block-sm mt-5">
                     <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827]">
-                      Handgepäck
+                      Hand Luggage
                     </h3>
                     <p className="ui-copy-compact mt-3 text-[#58708d]">
-                      Das Handgepäck hat in der Regel folgende maximale Größe: 55 × 40 × 23 cm,
-                      abhängig von der jeweiligen Fluggesellschaft.
+                      Hand luggage usually has the following maximum size: 55 x 40 x 23 cm,
+                      depending on the airline.
                     </p>
                   </div>
                 </div>
@@ -825,9 +825,6 @@ export default async function Home({
                       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)]">
                         <Info size={20} strokeWidth={2.2} />
                       </span>
-                      <p className="pt-1 text-[0.95rem] font-semibold tracking-[-0.02em] text-[#111827] md:pt-0">
-                        {localizedMediaContent.childSeatSection.disclaimerTitle}
-                      </p>
                     </div>
                     <p className="text-[0.98rem] leading-[1.7] text-[#58708d] md:mt-3 md:min-w-0">
                       {localizedMediaContent.childSeatSection.disclaimer}
@@ -1056,8 +1053,8 @@ export default async function Home({
               <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-10">
                 <SectionIntro
                   eyebrow="FAQ"
-                  title="Haeufige Fragen vor der Buchung."
-                  description="Die wichtigsten Antworten zu Vorlaufzeit, Flugtracking, Kindersitzen und Zahlung bleiben direkt auf der Startseite erreichbar."
+                  title="Frequently asked questions before booking."
+                  description="The most important answers about booking lead time, flight tracking, child seats, and payment are available directly on the homepage."
                   className="max-w-xl"
                 />
 

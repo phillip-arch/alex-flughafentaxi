@@ -6,6 +6,9 @@ import { districtPricingRows, getDistrictPrice } from '@/lib/pricing/districtPri
 import type { ViennaDistrictMapGeometry } from '@/lib/maps/viennaDistricts';
 import { SVG_WIDTH } from '@/lib/maps/viennaDistricts';
 
+type Point = { x: number; y: number };
+type MapFeature = ViennaDistrictMapGeometry['features'][number];
+
 const DESKTOP_MAP_WIDTH = 'lg:w-[54.7%]';
 const DESKTOP_TABLE_WIDTH = 'lg:w-[45.3%]';
 const MAP_SECTION_BASE_CLASS =
@@ -17,10 +20,14 @@ const MAP_SVG_BASE_CLASS =
 const MAP_SVG_SCALE_CLASS = 'scale-[1.177] sm:scale-[1.08]';
 const DEFAULT_DESKTOP_TOP_CLASS = 'sm:top-3 lg:top-5';
 const DEFAULT_MOBILE_TOP_CLASS = 'top-0';
-const DISTRICT_LABEL_OFFSETS: Record<string, { x: number; y: number }> = {
+const DISTRICT_LABEL_OFFSETS: Record<string, Point> = {
+  '6': { x: -8, y: 6 },
+  '7': { x: 0, y: 2 },
   '14': { x: -10, y: 0 },
   '17': { x: -8, y: 6 },
 };
+const LEFT_TOOLTIP_DISTRICTS = new Set(['2', '3', '10', '11', '21', '22']);
+const BELOW_TOOLTIP_DISTRICTS = new Set(['21']);
 const DISTRICT_DRIVE_TIMES: Record<string, string> = {
   '1010': '~25 min',
   '1020': '~20 min',
@@ -49,14 +56,34 @@ const DISTRICT_DRIVE_TIMES: Record<string, string> = {
 const TOOLTIP_WIDTH = 252;
 const TOOLTIP_HEIGHT = 142;
 const TOOLTIP_OFFSET = 18;
-const MOBILE_TOOLTIP_WIDTH = Math.round((Math.round(TOOLTIP_WIDTH * 1.4) + 68) * 0.95);
-const MOBILE_TOOLTIP_HEIGHT = Math.round(TOOLTIP_HEIGHT * 2 * 0.95);
+const MOBILE_TOOLTIP_SCALE = 0.95;
+const MOBILE_TOOLTIP_WIDTH_BEFORE_SCALE = Math.round(TOOLTIP_WIDTH * 1.4) + 68;
+const MOBILE_TOOLTIP_WIDTH = Math.round(MOBILE_TOOLTIP_WIDTH_BEFORE_SCALE * MOBILE_TOOLTIP_SCALE);
+const MOBILE_TOOLTIP_HEIGHT = Math.round(TOOLTIP_HEIGHT * 2 * MOBILE_TOOLTIP_SCALE);
+const DISTRICT_STROKE_WIDTH = 2.2;
+const ACTIVE_DISTRICT_STROKE_WIDTH = 3.2;
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 const districtByBezNr = new Map(
   districtPricingRows.map((district) => [String((Number(district.id) - 1000) / 10), district]),
 );
+
+const getTooltipX = (feature: MapFeature, tooltipWidth: number) => {
+  const preferredX = LEFT_TOOLTIP_DISTRICTS.has(feature.beznr)
+    ? feature.center.x - tooltipWidth - TOOLTIP_OFFSET
+    : feature.center.x + TOOLTIP_OFFSET;
+
+  return clamp(preferredX, 12, SVG_WIDTH - tooltipWidth - 12);
+};
+
+const getTooltipY = (feature: MapFeature, tooltipHeight: number, svgHeight: number) => {
+  const preferredY = BELOW_TOOLTIP_DISTRICTS.has(feature.beznr)
+    ? feature.center.y + TOOLTIP_OFFSET
+    : feature.center.y - tooltipHeight - TOOLTIP_OFFSET;
+
+  return clamp(preferredY, 12, svgHeight - tooltipHeight - 12);
+};
 
 type DistrictMapPriceExplorerProps = {
   mapGeometry: ViennaDistrictMapGeometry;
@@ -121,33 +148,9 @@ export default function DistrictMapPriceExplorer({
   const activeFeature = activeId
     ? mapGeometry.features.find((feature) => districtByBezNr.get(feature.beznr)?.id === activeId)
     : null;
-  const activeDistrict = activeId ? districtPricingRows.find((district) => district.id === activeId) : null;
-  const shouldPlaceTooltipLeft =
-    activeFeature?.beznr === '2' ||
-    activeFeature?.beznr === '3' ||
-    activeFeature?.beznr === '10' ||
-    activeFeature?.beznr === '11' ||
-    activeFeature?.beznr === '21' ||
-    activeFeature?.beznr === '22';
-  const shouldPlaceTooltipBelow = activeFeature?.beznr === '21';
-  const tooltipX = activeFeature
-    ? clamp(
-        shouldPlaceTooltipLeft
-          ? activeFeature.center.x - tooltipWidth - TOOLTIP_OFFSET
-          : activeFeature.center.x + TOOLTIP_OFFSET,
-        12,
-        SVG_WIDTH - tooltipWidth - 12,
-      )
-    : 0;
-  const tooltipY = activeFeature
-    ? clamp(
-        shouldPlaceTooltipBelow
-          ? activeFeature.center.y + TOOLTIP_OFFSET
-          : activeFeature.center.y - tooltipHeight - TOOLTIP_OFFSET,
-        12,
-        mapGeometry.svgHeight - tooltipHeight - 12,
-      )
-    : 0;
+  const activeDistrict = activeFeature ? districtByBezNr.get(activeFeature.beznr) : null;
+  const tooltipX = activeFeature ? getTooltipX(activeFeature, tooltipWidth) : 0;
+  const tooltipY = activeFeature ? getTooltipY(activeFeature, tooltipHeight, mapGeometry.svgHeight) : 0;
 
   return (
     <div className="flex flex-col items-start gap-8 lg:flex-row">
@@ -176,7 +179,7 @@ export default function DistrictMapPriceExplorer({
                       fill={isActive ? '#1679ff' : '#d8dee8'}
                       fillOpacity={isActive ? 0.9 : 1}
                       stroke={isActive ? '#0f5fca' : '#ffffff'}
-                      strokeWidth={isActive ? 3.2 : 2.2}
+                      strokeWidth={isActive ? ACTIVE_DISTRICT_STROKE_WIDTH : DISTRICT_STROKE_WIDTH}
                       vectorEffect="non-scaling-stroke"
                       className="cursor-pointer transition-all duration-200 focus:outline-none"
                       style={{ outline: 'none' }}
@@ -209,6 +212,16 @@ export default function DistrictMapPriceExplorer({
                   </g>
                 );
               })}
+              {activeFeature ? (
+                <path
+                  d={activeFeature.path}
+                  fill="none"
+                  stroke="#0f5fca"
+                  strokeWidth={ACTIVE_DISTRICT_STROKE_WIDTH}
+                  vectorEffect="non-scaling-stroke"
+                  className="pointer-events-none"
+                />
+              ) : null}
               {activeFeature && activeDistrict ? (
                 <foreignObject
                   x={tooltipX}
