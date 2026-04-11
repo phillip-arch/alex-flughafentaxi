@@ -49,8 +49,8 @@ const DISTRICT_DRIVE_TIMES: Record<string, string> = {
 const TOOLTIP_WIDTH = 252;
 const TOOLTIP_HEIGHT = 142;
 const TOOLTIP_OFFSET = 18;
-const MOBILE_TOOLTIP_WIDTH = Math.round(TOOLTIP_WIDTH * 1.4) + 68;
-const MOBILE_TOOLTIP_HEIGHT = TOOLTIP_HEIGHT * 2;
+const MOBILE_TOOLTIP_WIDTH = Math.round((Math.round(TOOLTIP_WIDTH * 1.4) + 68) * 0.95);
+const MOBILE_TOOLTIP_HEIGHT = Math.round(TOOLTIP_HEIGHT * 2 * 0.95);
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
@@ -216,13 +216,13 @@ export default function DistrictMapPriceExplorer({
                   className="pointer-events-none overflow-visible"
                 >
                   <div className="rounded-[1rem] border border-[#dbe7f8] bg-white/95 px-4 py-3 text-left shadow-[0_18px_45px_rgba(17,24,39,0.18)] backdrop-blur-sm">
-                    <p className="text-[37px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:text-[20px]">
+                    <p className="text-[35.15px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:text-[20px]">
                       📍 {activeDistrict.id} {activeDistrict.name}
                     </p>
-                    <p className="mt-2 text-[37px] font-semibold leading-tight text-[#5f6975] md:mt-1.5 md:text-[20px]">
+                    <p className="mt-2 text-[35.15px] font-semibold leading-tight text-[#5f6975] md:mt-1.5 md:text-[20px]">
                       ⏱️ {DISTRICT_DRIVE_TIMES[activeDistrict.id] ?? '~30 min'}
                     </p>
-                    <p className="mt-4 whitespace-nowrap text-[37px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:mt-2 md:text-[20px]">
+                    <p className="mt-4 whitespace-nowrap text-[35.15px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:mt-2 md:text-[20px]">
                       {getDistrictPrice(activeDistrict.group, 'limo')}€ <span className="text-[#9ca3af]">|</span>{' '}
                       {getDistrictPrice(activeDistrict.group, 'kombi')}€ <span className="text-[#9ca3af]">|</span>{' '}
                       {getDistrictPrice(activeDistrict.group, 'van')}€
