@@ -820,12 +820,10 @@ export default async function Home({
                 </div>
 
                 <div className="mt-8 rounded-[1.5rem] border border-[#dbe7f8] bg-[#f4f8ff] px-5 py-5 md:px-6 md:py-6">
-                  <div className="grid gap-4 md:flex md:items-start">
-                    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-4 md:flex md:items-start">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)]">
-                        <Info size={20} strokeWidth={2.2} />
-                      </span>
-                    </div>
+                  <div className="md:flex md:items-start md:gap-4">
+                    <span className="float-left mb-2 mr-4 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:float-none md:mb-0 md:mr-0">
+                      <Info size={20} strokeWidth={2.2} />
+                    </span>
                     <p className="text-[0.98rem] leading-[1.7] text-[#58708d] md:mt-3 md:min-w-0">
                       {localizedMediaContent.childSeatSection.disclaimer}
                     </p>

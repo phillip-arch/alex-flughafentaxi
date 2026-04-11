@@ -82,7 +82,7 @@ export default function BookingStepTwo({
             <Calendar
               onClick={() => setIsDatePickerOpen(true)}
               className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
-              size={20}
+              size={18}
             />
             <DatePickerComponent
               isOpen={isDatePickerOpen}
@@ -113,7 +113,7 @@ export default function BookingStepTwo({
             <Clock
               onClick={() => setIsTimePickerOpen(true)}
               className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
-              size={20}
+              size={18}
             />
             <TimePickerComponent
               isOpen={isTimePickerOpen}
@@ -143,7 +143,7 @@ export default function BookingStepTwo({
             <div className="flex min-h-[var(--field-height)] items-center justify-between rounded-[var(--radius-field)] bg-[#f5f5f7] px-4 py-3 md:relative md:top-[-10px] md:col-span-2 md:min-h-[3rem]">
               <div className="flex min-w-0 items-center">
                 <div className="min-w-0 text-[#1d1d1f]">
-                  <p className="text-[15px] font-medium leading-tight">Meet &amp; Greet (+ €6)</p>
+                  <p className="text-[15px] font-medium leading-tight">Meet &amp; Greet (+6€)</p>
                   <p className="mt-0.5 text-[13px] leading-tight text-[#86868b] md:whitespace-nowrap">
                     Driver waits inside arrivals with a name sign.
                   </p>
