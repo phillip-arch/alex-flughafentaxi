@@ -14,10 +14,11 @@ const MOBILE_MAP_SECTION_CLASS = 'w-full max-w-full rounded-none';
 const NON_MOBILE_MAP_SECTION_CLASS = 'sm:left-auto sm:w-full sm:translate-x-0 sm:rounded-[1.5rem]';
 const MAP_SVG_BASE_CLASS =
   'absolute inset-x-0 top-[6px] bottom-[6px] h-[calc(100%-12px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
-const MAP_SVG_SCALE_CLASS = 'scale-[1.07] sm:scale-[1.08]';
+const MAP_SVG_SCALE_CLASS = 'scale-[1.177] sm:scale-[1.08]';
 const DEFAULT_DESKTOP_TOP_CLASS = 'sm:top-3 lg:top-5';
 const DEFAULT_MOBILE_TOP_CLASS = 'top-0';
 const DISTRICT_LABEL_OFFSETS: Record<string, { x: number; y: number }> = {
+  '14': { x: -10, y: 0 },
   '17': { x: -8, y: 6 },
 };
 const DISTRICT_DRIVE_TIMES: Record<string, string> = {
@@ -126,6 +127,7 @@ export default function DistrictMapPriceExplorer({
     activeFeature?.beznr === '11' ||
     activeFeature?.beznr === '21' ||
     activeFeature?.beznr === '22';
+  const shouldPlaceTooltipBelow = activeFeature?.beznr === '21';
   const tooltipX = activeFeature
     ? clamp(
         shouldPlaceTooltipLeft
@@ -136,7 +138,13 @@ export default function DistrictMapPriceExplorer({
       )
     : 0;
   const tooltipY = activeFeature
-    ? clamp(activeFeature.center.y - tooltipHeight - TOOLTIP_OFFSET, 12, mapGeometry.svgHeight - tooltipHeight - 12)
+    ? clamp(
+        shouldPlaceTooltipBelow
+          ? activeFeature.center.y + TOOLTIP_OFFSET
+          : activeFeature.center.y - tooltipHeight - TOOLTIP_OFFSET,
+        12,
+        mapGeometry.svgHeight - tooltipHeight - 12,
+      )
     : 0;
 
   return (
@@ -208,13 +216,13 @@ export default function DistrictMapPriceExplorer({
                   className="pointer-events-none overflow-visible"
                 >
                   <div className="rounded-[1rem] border border-[#dbe7f8] bg-white/95 px-4 py-3 text-left shadow-[0_18px_45px_rgba(17,24,39,0.18)] backdrop-blur-sm">
-                    <p className="text-[38px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:text-[20px]">
+                    <p className="text-[37px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:text-[20px]">
                       📍 {activeDistrict.id} {activeDistrict.name}
                     </p>
-                    <p className="mt-2 text-[38px] font-semibold leading-tight text-[#5f6975] md:mt-1.5 md:text-[20px]">
+                    <p className="mt-2 text-[37px] font-semibold leading-tight text-[#5f6975] md:mt-1.5 md:text-[20px]">
                       ⏱️ {DISTRICT_DRIVE_TIMES[activeDistrict.id] ?? '~30 min'}
                     </p>
-                    <p className="mt-4 whitespace-nowrap text-[38px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:mt-2 md:text-[20px]">
+                    <p className="mt-4 whitespace-nowrap text-[37px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:mt-2 md:text-[20px]">
                       {getDistrictPrice(activeDistrict.group, 'limo')}€ <span className="text-[#9ca3af]">|</span>{' '}
                       {getDistrictPrice(activeDistrict.group, 'kombi')}€ <span className="text-[#9ca3af]">|</span>{' '}
                       {getDistrictPrice(activeDistrict.group, 'van')}€
