@@ -48,7 +48,7 @@ const DISTRICT_DRIVE_TIMES: Record<string, string> = {
 const TOOLTIP_WIDTH = 252;
 const TOOLTIP_HEIGHT = 142;
 const TOOLTIP_OFFSET = 18;
-const MOBILE_TOOLTIP_WIDTH = Math.round(TOOLTIP_WIDTH * 1.4) + 4;
+const MOBILE_TOOLTIP_WIDTH = Math.round(TOOLTIP_WIDTH * 1.4) + 9;
 const MOBILE_TOOLTIP_HEIGHT = TOOLTIP_HEIGHT * 2;
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
