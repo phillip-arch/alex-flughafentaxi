@@ -73,7 +73,7 @@ export default function BookingStepTwo({
               readOnly
               placeholder="DD.MM.YYYY"
               onClick={() => setIsDatePickerOpen(true)}
-              className={`ui-field-surface h-12 w-full rounded-[var(--radius-field)] border px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] ${
+              className={`ui-field-surface h-12 w-full rounded-[var(--radius-field)] border px-3 py-0 text-[15px] text-[#1d1d1f] outline-none transition-all cursor-pointer md:h-[2.4rem] md:px-[0.8rem] md:text-[17px] ${
                 isFieldInvalid('date')
                   ? 'border-[#d70015] focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015] placeholder:text-[#d70015]/60'
                   : 'border-[#d8d4ca] focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10'
