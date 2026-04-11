@@ -48,7 +48,7 @@ const DISTRICT_DRIVE_TIMES: Record<string, string> = {
 const TOOLTIP_WIDTH = 252;
 const TOOLTIP_HEIGHT = 142;
 const TOOLTIP_OFFSET = 18;
-const MOBILE_TOOLTIP_WIDTH = Math.round(TOOLTIP_WIDTH * 1.4);
+const MOBILE_TOOLTIP_WIDTH = Math.round(TOOLTIP_WIDTH * 1.4) + 2;
 const MOBILE_TOOLTIP_HEIGHT = TOOLTIP_HEIGHT * 2;
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
@@ -121,7 +121,11 @@ export default function DistrictMapPriceExplorer({
     ? mapGeometry.features.find((feature) => districtByBezNr.get(feature.beznr)?.id === activeId)
     : null;
   const activeDistrict = activeId ? districtPricingRows.find((district) => district.id === activeId) : null;
-  const shouldPlaceTooltipLeft = activeFeature?.beznr === '21' || activeFeature?.beznr === '22';
+  const shouldPlaceTooltipLeft =
+    activeFeature?.beznr === '2' ||
+    activeFeature?.beznr === '11' ||
+    activeFeature?.beznr === '21' ||
+    activeFeature?.beznr === '22';
   const tooltipX = activeFeature
     ? clamp(
         shouldPlaceTooltipLeft
