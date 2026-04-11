@@ -121,7 +121,7 @@ export default function DistrictMapPriceExplorer({
     ? mapGeometry.features.find((feature) => districtByBezNr.get(feature.beznr)?.id === activeId)
     : null;
   const activeDistrict = activeId ? districtPricingRows.find((district) => district.id === activeId) : null;
-  const shouldPlaceTooltipLeft = activeFeature?.beznr === '22';
+  const shouldPlaceTooltipLeft = activeFeature?.beznr === '21' || activeFeature?.beznr === '22';
   const tooltipX = activeFeature
     ? clamp(
         shouldPlaceTooltipLeft
@@ -204,13 +204,13 @@ export default function DistrictMapPriceExplorer({
                   className="pointer-events-none overflow-visible"
                 >
                   <div className="rounded-[1rem] border border-[#dbe7f8] bg-white/95 px-4 py-3 text-left shadow-[0_18px_45px_rgba(17,24,39,0.18)] backdrop-blur-sm">
-                    <p className="text-[40px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:text-[20px]">
+                    <p className="text-[39px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:text-[20px]">
                       📍 {activeDistrict.id} {activeDistrict.name}
                     </p>
-                    <p className="mt-2 text-[40px] font-semibold leading-tight text-[#5f6975] md:mt-1.5 md:text-[20px]">
+                    <p className="mt-2 text-[39px] font-semibold leading-tight text-[#5f6975] md:mt-1.5 md:text-[20px]">
                       ⏱️ {DISTRICT_DRIVE_TIMES[activeDistrict.id] ?? '~30 min'}
                     </p>
-                    <p className="mt-4 whitespace-nowrap text-[40px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:mt-2 md:text-[20px]">
+                    <p className="mt-4 whitespace-nowrap text-[39px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:mt-2 md:text-[20px]">
                       {getDistrictPrice(activeDistrict.group, 'limo')}€ <span className="text-[#9ca3af]">|</span>{' '}
                       {getDistrictPrice(activeDistrict.group, 'kombi')}€ <span className="text-[#9ca3af]">|</span>{' '}
                       {getDistrictPrice(activeDistrict.group, 'van')}€
