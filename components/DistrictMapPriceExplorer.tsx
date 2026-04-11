@@ -48,6 +48,8 @@ const DISTRICT_DRIVE_TIMES: Record<string, string> = {
 const TOOLTIP_WIDTH = 252;
 const TOOLTIP_HEIGHT = 142;
 const TOOLTIP_OFFSET = 18;
+const MOBILE_TOOLTIP_WIDTH = Math.round(TOOLTIP_WIDTH * 1.4);
+const MOBILE_TOOLTIP_HEIGHT = TOOLTIP_HEIGHT * 2;
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
@@ -70,6 +72,7 @@ export default function DistrictMapPriceExplorer({
 }: DistrictMapPriceExplorerProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [shouldRenderMap, setShouldRenderMap] = useState(!lazyMountMap);
+  const [isMobileTooltip, setIsMobileTooltip] = useState(false);
   const mapSectionRef = useRef<HTMLElement | null>(null);
   const mapAspectRatio = `${SVG_WIDTH} / ${mapGeometry.svgHeight}`;
 
@@ -98,8 +101,22 @@ export default function DistrictMapPriceExplorer({
     };
   }, [lazyMountMap, shouldRenderMap]);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const updateIsMobileTooltip = () => setIsMobileTooltip(mediaQuery.matches);
+
+    updateIsMobileTooltip();
+    mediaQuery.addEventListener('change', updateIsMobileTooltip);
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateIsMobileTooltip);
+    };
+  }, []);
+
   const mapSectionClassName = `${MAP_SECTION_BASE_CLASS} ${MOBILE_MAP_SECTION_CLASS} ${NON_MOBILE_MAP_SECTION_CLASS} ${DESKTOP_MAP_WIDTH} ${mobileTopClassName} ${desktopTopClassName}`;
   const mapSvgClassName = `${MAP_SVG_BASE_CLASS} ${MAP_SVG_SCALE_CLASS}`;
+  const tooltipWidth = isMobileTooltip ? MOBILE_TOOLTIP_WIDTH : TOOLTIP_WIDTH;
+  const tooltipHeight = isMobileTooltip ? MOBILE_TOOLTIP_HEIGHT : TOOLTIP_HEIGHT;
   const activeFeature = activeId
     ? mapGeometry.features.find((feature) => districtByBezNr.get(feature.beznr)?.id === activeId)
     : null;
@@ -108,14 +125,14 @@ export default function DistrictMapPriceExplorer({
   const tooltipX = activeFeature
     ? clamp(
         shouldPlaceTooltipLeft
-          ? activeFeature.center.x - TOOLTIP_WIDTH - TOOLTIP_OFFSET
+          ? activeFeature.center.x - tooltipWidth - TOOLTIP_OFFSET
           : activeFeature.center.x + TOOLTIP_OFFSET,
         12,
-        SVG_WIDTH - TOOLTIP_WIDTH - 12,
+        SVG_WIDTH - tooltipWidth - 12,
       )
     : 0;
   const tooltipY = activeFeature
-    ? clamp(activeFeature.center.y - TOOLTIP_HEIGHT - TOOLTIP_OFFSET, 12, mapGeometry.svgHeight - TOOLTIP_HEIGHT - 12)
+    ? clamp(activeFeature.center.y - tooltipHeight - TOOLTIP_OFFSET, 12, mapGeometry.svgHeight - tooltipHeight - 12)
     : 0;
 
   return (
@@ -147,7 +164,8 @@ export default function DistrictMapPriceExplorer({
                       stroke={isActive ? '#0f5fca' : '#ffffff'}
                       strokeWidth={isActive ? 3.2 : 2.2}
                       vectorEffect="non-scaling-stroke"
-                      className="cursor-pointer transition-all duration-200"
+                      className="cursor-pointer transition-all duration-200 focus:outline-none"
+                      style={{ outline: 'none' }}
                       tabIndex={0}
                       role="button"
                       aria-label={
@@ -181,18 +199,18 @@ export default function DistrictMapPriceExplorer({
                 <foreignObject
                   x={tooltipX}
                   y={tooltipY}
-                  width={TOOLTIP_WIDTH}
-                  height={TOOLTIP_HEIGHT}
+                  width={tooltipWidth}
+                  height={tooltipHeight}
                   className="pointer-events-none overflow-visible"
                 >
                   <div className="rounded-[1rem] border border-[#dbe7f8] bg-white/95 px-4 py-3 text-left shadow-[0_18px_45px_rgba(17,24,39,0.18)] backdrop-blur-sm">
-                    <p className="text-[20px] font-black leading-tight tracking-[-0.03em] text-[#111827]">
+                    <p className="text-[40px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:text-[20px]">
                       📍 {activeDistrict.id} {activeDistrict.name}
                     </p>
-                    <p className="mt-1.5 text-[20px] font-semibold leading-tight text-[#5f6975]">
+                    <p className="mt-2 text-[40px] font-semibold leading-tight text-[#5f6975] md:mt-1.5 md:text-[20px]">
                       ⏱️ {DISTRICT_DRIVE_TIMES[activeDistrict.id] ?? '~30 min'}
                     </p>
-                    <p className="mt-2 whitespace-nowrap text-[20px] font-black leading-tight tracking-[-0.03em] text-[#111827]">
+                    <p className="mt-4 whitespace-nowrap text-[40px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:mt-2 md:text-[20px]">
                       {getDistrictPrice(activeDistrict.group, 'limo')}€ <span className="text-[#9ca3af]">|</span>{' '}
                       {getDistrictPrice(activeDistrict.group, 'kombi')}€ <span className="text-[#9ca3af]">|</span>{' '}
                       {getDistrictPrice(activeDistrict.group, 'van')}€
