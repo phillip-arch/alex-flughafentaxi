@@ -124,6 +124,8 @@ export default function DistrictMapPriceExplorer({
   const activeDistrict = activeId ? districtPricingRows.find((district) => district.id === activeId) : null;
   const shouldPlaceTooltipLeft =
     activeFeature?.beznr === '2' ||
+    activeFeature?.beznr === '3' ||
+    activeFeature?.beznr === '10' ||
     activeFeature?.beznr === '11' ||
     activeFeature?.beznr === '21' ||
     activeFeature?.beznr === '22';
