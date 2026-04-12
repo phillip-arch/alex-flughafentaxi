@@ -13,17 +13,12 @@ import {
   type StreetOption,
 } from '@/lib/addresses';
 import {
-  Plane, 
   PlaneLanding, 
   PlaneTakeoff, 
   MapPin, 
   House,
   ChevronRight, 
   ChevronLeft, 
-  Check, 
-  Clock,
-  Car,
-  CreditCard,
   Building2,
   Users,
   Briefcase,
@@ -37,6 +32,7 @@ import {
 } from 'lucide-react';
 import { determineVehicle, calculateVehiclePrice } from '@/lib/pricing';
 import { BOOKING_FORM_CARD_CLASS, BOOKING_FORM_INPUT_CLASS, BOOKING_FORM_INPUT_INVALID_CLASS } from '@/lib/ui/bookingFormStyles';
+import { BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
 
 import { createBooking } from '@/app/(booking)/actions';
 
@@ -1509,7 +1505,7 @@ const BookingForm = ({
     </button>
   );
 
-  const shouldShowInfoTrigger = showStepIndicator || showInfoTrigger || (isAppSurface && hasMounted);
+  const shouldShowInfoTrigger = isAppSurface && hasMounted;
   const formContentTopPaddingClassName =
     !isAppSurface && showStepIndicator ? 'pt-9 md:pt-3' : 'pt-2 md:pt-3';
 
@@ -1789,89 +1785,7 @@ const BookingForm = ({
                   </button>
                 </div>
               </div>
-              <div className="pb-6 pt-2 md:pt-0">
-                <div className="min-w-0">
-                  <p className="text-[0.82rem] font-semibold uppercase tracking-[0.22em] text-[#1679ff]">
-                    Information
-                  </p>
-                  <h2 className="mt-3 text-[2.2rem] font-semibold leading-[0.98] tracking-[-0.06em] text-[#111827] md:max-w-[11ch] md:text-[4rem]">
-                    Airport Transfer Information
-                  </h2>
-                  <p className="mt-4 max-w-[44rem] text-[1.02rem] leading-8 text-[#6a7d96] md:text-[1.12rem]">
-                    All important details about arrival, booking lead time, and payment next to your booking.
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4 md:space-y-5">
-                <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
-                  <p className="text-[0.82rem] font-semibold uppercase tracking-[0.22em] text-[#1679ff]">
-                    Airport pickup
-                  </p>
-                  <h3 className="mt-2 text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
-                    Where to meet your driver
-                  </h3>
-                  <ul className="mt-4 space-y-2 text-[1rem] leading-8 text-[#6a6a6a]">
-                    <li>• Your driver waits in the arrivals hall</li>
-                    <li>• Name sign with your booking name</li>
-                    <li>• Free waiting time included</li>
-                  </ul>
-                </div>
-
-                <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
-                  <h3 className="text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
-                    Minimum booking lead time
-                  </h3>
-                  <div className="mt-4 space-y-2 text-[1rem] leading-8 text-[#6a6a6a]">
-                    <p>07:00-22:00 - book at least 3h in advance</p>
-                    <p>22:00-07:00 - book at least 8h in advance</p>
-                  </div>
-                </div>
-
-                <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
-                  <h3 className="text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
-                    Child seats
-                  </h3>
-                  <p className="mt-3 text-[1rem] leading-8 text-[#6a6a6a]">
-                    Available on request directly during booking.
-                  </p>
-                </div>
-
-                <div className="rounded-[1.6rem] border border-[#e8edf3] bg-white px-5 py-5 md:px-6 md:py-6">
-                  <h3 className="text-[1.5rem] font-semibold tracking-[-0.04em] text-[#111827]">
-                    Payment methods
-                  </h3>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    {['Bar', 'Visa', 'Mastercard', 'Apple Pay'].map((method) => (
-                      <div
-                        key={method}
-                        className="flex items-center gap-3 rounded-[1.2rem] border border-[#e8edf3] bg-[#f8fbff] px-4 py-4 text-[1rem] font-medium text-[#111827]"
-                      >
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#1679ff] shadow-[0_8px_18px_rgba(17,17,17,0.04)]">
-                          <CreditCard size={18} strokeWidth={2} />
-                        </span>
-                        <span>{method}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-3 pb-8 md:pb-2">
-                  {[
-                    { label: 'Fixed price', icon: Check },
-                    { label: 'Free waiting time', icon: Clock },
-                    { label: 'Flight tracking', icon: PlaneLanding },
-                  ].map(({ label, icon: Icon }) => (
-                    <div
-                      key={label}
-                      className="inline-flex items-center gap-2 rounded-full border border-[#e8edf3] bg-white px-4 py-3 text-[0.98rem] font-medium text-[#111827]"
-                    >
-                      <Icon size={18} className="text-[#1679ff]" />
-                      <span>{label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <BookingInfoPanel direction={formData.direction} meetAndGreet={formData.meetAndGreet} />
               </div>
             </div>
           </div>

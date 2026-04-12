@@ -13,9 +13,9 @@ type LanguageOption = {
 
 const navItems = [
   { name: 'Home', href: '/' },
-  { name: 'Preise', href: '/preise' },
-  { name: 'Gebiete', href: '/#gebiete' },
-  { name: 'Flotte', href: '/#flotte' },
+  { name: 'Prices', href: '/preise' },
+  { name: 'Areas', href: '/#gebiete' },
+  { name: 'Fleet', href: '/#flotte' },
   { name: 'FAQ', href: '/faq' },
 ];
 
@@ -165,7 +165,7 @@ export default function NavbarClient({
           <span className="relative block h-11 w-[120px] overflow-hidden lg:h-12 lg:w-[220px]">
             <Image
               src="https://web-site.website/images/aflogo.jpg"
-              alt="Flughafentaxi Alex Logo"
+              alt="Alex Airport Taxi Logo"
               fill
               sizes="(max-width: 1023px) 120px, 220px"
               className="object-contain object-left"
@@ -189,7 +189,7 @@ export default function NavbarClient({
               className="inline-flex items-center gap-1 text-[15px] font-medium text-white transition-colors hover:text-white/78"
               aria-haspopup="menu"
               aria-expanded={isDesktopLangMenuOpen}
-              aria-label="Sprache waehlen"
+              aria-label="Choose language"
             >
               <Globe size={20} strokeWidth={2.1} />
               <span className="inline-flex w-[2.1rem] justify-center text-[15px] font-medium uppercase">
@@ -211,7 +211,7 @@ export default function NavbarClient({
           </div>
 
           {showAccountEntry ? (
-            <Link href={withLang(accountHref)} className="ui-icon-button-accent -translate-y-px" aria-label="Zum Konto">
+            <Link href={withLang(accountHref)} className="ui-icon-button-accent -translate-y-px" aria-label="Go to account">
               <User size={18} strokeWidth={2.1} className="text-[#111111]" />
             </Link>
           ) : null}
@@ -225,7 +225,7 @@ export default function NavbarClient({
               className="inline-flex min-w-[4.75rem] items-center gap-1.5 text-[0.95rem] font-medium text-white"
               aria-haspopup="menu"
               aria-expanded={isMobileLangMenuOpen}
-              aria-label="Sprache waehlen"
+              aria-label="Choose language"
             >
               <Globe size={20} strokeWidth={2.1} />
               <span className="inline-flex w-[2.1rem] justify-center text-[0.95rem] font-medium uppercase">
@@ -236,14 +236,14 @@ export default function NavbarClient({
           </div>
 
           {showAccountEntry ? (
-            <Link href={withLang(accountHref)} className="ui-icon-button-accent" aria-label="Zum Konto">
+            <Link href={withLang(accountHref)} className="ui-icon-button-accent" aria-label="Go to account">
               <User size={18} strokeWidth={2.1} className="text-[#111111]" />
             </Link>
           ) : null}
 
           <button
             className="ml-2 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-white"
-            aria-label={isMobileMenuOpen ? 'Menue schliessen' : 'Menue oeffnen'}
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
             onClick={toggleMobileMenu}
           >
             <span className="flex h-5 w-5 items-center justify-center">
@@ -261,7 +261,7 @@ export default function NavbarClient({
               <span className="relative block h-11 w-[120px] overflow-hidden">
                 <Image
                   src="https://web-site.website/images/aflogo.jpg"
-                  alt="Flughafentaxi Alex Logo"
+                  alt="Alex Airport Taxi Logo"
                   fill
                   sizes="120px"
                   className="object-contain object-left"
@@ -277,7 +277,7 @@ export default function NavbarClient({
                   className="inline-flex min-w-[4.75rem] items-center gap-1.5 text-[0.95rem] font-medium text-white"
                   aria-haspopup="menu"
                   aria-expanded={isMobileLangMenuOpen}
-                  aria-label="Sprache waehlen"
+                  aria-label="Choose language"
                 >
                   <Globe size={20} strokeWidth={2.1} />
                   <span className="inline-flex w-[2.1rem] justify-center text-[0.95rem] font-medium uppercase">
@@ -292,7 +292,7 @@ export default function NavbarClient({
                   href={withLang(accountHref)}
                   onClick={closeMobileMenu}
                   className="ui-icon-button-accent"
-                  aria-label="Zum Konto"
+                  aria-label="Go to account"
                 >
                   <User size={18} strokeWidth={2.1} className="text-[#111111]" />
                 </Link>
@@ -302,7 +302,7 @@ export default function NavbarClient({
                 type="button"
                 onClick={closeMobileMenu}
                 className="ml-2 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-white"
-                aria-label="Menue schliessen"
+                aria-label="Close menu"
               >
                 <span className="flex h-5 w-5 items-center justify-center">
                   <X size={20} />

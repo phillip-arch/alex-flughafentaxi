@@ -581,7 +581,7 @@ export default async function Home({
       <Navbar />
       <main>
 
-      <section className="relative overflow-hidden bg-white text-[var(--color-text)]">
+      <section id="hero" className="relative overflow-hidden bg-white text-[var(--color-text)]">
         <div className={heroSectionPaddingClass}>
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
@@ -841,9 +841,9 @@ export default async function Home({
           <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)] lg:items-center lg:gap-10">
             <div className="max-w-[44rem]">
                 <SectionIntro
-                  eyebrow="Kontakt"
-                  title="Fragen zur Buchung?"
-                  description="Sie koennen Ihren Flughafentransfer bequem online buchen. Falls Sie lieber direkt sprechen oder schnell Hilfe brauchen, sind wir per Telefon und WhatsApp sofort erreichbar."
+                  eyebrow="Contact"
+                  title="Questions about booking?"
+                  description="You can book your airport transfer conveniently online. If you prefer to speak directly or need quick help, we are available immediately by phone and WhatsApp."
                   className="max-w-[34rem]"
                 />
               </div>
@@ -876,7 +876,7 @@ export default async function Home({
               <SectionIntro
                 eyebrow="Terminal 3"
                 title="Terminal 3 map"
-                description="Orientierung fuer die Abholung am Flughafen Wien."
+                description="Guidance for pickup at Vienna Airport."
                 className="max-w-[42rem]"
               />
 
@@ -927,9 +927,9 @@ export default async function Home({
         <div className="app-container">
           <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
             <SectionIntro
-              eyebrow="Bewertungen"
-              title="Bewertungen von Fahrgaesten."
-              description="Echte Rueckmeldungen unserer Fahrgaeste vor Ihrer Buchung."
+              eyebrow="Reviews"
+              title="Passenger reviews."
+              description="Real feedback from our passengers before you book."
               className="max-w-[42rem]"
             />
 
@@ -965,23 +965,23 @@ export default async function Home({
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
               <div className="ui-text-block-lg max-w-[62rem]">
                 <SectionIntro
-                  eyebrow="Flughafen Wien"
-                  title="Flughafentaxi Wien - Stressfrei zum Flughafen Wien (VIE)"
+                  eyebrow="Vienna Airport"
+                  title="Vienna airport taxi - stress-free to Vienna Airport (VIE)"
                 />
                 <div className="ui-text-block-sm">
                   <p className="text-[1rem] font-semibold text-[#111827]">
                     Vienna International Airport (VIE)
                   </p>
-                  <p className="ui-copy-compact text-[#58708d]">1300 Schwechat, Oesterreich</p>
+                  <p className="ui-copy-compact text-[#58708d]">1300 Schwechat, Austria</p>
                 </div>
                 <div className="ui-copy-group max-w-[56rem] text-[#58708d]">
                   <p className="ui-copy-compact">
-                    Mit einem Flughafentaxi Wien gelangen Sie schnell und bequem zum Flughafen.
-                    Buchen Sie Ihre Fahrt in wenigen Schritten - sofort oder im Voraus.
+                    With a Vienna airport taxi, you can reach the airport quickly and comfortably.
+                    Book your ride in just a few steps - immediately or in advance.
                   </p>
                   <p className="ui-copy-compact">
-                    Puenktliche Abholung, Fixpreis und zuverlaessiger Transfer fuer Ihren perfekten
-                    Start in die Reise.
+                    On-time pickup, a fixed price, and reliable transfer service for the perfect
+                    start to your journey.
                   </p>
                 </div>
                 <div className="mt-8">
@@ -1001,9 +1001,9 @@ export default async function Home({
             <div className="px-6 py-7 md:px-8 md:py-8">
               <div className="ui-text-block-lg max-w-[36rem]">
                 <SectionIntro
-                  eyebrow="Orientierung"
-                  title="Ueberblick ueber den Flughafen Wien (VIE)"
-                  description="Die wichtigsten Hinweise zu Terminals, Gates und Ihrer Ankunftszeit auf einen Blick."
+                  eyebrow="Orientation"
+                  title="Overview of Vienna Airport (VIE)"
+                  description="The key information about terminals, gates, and your arrival time at a glance."
                 />
                 <p className="ui-copy-compact text-[#6a7d96]">
                   Der Flughafen Wien verfuegt ueber drei Eingaenge: Terminal 1 (T1), Terminal 1A
@@ -1089,9 +1089,9 @@ export default async function Home({
         <div className="app-container">
           <div className="ui-card-surface-light px-6 py-7 md:px-8 md:py-8">
             <SectionIntro
-              eyebrow="Strecken"
-              title="Beliebte Strecken"
-              description="Entdecken Sie unsere detaillierten Routenbeschreibungen. Jede Seite enthaelt eine Vergleichstabelle, Tipps und FAQs."
+              eyebrow="Routes"
+              title="Popular routes"
+              description="Explore our detailed route guides. Each page includes a comparison table, tips, and FAQs."
               className="max-w-[40rem]"
             />
 

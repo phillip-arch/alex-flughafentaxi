@@ -13,17 +13,43 @@ export default function FloatingContactButton() {
   const pathname = usePathname();
 
   useEffect(() => {
+    let animationFrame = 0;
+
     const syncVisibility = () => {
-      setIsVisible(window.scrollY > 0);
+      const hero = document.getElementById('hero');
+      const footer = document.getElementById('site-footer');
+      const isPastHero = hero ? hero.getBoundingClientRect().bottom <= 0 : window.scrollY > 0;
+      const isAtFooter = footer ? footer.getBoundingClientRect().top <= window.innerHeight : false;
+
+      setIsVisible(isPastHero && !isAtFooter);
+    };
+
+    const requestSyncVisibility = () => {
+      if (animationFrame) return;
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = 0;
+        syncVisibility();
+      });
     };
 
     syncVisibility();
-    window.addEventListener('scroll', syncVisibility, { passive: true });
+    window.addEventListener('scroll', requestSyncVisibility, { passive: true });
+    window.addEventListener('resize', requestSyncVisibility);
 
     return () => {
-      window.removeEventListener('scroll', syncVisibility);
+      if (animationFrame) {
+        window.cancelAnimationFrame(animationFrame);
+      }
+      window.removeEventListener('scroll', requestSyncVisibility);
+      window.removeEventListener('resize', requestSyncVisibility);
     };
   }, [pathname]);
+
+  useEffect(() => {
+    if (!isVisible) {
+      setIsOpen(false);
+    }
+  }, [isVisible]);
 
   useEffect(() => {
     setIsOpen(false);
@@ -64,10 +90,10 @@ export default function FloatingContactButton() {
           <div className="flex items-start justify-between gap-3">
             <div className="flex max-w-[15rem] flex-col gap-[10px]">
               <h2 className="text-[1.35rem] font-black tracking-[-0.05em] text-[#1b2436] md:text-[1.45rem]">
-                Wie koennen wir helfen?
+                How can we help?
               </h2>
               <p className="text-[0.8rem] leading-[1.5] text-[#67758d] md:text-[0.82rem]">
-                Wir sind fuer Sie da, wenn Sie Hilfe bei Ihrer Fahrt oder Buchung brauchen.
+                We are here if you need help with your ride or booking.
               </p>
             </div>
 
@@ -91,10 +117,10 @@ export default function FloatingContactButton() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[0.88rem] font-bold tracking-[-0.03em] text-[#1b2436] md:text-[0.92rem]">
-                  Rufen Sie uns an
+                  Call us
                 </span>
                 <span className="mt-0.5 block text-[0.76rem] text-[#6c7a92] md:text-[0.8rem]">
-                  Rund um die Uhr erreichbar
+                  Available 24/7
                 </span>
               </span>
               <ArrowRight size={22} className="shrink-0 text-[#8b97ab]" strokeWidth={1.9} />
@@ -109,10 +135,10 @@ export default function FloatingContactButton() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[0.88rem] font-bold tracking-[-0.03em] text-[#1b2436] md:text-[0.92rem]">
-                  Kontakt per WhatsApp
+                  Contact via WhatsApp
                 </span>
                 <span className="mt-0.5 block text-[0.76rem] text-[#6c7a92] md:text-[0.8rem]">
-                  Schnelle Antwort
+                  Quick response
                 </span>
               </span>
               <ArrowRight size={22} className="shrink-0 text-[#8b97ab]" strokeWidth={1.9} />
@@ -120,7 +146,7 @@ export default function FloatingContactButton() {
           </div>
 
           <div className="mt-4 rounded-[1.2rem] border border-[#e7edf5] bg-[#f5f8fd] px-4 py-3 text-[0.76rem] text-[#6a7891] md:text-[0.8rem]">
-            Wir antworten normalerweise innerhalb von 2 bis 5 Minuten.
+            We usually respond within 2 to 5 minutes.
           </div>
         </div>
       ) : null}
@@ -137,10 +163,10 @@ export default function FloatingContactButton() {
           </span>
           <span className="text-left">
             <span className="block text-[0.95rem] font-bold tracking-[-0.03em] text-[#1b2436] md:text-[0.82rem]">
-              Brauchen Sie Hilfe?
+              Need help?
             </span>
             <span className="mt-0.5 block text-[0.8rem] text-[#6c7a92] md:text-[0.72rem]">
-              Support & Kontakt
+              Support & Contact
             </span>
           </span>
         </button>
