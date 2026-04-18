@@ -1,5 +1,18 @@
 export type VehicleType = 'Limo' | 'Kombi' | 'Bus';
 
+export function formatVehicleTypeLabel(vehicleType: VehicleType | string): string {
+  switch (vehicleType) {
+    case 'Limo':
+      return 'Sedan';
+    case 'Kombi':
+      return 'Station wagon';
+    case 'Bus':
+      return 'Minivan';
+    default:
+      return vehicleType;
+  }
+}
+
 export function determineVehicle(passengers: number, suitcases: number, handLuggage: number): VehicleType {
   // 1. Limo (Limousine)
   if (passengers <= 2 && suitcases <= 2 && handLuggage <= 2) {

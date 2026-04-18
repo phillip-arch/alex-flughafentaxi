@@ -189,21 +189,21 @@ const whyUsTimelineItems = [
 
 const vehicleCategoryHighlights = [
   {
-    title: 'Limousine',
+    title: 'Sedan',
     audience: 'Fuer Einzelpersonen und Paare',
     summary: 'Kompakt, schnell verfuegbar und ideal fuer klassische Transfers mit wenig Gepaeck.',
     price: 'ab 39 EUR',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
   },
   {
-    title: 'Kombi',
+    title: 'Station wagon',
     audience: 'Fuer Familien und Gruppen',
     summary: 'Mehr Platz fuer Koffer, Kinderwagen oder mehrere Mitreisende ohne Komfortverlust.',
     price: 'ab 45 EUR',
     imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
   },
   {
-    title: 'Bus',
+    title: 'Minivan',
     audience: 'Fuer groessere Gruppen',
     summary: 'Die passende Wahl, wenn mehrere Fahrgaeste gemeinsam und planbar ankommen sollen.',
     price: 'ab 69 EUR',
@@ -515,10 +515,7 @@ function HeroBookingCard() {
       <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
       <div className={heroBookingCardClass}>
         <div className={heroBookingHeaderClass}>
-          <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
-            Book in just a few steps
-          </p>
-          <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:self-auto lg:mr-[6px]">
+          <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:ml-auto sm:self-auto lg:mr-[6px]">
             Step 1 of 3
           </span>
         </div>
@@ -586,11 +583,8 @@ export default async function Home({
           <div className="mx-auto max-w-[104rem]">
             <div className="text-center">
               <h1 className={heroHeadlineClass}>
-                <span className="block">Vienna Airport Taxi</span>
-                <span className="block">
-                  On time at a fixed price,{' '}
-                  <span className="block md:inline">no surprises</span>
-                </span>
+                <span className="block">Vienna Airport Taxi:</span>
+                <span className="block">Fixed-Price Transfers</span>
               </h1>
             </div>
 

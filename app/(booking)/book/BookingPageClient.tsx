@@ -61,7 +61,6 @@ export default function BookingPageClient({
                   onDirectionChange={setDirection}
                   meetAndGreetSelected={meetAndGreet}
                   onMeetAndGreetChange={setMeetAndGreet}
-                  headerTitle={!isAppSurface ? 'Book in just a few steps' : undefined}
                   showStepOneRouteIntro={isAppSurface}
                   initialFavorites={initialFavorites}
                   initialIsLoggedIn={initialIsLoggedIn}

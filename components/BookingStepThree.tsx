@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { Calendar, Car, ChevronLeft, ChevronRight, MapPin, Users, Briefcase } from 'lucide-react';
+import { Briefcase, ChevronLeft, ShoppingBag, Users } from 'lucide-react';
+import { formatVehicleTypeLabel } from '@/lib/pricing';
 
 type BookingStepThreeProps = {
   formData: any;
@@ -51,79 +53,65 @@ export default function BookingStepThree({
   const currentLang = searchParams.get('lang')?.toLowerCase() === 'de' ? 'de' : 'en';
   const agbHref = `/agb?lang=${currentLang}`;
   const privacyHref = `/datenschutz?lang=${currentLang}`;
+  const cityLabel = formData.city?.trim() || formData.zip?.trim() || 'Pickup';
+  const compactRoute =
+    formData.direction === 'to_airport' ? `${cityLabel} \u2192 VIE` : `VIE \u2192 ${cityLabel}`;
+  const vehicleLabel = formatVehicleTypeLabel(vehicleType);
+  const vehicleImage =
+    vehicleType === 'Bus'
+      ? {
+          src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
+          alt: 'Airport taxi minivan',
+        }
+      : vehicleType === 'Kombi'
+        ? {
+            src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
+            alt: 'Airport taxi station wagon',
+          }
+        : {
+            src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
+            alt: 'Airport taxi sedan',
+          };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-      <div className="mb-4 text-center">
-        <h2 className="mb-2 text-[15px] font-semibold leading-tight tracking-[-0.04em] text-[#111111]">
-          Overview
-        </h2>
-        <p className="text-[12px] text-[#6d7075]">Please review your details.</p>
-      </div>
-
-      <div className="rounded-[22px] border border-[#d8d4ca] bg-[#fbfaf8] p-4 text-left shadow-[0_10px_28px_rgba(17,17,17,0.05)] md:p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6d7075]">
-              Total price
-            </p>
-            <p className="mt-1 text-[46px] font-semibold leading-none tracking-[-0.05em] text-[#0a63ff] md:text-[52px]">
-              {totalPrice} EUR
-            </p>
+      <div className="grid min-h-[7rem] grid-cols-[30%_70%] overflow-hidden rounded-[1.05rem] border border-[#dbe7f8] bg-[#f8fbff] shadow-[0_12px_28px_rgba(17,17,17,0.05)]">
+        <div className="relative flex items-center justify-center bg-transparent px-2 py-3">
+          <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-[0.9rem] border border-[#dbe7f8] bg-white shadow-[0_10px_24px_rgba(17,17,17,0.06)] md:h-24 md:w-36">
+            <Image
+              src={vehicleImage.src}
+              alt={vehicleImage.alt}
+              fill
+              className="object-cover"
+              sizes="(min-width: 768px) 144px, 112px"
+            />
           </div>
-          <span className="inline-flex items-center rounded-full bg-[#1679FF] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
-            Fixed price
-          </span>
         </div>
-
-        <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#d6e5ff] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1d1d1f]">
-          <MapPin size={14} className="text-[#0a63ff]" />
-          <span>{routeSummary}</span>
-        </div>
-
-        <div className="mt-4 rounded-[18px] border border-[#e3dfd5] bg-white px-4 py-4">
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="flex items-start gap-2.5">
-              <Calendar size={15} className="mt-0.5 text-[#0a63ff]" />
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">
-                  Date
-                </p>
-                <p className="mt-0.5 text-[14px] font-medium text-[#1d1d1f]">{dateSummary}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <MapPin size={15} className="mt-0.5 text-[#0a63ff]" />
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">
-                  Street
-                </p>
-                <p className="mt-0.5 text-[14px] font-medium text-[#1d1d1f]">{streetSummary}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <Users size={15} className="mt-0.5 text-[#0a63ff]" />
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">
-                  Passengers
-                </p>
-                <p className="mt-0.5 text-[14px] font-medium text-[#1d1d1f]">
-                  {formData.passengers || 0} passengers
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <Car size={15} className="mt-0.5 text-[#0a63ff]" />
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#86868b]">
-                  Vehicle
-                </p>
-                <p className="mt-0.5 text-[14px] font-medium leading-[1.35] text-[#1d1d1f]">
-                  {vehicleType} | {formData.luggage || 0} suitcases | {formData.handLuggage || 0}{' '}
-                  hand luggage
-                </p>
-              </div>
-            </div>
+        <div className="flex min-w-0 flex-col justify-center gap-2 px-4 py-4 text-left md:px-5">
+          <p className="truncate text-[1.05rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[1.18rem]">
+            {compactRoute}
+          </p>
+          <p className="text-[0.95rem] font-semibold leading-none tracking-[-0.03em] text-[#1F7CFF] md:text-[1.02rem]">
+            {vehicleLabel}
+          </p>
+          <p className="text-[1.75rem] font-semibold leading-none tracking-[-0.04em] text-[#111827] md:text-[2rem]">
+            {totalPrice} EUR
+          </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.86rem] font-medium text-[#5f6975]">
+            <span className="inline-flex items-center gap-1" title="Passengers">
+              <Users size={15} className="text-[#1F7CFF]" />
+              {formData.passengers || 0}
+            </span>
+            <span className="text-[#b7bec8]">|</span>
+            <span className="inline-flex items-center gap-1" title="Suitcases">
+              <Briefcase size={15} className="text-[#1F7CFF]" />
+              {formData.luggage || 0}
+            </span>
+            <span className="text-[#b7bec8]">|</span>
+            <span className="inline-flex items-center gap-1" title="Hand luggage">
+              <ShoppingBag size={15} className="text-[#1F7CFF]" />
+              {formData.handLuggage || 0}
+            </span>
           </div>
         </div>
       </div>
@@ -195,7 +183,7 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('cash')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
               formData.paymentMethod === 'cash'
-                ? 'border-[#1f9d55] bg-[#1f9d55] text-white'
+                ? 'border-[#1F7CFF] bg-[#1F7CFF] text-white'
                 : touched['paymentMethod'] && !formData.paymentMethod
                   ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                   : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
@@ -208,7 +196,7 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('card')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
               formData.paymentMethod === 'card'
-                ? 'border-[#1679FF] bg-[#1679FF] text-white'
+                ? 'border-[#1F7CFF] bg-[#1F7CFF] text-white'
                 : touched['paymentMethod'] && !formData.paymentMethod
                   ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                   : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
@@ -226,56 +214,8 @@ export default function BookingStepThree({
           onChange={handleChange}
           rows={3}
           placeholder="Notes (optional)"
-          className="ui-field-surface w-full resize-none rounded-[var(--radius-field)] border border-[#d2d2d7] p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none transition-all focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] md:p-[0.8rem]"
+          className="ui-field-surface w-full resize-none rounded-[var(--radius-field)] border border-[#d2d2d7] p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none transition-all focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:p-[0.8rem]"
         />
-      </div>
-
-      <div className="hidden rounded-[24px] border border-[#d8d4ca] bg-[linear-gradient(180deg,#faf8f4_0%,#f5f5f7_100%)] p-6 shadow-[0_20px_50px_rgba(17,17,17,0.06)] md:p-8">
-        <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#86868b]">
-          Total price
-        </p>
-        <p className="mb-4 text-[48px] font-semibold leading-none tracking-tight text-[#1d1d1f]">
-          {totalPrice} {'\u20AC'}
-        </p>
-        <div className="mb-6 flex items-center justify-center gap-2 text-[14px] font-medium text-[#1d1d1f]">
-          {formData.direction === 'to_airport' ? (
-            <>
-              <span>
-                {formData.zip} {formData.city}
-              </span>
-              <ChevronRight size={14} className="text-[#86868b]" />
-              <span>Vienna Airport (VIE)</span>
-            </>
-          ) : (
-            <>
-              <span>Vienna Airport (VIE)</span>
-              <ChevronRight size={14} className="text-[#86868b]" />
-              <span>
-                {formData.zip} {formData.city}
-              </span>
-            </>
-          )}
-        </div>
-        <div className="mx-auto max-w-[320px] rounded-[16px] border border-[#d2d2d7]/50 bg-white p-4 shadow-sm">
-          <div className="flex items-center gap-1.5" title="Hand luggage">
-            <Car size={18} className="text-[#0071e3]" />
-            <span>Vehicle: {vehicleType}</span>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px] font-medium text-[#86868b]">
-            <div className="flex items-center gap-1.5" title="Passengers">
-              <Users size={16} />
-              <span>{formData.passengers || 0}</span>
-            </div>
-            <div className="flex items-center gap-1.5" title="Suitcases">
-              <Briefcase size={16} />
-              <span>{formData.luggage || 0}</span>
-            </div>
-            <div className="flex items-center gap-1.5" title="Hand luggage">
-              <Briefcase size={14} className="opacity-70" />
-              <span>{formData.handLuggage || 0}</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {error ? (
@@ -284,15 +224,6 @@ export default function BookingStepThree({
           {error}
         </div>
       ) : null}
-
-      <div className={actionRowClass}>
-        <button type="button" onClick={prevStep} className={secondaryBackButtonClass}>
-          <ChevronLeft size={24} />
-        </button>
-        <button type="submit" disabled={loading} className={`${primaryActionButtonClass} disabled:opacity-50`}>
-          {loading ? 'Booking...' : 'Secure ride now'}
-        </button>
-      </div>
 
       <p className="mt-4 text-left text-[12px] leading-[1.5] text-[#5f6975] md:text-[13px]">
         By booking, you accept our{' '}
@@ -308,6 +239,15 @@ export default function BookingStepThree({
         </Link>
         . Your data is used only to carry out the ride.
       </p>
+
+      <div className={actionRowClass}>
+        <button type="button" onClick={prevStep} className={secondaryBackButtonClass}>
+          <ChevronLeft size={24} />
+        </button>
+        <button type="submit" disabled={loading} className={`${primaryActionButtonClass} disabled:opacity-50`}>
+          {loading ? 'Booking...' : 'Secure ride now'}
+        </button>
+      </div>
     </div>
   );
 }

@@ -15,18 +15,16 @@ import {
 import {
   PlaneLanding, 
   PlaneTakeoff, 
+  Calendar,
   MapPin, 
   House,
   ChevronRight, 
   ChevronLeft, 
+  Clock,
   Building2,
-  Users,
-  Briefcase,
-  ShoppingBag,
   ArrowUpDown,
   Info,
   Plus,
-  Minus,
   X,
   LucideIcon,
 } from 'lucide-react';
@@ -208,9 +206,9 @@ const BookingForm = ({
     pickupAt: '',
     date: '',
     time: '',
-    passengers: '',
-    luggage: '',
-    handLuggage: '',
+    passengers: 1,
+    luggage: 0,
+    handLuggage: 1,
     childSeat: false,
     babySeats: 0,
     childSeats: 0,
@@ -968,12 +966,22 @@ const BookingForm = ({
     setFormData((prev) => {
       const currentValue = prev[name];
       const numericValue = typeof currentValue === 'number' ? currentValue : null;
+      const isChildSeatField =
+        name === 'babySeats' || name === 'childSeats' || name === 'boosterSeats';
 
       if (delta < 0) {
         if (numericValue === null) return prev;
+        const nextValue = Math.max(min, numericValue - 1);
+        const nextBabySeats = name === 'babySeats' ? nextValue : prev.babySeats;
+        const nextChildSeats = name === 'childSeats' ? nextValue : prev.childSeats;
+        const nextBoosterSeats = name === 'boosterSeats' ? nextValue : prev.boosterSeats;
+
         return {
           ...prev,
-          [name]: Math.max(min, numericValue - 1),
+          [name]: nextValue,
+          ...(isChildSeatField
+            ? { childSeat: nextBabySeats + nextChildSeats + nextBoosterSeats > 0 }
+            : {}),
         };
       }
 
@@ -981,50 +989,18 @@ const BookingForm = ({
         numericValue === null
           ? (min === 0 ? 1 : min)
           : Math.min(max, numericValue + 1);
+      const nextBabySeats = name === 'babySeats' ? nextValue : prev.babySeats;
+      const nextChildSeats = name === 'childSeats' ? nextValue : prev.childSeats;
+      const nextBoosterSeats = name === 'boosterSeats' ? nextValue : prev.boosterSeats;
 
       return {
         ...prev,
         [name]: nextValue,
+        ...(isChildSeatField
+          ? { childSeat: nextBabySeats + nextChildSeats + nextBoosterSeats > 0 }
+          : {}),
       };
     });
-  };
-
-  const renderStepper = (
-    name: StepperFieldName,
-    label: string,
-    min: number,
-    max: number,
-    value: number | '',
-    compact = false
-  ) => {
-  const displayValue = value === '' ? '--' : value;
-
-    return (
-      <div className={`flex flex-col items-center justify-center rounded-[14px] border border-[#d2d2d7] bg-white ${compact ? 'gap-1.5 p-2.5 md:gap-[0.3rem] md:p-2' : 'gap-2 p-3.5 md:gap-[0.4rem] md:p-[0.7rem]'} md:rounded-2xl`}>
-        <span className={`font-medium uppercase text-[#86868b] ${compact ? 'text-[11px]' : 'text-[13px]'}`}>{label}</span>
-        <div className="ui-field-surface flex h-12 w-full items-center justify-between gap-2 rounded-[14px] border border-[#d2d2d7] px-2 md:h-[2.4rem] md:gap-[0.4rem] md:px-[0.4rem] md:rounded-full">
-          <button
-            type="button"
-            onClick={() => updateStepperValue(name, -1, min, max)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f3ee] md:h-[1.8rem] md:w-[1.8rem]"
-            aria-label={`${label} verringern`}
-          >
-            <Minus size={16} />
-          </button>
-          <span className={`min-w-[2.2rem] text-center font-semibold text-[#1d1d1f] ${compact ? 'text-[20px]' : 'text-[24px]'}`}>
-              {displayValue}
-            </span>
-          <button
-            type="button"
-            onClick={() => updateStepperValue(name, 1, min, max)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f3ee] md:h-[1.8rem] md:w-[1.8rem]"
-            aria-label={`${label} erhoehen`}
-          >
-            <Plus size={16} />
-          </button>
-        </div>
-      </div>
-    );
   };
 
   const handleInlineSelect = (name: InlineSelectFieldName, value: number) => {
@@ -1202,12 +1178,12 @@ const BookingForm = ({
     const requiredFields: (keyof ExtendedBookingInput)[] = [];
 
     if (step === 1) {
-      requiredFields.push('street', 'zip');
+      requiredFields.push('date', 'time', 'street', 'zip');
       if (formData.extraStop) {
         requiredFields.push('extraStopStreet', 'extraStopZip');
       }
     } else if (step === 2) {
-      requiredFields.push('date', 'time', 'passengers', 'luggage', 'handLuggage');
+      requiredFields.push('passengers', 'luggage', 'handLuggage');
       if (formData.direction === 'from_airport') {
         requiredFields.push('flightNumber');
       }
@@ -1239,7 +1215,7 @@ const BookingForm = ({
       }
     }
 
-    if (step === 2) {
+    if (step === 1) {
       const leadTimeError = getLeadTimeError();
       if (leadTimeError) {
         return {
@@ -1306,7 +1282,7 @@ const BookingForm = ({
           newTouched[field] = true;
         });
 
-        if (validation.errorMessage && validation.errorMessage !== REQUIRED_FIELDS_ERROR && step === 2) {
+        if (validation.errorMessage && validation.errorMessage !== REQUIRED_FIELDS_ERROR && step === 1) {
           newTouched['date'] = true;
           newTouched['time'] = true;
         }
@@ -1343,6 +1319,8 @@ const BookingForm = ({
               extraStopCity: formData.extraStopCity,
               extraStopZip: formData.extraStopZip,
               extraStopStreet: formData.extraStopStreet,
+              date: formData.date,
+              time: formData.time,
               meetAndGreet: formData.meetAndGreet,
             },
             selectedStreetOption: resolvedStreetOption,
@@ -1498,11 +1476,76 @@ const BookingForm = ({
     <button
       type="button"
       onClick={() => handleStepIndicatorClick(currentStep)}
-      className="inline-flex shrink-0 items-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[0.8rem] py-[0.42rem] text-[10.25px] text-[#1679ff] transition-all md:px-3.5 md:py-2 md:text-[0.84rem]"
+      className="inline-flex shrink-0 items-center bg-transparent p-0 text-[10.25px] text-[#1679ff] transition-colors hover:text-[#0f5fcc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:text-[0.84rem]"
       aria-current="step"
     >
       <span className="font-semibold tracking-[-0.02em]">{copy.stepLabel(currentStep)}</span>
     </button>
+  );
+
+  const DateTimeFields = () => (
+    <div className="grid grid-cols-2 gap-4">
+      <div>
+        <label className="mb-2 ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]">Date</label>
+        <div className="relative">
+          <input
+            type="text"
+            name="date"
+            value={formData.date}
+            readOnly
+            placeholder="DD.MM.YYYY"
+            onClick={() => setIsDatePickerOpen(true)}
+            className={`ui-field-surface h-12 w-full cursor-pointer rounded-[var(--radius-field)] border px-3 py-0 text-[10px] text-[#1d1d1f] outline-none transition-all md:h-[2.4rem] md:px-[0.8rem] md:text-[17px] ${
+              isFieldInvalid('date')
+                ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
+                : 'border-[#d8d4ca] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
+            }`}
+          />
+          <Calendar
+            onClick={() => setIsDatePickerOpen(true)}
+            className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
+            size={18}
+          />
+          <DatePicker
+            isOpen={isDatePickerOpen}
+            onClose={() => setIsDatePickerOpen(false)}
+            onSelect={handleDateSelect}
+            selectedDate={formData.date}
+          />
+        </div>
+      </div>
+      <div>
+        <label className="mb-2 ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]">
+          {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            name="time"
+            value={formData.time}
+            readOnly
+            placeholder="--:--"
+            onClick={() => setIsTimePickerOpen(true)}
+            className={`ui-field-surface h-12 w-full cursor-pointer rounded-[var(--radius-field)] border px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all md:h-[2.4rem] md:px-[0.8rem] ${
+              isFieldInvalid('time')
+                ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
+                : 'border-[#d8d4ca] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
+            }`}
+          />
+          <Clock
+            onClick={() => setIsTimePickerOpen(true)}
+            className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
+            size={18}
+          />
+          <TimePicker
+            isOpen={isTimePickerOpen}
+            onClose={() => setIsTimePickerOpen(false)}
+            onSelect={handleTimeSelect}
+            selectedTime={formData.time}
+          />
+        </div>
+      </div>
+    </div>
   );
 
   const shouldShowInfoTrigger = isAppSurface && hasMounted;
@@ -1552,6 +1595,15 @@ const BookingForm = ({
                     <p className="text-[12px] text-[#6d7075]">{copy.routeDescription}</p>
                   </div>
                 )}
+              <div className="rounded-[2.2rem] bg-transparent pt-[11px] shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
+                <div className="flex gap-2.5 md:gap-4">
+                  <div className="w-5 shrink-0 md:w-5" aria-hidden="true" />
+                  <div className="min-w-0 flex-1">
+                    <DateTimeFields />
+                  </div>
+                  <div className="w-10 shrink-0 md:w-8" aria-hidden="true" />
+                </div>
+              </div>
               <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
                 <div className="flex gap-2.5 md:gap-4">
                   <div className="flex w-5 shrink-0 flex-col items-center pt-[42px] md:w-5 md:pt-[42px]">
@@ -1709,29 +1761,23 @@ const BookingForm = ({
           {currentStep === 2 && (
             <BookingStepTwo
               formData={formData}
+              totalPrice={totalPrice}
+              vehicleType={vehicleType}
               error={error}
               flightLookupError={flightLookupError}
               isLookingUpFlight={isLookingUpFlight}
-              isDatePickerOpen={isDatePickerOpen}
-              isTimePickerOpen={isTimePickerOpen}
-              setIsDatePickerOpen={setIsDatePickerOpen}
-              setIsTimePickerOpen={setIsTimePickerOpen}
-              handleDateSelect={handleDateSelect}
-              handleTimeSelect={handleTimeSelect}
               handleChange={handleChange}
               handleBlur={handleBlur}
               handleFlightNumberBlur={handleFlightNumberBlur}
               handleMeetAndGreetChange={handleMeetAndGreetChange}
               getInputClassName={getInputClassName}
               isFieldInvalid={isFieldInvalid}
-              renderInlineSelect={renderInlineSelect}
+              updateStepperValue={updateStepperValue}
               prevStep={prevStep}
               nextStep={nextStep}
               actionRowClass={actionRowClass}
               primaryActionButtonClass={primaryActionButtonClass}
               secondaryBackButtonClass={secondaryBackButtonClass}
-              DatePickerComponent={DatePicker}
-              TimePickerComponent={TimePicker}
             />
           )}
 

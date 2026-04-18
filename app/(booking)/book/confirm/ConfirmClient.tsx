@@ -100,7 +100,7 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
         <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#000000] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#232325] hover:text-white visited:text-white"
+            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#1F7CFF] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#176be0] hover:text-white visited:text-white"
           >
             <span className="text-white">Back to homepage</span>
             <ArrowRight size={17} className="text-white" />
@@ -126,7 +126,7 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
         <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-[var(--radius-field)] bg-[#000000] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#232325] hover:text-white visited:text-white"
+            className="inline-flex items-center justify-center rounded-[var(--radius-field)] bg-[#1F7CFF] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#176be0] hover:text-white visited:text-white"
           >
             <span className="text-white">Back to homepage</span>
           </Link>
@@ -150,7 +150,7 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
           <button
             onClick={handleConfirm}
             disabled={status === 'loading'}
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#000000] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white transition-colors hover:bg-[#232325] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#1F7CFF] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {status === 'loading' ? (
               <>
