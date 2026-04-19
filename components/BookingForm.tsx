@@ -21,6 +21,7 @@ import {
   ChevronRight, 
   ChevronLeft, 
   Clock,
+  CheckCircle2,
   Building2,
   ArrowUpDown,
   Info,
@@ -127,7 +128,14 @@ const DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'md:mt-[3.45rem]';
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[#7fb3ff] focus:!bg-white focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-white !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
+const BOOKING_FIELD_LABEL_CLASS =
+  'mb-2 ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
+const TIME_VALUE_PATTERN = /^\d{2}:\d{2}$/;
+const NIGHT_LEAD_TIME_ERROR =
+  'For rides between 22:00 and 07:00, booking at least 8 hours in advance is required.';
+const DAYTIME_LEAD_TIME_ERROR =
+  'Short-notice bookings are only possible up to 3 hours before pickup.';
 
 const BookingForm = ({
   onDirectionChange,
@@ -543,13 +551,6 @@ const BookingForm = ({
           };
         })
       : [];
-  const routeSummary =
-    formData.direction === 'to_airport'
-      ? `${formData.zip} ${formData.city} -> Vienna Airport (VIE)`
-      : `Vienna Airport (VIE) -> ${formData.zip} ${formData.city}`;
-  const streetSummary = formData.street || 'Not selected yet';
-  const dateSummary = [formData.date, formData.time].filter(Boolean).join(' | ') || 'Not selected yet';
-
   const hasTypedStreetNumber = (rawValue: string, baseStreet: string) => {
     const normalizedRaw = rawValue.trim().replace(/\s+/g, ' ');
     const normalizedBase = baseStreet.trim().replace(/\s+/g, ' ');
@@ -859,10 +860,16 @@ const BookingForm = ({
   const handleDateSelect = (date: string) => {
     setFlightLookupError(null);
     setFormData(prev => ({ ...prev, date }));
+    validateLeadTimeSelection(date, formData.time);
   };
 
   const handleTimeSelect = (time: string) => {
     setFormData(prev => ({ ...prev, time }));
+    validateLeadTimeSelection(formData.date, time);
+  };
+
+  const handleNotesChange = (notes: string) => {
+    setFormData((prev) => ({ ...prev, notes }));
   };
 
   const formatSelectedDateForFlightLookup = (date: string) => {
@@ -1135,11 +1142,11 @@ const BookingForm = ({
     return value === null;
   };
 
-  const parseSelectedDateTime = () => {
-    if (!formData.date || !formData.time) return null;
+  const parseSelectedDateTime = (date = formData.date, time = formData.time) => {
+    if (!date || !time || !TIME_VALUE_PATTERN.test(time)) return null;
 
-    const [day, month, year] = formData.date.split('.');
-    const [hours, minutes] = formData.time.split(':');
+    const [day, month, year] = date.split('.');
+    const [hours, minutes] = time.split(':');
     const selectedDate = new Date(
       Number.parseInt(year, 10),
       Number.parseInt(month, 10) - 1,
@@ -1155,8 +1162,8 @@ const BookingForm = ({
     return selectedDate;
   };
 
-  const getLeadTimeError = () => {
-    const selectedDate = parseSelectedDateTime();
+  const getLeadTimeError = (date = formData.date, time = formData.time) => {
+    const selectedDate = parseSelectedDateTime(date, time);
     if (!selectedDate) return REQUIRED_FIELDS_ERROR;
 
     const now = new Date();
@@ -1169,9 +1176,23 @@ const BookingForm = ({
       return null;
     }
 
-    return isNightTime
-      ? 'For rides between 22:00 and 07:00, booking at least 8 hours in advance is required.'
-      : 'Short-notice bookings are only possible up to 3 hours before pickup.';
+    return isNightTime ? NIGHT_LEAD_TIME_ERROR : DAYTIME_LEAD_TIME_ERROR;
+  };
+
+  const isLeadTimeErrorMessage = (message: string | null) =>
+    message === NIGHT_LEAD_TIME_ERROR || message === DAYTIME_LEAD_TIME_ERROR;
+
+  const validateLeadTimeSelection = (date: string, time: string) => {
+    if (!date || !TIME_VALUE_PATTERN.test(time)) return;
+
+    const leadTimeError = getLeadTimeError(date, time);
+    if (leadTimeError && leadTimeError !== REQUIRED_FIELDS_ERROR) {
+      setTouched((prev) => ({ ...prev, date: true, time: true }));
+      setError(leadTimeError);
+      return;
+    }
+
+    setError((prev) => (isLeadTimeErrorMessage(prev) ? null : prev));
   };
 
   const getStepValidation = (step: number) => {
@@ -1467,10 +1488,29 @@ const BookingForm = ({
     }
   };
 
-  const actionRowClass = 'mt-4 flex items-center gap-3';
+  const actionRowWithTrustClass =
+    'mt-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-4';
+  const actionButtonGroupClass = 'flex w-full items-center gap-3 md:w-auto';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
     'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
+
+  const BookingActionTrustLine = ({ alignWithPrimaryButton = false }: { alignWithPrimaryButton?: boolean }) => (
+    <div
+      className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold tracking-[-0.03em] text-[#4b5563] md:text-[13px] ${
+        alignWithPrimaryButton ? 'md:pl-0' : ''
+      }`}
+    >
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+        <CheckCircle2 size={15} className="text-[#111827]" strokeWidth={2.4} />
+        Fixed price guaranteed
+      </span>
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+        <CheckCircle2 size={15} className="text-[#111827]" strokeWidth={2.4} />
+        On-time pickup
+      </span>
+    </div>
+  );
 
   const StepIndicator = () => (
     <button
@@ -1484,9 +1524,9 @@ const BookingForm = ({
   );
 
   const DateTimeFields = () => (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,1fr)] gap-3 md:grid-cols-2 md:gap-4">
       <div>
-        <label className="mb-2 ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]">Date</label>
+        <label className={BOOKING_FIELD_LABEL_CLASS}>Date</label>
         <div className="relative">
           <input
             type="text"
@@ -1515,7 +1555,7 @@ const BookingForm = ({
         </div>
       </div>
       <div>
-        <label className="mb-2 ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]">
+        <label className={BOOKING_FIELD_LABEL_CLASS}>
           {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
         </label>
         <div className="relative">
@@ -1549,8 +1589,12 @@ const BookingForm = ({
   );
 
   const shouldShowInfoTrigger = isAppSurface && hasMounted;
-  const formContentTopPaddingClassName =
-    !isAppSurface && showStepIndicator ? 'pt-9 md:pt-3' : 'pt-2 md:pt-3';
+  const formContentSpacingClassName = showStepIndicator
+    ? 'px-5 pt-6 pb-6 md:px-7 md:pt-5 md:pb-5'
+    : 'px-1 pt-2 pb-2 md:px-2 md:pt-3 md:pb-3';
+  const stepHeaderClassName = 'mb-6 flex justify-center md:mb-7 md:justify-end md:pr-1';
+  const titleHeaderClassName =
+    'mb-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
 
   return (
     <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] md:max-w-none relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
@@ -1568,21 +1612,17 @@ const BookingForm = ({
           <Info size={22} strokeWidth={2.2} />
         </button>
       ) : null}
-      <div
-        className={`px-1 md:px-2 ${formContentTopPaddingClassName} ${
-          allowExtendedDropdownSpace ? 'pb-0 md:pb-1' : 'pb-2 md:pb-3'
-        }`}
-      >
+      <div className={`${formContentSpacingClassName} ${allowExtendedDropdownSpace ? '' : 'pb-2 md:pb-3'}`}>
         <form onSubmit={handleSubmit}>
           {headerTitle ? (
-            <div className="mb-[10px] flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]">
+            <div className={titleHeaderClassName}>
               <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
                 {headerTitle}
               </p>
               {showStepIndicator ? <StepIndicator /> : null}
             </div>
           ) : showStepIndicator ? (
-            <div className="mb-8 mt-2 flex justify-center md:mb-10 md:mt-0 md:justify-end md:pr-1">
+            <div className={stepHeaderClassName}>
               <StepIndicator />
             </div>
           ) : null}
@@ -1618,7 +1658,7 @@ const BookingForm = ({
 
                   <div className="min-w-0 flex-1">
                     <div className="min-h-[4.2rem]">
-                      <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">{copy.pickupLabel}</p>
+                      <p className={BOOKING_FIELD_LABEL_CLASS}>{copy.pickupLabel}</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="mr-[-5px] md:mr-0">
@@ -1669,7 +1709,7 @@ const BookingForm = ({
                     </div>
 
                     <div className="mt-2.5 min-h-[4.2rem]">
-                      <p className="mb-1.5 text-[12px] font-medium text-[#5f6975]">{copy.destinationLabel}</p>
+                      <p className={BOOKING_FIELD_LABEL_CLASS}>{copy.destinationLabel}</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="mr-[-5px] md:mr-0">
@@ -1746,14 +1786,17 @@ const BookingForm = ({
                 </div>
               )}
 
-              <div className={actionRowClass}>
+              <div className={actionRowWithTrustClass}>
+                <div className={actionButtonGroupClass}>
                   <button
                     type="button"
                     onClick={nextStep}
                     className={primaryActionButtonClass}
                   >
-                  {copy.nextLabel}
-                </button>
+                    {copy.nextLabel}
+                  </button>
+                </div>
+                <BookingActionTrustLine />
               </div>
             </div>
           )}
@@ -1775,7 +1818,9 @@ const BookingForm = ({
               updateStepperValue={updateStepperValue}
               prevStep={prevStep}
               nextStep={nextStep}
-              actionRowClass={actionRowClass}
+              actionRowClass={actionRowWithTrustClass}
+              actionButtonGroupClass={actionButtonGroupClass}
+              actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
               primaryActionButtonClass={primaryActionButtonClass}
               secondaryBackButtonClass={secondaryBackButtonClass}
             />
@@ -1785,21 +1830,21 @@ const BookingForm = ({
             <BookingStepThree
               formData={formData}
               totalPrice={totalPrice}
-              routeSummary={routeSummary}
-              streetSummary={streetSummary}
-              dateSummary={dateSummary}
               vehicleType={vehicleType}
               isLoggedIn={isLoggedIn}
               error={error}
               loading={loading}
               handleBookingForMyselfToggle={handleBookingForMyselfToggle}
               handleChange={handleChange}
+              handleNotesChange={handleNotesChange}
               handleBlur={handleBlur}
               getInputClassName={getInputClassName}
               handlePaymentChange={handlePaymentChange}
               touched={touched}
               prevStep={prevStep}
-              actionRowClass={actionRowClass}
+              actionRowClass={actionRowWithTrustClass}
+              actionButtonGroupClass={actionButtonGroupClass}
+              actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
               secondaryBackButtonClass={secondaryBackButtonClass}
               primaryActionButtonClass={primaryActionButtonClass}
             />

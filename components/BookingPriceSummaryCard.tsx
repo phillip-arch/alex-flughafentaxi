@@ -1,0 +1,102 @@
+'use client';
+
+import Image from 'next/image';
+import { Briefcase, Pencil, ShoppingBag, Users } from 'lucide-react';
+import { formatVehicleTypeLabel } from '@/lib/pricing';
+
+type BookingPriceSummaryCardProps = {
+  formData: any;
+  totalPrice: number;
+  vehicleType: string;
+  invalid?: boolean;
+  onEdit?: () => void;
+};
+
+export default function BookingPriceSummaryCard({
+  formData,
+  totalPrice,
+  vehicleType,
+  invalid = false,
+  onEdit,
+}: BookingPriceSummaryCardProps) {
+  const passengerValue = formData.passengers === '' ? '--' : formData.passengers;
+  const luggageValue = formData.luggage === '' ? '--' : formData.luggage;
+  const handLuggageValue = formData.handLuggage === '' ? '--' : formData.handLuggage;
+  const cityLabel = formData.city?.trim() || formData.zip?.trim() || 'Pickup';
+  const compactRoute =
+    formData.direction === 'to_airport' ? `${cityLabel} \u2192 VIE` : `VIE \u2192 ${cityLabel}`;
+  const vehicleLabel = formatVehicleTypeLabel(vehicleType);
+  const vehicleImage =
+    vehicleType === 'Bus'
+      ? {
+          src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
+          alt: 'Airport taxi minivan',
+        }
+      : vehicleType === 'Kombi'
+        ? {
+            src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
+            alt: 'Airport taxi station wagon',
+          }
+        : {
+            src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
+            alt: 'Airport taxi sedan',
+          };
+
+  return (
+    <div
+      className={`relative grid min-h-[6.6rem] grid-cols-[30%_70%] overflow-hidden rounded-[0.75rem] border bg-[#f8fbff] shadow-[0_8px_18px_rgba(17,17,17,0.04)] md:min-h-[13.5rem] md:rounded-[1.05rem] md:shadow-[0_12px_28px_rgba(17,17,17,0.05)] ${
+        invalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
+      }`}
+    >
+      <div className="relative flex items-center justify-center bg-transparent px-1 py-2 md:px-2 md:py-3">
+        <div className="relative h-24 w-[8.4rem] shrink-0 md:h-48 md:w-72">
+          <Image
+            src={vehicleImage.src}
+            alt={vehicleImage.alt}
+            fill
+            className="object-contain mix-blend-multiply"
+            sizes="(min-width: 768px) 288px, 134px"
+          />
+        </div>
+      </div>
+      <div className={`relative z-10 flex min-w-0 flex-col justify-center gap-1 px-2 py-2 text-left md:gap-2 md:px-5 md:py-4 ${onEdit ? 'pr-12 md:pr-20' : ''}`}>
+        <p className="truncate text-[0.72rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[1.18rem]">
+          {compactRoute}
+        </p>
+        <p className="text-[0.9rem] font-semibold leading-none tracking-[-0.03em] text-[#1F7CFF] md:text-[1.5rem]">
+          {vehicleLabel}
+        </p>
+        <p className="text-[1.25rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2.45rem]">
+          {totalPrice} EUR
+        </p>
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.58rem] font-medium text-[#5f6975] md:gap-x-3 md:gap-y-1 md:text-[0.86rem]">
+          <span className="inline-flex items-center gap-0.5 md:gap-1" title="Passengers">
+            <Users className="h-2.5 w-2.5 text-[#1F7CFF] md:h-[15px] md:w-[15px]" />
+            {passengerValue}
+          </span>
+          <span className="text-[#b7bec8]">|</span>
+          <span className="inline-flex items-center gap-0.5 md:gap-1" title="Suitcases">
+            <Briefcase className="h-2.5 w-2.5 text-[#1F7CFF] md:h-[15px] md:w-[15px]" />
+            {luggageValue}
+          </span>
+          <span className="text-[#b7bec8]">|</span>
+          <span className="inline-flex items-center gap-0.5 md:gap-1" title="Hand luggage">
+            <ShoppingBag className="h-2.5 w-2.5 text-[#1F7CFF] md:h-[15px] md:w-[15px]" />
+            {handLuggageValue}
+          </span>
+        </div>
+      </div>
+      {onEdit ? (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="absolute right-2 top-2 inline-flex h-7 items-center gap-1 rounded-[0.45rem] border border-[#dbe7f8] bg-white px-2 text-[0.68rem] font-semibold text-[#1F7CFF] shadow-[0_6px_14px_rgba(17,17,17,0.05)] transition-colors hover:bg-[#eef5ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:right-3 md:top-3 md:h-9 md:gap-1.5 md:rounded-[0.55rem] md:px-3 md:text-[0.82rem] md:shadow-[0_8px_18px_rgba(17,17,17,0.05)]"
+          aria-label="Edit passengers and luggage"
+        >
+          <Pencil className="h-3 w-3 md:h-3.5 md:w-3.5" />
+          Edit
+        </button>
+      ) : null}
+    </div>
+  );
+}

@@ -628,7 +628,7 @@ export default function AccountClient({
             <section className="space-y-6">
               <div className="grid items-start gap-6 md:grid-cols-2">
                 <section className="order-1 min-w-0 self-start md:sticky md:top-6">
-                  <div className="ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
+                  <div className="ui-card-surface-light">
                     <BookingForm
                       onDirectionChange={setBookingDirection}
                       meetAndGreetSelected={meetAndGreet}

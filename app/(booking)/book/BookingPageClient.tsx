@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import BookingForm from '@/components/BookingForm';
-import BookingTrustPills from '@/components/BookingTrustPills';
 import AccountMobileBottomNav from '@/components/account/AccountMobileBottomNav';
 import { BookingDirection, BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
 import NavbarClient from '@/components/NavbarClient';
@@ -53,10 +52,10 @@ export default function BookingPageClient({
     <>
       {!isAppSurface ? <NavbarClient /> : null}
       <section className="bg-white">
-        <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-28 md:pt-28'}`}>
+        <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-[80px] md:pt-28'}`}>
           <div className="grid items-start gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:gap-10">
             <section className="order-1 self-start lg:sticky lg:top-24">
-              <div className="w-full max-w-[42rem] ui-card-surface-light px-4 py-4 md:px-5 md:py-5">
+              <div className="w-full max-w-[42rem] ui-card-surface-light">
                 <BookingForm
                   onDirectionChange={setDirection}
                   meetAndGreetSelected={meetAndGreet}
@@ -66,9 +65,6 @@ export default function BookingPageClient({
                   initialIsLoggedIn={initialIsLoggedIn}
                   initialAccountDefaults={initialAccountDefaults}
                 />
-                {!isAppSurface ? (
-                  <BookingTrustPills className="mx-auto mt-3 flex min-h-[5.75rem] max-w-[340px] flex-wrap items-center justify-center gap-[10px] md:min-h-0 md:gap-[14px] lg:relative lg:top-5 lg:mt-0 lg:max-w-none lg:flex-nowrap lg:justify-center" />
-                ) : null}
               </div>
             </section>
 

@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import Image from 'next/image';
 import { Armchair, Baby, Briefcase, ChevronLeft, Minus, Plus, ShieldCheck, ShoppingBag, Users, X } from 'lucide-react';
-import { formatVehicleTypeLabel } from '@/lib/pricing';
+import BookingPriceSummaryCard from '@/components/BookingPriceSummaryCard';
 
 type BookingStepTwoProps = {
   formData: any;
@@ -23,6 +22,8 @@ type BookingStepTwoProps = {
   prevStep: () => void;
   nextStep: () => void;
   actionRowClass: string;
+  actionButtonGroupClass: string;
+  actionTrustLine: React.ReactNode;
   primaryActionButtonClass: string;
   secondaryBackButtonClass: string;
 };
@@ -44,32 +45,15 @@ export default function BookingStepTwo({
   prevStep,
   nextStep,
   actionRowClass,
+  actionButtonGroupClass,
+  actionTrustLine,
   primaryActionButtonClass,
   secondaryBackButtonClass,
 }: BookingStepTwoProps) {
   const [isTravelSheetOpen, setIsTravelSheetOpen] = useState(false);
   const [isChildSeatSheetOpen, setIsChildSeatSheetOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const passengerValue = formData.passengers === '' ? '--' : formData.passengers;
-  const luggageValue = formData.luggage === '' ? '--' : formData.luggage;
-  const handLuggageValue = formData.handLuggage === '' ? '--' : formData.handLuggage;
   const childSeatTotal = formData.babySeats + formData.childSeats + formData.boosterSeats;
-  const vehicleLabel = formatVehicleTypeLabel(vehicleType);
-  const vehicleImage =
-    vehicleType === 'Bus'
-      ? {
-          src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
-          alt: 'Airport taxi minivan',
-        }
-      : vehicleType === 'Kombi'
-        ? {
-            src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
-            alt: 'Airport taxi station wagon',
-          }
-        : {
-            src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
-            alt: 'Airport taxi sedan',
-          };
   const travelSummaryInvalid =
     isFieldInvalid('passengers') || isFieldInvalid('luggage') || isFieldInvalid('handLuggage');
 
@@ -147,6 +131,23 @@ export default function BookingStepTwo({
     </div>
   );
 
+  const renderSheetHeader = (title: string, description: string, onClose: () => void) => (
+    <div className="mb-8 flex items-start justify-between gap-4">
+      <div>
+        <h3 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-[#111827]">{title}</h3>
+        <p className="mt-1 text-[0.92rem] text-[#6d7075]">{description}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#e4e8ef] bg-white text-[#111827]"
+        aria-label="Close"
+      >
+        <X size={18} />
+      </button>
+    </div>
+  );
+
   const travelSheet =
     isTravelSheetOpen && isMounted
       ? createPortal(
@@ -159,20 +160,7 @@ export default function BookingStepTwo({
             />
             <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
-              <div className="mb-5 flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-[#111827]">Passengers and luggage</h3>
-                  <p className="mt-1 text-[0.92rem] text-[#6d7075]">Adjust each item before continuing.</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsTravelSheetOpen(false)}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#e4e8ef] bg-white text-[#111827]"
-                  aria-label="Close"
-                >
-                  <X size={18} />
-                </button>
-              </div>
+              {renderSheetHeader('Passengers and luggage', 'Adjust each item before continuing.', () => setIsTravelSheetOpen(false))}
               <div className="space-y-3">
                 {renderSheetStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
                 {renderSheetStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
@@ -203,20 +191,7 @@ export default function BookingStepTwo({
             />
             <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
-              <div className="mb-5 flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-[#111827]">Child seats</h3>
-                  <p className="mt-1 text-[0.92rem] text-[#6d7075]">Choose the seats you need for the ride.</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsChildSeatSheetOpen(false)}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#e4e8ef] bg-white text-[#111827]"
-                  aria-label="Close"
-                >
-                  <X size={18} />
-                </button>
-              </div>
+              {renderSheetHeader('Child seats', 'Choose the seats you need for the ride.', () => setIsChildSeatSheetOpen(false))}
               <div className="space-y-3">
                 {renderSheetStepper('babySeats', 'Baby seat', formData.babySeats, 0, 3, Baby)}
                 {renderSheetStepper('childSeats', 'Child seat', formData.childSeats, 0, 3, Armchair)}
@@ -237,6 +212,14 @@ export default function BookingStepTwo({
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+      <BookingPriceSummaryCard
+        formData={formData}
+        totalPrice={totalPrice}
+        vehicleType={vehicleType}
+        invalid={travelSummaryInvalid}
+        onEdit={() => setIsTravelSheetOpen(true)}
+      />
+
       {formData.direction === 'from_airport' ? (
         <div>
           <p className="mb-3 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Flight details</p>
@@ -283,54 +266,6 @@ export default function BookingStepTwo({
         </div>
       ) : null}
 
-      <div>
-        <label className={`mb-2 ml-1 block text-[12px] font-medium uppercase tracking-wide ${travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#6d7075]'}`}>
-          Passengers and luggage
-        </label>
-        <button
-          type="button"
-          onClick={() => setIsTravelSheetOpen(true)}
-          className={`ui-field-surface flex h-14 w-full items-center justify-between rounded-[var(--radius-field)] border px-4 text-left text-[#1d1d1f] outline-none transition-all md:h-[3rem] ${
-            travelSummaryInvalid
-              ? 'border-[#d70015] text-[#d70015]'
-              : 'border-[#d2d2d7] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
-          }`}
-          aria-haspopup="dialog"
-          aria-expanded={isTravelSheetOpen}
-          aria-label={`${passengerValue} passengers, ${luggageValue} suitcases, ${handLuggageValue} hand luggage`}
-        >
-          <span className="flex min-w-0 items-center gap-4 text-[15px] font-semibold tracking-[-0.03em] sm:hidden">
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap" title="Passengers">
-              <Users size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
-              {passengerValue}
-            </span>
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap" title="Suitcases">
-              <Briefcase size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
-              {luggageValue}
-            </span>
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap" title="Hand luggage">
-              <ShoppingBag size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
-              {handLuggageValue}
-            </span>
-          </span>
-          <span className="hidden min-w-0 items-center gap-3 text-[15px] font-semibold tracking-[-0.03em] sm:flex md:text-[16px]">
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-              <Users size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
-              {passengerValue} Passengers
-            </span>
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-              <Briefcase size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
-              {luggageValue} Suitcases
-            </span>
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-              <ShoppingBag size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
-              {handLuggageValue} Hand luggage
-            </span>
-          </span>
-          <ChevronLeft size={18} className="-rotate-90 text-[#86868b]" />
-        </button>
-      </div>
-
       {travelSheet}
 
       <div>
@@ -372,31 +307,6 @@ export default function BookingStepTwo({
 
       {childSeatSheet}
 
-      <div className="flex min-h-[6.25rem] items-center justify-between gap-4 rounded-[1.05rem] border border-[#dbe7f8] bg-[#f8fbff] px-4 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.05)] md:min-h-[7.25rem] md:px-5 md:py-5">
-        <div className="flex min-w-0 items-center gap-4">
-          <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-[0.9rem] border border-[#dbe7f8] bg-white shadow-[0_10px_24px_rgba(17,17,17,0.06)] md:h-24 md:w-36">
-            <Image
-              src={vehicleImage.src}
-              alt={vehicleImage.alt}
-              fill
-              className="object-cover"
-              sizes="(min-width: 768px) 144px, 112px"
-            />
-          </div>
-          <div className="hidden min-w-0 md:block">
-            <p className="text-[1.05rem] font-semibold tracking-[-0.04em] text-[#1F7CFF] md:text-[1.16rem]">{vehicleLabel}</p>
-          </div>
-        </div>
-        <div className="shrink-0 text-left">
-          <p className="mb-1 text-[0.95rem] font-semibold leading-none tracking-[-0.03em] text-[#1F7CFF] md:hidden">
-            {vehicleLabel}
-          </p>
-          <span className="block text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2.45rem]">
-            {totalPrice} EUR
-          </span>
-        </div>
-      </div>
-
       {error ? (
         <div className="mt-4 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8]">
           <span className="block w-1.5 h-1.5 bg-[#d70015] rounded-full" />
@@ -405,12 +315,15 @@ export default function BookingStepTwo({
       ) : null}
 
       <div className={actionRowClass}>
-        <button type="button" onClick={prevStep} className={secondaryBackButtonClass}>
-          <ChevronLeft size={24} />
-        </button>
-        <button type="button" onClick={nextStep} className={primaryActionButtonClass}>
-          Next
-        </button>
+        <div className={actionButtonGroupClass}>
+          <button type="button" onClick={prevStep} className={secondaryBackButtonClass}>
+            <ChevronLeft size={24} />
+          </button>
+          <button type="button" onClick={nextStep} className={primaryActionButtonClass}>
+            Next
+          </button>
+        </div>
+        {actionTrustLine}
       </div>
     </div>
   );

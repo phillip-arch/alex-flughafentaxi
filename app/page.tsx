@@ -12,7 +12,6 @@ import {
   ShoppingBag,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
-import BookingTrustPills from '@/components/BookingTrustPills';
 import Navbar from '@/components/Navbar';
 import PriceTable from '@/components/PriceTable';
 import VehicleCategoryCard from '@/components/VehicleCategoryCard';
@@ -505,10 +504,6 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
   );
 }
 
-function HeroTrustPills() {
-  return <BookingTrustPills items={['Fixed price guaranteed', 'On-time pickup', 'Reliable service']} />;
-}
-
 function HeroBookingCard() {
   return (
     <div id="hero-booking" className="relative w-full max-w-[42rem]">
@@ -523,7 +518,6 @@ function HeroBookingCard() {
         <div className="min-h-0 lg:flex-1 lg:min-h-0">
           <BookingForm showStepIndicator={false} heroEnglishCopy />
         </div>
-        <HeroTrustPills />
       </div>
     </div>
   );
