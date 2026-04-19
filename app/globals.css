@@ -453,6 +453,13 @@ p {
   }
 }
 
+@media (min-width: 768px) and (max-height: 850px) {
+  .ui-button-booking-primary {
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+  }
+}
+
 @media (min-width: 1024px) {
   .app-container {
     padding-inline: 3.5rem;

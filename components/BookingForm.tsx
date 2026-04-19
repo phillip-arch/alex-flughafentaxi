@@ -29,7 +29,7 @@ import {
   X,
   LucideIcon,
 } from 'lucide-react';
-import { determineVehicle, calculateVehiclePrice } from '@/lib/pricing';
+import { determineVehicle, calculateVehiclePrice, type VehicleType } from '@/lib/pricing';
 import { BOOKING_FORM_CARD_CLASS, BOOKING_FORM_INPUT_CLASS, BOOKING_FORM_INPUT_INVALID_CLASS } from '@/lib/ui/bookingFormStyles';
 import { BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
 
@@ -45,6 +45,7 @@ type Direction = 'to_airport' | 'from_airport' | null;
 type PaymentMethod = 'cash' | 'card' | null;
 
 const PENDING_BOOKING_STORAGE_KEY = 'pending-booking-form';
+const VEHICLE_ORDER: VehicleType[] = ['Limo', 'Kombi', 'Bus'];
 
 interface FavoriteAddress {
   id: string;
@@ -70,6 +71,8 @@ interface ExtendedBookingInput {
   passengers: number | '';
   luggage: number | '';
   handLuggage: number | '';
+  travelDetailsSelected: boolean;
+  vehicleOverride: VehicleType | null;
   childSeat: boolean;
   babySeats: number;
   childSeats: number;
@@ -217,6 +220,8 @@ const BookingForm = ({
     passengers: 1,
     luggage: 0,
     handLuggage: 1,
+    travelDetailsSelected: false,
+    vehicleOverride: null,
     childSeat: false,
     babySeats: 0,
     childSeats: 0,
@@ -532,11 +537,21 @@ const BookingForm = ({
   const suitcases = typeof formData.luggage === 'number' ? formData.luggage : 0;
   const handLuggage = typeof formData.handLuggage === 'number' ? formData.handLuggage : 0;
   
-  const vehicleType = determineVehicle(passengers, suitcases, handLuggage);
+  const requiredVehicleType = determineVehicle(passengers, suitcases, handLuggage);
+  const requiredVehicleIndex = VEHICLE_ORDER.indexOf(requiredVehicleType);
+  const overrideVehicleIndex = formData.vehicleOverride ? VEHICLE_ORDER.indexOf(formData.vehicleOverride) : -1;
+  const vehicleType =
+    overrideVehicleIndex > requiredVehicleIndex && formData.vehicleOverride
+      ? formData.vehicleOverride
+      : requiredVehicleType;
   
   // Calculate price with ZIP-based surcharge when available
   const vehiclePrice = calculateVehiclePrice(basePrice, vehicleType, dbPrices);
   const totalPrice = vehiclePrice + extraStopPrice + meetAndGreetPrice;
+  const vehiclePriceOptions = (['Limo', 'Kombi', 'Bus'] as VehicleType[]).map((optionVehicleType) => ({
+    vehicleType: optionVehicleType,
+    totalPrice: calculateVehiclePrice(basePrice, optionVehicleType, dbPrices) + extraStopPrice + meetAndGreetPrice,
+  }));
   const selectedStreetOption = resolvedStreetOption;
   const selectedExtraStopStreetOption = resolvedExtraStopStreetOption;
   const favoriteMenuItems =
@@ -1162,6 +1177,22 @@ const BookingForm = ({
     return selectedDate;
   };
 
+  const handleVehicleUpgrade = (nextVehicleType: VehicleType) => {
+    setFormData((prev) => ({
+      ...prev,
+      travelDetailsSelected: true,
+      vehicleOverride: nextVehicleType,
+    }));
+  };
+
+  const handleTravelDetailsConfirm = (selectedVehicleType: VehicleType) => {
+    setFormData((prev) => ({
+      ...prev,
+      travelDetailsSelected: true,
+      vehicleOverride: selectedVehicleType,
+    }));
+  };
+
   const getLeadTimeError = (date = formData.date, time = formData.time) => {
     const selectedDate = parseSelectedDateTime(date, time);
     if (!selectedDate) return REQUIRED_FIELDS_ERROR;
@@ -1489,7 +1520,7 @@ const BookingForm = ({
   };
 
   const actionRowWithTrustClass =
-    'mt-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-4';
+    'mt-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-4 [@media(min-width:768px)_and_(max-height:850px)]:mt-3';
   const actionButtonGroupClass = 'flex w-full items-center gap-3 md:w-auto';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
@@ -1498,7 +1529,7 @@ const BookingForm = ({
   const BookingActionTrustLine = ({ alignWithPrimaryButton = false }: { alignWithPrimaryButton?: boolean }) => (
     <div
       className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold tracking-[-0.03em] text-[#4b5563] md:text-[13px] ${
-        alignWithPrimaryButton ? 'md:pl-0' : ''
+        alignWithPrimaryButton ? 'w-full justify-end text-right md:w-auto md:justify-start md:text-left md:pl-0' : ''
       }`}
     >
       <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
@@ -1524,10 +1555,15 @@ const BookingForm = ({
   );
 
   const DateTimeFields = () => (
-    <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,1fr)] gap-3 md:grid-cols-2 md:gap-4">
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
       <div>
         <label className={BOOKING_FIELD_LABEL_CLASS}>Date</label>
-        <div className="relative">
+        <div className="relative w-full">
+          <Calendar
+            onClick={() => setIsDatePickerOpen(true)}
+            className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#1F7CFF]'}`}
+            size={18}
+          />
           <input
             type="text"
             name="date"
@@ -1535,16 +1571,11 @@ const BookingForm = ({
             readOnly
             placeholder="DD.MM.YYYY"
             onClick={() => setIsDatePickerOpen(true)}
-            className={`ui-field-surface h-12 w-full cursor-pointer rounded-[var(--radius-field)] border px-3 py-0 text-[10px] text-[#1d1d1f] outline-none transition-all md:h-[2.4rem] md:px-[0.8rem] md:text-[17px] ${
+            className={`ui-field-surface h-12 w-full cursor-pointer rounded-[var(--radius-field)] border py-0 pl-10 pr-3 text-[10px] text-[#1d1d1f] outline-none transition-all md:h-[2.4rem] md:pl-10 md:pr-[0.8rem] md:text-[17px] ${
               isFieldInvalid('date')
                 ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
                 : 'border-[#d8d4ca] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
             }`}
-          />
-          <Calendar
-            onClick={() => setIsDatePickerOpen(true)}
-            className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
-            size={18}
           />
           <DatePicker
             isOpen={isDatePickerOpen}
@@ -1558,7 +1589,12 @@ const BookingForm = ({
         <label className={BOOKING_FIELD_LABEL_CLASS}>
           {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
         </label>
-        <div className="relative">
+        <div className="relative w-full">
+          <Clock
+            onClick={() => setIsTimePickerOpen(true)}
+            className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#1F7CFF]'}`}
+            size={18}
+          />
           <input
             type="text"
             name="time"
@@ -1566,16 +1602,11 @@ const BookingForm = ({
             readOnly
             placeholder="--:--"
             onClick={() => setIsTimePickerOpen(true)}
-            className={`ui-field-surface h-12 w-full cursor-pointer rounded-[var(--radius-field)] border px-3 py-0 text-[17px] text-[#1d1d1f] outline-none transition-all md:h-[2.4rem] md:px-[0.8rem] ${
+            className={`ui-field-surface h-12 w-full cursor-pointer rounded-[var(--radius-field)] border py-0 pl-10 pr-3 text-[17px] text-[#1d1d1f] outline-none transition-all md:h-[2.4rem] md:pl-10 md:pr-[0.8rem] ${
               isFieldInvalid('time')
                 ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
                 : 'border-[#d8d4ca] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
             }`}
-          />
-          <Clock
-            onClick={() => setIsTimePickerOpen(true)}
-            className={`absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#6d7075]'}`}
-            size={18}
           />
           <TimePicker
             isOpen={isTimePickerOpen}
@@ -1590,9 +1621,9 @@ const BookingForm = ({
 
   const shouldShowInfoTrigger = isAppSurface && hasMounted;
   const formContentSpacingClassName = showStepIndicator
-    ? 'px-5 pt-6 pb-6 md:px-7 md:pt-5 md:pb-5'
+    ? 'px-5 pt-6 pb-6 md:px-7 md:pt-5 md:pb-5 [@media(min-width:768px)_and_(max-height:850px)]:pt-4 [@media(min-width:768px)_and_(max-height:850px)]:pb-4'
     : 'px-1 pt-2 pb-2 md:px-2 md:pt-3 md:pb-3';
-  const stepHeaderClassName = 'mb-6 flex justify-center md:mb-7 md:justify-end md:pr-1';
+  const stepHeaderClassName = 'mb-6 flex justify-center md:mb-7 md:justify-end md:pr-1 [@media(min-width:768px)_and_(max-height:850px)]:mb-4';
   const titleHeaderClassName =
     'mb-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
 
@@ -1804,8 +1835,10 @@ const BookingForm = ({
           {currentStep === 2 && (
             <BookingStepTwo
               formData={formData}
-              totalPrice={totalPrice}
               vehicleType={vehicleType}
+              vehiclePriceOptions={vehiclePriceOptions}
+              onVehicleUpgrade={handleVehicleUpgrade}
+              onTravelDetailsConfirm={handleTravelDetailsConfirm}
               error={error}
               flightLookupError={flightLookupError}
               isLookingUpFlight={isLookingUpFlight}

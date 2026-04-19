@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import Image from 'next/image';
 import { Armchair, Baby, Briefcase, ChevronLeft, Minus, Plus, ShieldCheck, ShoppingBag, Users, X } from 'lucide-react';
-import BookingPriceSummaryCard from '@/components/BookingPriceSummaryCard';
+import { formatVehicleTypeLabel, type VehicleType } from '@/lib/pricing';
+
+type VehiclePriceOption = {
+  vehicleType: VehicleType;
+  totalPrice: number;
+};
 
 type BookingStepTwoProps = {
   formData: any;
-  totalPrice: number;
-  vehicleType: string;
+  vehicleType: VehicleType;
+  vehiclePriceOptions: VehiclePriceOption[];
+  onVehicleUpgrade: (nextVehicleType: VehicleType) => void;
+  onTravelDetailsConfirm: (selectedVehicleType: VehicleType) => void;
   error: string | null;
   flightLookupError: string | null;
   isLookingUpFlight: boolean;
@@ -30,8 +38,10 @@ type BookingStepTwoProps = {
 
 export default function BookingStepTwo({
   formData,
-  totalPrice,
   vehicleType,
+  vehiclePriceOptions,
+  onVehicleUpgrade,
+  onTravelDetailsConfirm,
   error,
   flightLookupError,
   isLookingUpFlight,
@@ -52,10 +62,42 @@ export default function BookingStepTwo({
 }: BookingStepTwoProps) {
   const [isTravelSheetOpen, setIsTravelSheetOpen] = useState(false);
   const [isChildSeatSheetOpen, setIsChildSeatSheetOpen] = useState(false);
+  const [activeTravelVehicleType, setActiveTravelVehicleType] = useState<VehicleType | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const childSeatTotal = formData.babySeats + formData.childSeats + formData.boosterSeats;
+  const hasSelectedTravelDetails = Boolean(formData.travelDetailsSelected);
   const travelSummaryInvalid =
     isFieldInvalid('passengers') || isFieldInvalid('luggage') || isFieldInvalid('handLuggage');
+  const vehicleOrder: VehicleType[] = ['Limo', 'Kombi', 'Bus'];
+  const vehicleCards: Array<{
+    vehicleType: VehicleType;
+    maxPassengers: number;
+    maxSuitcases: number;
+    imageSrc: string;
+    imageAlt: string;
+  }> = [
+    {
+      vehicleType: 'Limo',
+      maxPassengers: 2,
+      maxSuitcases: 2,
+      imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
+      imageAlt: 'Airport taxi sedan',
+    },
+    {
+      vehicleType: 'Kombi',
+      maxPassengers: 4,
+      maxSuitcases: 4,
+      imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
+      imageAlt: 'Airport taxi station wagon',
+    },
+    {
+      vehicleType: 'Bus',
+      maxPassengers: 8,
+      maxSuitcases: 8,
+      imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
+      imageAlt: 'Airport taxi minivan',
+    },
+  ];
 
   useEffect(() => {
     setIsMounted(true);
@@ -99,37 +141,45 @@ export default function BookingStepTwo({
     min: number,
     max: number,
     Icon: typeof Users
-  ) => (
-    <div className="flex items-center justify-between gap-4 rounded-[1.1rem] border border-[#e4e8ef] bg-[#f8fbff] px-4 py-4">
-      <div className="flex min-w-0 items-center gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[#1F7CFF] shadow-[0_8px_18px_rgba(17,17,17,0.06)]">
-          <Icon size={19} />
-        </span>
-        <p className="text-[1rem] font-semibold tracking-[-0.03em] text-[#111827]">{label}</p>
+  ) => {
+    const numericValue = typeof value === 'number' ? value : null;
+    const isAtMin = numericValue !== null && numericValue <= min;
+    const isAtMax = numericValue !== null && numericValue >= max;
+
+    return (
+      <div className="flex items-center justify-between gap-4 rounded-[1.1rem] border border-[#e4e8ef] bg-[#f8fbff] px-4 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[#1F7CFF] shadow-[0_8px_18px_rgba(17,17,17,0.06)]">
+            <Icon size={19} />
+          </span>
+          <p className="text-[1rem] font-semibold tracking-[-0.03em] text-[#111827]">{label}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={() => updateStepperValue(name, -1, min, max)}
+            disabled={isAtMin}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-[#f3f4f6] disabled:text-[#b6bcc6] disabled:hover:bg-[#f3f4f6]"
+            aria-label={`Decrease ${label}`}
+          >
+            <Minus size={20} />
+          </button>
+          <span className="min-w-[2.4rem] text-center text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">
+            {value === '' ? '--' : value}
+          </span>
+          <button
+            type="button"
+            onClick={() => updateStepperValue(name, 1, min, max)}
+            disabled={isAtMax}
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db]"
+            aria-label={`Increase ${label}`}
+          >
+            <Plus size={20} />
+          </button>
+        </div>
       </div>
-      <div className="flex shrink-0 items-center gap-3">
-        <button
-          type="button"
-          onClick={() => updateStepperValue(name, -1, min, max)}
-          className="flex h-12 w-12 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff]"
-          aria-label={`Decrease ${label}`}
-        >
-          <Minus size={20} />
-        </button>
-        <span className="min-w-[2.4rem] text-center text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">
-          {value === '' ? '--' : value}
-        </span>
-        <button
-          type="button"
-          onClick={() => updateStepperValue(name, 1, min, max)}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0]"
-          aria-label={`Increase ${label}`}
-        >
-          <Plus size={20} />
-        </button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderSheetHeader = (title: string, description: string, onClose: () => void) => (
     <div className="mb-8 flex items-start justify-between gap-4">
@@ -148,6 +198,128 @@ export default function BookingStepTwo({
     </div>
   );
 
+  const getVehicleOptionPrice = (optionVehicleType: VehicleType) =>
+    vehiclePriceOptions.find((option) => option.vehicleType === optionVehicleType)?.totalPrice ?? 0;
+
+  const getNextVehicleType = (optionVehicleType: VehicleType) => {
+    const currentIndex = vehicleOrder.indexOf(optionVehicleType);
+    return currentIndex >= 0 ? vehicleOrder[currentIndex + 1] : undefined;
+  };
+  const sheetVehicleType = activeTravelVehicleType ?? vehicleType;
+  const currentVehicleCard = vehicleCards.find((card) => card.vehicleType === sheetVehicleType);
+  const currentVehiclePrice = getVehicleOptionPrice(sheetVehicleType);
+  const nextVehicleType = currentVehicleCard ? getNextVehicleType(currentVehicleCard.vehicleType) : undefined;
+  const nextVehiclePrice = nextVehicleType ? getVehicleOptionPrice(nextVehicleType) : 0;
+  const upgradePrice = Math.max(0, nextVehiclePrice - currentVehiclePrice);
+  const passengerValue = formData.passengers === '' ? 0 : formData.passengers;
+  const suitcaseValue = formData.luggage === '' ? 0 : formData.luggage;
+  const handLuggageValue = formData.handLuggage === '' ? 0 : formData.handLuggage;
+  const shouldShowTravelUpsell =
+    Boolean(currentVehicleCard && nextVehicleType) &&
+    (passengerValue >= (currentVehicleCard?.maxPassengers ?? Number.POSITIVE_INFINITY) ||
+      suitcaseValue >= (currentVehicleCard?.maxSuitcases ?? Number.POSITIVE_INFINITY) ||
+      handLuggageValue >= (currentVehicleCard?.maxSuitcases ?? Number.POSITIVE_INFINITY));
+
+  const confirmTravelSheet = () => {
+    onTravelDetailsConfirm(sheetVehicleType);
+    setIsTravelSheetOpen(false);
+  };
+
+  const openTravelSheet = (selectedVehicleType: VehicleType) => {
+    setActiveTravelVehicleType(selectedVehicleType);
+    setIsTravelSheetOpen(true);
+  };
+
+  const handleTravelUpgrade = (nextSelectedVehicleType: VehicleType) => {
+    setActiveTravelVehicleType(nextSelectedVehicleType);
+    onVehicleUpgrade(nextSelectedVehicleType);
+  };
+
+  const renderVehiclePriceCards = () => (
+    <div className="space-y-3 [@media(min-width:768px)_and_(max-height:850px)]:space-y-2">
+      {vehicleCards.map((card) => {
+        const isSelected = hasSelectedTravelDetails && card.vehicleType === vehicleType;
+        const isUnavailable =
+          hasSelectedTravelDetails &&
+          !isSelected &&
+          (passengerValue > card.maxPassengers ||
+            suitcaseValue > card.maxSuitcases ||
+            handLuggageValue > card.maxSuitcases);
+        const price = getVehicleOptionPrice(card.vehicleType);
+
+        return (
+          <div
+            key={card.vehicleType}
+            className={`relative h-[6.55rem] rounded-[0.95rem] border bg-[#f8fbff] px-4 py-4 shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-colors md:h-[8.5rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[5.65rem] [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-2.5 ${
+              isUnavailable
+                ? 'border-[#e5e7eb] bg-[#f3f4f6] opacity-60'
+                : travelSummaryInvalid && isSelected
+                  ? 'border-[#d70015]'
+                  : isSelected
+                    ? 'border-[#1F7CFF]'
+                    : 'border-[#dbe7f8]'
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => openTravelSheet(card.vehicleType)}
+              disabled={isUnavailable}
+              className="flex h-full w-full items-center gap-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 disabled:cursor-not-allowed [@media(min-width:768px)_and_(max-height:850px)]:gap-3"
+              aria-label={`Edit passengers and luggage for ${formatVehicleTypeLabel(card.vehicleType)}`}
+            >
+              <div className="relative h-[4.55rem] w-[6.37rem] shrink-0 overflow-visible md:h-[6.5rem] md:w-[9.1rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[4.4rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[7.2rem]">
+                <Image
+                  src={card.imageSrc}
+                  alt={card.imageAlt}
+                  fill
+                  className="scale-150 object-contain mix-blend-multiply"
+                  sizes="(min-width: 768px) 146px, 102px"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[1.1rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF] [@media(min-width:768px)_and_(max-height:850px)]:text-[1rem]">
+                      {formatVehicleTypeLabel(card.vehicleType)}
+                    </p>
+                    <div className="mt-1 flex min-h-[3rem] flex-col justify-start [@media(min-width:768px)_and_(max-height:850px)]:min-h-[2.35rem]">
+                      {isSelected ? (
+                        <div className="flex items-center gap-3 text-[0.9rem] font-semibold text-[#1f2937] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.82rem]">
+                          <span className="inline-flex items-center gap-1">
+                            <Users size={17} className="ui-icon-accent" />
+                            {passengerValue}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <Briefcase size={17} className="ui-icon-accent" />
+                            {suitcaseValue}
+                          </span>
+                        </div>
+                      ) : (
+                        <p className="mt-1 text-[0.86rem] font-medium leading-snug text-[#5f6975] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.78rem]">
+                          Max. {card.maxPassengers} passengers, {card.maxSuitcases} suitcases
+                        </p>
+                      )}
+                        {isUnavailable ? (
+                          <p className="mt-1 inline-flex rounded-[0.45rem] bg-white/75 px-2 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#6b7280] [@media(min-width:768px)_and_(max-height:850px)]:py-0.5 [@media(min-width:768px)_and_(max-height:850px)]:text-[0.64rem]">
+                            Too Small
+                          </p>
+                        ) : null}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-2">
+                    <p className="text-right text-[1.35rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.12rem]">
+                      {price} EUR
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   const travelSheet =
     isTravelSheetOpen && isMounted
       ? createPortal(
@@ -161,17 +333,49 @@ export default function BookingStepTwo({
             <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
               {renderSheetHeader('Passengers and luggage', 'Adjust each item before continuing.', () => setIsTravelSheetOpen(false))}
+              {shouldShowTravelUpsell && nextVehicleType ? (
+                <div className="mb-4 flex items-center justify-between gap-3 rounded-[1rem] border border-[#b8efc9] bg-[#f2fff5] px-4 py-3">
+                  <p className="text-[0.95rem] font-semibold leading-tight tracking-[-0.03em] text-[#145b2f]">
+                    Need more room?
+                    <br />
+                    Upgrade to {formatVehicleTypeLabel(nextVehicleType)}.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleTravelUpgrade(nextVehicleType)}
+                    className="shrink-0 rounded-[0.75rem] bg-[#119b45] px-4 py-2.5 text-[0.9rem] font-bold text-white transition-colors hover:bg-[#0c873b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7bd895] focus-visible:ring-offset-2"
+                  >
+                    {upgradePrice > 0 ? `Upgrade +${upgradePrice}€` : 'Upgrade'}
+                  </button>
+                </div>
+              ) : null}
               <div className="space-y-3">
-                {renderSheetStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
-                {renderSheetStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
-                {renderSheetStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, 8, ShoppingBag)}
+                {renderSheetStepper('passengers', 'Passengers', formData.passengers, 1, currentVehicleCard?.maxPassengers ?? 8, Users)}
+                {renderSheetStepper('luggage', 'Suitcases', formData.luggage, 0, currentVehicleCard?.maxSuitcases ?? 8, Briefcase)}
+                {renderSheetStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, currentVehicleCard?.maxSuitcases ?? 8, ShoppingBag)}
               </div>
+              {shouldShowTravelUpsell && nextVehicleType ? (
+                <div className="hidden">
+                  <p className="text-[0.95rem] font-semibold leading-tight tracking-[-0.03em] text-[#145b2f]">
+                    Need more room?
+                    <br />
+                    Upgrade to {formatVehicleTypeLabel(nextVehicleType)}.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleTravelUpgrade(nextVehicleType)}
+                    className="shrink-0 rounded-[0.75rem] bg-[#119b45] px-4 py-2.5 text-[0.9rem] font-bold text-white transition-colors hover:bg-[#0c873b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7bd895] focus-visible:ring-offset-2"
+                  >
+                    {upgradePrice > 0 ? `Upgrade +${upgradePrice}€` : 'Upgrade'}
+                  </button>
+                </div>
+              ) : null}
               <button
                 type="button"
-                onClick={() => setIsTravelSheetOpen(false)}
+                onClick={confirmTravelSheet}
                 className="mt-5 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[#1F7CFF] text-[1rem] font-semibold text-white transition-colors hover:bg-[#176be0]"
               >
-                Done
+                Confirm selection
               </button>
             </div>
           </div>,
@@ -211,14 +415,34 @@ export default function BookingStepTwo({
       : null;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-      <BookingPriceSummaryCard
-        formData={formData}
-        totalPrice={totalPrice}
-        vehicleType={vehicleType}
-        invalid={travelSummaryInvalid}
-        onEdit={() => setIsTravelSheetOpen(true)}
-      />
+    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
+      {renderVehiclePriceCards()}
+
+      {travelSheet}
+
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={() => setIsChildSeatSheetOpen(true)}
+          className="inline-flex items-center gap-2 text-left text-[14px] font-medium text-[#1F7CFF] transition-colors hover:text-[#176be0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
+          aria-haspopup="dialog"
+          aria-expanded={isChildSeatSheetOpen}
+        >
+          <Baby size={17} strokeWidth={2.2} />
+          {childSeatTotal > 0 ? 'Edit child seats' : 'Add child seats (optional)'}
+        </button>
+        {childSeatTotal > 0 ? (
+          <p className="text-left text-[12px] leading-[1.5] text-[#5f6975]">
+            {[
+              formData.babySeats > 0 ? `${formData.babySeats} baby` : null,
+              formData.childSeats > 0 ? `${formData.childSeats} child` : null,
+              formData.boosterSeats > 0 ? `${formData.boosterSeats} booster` : null,
+            ].filter(Boolean).join(', ')}
+          </p>
+        ) : null}
+      </div>
+
+      {childSeatSheet}
 
       {formData.direction === 'from_airport' ? (
         <div>
@@ -265,47 +489,6 @@ export default function BookingStepTwo({
           ) : null}
         </div>
       ) : null}
-
-      {travelSheet}
-
-      <div>
-        <label className="mb-2 ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]">
-          Child seats
-        </label>
-        <button
-          type="button"
-          onClick={() => setIsChildSeatSheetOpen(true)}
-          className="ui-field-surface flex h-14 w-full items-center justify-between rounded-[var(--radius-field)] border border-[#d2d2d7] px-4 text-left text-[#1d1d1f] outline-none transition-all focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:h-[3rem]"
-          aria-haspopup="dialog"
-          aria-expanded={isChildSeatSheetOpen}
-        >
-          <span className="flex min-w-0 items-center gap-3 text-[15px] font-semibold tracking-[-0.03em] md:text-[16px]">
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-              <Baby size={18} className="text-[#1F7CFF]" />
-              {childSeatTotal > 0 ? `${childSeatTotal} seats` : 'No child seats'}
-            </span>
-            {formData.babySeats > 0 ? (
-              <span className="hidden items-center gap-1 whitespace-nowrap text-[13px] font-medium text-[#6d7075] sm:inline-flex">
-                {formData.babySeats} baby
-              </span>
-            ) : null}
-            {formData.childSeats > 0 ? (
-              <span className="hidden items-center gap-1 whitespace-nowrap text-[13px] font-medium text-[#6d7075] sm:inline-flex">
-                {formData.childSeats} child
-              </span>
-            ) : null}
-            {formData.boosterSeats > 0 ? (
-              <span className="hidden items-center gap-1 whitespace-nowrap text-[13px] font-medium text-[#6d7075] sm:inline-flex">
-                {formData.boosterSeats} booster
-              </span>
-            ) : null}
-          </span>
-          <ChevronLeft size={18} className="-rotate-90 text-[#86868b]" />
-        </button>
-        <p className="mt-2 ml-1 text-[12px] text-[#86868b]">Included free of charge</p>
-      </div>
-
-      {childSeatSheet}
 
       {error ? (
         <div className="mt-4 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8]">

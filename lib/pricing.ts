@@ -5,7 +5,7 @@ export function formatVehicleTypeLabel(vehicleType: VehicleType | string): strin
     case 'Limo':
       return 'Sedan';
     case 'Kombi':
-      return 'Station wagon';
+      return 'St. wagon';
     case 'Bus':
       return 'Minivan';
     default:

@@ -52,7 +52,7 @@ export default function BookingPageClient({
     <>
       {!isAppSurface ? <NavbarClient /> : null}
       <section className="bg-white">
-        <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-[80px] md:pt-28'}`}>
+        <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-[80px] md:pt-28 [@media(min-width:768px)_and_(max-height:850px)]:pt-[88px]'}`}>
           <div className="grid items-start gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:gap-10">
             <section className="order-1 self-start lg:sticky lg:top-24">
               <div className="w-full max-w-[42rem] ui-card-surface-light">
