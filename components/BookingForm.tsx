@@ -1547,10 +1547,10 @@ const BookingForm = ({
     <button
       type="button"
       onClick={() => handleStepIndicatorClick(currentStep)}
-      className="inline-flex shrink-0 items-center bg-transparent p-0 text-[10.25px] text-[#1679ff] transition-colors hover:text-[#0f5fcc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:text-[0.84rem]"
+      className="inline-flex shrink-0 items-center bg-transparent p-0 text-[0.82rem] font-bold uppercase tracking-[0.22em] text-[#1F7CFF] transition-colors hover:text-[#0f5fcc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:text-[0.95rem]"
       aria-current="step"
     >
-      <span className="font-semibold tracking-[-0.02em]">{copy.stepLabel(currentStep)}</span>
+      <span>{copy.stepLabel(currentStep)}</span>
     </button>
   );
 
@@ -1571,7 +1571,7 @@ const BookingForm = ({
             readOnly
             placeholder="DD.MM.YYYY"
             onClick={() => setIsDatePickerOpen(true)}
-            className={`ui-field-surface h-12 w-full cursor-pointer rounded-[var(--radius-field)] border py-0 pl-10 pr-3 text-[10px] text-[#1d1d1f] outline-none transition-all md:h-[2.4rem] md:pl-10 md:pr-[0.8rem] md:text-[17px] ${
+            className={`ui-field-surface h-[2.8rem] w-full cursor-pointer rounded-[var(--radius-field)] border py-0 pl-10 pr-3 text-[10px] text-[#1d1d1f] outline-none transition-all md:h-[3rem] md:pl-10 md:pr-[0.8rem] md:text-[17px] ${
               isFieldInvalid('date')
                 ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
                 : 'border-[#d8d4ca] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
@@ -1602,7 +1602,7 @@ const BookingForm = ({
             readOnly
             placeholder="--:--"
             onClick={() => setIsTimePickerOpen(true)}
-            className={`ui-field-surface h-12 w-full cursor-pointer rounded-[var(--radius-field)] border py-0 pl-10 pr-3 text-[17px] text-[#1d1d1f] outline-none transition-all md:h-[2.4rem] md:pl-10 md:pr-[0.8rem] ${
+            className={`ui-field-surface h-[2.8rem] w-full cursor-pointer rounded-[var(--radius-field)] border py-0 pl-10 pr-3 text-[17px] text-[#1d1d1f] outline-none transition-all md:h-[3rem] md:pl-10 md:pr-[0.8rem] ${
               isFieldInvalid('time')
                 ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
                 : 'border-[#d8d4ca] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'

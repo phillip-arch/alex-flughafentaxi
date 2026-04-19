@@ -58,38 +58,52 @@ function getInfoBlock(direction: BookingDirection, meetAndGreet: boolean) {
 export function BookingInfoPanel({
   direction,
   meetAndGreet = false,
+  variant = 'card',
 }: {
   direction: BookingDirection;
   meetAndGreet?: boolean;
+  variant?: 'card' | 'book';
 }) {
   const infoBlock = getInfoBlock(direction, meetAndGreet);
+  const isBookVariant = variant === 'book';
 
   return (
-    <section className="ui-card-surface-light px-5 py-5 md:px-6 md:py-6">
-      <SectionIntro
-        eyebrow="Information"
-        title="Airport transfer information"
-        description="All key details about arrival, lead time, and payment right next to your booking."
-        className="max-w-none md:max-w-[34rem]"
-      />
+    <section className={isBookVariant ? 'px-0 py-0' : 'ui-card-surface-light px-5 py-5 md:px-6 md:py-6'}>
+      {isBookVariant ? (
+        <div className="max-w-none md:max-w-[34rem]">
+          <h2 className="text-[2rem] font-black leading-[1.02] tracking-[-0.055em] text-[#111827] md:text-[2.8rem]">
+            Airport transfer information
+          </h2>
+          <p className="mt-7 text-[1rem] leading-[1.45] tracking-[-0.02em] text-[#64748b] md:text-[1.18rem]">
+            All key details about arrival, lead time, and payment right next to your booking.
+          </p>
+        </div>
+      ) : (
+        <SectionIntro
+          eyebrow="Information"
+          title="Airport transfer information"
+          description="All key details about arrival, lead time, and payment right next to your booking."
+          className="max-w-none md:max-w-[34rem]"
+        />
+      )}
 
-      <div className="mt-6 rounded-[1.4rem] border border-[#e8edf3] bg-white px-4 py-4 md:px-5">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1679FF] md:text-[13px]">
-          {infoBlock.title}
+      <div className={`${isBookVariant ? 'mt-10 rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'mt-6 rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`}>
+        <p className={`${isBookVariant ? 'text-[1rem] tracking-[0.04em]' : 'text-[12px] tracking-[0.18em] md:text-[13px]'} font-semibold uppercase text-[#1679FF]`}>
+          {isBookVariant ? (direction === 'from_airport' ? 'AIRPORT PICKUP' : 'RECOMMENDED ARRIVAL TIME') : infoBlock.title}
         </p>
-        <p className="mt-2 text-sm font-medium text-[var(--color-text)]">{infoBlock.body}</p>
-        <div className="ui-copy mt-3 space-y-2 text-sm leading-6">
+        {!isBookVariant ? <p className="mt-2 text-sm font-medium text-[var(--color-text)]">{infoBlock.body}</p> : null}
+        <div className={`${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-2 text-sm leading-6'} text-[#64748b]`}>
           {infoBlock.items.map((item) => (
             <p key={item}>- {item}</p>
           ))}
         </div>
       </div>
 
-      <div className="mt-4 rounded-[1.4rem] border border-[#e8edf3] bg-white px-4 py-4 md:px-5">
-        <p className="text-sm font-semibold text-[var(--color-text)]">Minimum booking lead time</p>
-        <div className="ui-copy mt-3 space-y-1 text-sm leading-6">
-          <p>22:00-07:00 - book at least 3h in advance</p>
-          <p>07:00-22:00 - book at least 8h in advance</p>
+      <div className={`${isBookVariant ? 'mt-7 rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'mt-4 rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`}>
+        <p className={`${isBookVariant ? 'text-[1rem] uppercase tracking-[0.04em] text-[#1679FF]' : 'text-sm text-[var(--color-text)]'} font-semibold`}>Minimum booking lead time</p>
+        <div className={`${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-1 text-sm leading-6'} text-[#64748b]`}>
+          <p>22:00 - 07:00: book at least 3h in advance</p>
+          <p>07:00 - 22:00: book at least 8h in advance</p>
         </div>
       </div>
 

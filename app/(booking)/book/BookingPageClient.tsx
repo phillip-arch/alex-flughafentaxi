@@ -51,11 +51,11 @@ export default function BookingPageClient({
   return (
     <>
       {!isAppSurface ? <NavbarClient /> : null}
-      <section className="bg-white">
+      <section className="bg-[#f5f8fc]">
         <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-[80px] md:pt-28 [@media(min-width:768px)_and_(max-height:850px)]:pt-[88px]'}`}>
-          <div className="grid items-start gap-8 lg:grid-cols-[0.94fr_0.78fr] lg:gap-10">
+          <div className="grid items-start gap-10 lg:grid-cols-[0.98fr_0.72fr] lg:gap-12">
             <section className="order-1 self-start lg:sticky lg:top-24">
-              <div className="w-full max-w-[42rem] ui-card-surface-light">
+              <div className="w-full max-w-[46rem]">
                 <BookingForm
                   onDirectionChange={setDirection}
                   meetAndGreetSelected={meetAndGreet}
@@ -72,18 +72,20 @@ export default function BookingPageClient({
               <BookingInfoPanel
                 direction={direction}
                 meetAndGreet={meetAndGreet}
+                variant="book"
               />
             </aside>
           </div>
         </div>
       </section>
 
-      <section className="bg-white">
+      <section className="bg-[#f5f8fc]">
         <div className={`app-container ${isAppSurface ? 'pb-32 md:pb-28' : 'pb-0'}`}>
           <section className="mx-auto mt-6 max-w-[57.5rem] lg:hidden">
             <BookingInfoPanel
               direction={direction}
               meetAndGreet={meetAndGreet}
+              variant="book"
             />
           </section>
 

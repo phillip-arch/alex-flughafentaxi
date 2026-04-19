@@ -11,6 +11,9 @@ type VehiclePriceOption = {
   totalPrice: number;
 };
 
+// Keep the upgrade card styling in place for a later upsell return.
+const ENABLE_TRAVEL_UPSELL = false;
+
 type BookingStepTwoProps = {
   formData: any;
   vehicleType: VehicleType;
@@ -181,6 +184,55 @@ export default function BookingStepTwo({
     );
   };
 
+  const renderInlineTravelStepper = (
+    name: 'passengers' | 'luggage' | 'handLuggage',
+    label: string,
+    value: number | '',
+    min: number,
+    max: number,
+    Icon: typeof Users
+  ) => {
+    const numericValue = typeof value === 'number' ? value : null;
+    const isAtMin = numericValue !== null && numericValue <= min;
+    const isAtMax = numericValue !== null && numericValue >= max;
+
+    return (
+      <div className="flex min-h-[5.25rem] items-center justify-between gap-3 rounded-[1.15rem] bg-white px-4 py-3 shadow-[0_14px_30px_rgba(15,23,42,0.06)] md:min-h-[6.25rem] md:flex-col md:items-stretch md:px-3.5 md:py-3.5 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[5.25rem] [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-3">
+        <div className="flex min-w-0 items-center gap-3 md:gap-2.5">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF] md:h-7 md:w-7">
+            <Icon size={18} className="md:h-[15px] md:w-[15px]" />
+          </span>
+          <p className="truncate text-[1.02rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[0.78rem] lg:text-[0.84rem]">
+            {label}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-3 md:mt-3 md:justify-between md:gap-2.5">
+          <button
+            type="button"
+            onClick={() => updateStepperValue(name, -1, min, max)}
+            disabled={isAtMin}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white md:h-7 md:w-7"
+            aria-label={`Decrease ${label}`}
+          >
+            <Minus size={17} className="md:h-[15px] md:w-[15px]" />
+          </button>
+          <span className="min-w-[1.7rem] text-center text-[1.12rem] font-semibold leading-none tracking-[-0.04em] text-[#111827] md:min-w-[1.6rem] md:text-[0.95rem]">
+            {value === '' ? '--' : value}
+          </span>
+          <button
+            type="button"
+            onClick={() => updateStepperValue(name, 1, min, max)}
+            disabled={isAtMax}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] md:h-7 md:w-7"
+            aria-label={`Increase ${label}`}
+          >
+            <Plus size={17} className="md:h-[15px] md:w-[15px]" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const renderSheetHeader = (title: string, description: string, onClose: () => void) => (
     <div className="mb-8 flex items-start justify-between gap-4">
       <div>
@@ -208,6 +260,8 @@ export default function BookingStepTwo({
   const sheetVehicleType = activeTravelVehicleType ?? vehicleType;
   const currentVehicleCard = vehicleCards.find((card) => card.vehicleType === sheetVehicleType);
   const currentVehiclePrice = getVehicleOptionPrice(sheetVehicleType);
+  const inlineVehicleCard = vehicleCards.find((card) => card.vehicleType === vehicleType);
+  const inlineVehiclePrice = getVehicleOptionPrice(vehicleType);
   const nextVehicleType = currentVehicleCard ? getNextVehicleType(currentVehicleCard.vehicleType) : undefined;
   const nextVehiclePrice = nextVehicleType ? getVehicleOptionPrice(nextVehicleType) : 0;
   const upgradePrice = Math.max(0, nextVehiclePrice - currentVehiclePrice);
@@ -215,6 +269,7 @@ export default function BookingStepTwo({
   const suitcaseValue = formData.luggage === '' ? 0 : formData.luggage;
   const handLuggageValue = formData.handLuggage === '' ? 0 : formData.handLuggage;
   const shouldShowTravelUpsell =
+    ENABLE_TRAVEL_UPSELL &&
     Boolean(currentVehicleCard && nextVehicleType) &&
     (passengerValue >= (currentVehicleCard?.maxPassengers ?? Number.POSITIVE_INFINITY) ||
       suitcaseValue >= (currentVehicleCard?.maxSuitcases ?? Number.POSITIVE_INFINITY) ||
@@ -234,6 +289,41 @@ export default function BookingStepTwo({
     setActiveTravelVehicleType(nextSelectedVehicleType);
     onVehicleUpgrade(nextSelectedVehicleType);
   };
+
+  const renderInlineTravelDetails = () => (
+    <div className="space-y-6 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
+      {inlineVehicleCard ? (
+        <div
+          className={`flex min-h-[10.5rem] items-center justify-between gap-4 rounded-[1.45rem] border bg-white px-8 py-6 shadow-[0_22px_55px_rgba(15,23,42,0.06)] md:min-h-[10.8rem] [@media(min-width:768px)_and_(max-height:850px)]:min-h-[8rem] [@media(min-width:768px)_and_(max-height:850px)]:px-6 [@media(min-width:768px)_and_(max-height:850px)]:py-4 ${
+            travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
+          }`}
+        >
+          <div className="relative h-[5.2rem] w-[8.2rem] shrink-0 overflow-visible md:h-[6.7rem] md:w-[11rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[5.1rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[8.4rem]">
+            <Image
+              src={inlineVehicleCard.imageSrc}
+              alt={inlineVehicleCard.imageAlt}
+              fill
+              className="scale-125 object-contain mix-blend-multiply"
+              sizes="(min-width: 768px) 176px, 131px"
+            />
+          </div>
+          <div className="min-w-0 shrink-0 text-right">
+            <p className="truncate text-[1.2rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF] md:text-[1.25rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.05rem]">
+              {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
+            </p>
+            <p className="mt-2 text-right text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2.25rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.7rem]">
+              {inlineVehiclePrice} EUR
+            </p>
+          </div>
+        </div>
+      ) : null}
+      <div className="grid gap-4 md:grid-cols-3 md:gap-5">
+        {renderInlineTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
+        {renderInlineTravelStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
+        {renderInlineTravelStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, 8, ShoppingBag)}
+      </div>
+    </div>
+  );
 
   const renderVehiclePriceCards = () => (
     <div className="space-y-3 [@media(min-width:768px)_and_(max-height:850px)]:space-y-2">
@@ -275,6 +365,11 @@ export default function BookingStepTwo({
                   className="scale-150 object-contain mix-blend-multiply"
                   sizes="(min-width: 768px) 146px, 102px"
                 />
+                {isUnavailable ? (
+                  <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-[0.45rem] bg-white/90 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-[#6b7280] shadow-[0_4px_10px_rgba(17,17,17,0.08)] md:text-[0.72rem] [@media(min-width:768px)_and_(max-height:850px)]:py-0.5 [@media(min-width:768px)_and_(max-height:850px)]:text-[0.64rem]">
+                    Too Small
+                  </span>
+                ) : null}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-3">
@@ -299,11 +394,6 @@ export default function BookingStepTwo({
                           Max. {card.maxPassengers} passengers, {card.maxSuitcases} suitcases
                         </p>
                       )}
-                        {isUnavailable ? (
-                          <p className="mt-1 inline-flex rounded-[0.45rem] bg-white/75 px-2 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#6b7280] [@media(min-width:768px)_and_(max-height:850px)]:py-0.5 [@media(min-width:768px)_and_(max-height:850px)]:text-[0.64rem]">
-                            Too Small
-                          </p>
-                        ) : null}
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
@@ -333,6 +423,27 @@ export default function BookingStepTwo({
             <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
               {renderSheetHeader('Passengers and luggage', 'Adjust each item before continuing.', () => setIsTravelSheetOpen(false))}
+              {currentVehicleCard ? (
+                <div className="mb-4 flex items-center justify-between gap-3 rounded-[1rem] border border-[#dbe7f8] bg-[#f8fbff] px-4 py-2.5">
+                  <div className="relative h-[4.1rem] w-[6rem] shrink-0 overflow-visible md:h-[5rem] md:w-[7.5rem]">
+                    <Image
+                      src={currentVehicleCard.imageSrc}
+                      alt={currentVehicleCard.imageAlt}
+                      fill
+                      className="scale-125 object-contain mix-blend-multiply"
+                      sizes="(min-width: 768px) 120px, 96px"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1 text-right">
+                    <p className="truncate text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF]">
+                      {formatVehicleTypeLabel(currentVehicleCard.vehicleType)}
+                    </p>
+                    <p className="mt-1 text-[1.25rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
+                      {currentVehiclePrice} EUR
+                    </p>
+                  </div>
+                </div>
+              ) : null}
               {shouldShowTravelUpsell && nextVehicleType ? (
                 <div className="mb-4 flex items-center justify-between gap-3 rounded-[1rem] border border-[#b8efc9] bg-[#f2fff5] px-4 py-3">
                   <p className="text-[0.95rem] font-semibold leading-tight tracking-[-0.03em] text-[#145b2f]">
@@ -416,15 +527,13 @@ export default function BookingStepTwo({
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
-      {renderVehiclePriceCards()}
-
-      {travelSheet}
+      {renderInlineTravelDetails()}
 
       <div className="space-y-2">
         <button
           type="button"
           onClick={() => setIsChildSeatSheetOpen(true)}
-          className="inline-flex items-center gap-2 text-left text-[14px] font-medium text-[#1F7CFF] transition-colors hover:text-[#176be0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-2 text-left text-[1rem] font-semibold tracking-[-0.02em] text-[#1F7CFF] transition-colors hover:text-[#176be0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
           aria-haspopup="dialog"
           aria-expanded={isChildSeatSheetOpen}
         >
