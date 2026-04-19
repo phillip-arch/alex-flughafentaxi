@@ -297,8 +297,23 @@ export default function BookingStepTwo({
           }`}
           aria-haspopup="dialog"
           aria-expanded={isTravelSheetOpen}
+          aria-label={`${passengerValue} passengers, ${luggageValue} suitcases, ${handLuggageValue} hand luggage`}
         >
-          <span className="flex min-w-0 items-center gap-3 text-[15px] font-semibold tracking-[-0.03em] md:text-[16px]">
+          <span className="flex min-w-0 items-center gap-4 text-[15px] font-semibold tracking-[-0.03em] sm:hidden">
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap" title="Passengers">
+              <Users size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
+              {passengerValue}
+            </span>
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap" title="Suitcases">
+              <Briefcase size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
+              {luggageValue}
+            </span>
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap" title="Hand luggage">
+              <ShoppingBag size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
+              {handLuggageValue}
+            </span>
+          </span>
+          <span className="hidden min-w-0 items-center gap-3 text-[15px] font-semibold tracking-[-0.03em] sm:flex md:text-[16px]">
             <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
               <Users size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
               {passengerValue} Passengers
@@ -307,12 +322,10 @@ export default function BookingStepTwo({
               <Briefcase size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
               {luggageValue} Suitcases
             </span>
-            {formData.handLuggage !== '' && formData.handLuggage > 0 ? (
-              <span className="hidden items-center gap-1.5 whitespace-nowrap sm:inline-flex">
-                <ShoppingBag size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
-                {handLuggageValue} Hand luggage
-              </span>
-            ) : null}
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <ShoppingBag size={18} className={travelSummaryInvalid ? 'text-[#d70015]' : 'text-[#1F7CFF]'} />
+              {handLuggageValue} Hand luggage
+            </span>
           </span>
           <ChevronLeft size={18} className="-rotate-90 text-[#86868b]" />
         </button>
@@ -370,16 +383,18 @@ export default function BookingStepTwo({
               sizes="(min-width: 768px) 144px, 112px"
             />
           </div>
-          <div className="min-w-0">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1F7CFF]">
-              Fixed price
-            </p>
-            <p className="mt-2 text-[1.05rem] font-semibold tracking-[-0.04em] text-[#111827] md:text-[1.16rem]">{vehicleLabel}</p>
+          <div className="hidden min-w-0 md:block">
+            <p className="text-[1.05rem] font-semibold tracking-[-0.04em] text-[#1F7CFF] md:text-[1.16rem]">{vehicleLabel}</p>
           </div>
         </div>
-        <span className="shrink-0 text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2.45rem]">
-          {totalPrice} EUR
-        </span>
+        <div className="shrink-0 text-left">
+          <p className="mb-1 text-[0.95rem] font-semibold leading-none tracking-[-0.03em] text-[#1F7CFF] md:hidden">
+            {vehicleLabel}
+          </p>
+          <span className="block text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2.45rem]">
+            {totalPrice} EUR
+          </span>
+        </div>
       </div>
 
       {error ? (
