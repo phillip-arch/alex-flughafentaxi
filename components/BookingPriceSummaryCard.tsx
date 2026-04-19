@@ -52,12 +52,12 @@ export default function BookingPriceSummaryCard({
 
   return (
     <div
-      className={`relative mt-1 -mb-1 grid h-[4.8rem] grid-cols-[30%_40%_30%] overflow-hidden rounded-[0.75rem] border bg-[#f8fbff] shadow-[0_8px_18px_rgba(17,17,17,0.04)] md:mt-4 md:-mb-4 md:h-[6.05rem] md:grid-cols-[30%_42%_28%] md:rounded-[0.9rem] md:shadow-[0_12px_26px_rgba(17,17,17,0.05)] ${
+      className={`relative mt-1 grid h-[4.6rem] grid-cols-[30%_40%_30%] overflow-hidden rounded-[0.75rem] border bg-[#f8fbff] shadow-[0_8px_18px_rgba(17,17,17,0.04)] md:mt-4 md:h-[6.85rem] md:grid-cols-[30%_42%_28%] md:rounded-[0.9rem] md:shadow-[0_12px_26px_rgba(17,17,17,0.05)] ${
         invalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
       }`}
     >
       <div className="relative flex items-center justify-center bg-transparent px-1 py-1 md:px-2 md:py-1">
-        <div className="relative h-[4rem] w-[5.6rem] shrink-0 md:h-[7.5rem] md:w-[11.25rem]">
+        <div className="relative h-[4rem] w-[5.6rem] shrink-0 md:h-[6.35rem] md:w-[9.55rem]">
           <Image
             src={vehicleImage.src}
             alt={vehicleImage.alt}

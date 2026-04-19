@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import StreetAutocomplete from '@/components/address/StreetAutocomplete';
@@ -182,6 +182,8 @@ const BookingForm = ({
   // Picker States
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
+  const datePickerAnchorRef = useRef<HTMLDivElement | null>(null);
+  const timePickerAnchorRef = useRef<HTMLDivElement | null>(null);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(
@@ -1558,7 +1560,7 @@ const BookingForm = ({
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
       <div>
         <label className={BOOKING_FIELD_LABEL_CLASS}>Date</label>
-        <div className="relative w-full">
+        <div ref={datePickerAnchorRef} className="relative w-full">
           <Calendar
             onClick={() => setIsDatePickerOpen(true)}
             className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#1F7CFF]'}`}
@@ -1582,6 +1584,7 @@ const BookingForm = ({
             onClose={() => setIsDatePickerOpen(false)}
             onSelect={handleDateSelect}
             selectedDate={formData.date}
+            anchorRef={datePickerAnchorRef}
           />
         </div>
       </div>
@@ -1589,7 +1592,7 @@ const BookingForm = ({
         <label className={BOOKING_FIELD_LABEL_CLASS}>
           {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
         </label>
-        <div className="relative w-full">
+        <div ref={timePickerAnchorRef} className="relative w-full">
           <Clock
             onClick={() => setIsTimePickerOpen(true)}
             className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#1F7CFF]'}`}
@@ -1613,6 +1616,7 @@ const BookingForm = ({
             onClose={() => setIsTimePickerOpen(false)}
             onSelect={handleTimeSelect}
             selectedTime={formData.time}
+            anchorRef={timePickerAnchorRef}
           />
         </div>
       </div>

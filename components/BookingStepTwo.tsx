@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { Armchair, Baby, Briefcase, ChevronLeft, Minus, Plus, ShieldCheck, ShoppingBag, Users, X } from 'lucide-react';
 import { formatVehicleTypeLabel, type VehicleType } from '@/lib/pricing';
+import { BOOKING_OVERLAY_BACKDROP_CLASS } from './bookingOverlayStyles';
 
 type VehiclePriceOption = {
   vehicleType: VehicleType;
@@ -294,11 +295,11 @@ export default function BookingStepTwo({
     <div className="space-y-6 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {inlineVehicleCard ? (
         <div
-          className={`flex min-h-[7.25rem] items-center justify-between gap-4 overflow-hidden rounded-[1.15rem] border bg-white px-6 py-3.5 shadow-[0_16px_40px_rgba(15,23,42,0.06)] md:min-h-[7.5rem] [@media(min-width:768px)_and_(max-height:850px)]:min-h-[6rem] [@media(min-width:768px)_and_(max-height:850px)]:px-5 [@media(min-width:768px)_and_(max-height:850px)]:py-3 ${
+          className={`flex min-h-[7.25rem] flex-wrap items-center justify-between gap-x-4 gap-y-2 overflow-hidden rounded-[1.15rem] border bg-white px-6 py-3.5 shadow-[0_16px_40px_rgba(15,23,42,0.06)] md:min-h-[7.5rem] md:flex-nowrap md:gap-4 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[6rem] [@media(min-width:768px)_and_(max-height:850px)]:px-5 [@media(min-width:768px)_and_(max-height:850px)]:py-3 ${
             travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
           }`}
         >
-          <div className="relative h-[5.55rem] w-[9.15rem] shrink-0 overflow-visible md:h-[7.35rem] md:w-[12.15rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[5.85rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[9.75rem]">
+          <div className="relative order-1 h-[5rem] w-[8.25rem] shrink-0 overflow-visible md:order-none md:h-[6.35rem] md:w-[10.5rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[5.2rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[8.65rem]">
             <Image
               src={inlineVehicleCard.imageSrc}
               alt={inlineVehicleCard.imageAlt}
@@ -307,12 +308,14 @@ export default function BookingStepTwo({
               sizes="(min-width: 768px) 194px, 146px"
             />
           </div>
-          <div className="min-w-0 flex-1 px-2 text-left">
-            <p className="text-[0.9rem] font-medium leading-snug text-[#5f6975] md:text-[1rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
-              Max. {inlineVehicleCard.maxPassengers} passengers and {inlineVehicleCard.maxSuitcases} check-in suitcases
+          <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:flex-1 md:basis-auto md:px-2">
+            <p className="whitespace-normal text-[0.9rem] font-medium leading-snug text-[#5f6975] md:text-[1rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
+              Max. {inlineVehicleCard.maxPassengers} passengers and{' '}
+              <br className="hidden md:block" />
+              {inlineVehicleCard.maxSuitcases} check-in suitcases
             </p>
           </div>
-          <div className="min-w-0 shrink-0 text-right">
+          <div className="order-2 min-w-0 shrink-0 text-right md:order-none">
             <p className="truncate text-[1.2rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF] md:text-[1.25rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.05rem]">
               {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
             </p>
@@ -396,7 +399,9 @@ export default function BookingStepTwo({
                         </div>
                       ) : (
                         <p className="mt-1 text-[0.86rem] font-medium leading-snug text-[#5f6975] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.78rem]">
-                          Max. {card.maxPassengers} passengers and {card.maxSuitcases} check-in suitcases
+                          Max. {card.maxPassengers} passengers and{' '}
+                          <br className="hidden md:block" />
+                          {card.maxSuitcases} check-in suitcases
                         </p>
                       )}
                     </div>
@@ -418,7 +423,7 @@ export default function BookingStepTwo({
   const travelSheet =
     isTravelSheetOpen && isMounted
       ? createPortal(
-          <div className="fixed inset-0 z-[9999] flex items-end bg-black/45 px-0 md:items-center md:justify-center md:px-4" role="dialog" aria-modal="true" aria-label="Passengers and luggage">
+          <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-end px-0 md:items-center md:justify-center md:px-4`} role="dialog" aria-modal="true" aria-label="Passengers and luggage">
             <button
               type="button"
               aria-label="Close passengers and luggage"
@@ -502,7 +507,7 @@ export default function BookingStepTwo({
   const childSeatSheet =
     isChildSeatSheetOpen && isMounted
       ? createPortal(
-          <div className="fixed inset-0 z-[9999] flex items-end bg-black/45 px-0 md:items-center md:justify-center md:px-4" role="dialog" aria-modal="true" aria-label="Child seats">
+          <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-end px-0 md:items-center md:justify-center md:px-4`} role="dialog" aria-modal="true" aria-label="Child seats">
             <button
               type="button"
               aria-label="Close child seats"

@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom';
 import { useSearchParams } from 'next/navigation';
 import { ChevronLeft, NotebookPen, X } from 'lucide-react';
 import BookingPriceSummaryCard from '@/components/BookingPriceSummaryCard';
+import { BOOKING_OVERLAY_BACKDROP_CLASS } from './bookingOverlayStyles';
 
 type BookingStepThreeProps = {
   formData: any;
@@ -28,6 +29,9 @@ type BookingStepThreeProps = {
   secondaryBackButtonClass: string;
   primaryActionButtonClass: string;
 };
+
+const STEP_THREE_FIELD_LABEL_CLASS =
+  'ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
 
 export default function BookingStepThree({
   formData,
@@ -91,7 +95,7 @@ export default function BookingStepThree({
     isNoteModalOpen && isMounted
       ? createPortal(
           <div
-            className="fixed inset-0 z-[10000] flex items-end bg-black/45 px-0 md:items-center md:justify-center md:px-4"
+            className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[10000] flex items-end px-0 md:items-center md:justify-center md:px-4`}
             role="dialog"
             aria-modal="true"
             aria-label="Driver note"
@@ -143,7 +147,7 @@ export default function BookingStepThree({
       : null;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <BookingPriceSummaryCard formData={formData} totalPrice={totalPrice} vehicleType={vehicleType} />
 
       {isLoggedIn ? (
@@ -167,44 +171,56 @@ export default function BookingStepThree({
         </div>
       ) : null}
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="relative md:col-span-2">
+      <div className="grid gap-x-4 gap-y-5 md:grid-cols-2">
+        <div className="relative flex flex-col gap-3 md:col-span-2">
+          <label htmlFor="fullName" className={STEP_THREE_FIELD_LABEL_CLASS}>
+            Name
+          </label>
           <input
+            id="fullName"
             type="text"
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
             onBlur={handleBlur}
-            placeholder="Name"
+            placeholder=""
             className={getInputClassName('fullName')}
           />
         </div>
-        <div className="relative">
+        <div className="relative flex flex-col gap-3">
+          <label htmlFor="phone" className={STEP_THREE_FIELD_LABEL_CLASS}>
+            Phone number
+          </label>
           <input
+            id="phone"
             type="tel"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
             onBlur={handleBlur}
-            placeholder="Phone number"
+            placeholder=""
             className={getInputClassName('phone')}
           />
         </div>
-        <div className="relative">
+        <div className="relative flex flex-col gap-3">
+          <label htmlFor="email" className={STEP_THREE_FIELD_LABEL_CLASS}>
+            E-Mail
+          </label>
           <input
+            id="email"
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
             onBlur={handleBlur}
-            placeholder="E-Mail"
+            placeholder=""
             className={getInputClassName('email')}
           />
         </div>
       </div>
 
-      <div>
-        <p className="mb-3 ml-1 text-[12px] font-medium uppercase tracking-wide text-[#86868b]">
+      <div className="flex flex-col gap-3">
+        <p className={STEP_THREE_FIELD_LABEL_CLASS}>
           Payment
         </p>
         <div className="flex gap-3">
@@ -213,7 +229,7 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('cash')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
               formData.paymentMethod === 'cash'
-                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
+                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] ring-2 ring-inset ring-[#7fb3ff] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
                 : touched['paymentMethod'] && !formData.paymentMethod
                   ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                   : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
@@ -226,7 +242,7 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('card')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
               formData.paymentMethod === 'card'
-                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
+                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] ring-2 ring-inset ring-[#7fb3ff] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
                 : touched['paymentMethod'] && !formData.paymentMethod
                   ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                   : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'

@@ -1,18 +1,26 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { BOOKING_OVERLAY_BACKDROP_CLASS } from './bookingOverlayStyles';
 
 interface DatePickerProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (date: string) => void;
   selectedDate: string;
+  anchorRef?: React.RefObject<HTMLElement | null>;
 }
 
-export default function DatePicker({ isOpen, onClose, onSelect, selectedDate }: DatePickerProps) {
+export default function DatePicker({ isOpen, onClose, onSelect, selectedDate, anchorRef }: DatePickerProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties | undefined>(undefined);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!selectedDate) return;
@@ -26,28 +34,54 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate }: 
   useEffect(() => {
     if (!isOpen) return;
 
-    const handlePointerDown = (event: MouseEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        onClose();
-      }
-    };
-
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
       }
     };
 
-    document.addEventListener('mousedown', handlePointerDown);
     document.addEventListener('keydown', handleEscape);
 
     return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (!isOpen || !isMounted) return;
+
+    const updatePopoverPosition = () => {
+      const anchor = anchorRef?.current;
+      const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+
+      if (!anchor || !isDesktop) {
+        setPopoverStyle(undefined);
+        return;
+      }
+
+      const rect = anchor.getBoundingClientRect();
+      const panelWidth = Math.min(304, window.innerWidth - 32);
+      const left = Math.min(Math.max(rect.left, 16), window.innerWidth - panelWidth - 16);
+
+      setPopoverStyle({
+        left,
+        position: 'fixed',
+        top: rect.bottom + 12,
+        width: panelWidth,
+      });
+    };
+
+    updatePopoverPosition();
+    window.addEventListener('resize', updatePopoverPosition);
+    window.addEventListener('scroll', updatePopoverPosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updatePopoverPosition);
+      window.removeEventListener('scroll', updatePopoverPosition, true);
+    };
+  }, [anchorRef, isMounted, isOpen]);
+
+  if (!isOpen || !isMounted) return null;
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -95,11 +129,21 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate }: 
     return checkDate < today;
   };
 
-  return (
-    <div
-      ref={containerRef}
-      className="absolute left-0 top-full z-40 mt-3 w-[min(19rem,calc(100vw-3rem))] rounded-[1.375rem] border border-[#e6e1d7] bg-white p-2.5 shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-top-2 duration-200"
-    >
+  return createPortal(
+    <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-end justify-center px-4 pb-6 pt-10 md:items-center md:pb-10`}>
+      <button
+        type="button"
+        aria-label="Close calendar"
+        className="absolute inset-0 h-full w-full cursor-default"
+        onClick={onClose}
+      />
+      <div
+        className="relative z-10 w-[min(19rem,calc(100vw-3rem))] rounded-[1.375rem] border border-[#e6e1d7] bg-white p-2.5 shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-bottom-4 duration-200 md:slide-in-from-top-2"
+        style={popoverStyle}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Calendar"
+      >
       <div className="mb-2 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-[16px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
@@ -166,6 +210,8 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate }: 
           );
         })}
       </div>
-    </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
