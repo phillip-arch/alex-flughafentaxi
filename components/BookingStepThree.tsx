@@ -213,7 +213,7 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('cash')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
               formData.paymentMethod === 'cash'
-                ? 'border-[#1F7CFF] bg-[#1F7CFF] text-white'
+                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
                 : touched['paymentMethod'] && !formData.paymentMethod
                   ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                   : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
@@ -226,7 +226,7 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('card')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
               formData.paymentMethod === 'card'
-                ? 'border-[#1F7CFF] bg-[#1F7CFF] text-white'
+                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
                 : touched['paymentMethod'] && !formData.paymentMethod
                   ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                   : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'

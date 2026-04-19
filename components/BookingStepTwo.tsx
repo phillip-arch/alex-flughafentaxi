@@ -197,7 +197,7 @@ export default function BookingStepTwo({
     const isAtMax = numericValue !== null && numericValue >= max;
 
     return (
-      <div className="flex min-h-[5.25rem] items-center justify-between gap-3 rounded-[1.15rem] bg-white px-4 py-3 shadow-[0_14px_30px_rgba(15,23,42,0.06)] md:min-h-[6.25rem] md:flex-col md:items-stretch md:px-3.5 md:py-3.5 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[5.25rem] [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-3">
+      <div className="flex min-h-[4.65rem] items-center justify-between gap-3 rounded-[1.15rem] bg-white px-4 py-2 shadow-[0_14px_30px_rgba(15,23,42,0.06)] md:min-h-[5.5rem] md:flex-col md:items-stretch md:px-3.5 md:py-2.5 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[4.7rem] [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-2.5">
         <div className="flex min-w-0 items-center gap-3 md:gap-2.5">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF] md:h-7 md:w-7">
             <Icon size={18} className="md:h-[15px] md:w-[15px]" />
@@ -294,18 +294,23 @@ export default function BookingStepTwo({
     <div className="space-y-6 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {inlineVehicleCard ? (
         <div
-          className={`flex min-h-[10.5rem] items-center justify-between gap-4 rounded-[1.45rem] border bg-white px-8 py-6 shadow-[0_22px_55px_rgba(15,23,42,0.06)] md:min-h-[10.8rem] [@media(min-width:768px)_and_(max-height:850px)]:min-h-[8rem] [@media(min-width:768px)_and_(max-height:850px)]:px-6 [@media(min-width:768px)_and_(max-height:850px)]:py-4 ${
+          className={`flex min-h-[7.25rem] items-center justify-between gap-4 overflow-hidden rounded-[1.15rem] border bg-white px-6 py-3.5 shadow-[0_16px_40px_rgba(15,23,42,0.06)] md:min-h-[7.5rem] [@media(min-width:768px)_and_(max-height:850px)]:min-h-[6rem] [@media(min-width:768px)_and_(max-height:850px)]:px-5 [@media(min-width:768px)_and_(max-height:850px)]:py-3 ${
             travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
           }`}
         >
-          <div className="relative h-[5.2rem] w-[8.2rem] shrink-0 overflow-visible md:h-[6.7rem] md:w-[11rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[5.1rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[8.4rem]">
+          <div className="relative h-[5.55rem] w-[9.15rem] shrink-0 overflow-visible md:h-[7.35rem] md:w-[12.15rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[5.85rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[9.75rem]">
             <Image
               src={inlineVehicleCard.imageSrc}
               alt={inlineVehicleCard.imageAlt}
               fill
-              className="scale-125 object-contain mix-blend-multiply"
-              sizes="(min-width: 768px) 176px, 131px"
+              className="scale-[1.875] object-contain mix-blend-multiply"
+              sizes="(min-width: 768px) 194px, 146px"
             />
+          </div>
+          <div className="min-w-0 flex-1 px-2 text-left">
+            <p className="text-[0.9rem] font-medium leading-snug text-[#5f6975] md:text-[1rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
+              Max. {inlineVehicleCard.maxPassengers} passengers and {inlineVehicleCard.maxSuitcases} check-in suitcases
+            </p>
           </div>
           <div className="min-w-0 shrink-0 text-right">
             <p className="truncate text-[1.2rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF] md:text-[1.25rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.05rem]">
@@ -391,7 +396,7 @@ export default function BookingStepTwo({
                         </div>
                       ) : (
                         <p className="mt-1 text-[0.86rem] font-medium leading-snug text-[#5f6975] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.78rem]">
-                          Max. {card.maxPassengers} passengers, {card.maxSuitcases} suitcases
+                          Max. {card.maxPassengers} passengers and {card.maxSuitcases} check-in suitcases
                         </p>
                       )}
                     </div>
