@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Briefcase, CreditCard, Pencil, ShoppingBag, Users, Wallet } from 'lucide-react';
 import { formatVehicleTypeLabel } from '@/lib/pricing';
+import AnimatedPrice from './AnimatedPrice';
 
 type BookingPriceSummaryCardProps = {
   formData: any;
@@ -93,7 +94,7 @@ export default function BookingPriceSummaryCard({
       </div>
       <div className={`relative z-10 flex min-w-0 flex-col items-end justify-center gap-1 px-2.5 py-1 text-right md:gap-1.5 md:px-4 md:py-1 ${onEdit ? 'pt-8 md:pt-10' : ''}`}>
         <p className="text-[1.15rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[1.9rem]">
-          {totalPrice} EUR
+          <AnimatedPrice value={totalPrice} />
         </p>
         <div className="flex min-h-[0.88rem] items-center justify-end md:min-h-[1.05rem]">
           <div

@@ -1629,39 +1629,16 @@ const BookingForm = ({
         <p className="mb-1.5 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">
           Flight details
         </p>
-        <div className="grid gap-3 md:grid-cols-3 md:gap-4">
-          <div>
-            <input
-              type="text"
-              name="flightNumber"
-              value={formData.flightNumber}
-              onChange={handleChange}
-              onBlur={handleFlightNumberBlur}
-              placeholder="e.g. OS123"
-              className={getInputClassName('flightNumber')}
-            />
-          </div>
-          <div className="flex min-h-[var(--field-height)] items-center justify-between px-1 py-3 md:col-span-2 md:min-h-[3rem]">
-            <div className="flex min-w-0 items-center">
-              <div className="min-w-0 text-[#1d1d1f]">
-                <p className="text-[1rem] font-semibold leading-tight tracking-[-0.02em] text-[#1F7CFF]">
-                  Meet &amp; Greet (Optional +6€)
-                </p>
-                <p className="mt-0.5 text-[13px] leading-tight text-[#86868b] md:whitespace-nowrap">
-                  Driver waits inside arrivals with a name sign.
-                </p>
-              </div>
-            </div>
-            <label className="relative ml-3 inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                checked={Boolean(formData.meetAndGreet)}
-                onChange={(event) => handleMeetAndGreetChange(event.target.checked)}
-                className="peer sr-only"
-              />
-              <div className="h-[31px] w-[51px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] peer-focus:outline-none peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[27px] after:w-[27px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
-            </label>
-          </div>
+        <div className="mr-[-5px] md:mr-0">
+          <input
+            type="text"
+            name="flightNumber"
+            value={formData.flightNumber}
+            onChange={handleChange}
+            onBlur={handleFlightNumberBlur}
+            placeholder="e.g. OS123"
+            className={getInputClassName('flightNumber')}
+          />
         </div>
         {isLookingUpFlight ? (
           <p className="mt-2 ml-1 text-[12px] text-[#6d7075]">Loading flight data...</p>
@@ -1895,6 +1872,7 @@ const BookingForm = ({
               vehiclePriceOptions={vehiclePriceOptions}
               onVehicleUpgrade={handleVehicleUpgrade}
               onTravelDetailsConfirm={handleTravelDetailsConfirm}
+              handleMeetAndGreetChange={handleMeetAndGreetChange}
               error={error}
               isFieldInvalid={isFieldInvalid}
               updateStepperValue={updateStepperValue}
@@ -1969,4 +1947,3 @@ const BookingForm = ({
 };
 
 export default BookingForm;
-

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { Armchair, Baby, Briefcase, ChevronLeft, Minus, Plus, ShieldCheck, ShoppingBag, Users, X } from 'lucide-react';
 import { formatVehicleTypeLabel, type VehicleType } from '@/lib/pricing';
+import AnimatedPrice from './AnimatedPrice';
 import { BOOKING_OVERLAY_BACKDROP_CLASS } from './bookingOverlayStyles';
 
 type VehiclePriceOption = {
@@ -21,6 +22,7 @@ type BookingStepTwoProps = {
   vehiclePriceOptions: VehiclePriceOption[];
   onVehicleUpgrade: (nextVehicleType: VehicleType) => void;
   onTravelDetailsConfirm: (selectedVehicleType: VehicleType) => void;
+  handleMeetAndGreetChange: (checked: boolean) => void;
   error: string | null;
   isFieldInvalid: (name: any) => boolean;
   updateStepperValue: (name: any, delta: -1 | 1, min: number, max: number) => void;
@@ -39,6 +41,7 @@ export default function BookingStepTwo({
   vehiclePriceOptions,
   onVehicleUpgrade,
   onTravelDetailsConfirm,
+  handleMeetAndGreetChange,
   error,
   isFieldInvalid,
   updateStepperValue,
@@ -184,36 +187,36 @@ export default function BookingStepTwo({
     const isAtMax = numericValue !== null && numericValue >= max;
 
     return (
-      <div className="flex min-h-[4.65rem] items-center justify-between gap-3 rounded-[1.15rem] bg-white px-4 py-2 shadow-[0_14px_30px_rgba(15,23,42,0.06)] md:min-h-[5.5rem] md:flex-col md:items-stretch md:px-3.5 md:py-2.5 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[4.7rem] [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-2.5">
-        <div className="flex min-w-0 items-center gap-3 md:gap-2.5">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF] md:h-7 md:w-7">
-            <Icon size={18} className="md:h-[15px] md:w-[15px]" />
+      <div className="flex min-h-[4.65rem] items-center justify-between gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-2 shadow-[0_14px_30px_rgba(15,23,42,0.06)] md:min-h-[6.7rem] md:flex-col md:items-center md:justify-center md:gap-5 md:px-4 md:py-4 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[5.65rem] [@media(min-width:768px)_and_(max-height:850px)]:gap-3 [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-3">
+        <div className="flex min-w-0 items-center gap-3 md:justify-center md:gap-2.5">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF] md:h-auto md:w-auto md:bg-transparent">
+            <Icon size={18} className="md:h-[17px] md:w-[17px]" />
           </span>
-          <p className="truncate text-[1.02rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[0.78rem] lg:text-[0.84rem]">
+          <p className="truncate text-[1.02rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[1rem]">
             {label}
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-3 md:mt-3 md:justify-between md:gap-2.5">
+        <div className="flex shrink-0 items-center gap-3 md:w-full md:justify-center md:gap-7 [@media(min-width:768px)_and_(max-height:850px)]:gap-5">
           <button
             type="button"
             onClick={() => updateStepperValue(name, -1, min, max)}
             disabled={isAtMin}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white md:h-7 md:w-7"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white md:h-11 md:w-11 [@media(min-width:768px)_and_(max-height:850px)]:h-9 [@media(min-width:768px)_and_(max-height:850px)]:w-9"
             aria-label={`Decrease ${label}`}
           >
-            <Minus size={17} className="md:h-[15px] md:w-[15px]" />
+            <Minus size={17} className="md:h-[18px] md:w-[18px]" />
           </button>
-          <span className="min-w-[1.7rem] text-center text-[1.12rem] font-semibold leading-none tracking-[-0.04em] text-[#111827] md:min-w-[1.6rem] md:text-[0.95rem]">
+          <span className="min-w-[1.7rem] text-center text-[1.12rem] font-semibold leading-none tracking-[-0.04em] text-[#111827] md:min-w-[1.6rem] md:text-[1.15rem]">
             {value === '' ? '--' : value}
           </span>
           <button
             type="button"
             onClick={() => updateStepperValue(name, 1, min, max)}
             disabled={isAtMax}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] md:h-7 md:w-7"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] md:h-11 md:w-11 [@media(min-width:768px)_and_(max-height:850px)]:h-9 [@media(min-width:768px)_and_(max-height:850px)]:w-9"
             aria-label={`Increase ${label}`}
           >
-            <Plus size={17} className="md:h-[15px] md:w-[15px]" />
+            <Plus size={17} className="md:h-[18px] md:w-[18px]" />
           </button>
         </div>
       </div>
@@ -255,6 +258,7 @@ export default function BookingStepTwo({
   const passengerValue = formData.passengers === '' ? 0 : formData.passengers;
   const suitcaseValue = formData.luggage === '' ? 0 : formData.luggage;
   const handLuggageValue = formData.handLuggage === '' ? 0 : formData.handLuggage;
+  const canUseMeetAndGreet = formData.direction === 'from_airport';
   const shouldShowTravelUpsell =
     ENABLE_TRAVEL_UPSELL &&
     Boolean(currentVehicleCard && nextVehicleType) &&
@@ -306,7 +310,7 @@ export default function BookingStepTwo({
               {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
             </p>
             <p className="mt-2 text-right text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2.25rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.7rem]">
-              {inlineVehiclePrice} EUR
+              <AnimatedPrice value={inlineVehiclePrice} />
             </p>
           </div>
         </div>
@@ -394,7 +398,7 @@ export default function BookingStepTwo({
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
                     <p className="text-right text-[1.35rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.12rem]">
-                      {price} EUR
+                      <AnimatedPrice value={price} />
                     </p>
                   </div>
                 </div>
@@ -435,7 +439,7 @@ export default function BookingStepTwo({
                       {formatVehicleTypeLabel(currentVehicleCard.vehicleType)}
                     </p>
                     <p className="mt-1 text-[1.25rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
-                      {currentVehiclePrice} EUR
+                      <AnimatedPrice value={currentVehiclePrice} />
                     </p>
                   </div>
                 </div>
@@ -525,26 +529,66 @@ export default function BookingStepTwo({
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {renderInlineTravelDetails()}
 
-      <div className="space-y-2">
-        <button
-          type="button"
-          onClick={() => setIsChildSeatSheetOpen(true)}
-          className="inline-flex items-center gap-2 text-left text-[1rem] font-semibold tracking-[-0.02em] text-[#1F7CFF] transition-colors hover:text-[#176be0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
-          aria-haspopup="dialog"
-          aria-expanded={isChildSeatSheetOpen}
-        >
-          <Baby size={17} strokeWidth={2.2} />
-          {childSeatTotal > 0 ? 'Edit child seats' : 'Add child seats (optional)'}
-        </button>
-        {childSeatTotal > 0 ? (
-          <p className="text-left text-[12px] leading-[1.5] text-[#5f6975]">
-            {[
-              formData.babySeats > 0 ? `${formData.babySeats} baby` : null,
-              formData.childSeats > 0 ? `${formData.childSeats} child` : null,
-              formData.boosterSeats > 0 ? `${formData.boosterSeats} booster` : null,
-            ].filter(Boolean).join(', ')}
-          </p>
-        ) : null}
+      <div className="space-y-3">
+        <p className="ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Optional</p>
+        <div className={canUseMeetAndGreet ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1 gap-4'}>
+          {canUseMeetAndGreet ? (
+            <button
+              type="button"
+              onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
+              className={`flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border bg-white px-4 py-3 text-left shadow-[0_12px_28px_rgba(15,23,42,0.045)] transition-colors hover:border-[#7fb3ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 ${
+                formData.meetAndGreet ? 'border-[#7fb3ff]' : 'border-[#dbe7f8]'
+              }`}
+              aria-pressed={Boolean(formData.meetAndGreet)}
+            >
+              <span className="min-w-0">
+                <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+                  Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
+                </span>
+                <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
+                  Driver waits inside arrivals with a name sign.
+                </span>
+              </span>
+              <span
+                className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors ${
+                  formData.meetAndGreet ? 'bg-[#1F7CFF]' : 'bg-[#e9edf3]'
+                }`}
+                aria-hidden="true"
+              >
+                <span
+                  className={`absolute top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white shadow-[0_2px_8px_rgba(15,23,42,0.16)] transition-transform ${
+                    formData.meetAndGreet ? 'translate-x-[1.45rem]' : 'translate-x-[0.25rem]'
+                  }`}
+                />
+              </span>
+            </button>
+          ) : null}
+
+          <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3 shadow-[0_12px_28px_rgba(15,23,42,0.045)]">
+            <div className="min-w-0">
+              <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">Free child seats</p>
+              <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">Infant, toddler or booster seats.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsChildSeatSheetOpen(true)}
+              className="inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1F7CFF] transition-colors hover:bg-[#e1eeff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
+              aria-haspopup="dialog"
+              aria-expanded={isChildSeatSheetOpen}
+            >
+              + {childSeatTotal > 0 ? 'Edit' : 'Add'}
+            </button>
+            {childSeatTotal > 0 ? (
+              <p className="sr-only">
+                {[
+                  formData.babySeats > 0 ? `${formData.babySeats} baby` : null,
+                  formData.childSeats > 0 ? `${formData.childSeats} child` : null,
+                  formData.boosterSeats > 0 ? `${formData.boosterSeats} booster` : null,
+                ].filter(Boolean).join(', ')}
+              </p>
+            ) : null}
+          </div>
+        </div>
       </div>
 
       {childSeatSheet}
