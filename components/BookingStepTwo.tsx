@@ -22,13 +22,6 @@ type BookingStepTwoProps = {
   onVehicleUpgrade: (nextVehicleType: VehicleType) => void;
   onTravelDetailsConfirm: (selectedVehicleType: VehicleType) => void;
   error: string | null;
-  flightLookupError: string | null;
-  isLookingUpFlight: boolean;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-  handleBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-  handleFlightNumberBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
-  handleMeetAndGreetChange: (checked: boolean) => void;
-  getInputClassName: (name: any) => string;
   isFieldInvalid: (name: any) => boolean;
   updateStepperValue: (name: any, delta: -1 | 1, min: number, max: number) => void;
   prevStep: () => void;
@@ -47,13 +40,6 @@ export default function BookingStepTwo({
   onVehicleUpgrade,
   onTravelDetailsConfirm,
   error,
-  flightLookupError,
-  isLookingUpFlight,
-  handleChange,
-  handleBlur,
-  handleFlightNumberBlur,
-  handleMeetAndGreetChange,
-  getInputClassName,
   isFieldInvalid,
   updateStepperValue,
   prevStep,
@@ -562,52 +548,6 @@ export default function BookingStepTwo({
       </div>
 
       {childSeatSheet}
-
-      {formData.direction === 'from_airport' ? (
-        <div>
-          <p className="mb-3 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Flight details</p>
-          <div className="grid gap-3 md:grid-cols-3 md:gap-4">
-            <div>
-              <input
-                type="text"
-                name="flightNumber"
-                value={formData.flightNumber}
-                onChange={handleChange}
-                onBlur={handleFlightNumberBlur}
-                placeholder="Flight number (e.g. OS123)"
-                className={getInputClassName('flightNumber')}
-              />
-            </div>
-            <div className="flex min-h-[var(--field-height)] items-center justify-between rounded-[var(--radius-field)] bg-[#f5f5f7] px-4 py-3 md:relative md:top-[-10px] md:col-span-2 md:min-h-[3rem]">
-              <div className="flex min-w-0 items-center">
-                <div className="min-w-0 text-[#1d1d1f]">
-                  <p className="text-[15px] font-medium leading-tight">Meet &amp; Greet (+6€)</p>
-                  <p className="mt-0.5 text-[13px] leading-tight text-[#86868b] md:whitespace-nowrap">
-                    Driver waits inside arrivals with a name sign.
-                  </p>
-                </div>
-              </div>
-              <label className="relative ml-3 inline-flex cursor-pointer items-center">
-                <input
-                  type="checkbox"
-                  checked={Boolean(formData.meetAndGreet)}
-                  onChange={(event) => handleMeetAndGreetChange(event.target.checked)}
-                  className="peer sr-only"
-                />
-                <div className="h-[31px] w-[51px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] peer-focus:outline-none peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[27px] after:w-[27px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
-              </label>
-            </div>
-          </div>
-          {isLookingUpFlight ? (
-            <p className="mt-2 ml-1 text-[12px] text-[#6d7075]">Loading flight data...</p>
-          ) : null}
-          {flightLookupError ? (
-            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-              {flightLookupError}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
 
       {error ? (
         <div className="mt-4 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8]">

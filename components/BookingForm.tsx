@@ -132,7 +132,7 @@ const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.
 const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-white !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const BOOKING_FIELD_LABEL_CLASS =
-  'mb-2 ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
+  'mb-1.5 ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 const TIME_VALUE_PATTERN = /^\d{2}:\d{2}$/;
 const NIGHT_LEAD_TIME_ERROR =
@@ -1233,14 +1233,14 @@ const BookingForm = ({
 
     if (step === 1) {
       requiredFields.push('date', 'time', 'street', 'zip');
+      if (formData.direction === 'from_airport') {
+        requiredFields.push('flightNumber');
+      }
       if (formData.extraStop) {
         requiredFields.push('extraStopStreet', 'extraStopZip');
       }
     } else if (step === 2) {
       requiredFields.push('passengers', 'luggage', 'handLuggage');
-      if (formData.direction === 'from_airport') {
-        requiredFields.push('flightNumber');
-      }
     } else if (step === 3) {
       requiredFields.push('fullName', 'email', 'phone', 'paymentMethod');
     }
@@ -1560,7 +1560,7 @@ const BookingForm = ({
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
       <div>
         <label className={BOOKING_FIELD_LABEL_CLASS}>Date</label>
-        <div ref={datePickerAnchorRef} className="relative w-full">
+        <div ref={datePickerAnchorRef} className="relative mr-[-5px] w-full md:mr-0">
           <Calendar
             onClick={() => setIsDatePickerOpen(true)}
             className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#1F7CFF]'}`}
@@ -1592,7 +1592,7 @@ const BookingForm = ({
         <label className={BOOKING_FIELD_LABEL_CLASS}>
           {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
         </label>
-        <div ref={timePickerAnchorRef} className="relative w-full">
+        <div ref={timePickerAnchorRef} className="relative mr-[-5px] w-full md:mr-0">
           <Clock
             onClick={() => setIsTimePickerOpen(true)}
             className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#1F7CFF]'}`}
@@ -1622,6 +1622,57 @@ const BookingForm = ({
       </div>
     </div>
   );
+
+  const FlightDetailsFields = () =>
+    formData.direction === 'from_airport' ? (
+      <div className="mt-4">
+        <p className="mb-1.5 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">
+          Flight details
+        </p>
+        <div className="grid gap-3 md:grid-cols-3 md:gap-4">
+          <div>
+            <input
+              type="text"
+              name="flightNumber"
+              value={formData.flightNumber}
+              onChange={handleChange}
+              onBlur={handleFlightNumberBlur}
+              placeholder="e.g. OS123"
+              className={getInputClassName('flightNumber')}
+            />
+          </div>
+          <div className="flex min-h-[var(--field-height)] items-center justify-between px-1 py-3 md:col-span-2 md:min-h-[3rem]">
+            <div className="flex min-w-0 items-center">
+              <div className="min-w-0 text-[#1d1d1f]">
+                <p className="text-[1rem] font-semibold leading-tight tracking-[-0.02em] text-[#1F7CFF]">
+                  Meet &amp; Greet (Optional +6€)
+                </p>
+                <p className="mt-0.5 text-[13px] leading-tight text-[#86868b] md:whitespace-nowrap">
+                  Driver waits inside arrivals with a name sign.
+                </p>
+              </div>
+            </div>
+            <label className="relative ml-3 inline-flex cursor-pointer items-center">
+              <input
+                type="checkbox"
+                checked={Boolean(formData.meetAndGreet)}
+                onChange={(event) => handleMeetAndGreetChange(event.target.checked)}
+                className="peer sr-only"
+              />
+              <div className="h-[31px] w-[51px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] peer-focus:outline-none peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[27px] after:w-[27px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
+            </label>
+          </div>
+        </div>
+        {isLookingUpFlight ? (
+          <p className="mt-2 ml-1 text-[12px] text-[#6d7075]">Loading flight data...</p>
+        ) : null}
+        {flightLookupError ? (
+          <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+            {flightLookupError}
+          </div>
+        ) : null}
+      </div>
+    ) : null;
 
   const shouldShowInfoTrigger = isAppSurface && hasMounted;
   const formContentSpacingClassName = showStepIndicator
@@ -1674,7 +1725,8 @@ const BookingForm = ({
                 <div className="flex gap-2.5 md:gap-4">
                   <div className="w-5 shrink-0 md:w-5" aria-hidden="true" />
                   <div className="min-w-0 flex-1">
-                    <DateTimeFields />
+                    {DateTimeFields()}
+                    {FlightDetailsFields()}
                   </div>
                   <div className="w-10 shrink-0 md:w-8" aria-hidden="true" />
                 </div>
@@ -1844,13 +1896,6 @@ const BookingForm = ({
               onVehicleUpgrade={handleVehicleUpgrade}
               onTravelDetailsConfirm={handleTravelDetailsConfirm}
               error={error}
-              flightLookupError={flightLookupError}
-              isLookingUpFlight={isLookingUpFlight}
-              handleChange={handleChange}
-              handleBlur={handleBlur}
-              handleFlightNumberBlur={handleFlightNumberBlur}
-              handleMeetAndGreetChange={handleMeetAndGreetChange}
-              getInputClassName={getInputClassName}
               isFieldInvalid={isFieldInvalid}
               updateStepperValue={updateStepperValue}
               prevStep={prevStep}
@@ -1924,5 +1969,4 @@ const BookingForm = ({
 };
 
 export default BookingForm;
-
 

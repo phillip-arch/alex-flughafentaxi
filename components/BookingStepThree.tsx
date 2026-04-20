@@ -147,32 +147,26 @@ export default function BookingStepThree({
       : null;
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
       <BookingPriceSummaryCard formData={formData} totalPrice={totalPrice} vehicleType={vehicleType} />
 
       {isLoggedIn ? (
-        <div className="flex flex-col gap-4 rounded-xl border border-[#d2d2d7] bg-white p-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="text-[#1d1d1f]">
-                <p className="text-[15px] font-medium">Booking for myself</p>
-              </div>
-            </div>
-            <label className="relative inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                checked={formData.bookingForMyself}
-                onChange={(e) => handleBookingForMyselfToggle(e.target.checked)}
-                className="peer sr-only"
-              />
-              <div className="h-[31px] w-[51px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] peer-focus:outline-none peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[27px] after:w-[27px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
-            </label>
-          </div>
+        <div className="flex items-center justify-between gap-4 px-1">
+          <p className="text-[15px] font-medium text-[#1d1d1f]">Booking for myself</p>
+          <label className="relative inline-flex cursor-pointer items-center">
+            <input
+              type="checkbox"
+              checked={formData.bookingForMyself}
+              onChange={(e) => handleBookingForMyselfToggle(e.target.checked)}
+              className="peer sr-only"
+            />
+            <div className="h-[31px] w-[51px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] peer-focus:outline-none peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[27px] after:w-[27px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
+          </label>
         </div>
       ) : null}
 
-      <div className="grid gap-x-4 gap-y-5 md:grid-cols-2">
-        <div className="relative flex flex-col gap-3 md:col-span-2">
+      <div className="grid gap-x-4 gap-y-4 md:grid-cols-2">
+        <div className="relative flex flex-col gap-2 md:col-span-2">
           <label htmlFor="fullName" className={STEP_THREE_FIELD_LABEL_CLASS}>
             Name
           </label>
@@ -187,7 +181,7 @@ export default function BookingStepThree({
             className={getInputClassName('fullName')}
           />
         </div>
-        <div className="relative flex flex-col gap-3">
+        <div className="relative flex flex-col gap-2">
           <label htmlFor="phone" className={STEP_THREE_FIELD_LABEL_CLASS}>
             Phone number
           </label>
@@ -202,7 +196,7 @@ export default function BookingStepThree({
             className={getInputClassName('phone')}
           />
         </div>
-        <div className="relative flex flex-col gap-3">
+        <div className="relative flex flex-col gap-2">
           <label htmlFor="email" className={STEP_THREE_FIELD_LABEL_CLASS}>
             E-Mail
           </label>
@@ -219,7 +213,7 @@ export default function BookingStepThree({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
         <p className={STEP_THREE_FIELD_LABEL_CLASS}>
           Payment
         </p>
