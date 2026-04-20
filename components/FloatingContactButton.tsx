@@ -18,7 +18,7 @@ export default function FloatingContactButton() {
     const syncVisibility = () => {
       const hero = document.getElementById('hero');
       const footer = document.getElementById('site-footer');
-      const isPastHero = hero ? hero.getBoundingClientRect().bottom <= 0 : window.scrollY > 0;
+      const isPastHero = hero ? hero.getBoundingClientRect().bottom <= 0 : false;
       const isAtFooter = footer ? footer.getBoundingClientRect().top <= window.innerHeight : false;
 
       setIsVisible(isPastHero && !isAtFooter);

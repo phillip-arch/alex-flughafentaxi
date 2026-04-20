@@ -1575,8 +1575,8 @@ const BookingForm = ({
 
   const BookingActionTrustLine = ({ alignWithPrimaryButton = false }: { alignWithPrimaryButton?: boolean }) => (
     <div
-      className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold tracking-[-0.03em] text-[#4b5563] md:text-[13px] ${
-        alignWithPrimaryButton ? 'w-full justify-end text-right md:w-auto md:justify-start md:text-left md:pl-0' : ''
+      className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] font-semibold tracking-[-0.03em] text-[#4b5563] md:justify-start md:text-left md:text-[13px] ${
+        alignWithPrimaryButton ? 'w-full md:w-auto md:pl-0' : ''
       }`}
     >
       <span className="inline-flex items-center gap-1.5 whitespace-nowrap">

@@ -316,9 +316,9 @@ export default function BookingStepTwo({
             />
           </div>
           <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:flex-1 md:basis-auto md:px-2 md:text-center">
-            <p className="whitespace-normal text-[0.9rem] font-medium leading-snug text-[#5f6975] md:text-[1rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
+            <p className="whitespace-nowrap text-[0.9rem] font-medium leading-snug text-[#5f6975] md:whitespace-normal md:text-[1rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
               Max. {inlineVehicleCard.maxPassengers} passengers and{' '}
-              <br />
+              <br className="hidden md:block" />
               {inlineVehicleCard.maxSuitcases} check-in suitcases
             </p>
           </div>
@@ -591,7 +591,7 @@ export default function BookingStepTwo({
       <div className="space-y-3">
         <p className="ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Optional</p>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3 shadow-[0_12px_28px_rgba(15,23,42,0.045)]">
               <div className="min-w-0">
                 <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">Free child seats</p>
