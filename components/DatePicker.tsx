@@ -130,7 +130,7 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate, an
   };
 
   return createPortal(
-    <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-end justify-center px-4 pb-6 pt-10 md:items-center md:pb-10`}>
+    <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-center justify-center px-4 py-10`}>
       <button
         type="button"
         aria-label="Close calendar"

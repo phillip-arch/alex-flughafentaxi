@@ -28,11 +28,11 @@ export default function BookingPriceSummaryCard({
   const vehicleLabel = formatVehicleTypeLabel(vehicleType);
   const paymentLabel =
     formData.paymentMethod === 'cash'
-      ? 'Cash payment'
+      ? 'Cash'
       : formData.paymentMethod === 'card'
         ? 'Credit card'
         : null;
-  const stablePaymentLabel = paymentLabel ?? 'Cash payment';
+  const stablePaymentLabel = paymentLabel ?? 'Cash';
   const PaymentIcon = formData.paymentMethod === 'card' ? CreditCard : Wallet;
   const vehicleImage =
     vehicleType === 'Bus'

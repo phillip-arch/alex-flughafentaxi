@@ -122,7 +122,7 @@ export default function TimePicker({ isOpen, onClose, onSelect, selectedTime, an
   };
 
   return createPortal(
-    <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-end justify-center px-4 pb-6 pt-10 md:items-center md:pb-10`}>
+    <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-center justify-center px-4 py-10`}>
       <button
         type="button"
         aria-label="Close time picker"
@@ -130,7 +130,7 @@ export default function TimePicker({ isOpen, onClose, onSelect, selectedTime, an
         onClick={onClose}
       />
       <div
-        className="relative z-10 w-[9rem] max-w-[calc(100vw-2rem)] rounded-[0.9rem] border border-[#e6e1d7] bg-white p-[0.7rem] shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-bottom-4 duration-200 md:slide-in-from-top-2"
+        className="relative z-10 w-[9rem] max-w-[calc(100vw-2rem)] rounded-[0.9rem] border border-[#e6e1d7] bg-white p-[0.7rem] shadow-[0_16px_34px_rgba(17,17,17,0.14)]"
         style={popoverStyle}
         role="dialog"
         aria-modal="true"

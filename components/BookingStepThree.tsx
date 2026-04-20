@@ -235,7 +235,7 @@ export default function BookingStepThree({
                   : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
             }`}
           >
-            <span className="text-[14px] font-medium md:text-[12px]">Cash payment</span>
+            <span className="text-[14px] font-medium md:text-[12px]">Cash</span>
           </button>
           <button
             type="button"
