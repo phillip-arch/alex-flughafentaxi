@@ -13,8 +13,6 @@ import {
   type StreetOption,
 } from '@/lib/addresses';
 import {
-  PlaneLanding, 
-  PlaneTakeoff, 
   Calendar,
   MapPin, 
   House,
@@ -1199,7 +1197,6 @@ const BookingForm = ({
             }}
             placeholder={copy.streetPlaceholder}
             className={getInputClassName('extraStopStreet')}
-            leadingIcon={<MapPin className="text-[#64748b]" size={18} strokeWidth={2.1} />}
           />
           {streetNumberWarning === 'extraStopStreet' ? (
             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
@@ -1567,8 +1564,8 @@ const BookingForm = ({
   };
 
   const actionRowWithTrustClass =
-    'mt-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-7 [@media(min-width:768px)_and_(max-height:850px)]:mt-3';
-  const actionButtonGroupClass = 'flex w-full items-center gap-3 md:w-auto';
+    'mt-4 flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-7 [@media(min-width:768px)_and_(max-height:850px)]:mt-3';
+  const actionButtonGroupClass = 'flex w-full items-center justify-center gap-3 md:w-auto';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
     'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
@@ -1774,10 +1771,7 @@ const BookingForm = ({
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="mr-[-5px] md:mr-0">
                             <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
-                              <span className="pointer-events-none absolute left-3 top-1/2 inline-flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center text-[#1e293b]">
-                                <PlaneLanding size={18} strokeWidth={2.1} />
-                              </span>
-                              <p className="truncate pl-[1.9rem] pr-12 leading-[1.2] text-[#111111]">
+                              <p className="truncate pr-12 leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
                               </p>
                               {!formData.extraStop ? (
@@ -1816,7 +1810,6 @@ const BookingForm = ({
                               }}
                               placeholder={copy.streetPlaceholder}
                               className={`${getInputClassName('street')} !pr-12`}
-                              leadingIcon={<MapPin className="text-[#1e293b]" size={18} strokeWidth={2.1} />}
                             />
                             {!formData.extraStop ? (
                               <button
@@ -1867,7 +1860,6 @@ const BookingForm = ({
                               }}
                               placeholder={copy.streetPlaceholder}
                               className={`${getInputClassName('street')} !pr-12`}
-                              leadingIcon={<MapPin className="text-[#1F7CFF]" size={18} strokeWidth={2.1} />}
                             />
                             <button
                               type="button"
@@ -1895,10 +1887,7 @@ const BookingForm = ({
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="mr-[-5px] md:mr-0">
                             <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
-                              <span className="pointer-events-none absolute left-3 top-1/2 inline-flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center text-[#1F7CFF]">
-                                <PlaneTakeoff size={18} strokeWidth={2.1} />
-                              </span>
-                              <p className="truncate pl-[1.9rem] pr-12 leading-[1.2] text-[#111111]">
+                              <p className="truncate pr-12 leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
                               </p>
                               <button

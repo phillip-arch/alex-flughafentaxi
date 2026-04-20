@@ -316,7 +316,7 @@ export default function BookingStepTwo({
             />
           </div>
           <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:flex-1 md:basis-auto md:px-2 md:text-center">
-            <p className="whitespace-nowrap text-[0.9rem] font-medium leading-snug text-[#5f6975] md:whitespace-normal md:text-[1rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
+            <p className="whitespace-nowrap text-[clamp(0.68rem,3vw,0.9rem)] font-medium leading-snug tracking-[-0.02em] text-[#5f6975] md:whitespace-normal md:text-[1rem] md:tracking-normal [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
               Max. {inlineVehicleCard.maxPassengers} passengers and{' '}
               <br className="hidden md:block" />
               {inlineVehicleCard.maxSuitcases} check-in suitcases
