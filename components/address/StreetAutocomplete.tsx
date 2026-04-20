@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode, type Ref } from 'react';
 import type { StreetOption } from '@/lib/addresses';
 import { buildStreetOptionValue } from '@/lib/addresses';
 
@@ -16,6 +16,9 @@ type StreetAutocompleteProps = {
   zipHint?: string;
   placeholder: string;
   className: string;
+  leadingIcon?: ReactNode;
+  inputRef?: Ref<HTMLInputElement>;
+  autoFocus?: boolean;
   mobileDropdownFullWidth?: boolean;
   mobileSelectedStreetOnly?: boolean;
   menuItems?: StreetAutocompleteMenuItem[];
@@ -32,6 +35,9 @@ export default function StreetAutocomplete({
   zipHint = '',
   placeholder,
   className,
+  leadingIcon,
+  inputRef,
+  autoFocus,
   mobileDropdownFullWidth = false,
   mobileSelectedStreetOnly = false,
   menuItems = [],
@@ -99,6 +105,7 @@ export default function StreetAutocomplete({
     ? normalizedInputValue || selectedOption.street
     : value || selectedOption?.street || '';
   const displayValue = showMobileSelectedStreetOnly ? mobileDisplayValue : desktopBlurValue;
+  const hasLeadingIcon = Boolean(leadingIcon);
 
   const selectOption = (option: StreetOption) => {
     onSelect(option);
@@ -223,9 +230,16 @@ export default function StreetAutocomplete({
       className="relative"
     >
       <div className="relative">
+        {leadingIcon ? (
+          <span className="pointer-events-none absolute left-3 top-1/2 z-10 inline-flex -translate-y-1/2 text-[#1F7CFF]">
+            {leadingIcon}
+          </span>
+        ) : null}
         <input
+          ref={inputRef}
           type="text"
           value={displayValue}
+          autoFocus={autoFocus}
           onChange={(event) => {
             const nextValue = event.target.value;
             const normalizedNextValue = nextValue.trim().replace(/\s+/g, ' ');
@@ -320,7 +334,7 @@ export default function StreetAutocomplete({
               ? `${listboxId}-option-${activeIndex}`
               : undefined
           }
-          className={`${className} ${mobileSelectedInputClasses} ${
+          className={`${className} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''} ${mobileSelectedInputClasses} ${
             showMobileSelectedSummary
               ? 'text-transparent caret-transparent md:text-inherit md:caret-auto'
               : ''
@@ -328,7 +342,7 @@ export default function StreetAutocomplete({
         />
 
         {showMobileSelectedSummary ? (
-          <div className="pointer-events-none absolute inset-x-0 inset-y-0 flex flex-col justify-center px-[0.6rem] md:hidden">
+          <div className={`pointer-events-none absolute inset-x-0 inset-y-0 flex flex-col justify-center pr-[0.6rem] md:hidden ${hasLeadingIcon ? 'pl-10' : 'pl-[0.6rem]'}`}>
             <span className="truncate text-[18px] font-semibold tracking-[-0.03em] leading-tight text-[#111111]">
               {displayValue}
             </span>

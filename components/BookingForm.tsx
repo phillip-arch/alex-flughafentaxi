@@ -124,10 +124,8 @@ const EMPTY_ACCOUNT_DEFAULTS = {
 };
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
-const ROUTE_MARKER_TOP_OFFSET_CLASS = '-translate-y-1';
-const ROUTE_MARKER_BOTTOM_OFFSET_CLASS = 'translate-y-[3px]';
-const MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'mt-[2.7875rem]';
-const DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS = 'md:mt-[3.45rem]';
+const STEP_ONE_GRID_CLASS =
+  'grid grid-cols-[1.25rem_minmax(0,1fr)_2.75rem] gap-2.5 md:grid-cols-[1.25rem_minmax(0,9fr)_minmax(2rem,1fr)] md:gap-4';
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[#7fb3ff] focus:!bg-white focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-white !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
@@ -184,7 +182,11 @@ const BookingForm = ({
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const datePickerAnchorRef = useRef<HTMLDivElement | null>(null);
   const timePickerAnchorRef = useRef<HTMLDivElement | null>(null);
+  const extraStopInputRef = useRef<HTMLInputElement | null>(null);
+  const extraStopFocusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const extraStopCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
+  const [isExtraStopClosing, setIsExtraStopClosing] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(
     sortFavoriteAddresses(initialFavorites),
@@ -261,6 +263,29 @@ const BookingForm = ({
   useEffect(() => {
     setHasMounted(true);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (extraStopFocusTimeoutRef.current) {
+        clearTimeout(extraStopFocusTimeoutRef.current);
+      }
+      if (extraStopCloseTimeoutRef.current) {
+        clearTimeout(extraStopCloseTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!formData.extraStop || isExtraStopClosing) return;
+
+    if (extraStopFocusTimeoutRef.current) {
+      clearTimeout(extraStopFocusTimeoutRef.current);
+    }
+
+    extraStopFocusTimeoutRef.current = setTimeout(() => {
+      extraStopInputRef.current?.focus({ preventScroll: true });
+    }, 120);
+  }, [formData.extraStop, isExtraStopClosing]);
 
   useEffect(() => {
     if (!openInlineSelect) return;
@@ -912,8 +937,6 @@ const BookingForm = ({
   const handleFlightNumberBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
     handleBlur(e);
 
-    if (formData.direction !== 'from_airport') return;
-
     const lookupFlightNumber = extractLookupFlightNumber(e.target.value);
     if (!lookupFlightNumber) return;
 
@@ -921,6 +944,8 @@ const BookingForm = ({
       setFlightLookupError('Please enter a valid flight number, e.g. OS123.');
       return;
     }
+
+    if (formData.direction !== 'from_airport') return;
 
     const formattedDate = formatSelectedDateForFlightLookup(formData.date);
     if (!formattedDate) {
@@ -979,11 +1004,30 @@ const BookingForm = ({
     handleDirectionChange(nextDirection);
   };
 
-  const toggleExtraStop = () => {
-    setFormData((prev) => ({
-      ...prev,
-      extraStop: !prev.extraStop,
-    }));
+  const openExtraStop = () => {
+    if (extraStopCloseTimeoutRef.current) {
+      clearTimeout(extraStopCloseTimeoutRef.current);
+      extraStopCloseTimeoutRef.current = null;
+    }
+
+    setIsExtraStopClosing(false);
+    setFormData((prev) => (prev.extraStop ? prev : { ...prev, extraStop: true }));
+  };
+
+  const closeExtraStop = () => {
+    if (!formData.extraStop || isExtraStopClosing) return;
+
+    if (extraStopFocusTimeoutRef.current) {
+      clearTimeout(extraStopFocusTimeoutRef.current);
+      extraStopFocusTimeoutRef.current = null;
+    }
+
+    setIsExtraStopClosing(true);
+    extraStopCloseTimeoutRef.current = setTimeout(() => {
+      setFormData((prev) => ({ ...prev, extraStop: false }));
+      setIsExtraStopClosing(false);
+      extraStopCloseTimeoutRef.current = null;
+    }, 280);
   };
 
   const updateStepperValue = (name: StepperFieldName, delta: -1 | 1, min: number, max: number) => {
@@ -1108,18 +1152,36 @@ const BookingForm = ({
     if (!formData.extraStop) return null;
 
     return (
-      <div className="animate-in fade-in slide-in-from-top-2 rounded-[1.35rem] border border-[#dbe7f8] bg-white p-3.5 shadow-[0_10px_28px_rgba(17,17,17,0.04)] duration-300">
-        <div className="mb-3 flex flex-col gap-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1679ff]">
-            Extra stop
-          </p>
-          <p className="text-[12px] text-[#6a7d96]">
-            +10 EUR surcharge for an additional address.
-          </p>
+      <div
+        className={`mt-3 overflow-hidden rounded-[1.35rem] border bg-white shadow-[0_10px_28px_rgba(17,17,17,0.04)] transition-[max-height,opacity,transform,padding,border-color] duration-[280ms] ease-out ${
+          isExtraStopClosing
+            ? 'max-h-0 -translate-y-2 border-transparent p-0 opacity-0'
+            : 'max-h-[18rem] translate-y-0 border-[#dbe7f8] p-3.5 opacity-100'
+        }`}
+      >
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1679ff]">
+              Extra stop
+            </p>
+            <p className="text-[12px] text-[#6a7d96]">
+              +10 EUR surcharge for an additional address.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={closeExtraStop}
+            className="-mr-1 -mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f6fb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
+            aria-label="Remove extra stop"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         <div>
           <StreetAutocomplete
+            inputRef={extraStopInputRef}
+            autoFocus={!isExtraStopClosing}
             value={extraStopStreetInputValue}
             selectedOption={selectedExtraStopStreetOption}
             zipHint={formData.zip}
@@ -1133,6 +1195,7 @@ const BookingForm = ({
             }}
             placeholder={copy.streetPlaceholder}
             className={getInputClassName('extraStopStreet')}
+            leadingIcon={<MapPin className="text-[#64748b]" size={18} strokeWidth={2.1} />}
           />
           {streetNumberWarning === 'extraStopStreet' ? (
             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
@@ -1398,28 +1461,6 @@ const BookingForm = ({
     }
   };
 
-  const handleStepIndicatorClick = (targetStep: number) => {
-    if (targetStep === currentStep) return;
-
-    if (targetStep < currentStep) {
-      setError(null);
-      setCurrentStep(targetStep);
-      requestAnimationFrame(scrollToPageTop);
-      return;
-    }
-
-    for (let step = currentStep; step < targetStep; step += 1) {
-      const isValid = validateStep(step);
-      if (!isValid) {
-        setCurrentStep(step);
-        return;
-      }
-    }
-
-    setCurrentStep(targetStep);
-    requestAnimationFrame(scrollToPageTop);
-  };
-
   const prevStep = () => {
     setError(null);
     setCurrentStep((prev) => prev - 1);
@@ -1522,7 +1563,7 @@ const BookingForm = ({
   };
 
   const actionRowWithTrustClass =
-    'mt-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-4 [@media(min-width:768px)_and_(max-height:850px)]:mt-3';
+    'mt-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-7 [@media(min-width:768px)_and_(max-height:850px)]:mt-3';
   const actionButtonGroupClass = 'flex w-full items-center gap-3 md:w-auto';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
@@ -1546,18 +1587,16 @@ const BookingForm = ({
   );
 
   const StepIndicator = () => (
-    <button
-      type="button"
-      onClick={() => handleStepIndicatorClick(currentStep)}
-      className="inline-flex shrink-0 items-center bg-transparent p-0 text-[0.82rem] font-bold uppercase tracking-[0.22em] text-[#1F7CFF] transition-colors hover:text-[#0f5fcc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:text-[0.95rem]"
+    <span
+      className="inline-flex w-[6.75rem] shrink-0 items-center justify-center text-center text-[12px] font-semibold text-[#1679FF] md:w-[7.35rem] md:text-[0.84rem]"
       aria-current="step"
     >
-      <span>{copy.stepLabel(currentStep)}</span>
-    </button>
+      {copy.stepLabel(currentStep)}
+    </span>
   );
 
   const DateTimeFields = () => (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+    <div className="grid grid-cols-1 gap-3 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
       <div>
         <label className={BOOKING_FIELD_LABEL_CLASS}>Date</label>
         <div ref={datePickerAnchorRef} className="relative mr-[-5px] w-full md:mr-0">
@@ -1653,8 +1692,8 @@ const BookingForm = ({
 
   const shouldShowInfoTrigger = isAppSurface && hasMounted;
   const formContentSpacingClassName = showStepIndicator
-    ? 'px-5 pt-6 pb-6 md:px-7 md:pt-5 md:pb-5 [@media(min-width:768px)_and_(max-height:850px)]:pt-4 [@media(min-width:768px)_and_(max-height:850px)]:pb-4'
-    : 'px-1 pt-2 pb-2 md:px-2 md:pt-3 md:pb-3';
+    ? 'p-6 md:p-8 [@media(min-width:768px)_and_(max-height:850px)]:p-6'
+    : 'p-6 md:p-8 [@media(min-width:768px)_and_(max-height:850px)]:p-6';
   const stepHeaderClassName = 'mb-6 flex justify-center md:mb-7 md:justify-end md:pr-1 [@media(min-width:768px)_and_(max-height:850px)]:mb-4';
   const titleHeaderClassName =
     'mb-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
@@ -1698,24 +1737,29 @@ const BookingForm = ({
                     <p className="text-[12px] text-[#6d7075]">{copy.routeDescription}</p>
                   </div>
                 )}
-              <div className="rounded-[2.2rem] bg-transparent pt-[11px] shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
-                <div className="flex gap-2.5 md:gap-4">
-                  <div className="w-5 shrink-0 md:w-5" aria-hidden="true" />
+              <div className="rounded-[2.2rem] bg-transparent pt-[11px] shadow-none">
+                <div className={STEP_ONE_GRID_CLASS}>
+                  <div aria-hidden="true" />
                   <div className="min-w-0 flex-1">
                     {DateTimeFields()}
                     {FlightDetailsFields()}
                   </div>
-                  <div className="w-10 shrink-0 md:w-8" aria-hidden="true" />
+                  <div className="min-w-0" aria-hidden="true" />
                 </div>
               </div>
-              <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none md:-ml-2 md:pl-3 md:-mr-3 md:pr-0">
-                <div className="flex gap-2.5 md:gap-4">
-                  <div className="flex w-5 shrink-0 flex-col items-center pt-[42px] md:w-5 md:pt-[42px]">
-                    <div className={`${ROUTE_MARKER_TOP_OFFSET_CLASS} flex h-4 w-4 items-center justify-center rounded-full border-[3px] border-[#111111] bg-white`}>
-                      <span className="h-2.5 w-2.5 rounded-full bg-white" />
+              <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none">
+                <div className={STEP_ONE_GRID_CLASS}>
+                  <div className="relative min-h-full" aria-hidden="true">
+                    <div className="absolute bottom-[1.6rem] left-1/2 top-[50px] w-[3px] -translate-x-1/2 bg-[#cfd7e3]" />
+                    <div className="absolute left-1/2 top-[42px] flex h-4 w-4 -translate-x-1/2 items-center justify-center rounded-full border-[3px] border-[#111111] bg-[var(--color-form-bg)]">
+                      <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-form-bg)]" />
                     </div>
-                    <div className="-my-1 h-[68px] w-[3px] bg-[#cfd7e3] md:-my-1 md:h-[68px]" />
-                    <div className={`${ROUTE_MARKER_BOTTOM_OFFSET_CLASS} flex h-[21px] w-[21px] items-center justify-center rounded-full bg-[#e8f1ff]`}>
+                    {formData.extraStop ? (
+                      <div className="absolute left-1/2 top-[9.9rem] flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center rounded-full border border-[#9ca3af] bg-white shadow-[0_0_0_5px_var(--color-form-bg)]">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#9ca3af]" />
+                      </div>
+                    ) : null}
+                    <div className="absolute bottom-[0.95rem] left-1/2 flex h-[21px] w-[21px] -translate-x-1/2 items-center justify-center rounded-full bg-[#e8f1ff]">
                       <span className="h-[11.5px] w-[11.5px] rounded-full bg-[#1f7cff]" />
                     </div>
                   </div>
@@ -1726,15 +1770,16 @@ const BookingForm = ({
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="mr-[-5px] md:mr-0">
-                            <div className={`flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
-                              <span className="mr-2 inline-flex shrink-0 text-[#111111]">
+                            <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
+                              <span className="pointer-events-none absolute left-3 top-1/2 inline-flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center text-[#1e293b]">
                                 <PlaneLanding size={18} strokeWidth={2.1} />
                               </span>
-                              <p className="leading-[1.2] text-[#111111]">
+                              <p className="pl-[1.9rem] leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
                               </p>
                             </div>
                           </div>
+                          {renderExtraStopPanel()}
                         </div>
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
@@ -1755,6 +1800,7 @@ const BookingForm = ({
                               }}
                               placeholder={copy.streetPlaceholder}
                               className={getInputClassName('street')}
+                              leadingIcon={<MapPin className="text-[#1e293b]" size={18} strokeWidth={2.1} />}
                             />
                           </div>
                           {streetNumberWarning === 'street' ? (
@@ -1792,6 +1838,7 @@ const BookingForm = ({
                               }}
                               placeholder={copy.streetPlaceholder}
                               className={getInputClassName('street')}
+                              leadingIcon={<MapPin className="text-[#1F7CFF]" size={18} strokeWidth={2.1} />}
                             />
                           </div>
                           {streetNumberWarning === 'street' ? (
@@ -1804,16 +1851,15 @@ const BookingForm = ({
                               Address could not be recognized clearly. Please choose from the list.
                             </div>
                           ) : null}
-                          {renderExtraStopPanel()}
                         </div>
                       ) : (
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="mr-[-5px] md:mr-0">
-                            <div className={`flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
-                              <span className="mr-2 inline-flex shrink-0 text-[#111111]">
+                            <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
+                              <span className="pointer-events-none absolute left-3 top-1/2 inline-flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center text-[#1F7CFF]">
                                 <PlaneTakeoff size={18} strokeWidth={2.1} />
                               </span>
-                              <p className="leading-[1.2] text-[#111111]">
+                              <p className="pl-[1.9rem] leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
                               </p>
                             </div>
@@ -1822,22 +1868,24 @@ const BookingForm = ({
                       )}
                     </div>
                   </div>
-                  <div className="flex shrink-0 flex-col justify-start pt-[1.75rem]">
-                    <button
-                      type="button"
-                      onClick={toggleExtraStop}
-                      className="inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
-                      aria-label={copy.addStopLabel}
-                    >
-                      <Plus size={19} className="-translate-x-[2px]" />
-                    </button>
+                  <div className="relative min-w-0">
+                    {!formData.extraStop ? (
+                      <button
+                        type="button"
+                        onClick={openExtraStop}
+                        className="absolute left-1/2 top-[1.75rem] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
+                        aria-label={copy.addStopLabel}
+                      >
+                        <Plus size={19} />
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={toggleDirection}
-                      className={`${MOBILE_DIRECTION_SWITCH_MARGIN_TOP_CLASS} ${DESKTOP_DIRECTION_SWITCH_MARGIN_TOP_CLASS} inline-flex h-10 w-10 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8`}
+                      className="absolute bottom-[0.65rem] left-1/2 inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:bottom-[0.95rem] md:h-8 md:w-8"
                       aria-label={copy.swapRouteLabel}
                     >
-                      <ArrowUpDown size={19} className="-translate-x-[2px]" />
+                      <ArrowUpDown size={19} />
                     </button>
                   </div>
                 </div>
@@ -1873,6 +1921,7 @@ const BookingForm = ({
               onVehicleUpgrade={handleVehicleUpgrade}
               onTravelDetailsConfirm={handleTravelDetailsConfirm}
               handleMeetAndGreetChange={handleMeetAndGreetChange}
+              handleNotesChange={handleNotesChange}
               error={error}
               isFieldInvalid={isFieldInvalid}
               updateStepperValue={updateStepperValue}
@@ -1896,7 +1945,6 @@ const BookingForm = ({
               loading={loading}
               handleBookingForMyselfToggle={handleBookingForMyselfToggle}
               handleChange={handleChange}
-              handleNotesChange={handleNotesChange}
               handleBlur={handleBlur}
               getInputClassName={getInputClassName}
               handlePaymentChange={handlePaymentChange}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import { Armchair, Baby, Briefcase, ChevronLeft, Minus, Plus, ShieldCheck, ShoppingBag, Users, X } from 'lucide-react';
+import { Armchair, Baby, Briefcase, ChevronLeft, Minus, NotebookPen, Plus, ShieldCheck, ShoppingBag, Users, X } from 'lucide-react';
 import { formatVehicleTypeLabel, type VehicleType } from '@/lib/pricing';
 import AnimatedPrice from './AnimatedPrice';
 import { BOOKING_OVERLAY_BACKDROP_CLASS } from './bookingOverlayStyles';
@@ -23,6 +23,7 @@ type BookingStepTwoProps = {
   onVehicleUpgrade: (nextVehicleType: VehicleType) => void;
   onTravelDetailsConfirm: (selectedVehicleType: VehicleType) => void;
   handleMeetAndGreetChange: (checked: boolean) => void;
+  handleNotesChange: (notes: string) => void;
   error: string | null;
   isFieldInvalid: (name: any) => boolean;
   updateStepperValue: (name: any, delta: -1 | 1, min: number, max: number) => void;
@@ -42,6 +43,7 @@ export default function BookingStepTwo({
   onVehicleUpgrade,
   onTravelDetailsConfirm,
   handleMeetAndGreetChange,
+  handleNotesChange,
   error,
   isFieldInvalid,
   updateStepperValue,
@@ -55,9 +57,12 @@ export default function BookingStepTwo({
 }: BookingStepTwoProps) {
   const [isTravelSheetOpen, setIsTravelSheetOpen] = useState(false);
   const [isChildSeatSheetOpen, setIsChildSeatSheetOpen] = useState(false);
+  const [isNoteSheetOpen, setIsNoteSheetOpen] = useState(false);
   const [activeTravelVehicleType, setActiveTravelVehicleType] = useState<VehicleType | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [draftNotes, setDraftNotes] = useState(formData.notes || '');
   const childSeatTotal = formData.babySeats + formData.childSeats + formData.boosterSeats;
+  const hasDriverNote = Boolean(formData.notes?.trim());
   const hasSelectedTravelDetails = Boolean(formData.travelDetailsSelected);
   const travelSummaryInvalid =
     isFieldInvalid('passengers') || isFieldInvalid('luggage') || isFieldInvalid('handLuggage');
@@ -97,7 +102,13 @@ export default function BookingStepTwo({
   }, []);
 
   useEffect(() => {
-    if (!isTravelSheetOpen && !isChildSeatSheetOpen) return;
+    if (isNoteSheetOpen) {
+      setDraftNotes(formData.notes || '');
+    }
+  }, [isNoteSheetOpen, formData.notes]);
+
+  useEffect(() => {
+    if (!isTravelSheetOpen && !isChildSeatSheetOpen && !isNoteSheetOpen) return;
 
     const scrollY = window.scrollY;
     const originalBodyOverflow = document.body.style.overflow;
@@ -109,6 +120,7 @@ export default function BookingStepTwo({
       if (event.key === 'Escape') {
         setIsTravelSheetOpen(false);
         setIsChildSeatSheetOpen(false);
+        setIsNoteSheetOpen(false);
       }
     };
 
@@ -125,7 +137,12 @@ export default function BookingStepTwo({
       document.body.style.width = originalBodyWidth;
       window.scrollTo(0, scrollY);
     };
-  }, [isTravelSheetOpen, isChildSeatSheetOpen]);
+  }, [isTravelSheetOpen, isChildSeatSheetOpen, isNoteSheetOpen]);
+
+  const saveDriverNote = () => {
+    handleNotesChange(draftNotes);
+    setIsNoteSheetOpen(false);
+  };
 
   const renderSheetStepper = (
     name: 'passengers' | 'luggage' | 'handLuggage' | 'babySeats' | 'childSeats' | 'boosterSeats',
@@ -298,7 +315,7 @@ export default function BookingStepTwo({
               sizes="(min-width: 768px) 194px, 146px"
             />
           </div>
-          <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:flex-1 md:basis-auto md:px-2">
+          <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:flex-1 md:basis-auto md:px-2 md:text-center">
             <p className="whitespace-normal text-[0.9rem] font-medium leading-snug text-[#5f6975] md:text-[1rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
               Max. {inlineVehicleCard.maxPassengers} passengers and{' '}
               <br />
@@ -525,73 +542,139 @@ export default function BookingStepTwo({
         )
       : null;
 
+  const noteSheet =
+    isNoteSheetOpen && isMounted
+      ? createPortal(
+          <div
+            className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[10000] flex items-end px-0 md:items-center md:justify-center md:px-4`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Driver note"
+          >
+            <button
+              type="button"
+              aria-label="Close driver note"
+              className="absolute inset-0 h-full w-full cursor-default"
+              onClick={() => setIsNoteSheetOpen(false)}
+            />
+            <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[32rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
+              <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
+              {renderSheetHeader(
+                'Note for the driver',
+                'Add pickup details, luggage notes, or anything the driver should know.',
+                () => setIsNoteSheetOpen(false),
+              )}
+              <textarea
+                value={draftNotes}
+                onChange={(event) => setDraftNotes(event.target.value)}
+                rows={5}
+                placeholder="Add your note here"
+                className="ui-field-surface w-full resize-none rounded-[var(--radius-field)] border border-[#d2d2d7] p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none transition-all focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]"
+              />
+              <button
+                type="button"
+                onClick={saveDriverNote}
+                className="mt-4 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[#1F7CFF] text-[1rem] font-semibold text-white transition-colors hover:bg-[#176be0]"
+              >
+                Save
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {renderInlineTravelDetails()}
 
       <div className="space-y-3">
         <p className="ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Optional</p>
-        <div className={canUseMeetAndGreet ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1 gap-4'}>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3 shadow-[0_12px_28px_rgba(15,23,42,0.045)]">
+              <div className="min-w-0">
+                <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">Free child seats</p>
+                <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">Infant, toddler or booster seats.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsChildSeatSheetOpen(true)}
+                className="inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1F7CFF] transition-colors hover:bg-[#e1eeff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
+                aria-haspopup="dialog"
+                aria-expanded={isChildSeatSheetOpen}
+              >
+                + {childSeatTotal > 0 ? 'Edit' : 'Add'}
+              </button>
+              {childSeatTotal > 0 ? (
+                <p className="sr-only">
+                  {[
+                    formData.babySeats > 0 ? `${formData.babySeats} baby` : null,
+                    formData.childSeats > 0 ? `${formData.childSeats} child` : null,
+                    formData.boosterSeats > 0 ? `${formData.boosterSeats} booster` : null,
+                  ].filter(Boolean).join(', ')}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3 shadow-[0_12px_28px_rgba(15,23,42,0.045)]">
+              <div className="min-w-0">
+                <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+                  Note for driver
+                </p>
+                <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">
+                  {hasDriverNote ? 'Driver note added.' : 'Pickup details or requests.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNoteSheetOpen(true)}
+                className="inline-flex h-10 shrink-0 items-center justify-center gap-1 rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1F7CFF] transition-colors hover:bg-[#e1eeff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
+                aria-haspopup="dialog"
+                aria-expanded={isNoteSheetOpen}
+              >
+                <NotebookPen size={15} strokeWidth={2.2} />
+                {hasDriverNote ? 'Edit' : 'Add'}
+              </button>
+            </div>
+          </div>
+
           {canUseMeetAndGreet ? (
-            <button
-              type="button"
-              onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
-              className={`flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border bg-white px-4 py-3 text-left shadow-[0_12px_28px_rgba(15,23,42,0.045)] transition-colors hover:border-[#7fb3ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 ${
+            <div
+              className={`flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border bg-white px-4 py-3 text-left shadow-[0_12px_28px_rgba(15,23,42,0.045)] ${
                 formData.meetAndGreet ? 'border-[#7fb3ff]' : 'border-[#dbe7f8]'
               }`}
-              aria-pressed={Boolean(formData.meetAndGreet)}
             >
-              <span className="min-w-0">
-                <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+              <div className="min-w-0">
+                <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
                   Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
-                </span>
-                <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
+                </p>
+                <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">
                   Driver waits inside arrivals with a name sign.
-                </span>
-              </span>
-              <span
-                className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors ${
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
+                className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 ${
                   formData.meetAndGreet ? 'bg-[#1F7CFF]' : 'bg-[#e9edf3]'
                 }`}
-                aria-hidden="true"
+                aria-pressed={Boolean(formData.meetAndGreet)}
+                aria-label="Toggle Meet and Greet"
               >
                 <span
-                  className={`absolute top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white shadow-[0_2px_8px_rgba(15,23,42,0.16)] transition-transform ${
-                    formData.meetAndGreet ? 'translate-x-[1.45rem]' : 'translate-x-[0.25rem]'
+                  className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white shadow-[0_2px_8px_rgba(15,23,42,0.16)] transition-transform ${
+                    formData.meetAndGreet ? 'translate-x-[1.2rem]' : 'translate-x-0'
                   }`}
                 />
-              </span>
-            </button>
-          ) : null}
-
-          <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3 shadow-[0_12px_28px_rgba(15,23,42,0.045)]">
-            <div className="min-w-0">
-              <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">Free child seats</p>
-              <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">Infant, toddler or booster seats.</p>
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsChildSeatSheetOpen(true)}
-              className="inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1F7CFF] transition-colors hover:bg-[#e1eeff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
-              aria-haspopup="dialog"
-              aria-expanded={isChildSeatSheetOpen}
-            >
-              + {childSeatTotal > 0 ? 'Edit' : 'Add'}
-            </button>
-            {childSeatTotal > 0 ? (
-              <p className="sr-only">
-                {[
-                  formData.babySeats > 0 ? `${formData.babySeats} baby` : null,
-                  formData.childSeats > 0 ? `${formData.childSeats} child` : null,
-                  formData.boosterSeats > 0 ? `${formData.boosterSeats} booster` : null,
-                ].filter(Boolean).join(', ')}
-              </p>
-            ) : null}
-          </div>
+          ) : null}
         </div>
       </div>
 
       {childSeatSheet}
+      {noteSheet}
 
       {error ? (
         <div className="mt-4 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8]">

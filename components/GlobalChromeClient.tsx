@@ -1,11 +1,7 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
-
-const FloatingContactButton = dynamic(() => import('@/components/FloatingContactButton'), {
-  ssr: false,
-});
+import FloatingContactButton from '@/components/FloatingContactButton';
 
 export default function GlobalChromeClient({ surface }: { surface: 'www' | 'app' | 'dispatch' }) {
   const pathname = usePathname();

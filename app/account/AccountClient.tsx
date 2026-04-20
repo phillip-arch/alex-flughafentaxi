@@ -579,7 +579,7 @@ export default function AccountClient({
   }, [activeTab, bookingsLoaded, bookingsLoading]);
 
   return (
-    <div suppressHydrationWarning className="bg-[#f7f9fc] pb-28 pt-[30px] md:pb-14 md:pt-0">
+    <div suppressHydrationWarning className="bg-[var(--color-page-bg)] pb-28 pt-[30px] md:pb-14 md:pt-0">
       <div className="app-container">
         <div className={`${accountShellClass} space-y-6`}>
           {activeTab === 'start' ? (
@@ -628,7 +628,7 @@ export default function AccountClient({
             <section className="space-y-6">
               <div className="grid items-start gap-6 md:grid-cols-2">
                 <section className="order-1 min-w-0 self-start md:sticky md:top-6">
-                  <div className="ui-card-surface-light">
+                  <div className="w-full">
                     <BookingForm
                       onDirectionChange={setBookingDirection}
                       meetAndGreetSelected={meetAndGreet}

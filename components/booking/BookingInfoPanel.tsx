@@ -102,8 +102,8 @@ export function BookingInfoPanel({
       <div className={`${isBookVariant ? 'mt-7 rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'mt-4 rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`}>
         <p className={`${isBookVariant ? 'text-[1rem] uppercase tracking-[0.04em] text-[#1679FF]' : 'text-sm text-[var(--color-text)]'} font-semibold`}>Minimum booking lead time</p>
         <div className={`${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-1 text-sm leading-6'} text-[#64748b]`}>
-          <p>22:00 - 07:00: book at least 3h in advance</p>
-          <p>07:00 - 22:00: book at least 8h in advance</p>
+          <p>07:00 - 22:00: book at least 3h in advance</p>
+          <p>22:00 - 07:00: book at least 8h in advance</p>
         </div>
       </div>
 

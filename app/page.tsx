@@ -2,14 +2,20 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
+  Baby,
   Check,
   ChevronDown,
   ChevronRight,
   Briefcase,
+  CreditCard,
+  Hourglass,
   Info,
   MapPin,
   Phone,
+  ShieldCheck,
   ShoppingBag,
+  Star,
+  Wifi,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
@@ -213,15 +219,40 @@ const vehicleCategoryHighlights = [
 const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
-  'mx-auto mt-[16px] max-w-[24ch] text-center text-[30px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:mt-4 md:max-w-none md:text-[40px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor]';
+  'mx-auto mt-[16px] max-w-[24ch] text-center text-[30px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:mt-4 md:max-w-none md:text-[40px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor] lg:mx-0 lg:text-left';
 const heroGridClass =
-  'grid gap-[4.375rem] lg:grid-cols-[0.94fr_0.78fr] lg:items-stretch lg:gap-10';
-const heroBookingColumnClass = 'mt-10 text-center lg:mt-12 lg:text-left';
+  'grid items-start gap-10 lg:grid-cols-[0.98fr_0.72fr] lg:items-stretch lg:gap-20 xl:gap-24';
+const heroBookingColumnClass = 'mt-10 self-start text-left lg:mt-12';
 const heroBookingCardClass =
-  'relative flex min-h-[31.5rem] flex-col overflow-visible rounded-[1.6rem] border border-[#eef2f8] bg-white p-[20px_16px_20px] text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] md:min-h-0 md:rounded-[2rem] md:p-[20px_20px_20px] lg:pb-[59px]';
-const heroBookingHeaderClass =
-  'mb-[10px] flex min-h-[4.65rem] flex-col items-center gap-3 text-center sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
+  'relative mt-8 w-full max-w-[46rem] text-left md:mt-10';
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
+
+const heroBenefitCards = [
+  {
+    title: 'Child Seats',
+    description: 'Free on request',
+    icon: Baby,
+    iconClassName: 'text-[#f59e0b]',
+  },
+  {
+    title: 'Free WiFi',
+    description: 'In all vehicles',
+    icon: Wifi,
+    iconClassName: 'text-[#1F7CFF]',
+  },
+  {
+    title: 'All Payments',
+    description: 'Cash, card, Apple Pay',
+    icon: CreditCard,
+    iconClassName: 'text-[#1679FF]',
+  },
+  {
+    title: 'Flight Tracking',
+    description: 'We adjust for delays',
+    icon: ShieldCheck,
+    iconClassName: 'text-[#1F7CFF]',
+  },
+] as const;
 
 const vehicleCategories: VehicleCategory[] = [
   {
@@ -506,17 +537,10 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
 
 function HeroBookingCard() {
   return (
-    <div id="hero-booking" className="relative w-full max-w-[42rem]">
-      <div className="absolute -left-6 top-10 hidden h-24 w-24 rounded-full bg-[#0a63ff]/14 blur-3xl lg:block" />
+    <div id="hero-booking" className="relative w-full max-w-[46rem]">
       <div className={heroBookingCardClass}>
-        <div className={heroBookingHeaderClass}>
-          <span className="shrink-0 self-center rounded-full border border-[#d6e4ff] bg-[#edf4ff] px-[10px] py-[6px] text-center text-[12px] font-semibold text-[#1679FF] md:px-3.5 md:py-2 md:text-[0.84rem] sm:ml-auto sm:self-auto lg:mr-[6px]">
-            Step 1 of 3
-          </span>
-        </div>
-
         <div className="min-h-0 lg:flex-1 lg:min-h-0">
-          <BookingForm showStepIndicator={false} heroEnglishCopy />
+          <BookingForm heroEnglishCopy />
         </div>
       </div>
     </div>
@@ -525,34 +549,52 @@ function HeroBookingCard() {
 
 function HeroImageCard() {
   return (
-    <div className="relative mx-auto w-full max-w-[35rem] lg:mt-12 lg:h-[calc(100%-3rem)]">
-      <div className="flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-[#eef2f8] bg-white shadow-[0_28px_80px_rgba(17,17,17,0.08)] md:rounded-[2rem]">
-        <div className="relative h-[13.5rem] md:h-[20.5rem] lg:min-h-0 lg:flex-1">
-          <Image
-            src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
-            alt="Alex Flughafentaxi Wien"
-            fill
-            priority
-            fetchPriority="high"
-            quality={72}
-            className="object-cover"
-            sizes="(min-width: 1024px) 35rem, (min-width: 768px) 46vw, 92vw"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(17,17,17,0.08)_100%)]" />
-        </div>
+    <div className="relative mx-auto flex h-full w-full max-w-[35rem] flex-col lg:mt-12">
+      <div className="relative h-[17rem] overflow-hidden rounded-[1.9rem] shadow-[0_30px_80px_rgba(15,23,42,0.13)] md:h-[22rem] md:rounded-[2.25rem]">
+        <Image
+          src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
+          alt="Alex Flughafentaxi Wien"
+          fill
+          priority
+          fetchPriority="high"
+          quality={72}
+          className="object-cover"
+          sizes="(min-width: 1024px) 35rem, (min-width: 768px) 46vw, 92vw"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(15,23,42,0.12)_100%)]" />
+      </div>
 
-        <div className="grid grid-cols-1 border-t border-[#e8eef7] md:grid-cols-2">
-          <div className="px-4 py-4 md:px-5">
-            <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Vienna</p>
-            <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">Book quickly. Fixed price guaranteed.</p>
-          </div>
-          <div className="border-t border-[#e8eef7] px-4 py-4 md:border-l md:border-t-0 md:px-5">
-            <p className="text-[1rem] font-black tracking-[-0.04em] text-[#111111]">Airport</p>
-            <p className="mt-2 text-[0.9rem] leading-[1.5] text-[#62738a]">
-              On-time pickup at Vienna Airport (VIE).
+      <div className="absolute left-4 top-5 z-10 inline-flex items-center gap-3 rounded-[1.15rem] bg-white px-4 py-3 text-[#0f172a] shadow-[0_18px_40px_rgba(15,23,42,0.14)] md:-left-6 md:top-7 md:px-5">
+        <Star size={18} className="fill-[#eab308] text-[#eab308]" strokeWidth={2.2} />
+        <span className="text-[1rem] font-black tracking-[-0.03em] md:text-[1.05rem]">
+          4.9/5 Rating
+        </span>
+      </div>
+
+      <div className="absolute right-4 top-[13.5rem] z-10 inline-flex items-center gap-3 rounded-[1.15rem] bg-white px-4 py-3 text-[#0f172a] shadow-[0_18px_40px_rgba(15,23,42,0.14)] md:-right-5 md:top-[16.5rem] md:px-5">
+        <Hourglass size={18} className="text-[#38bdf8]" strokeWidth={2.2} />
+        <span className="text-[1rem] font-black tracking-[-0.03em] md:text-[1.05rem]">
+          60m Free Waiting
+        </span>
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-10">
+        {heroBenefitCards.map(({ title, description, icon: Icon, iconClassName }) => (
+          <div
+            key={title}
+            className="rounded-[1.35rem] border border-[#dfe7f2] bg-[#f8fbff]/70 px-5 py-5 shadow-[0_8px_24px_rgba(15,23,42,0.035)]"
+          >
+            <div className="flex items-center gap-2.5">
+              <Icon size={18} className={iconClassName} strokeWidth={2.25} />
+              <p className="text-[1rem] font-black leading-tight tracking-[-0.035em] text-[#0f172a]">
+                {title}
+              </p>
+            </div>
+            <p className="mt-3 text-[0.92rem] leading-6 text-[#64748b]">
+              {description}
             </p>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
@@ -572,18 +614,15 @@ export default async function Home({
       <Navbar />
       <main>
 
-      <section id="hero" className="relative overflow-hidden bg-white text-[var(--color-text)]">
+      <section id="hero" className="relative overflow-hidden bg-[var(--color-page-bg)] text-[var(--color-text)]">
         <div className={heroSectionPaddingClass}>
           <div className="mx-auto max-w-[104rem]">
-            <div className="text-center">
-              <h1 className={heroHeadlineClass}>
-                <span className="block">Vienna Airport Taxi:</span>
-                <span className="block">Fixed-Price Transfers</span>
-              </h1>
-            </div>
-
             <div className={heroGridClass}>
               <div className={heroBookingColumnClass}>
+                <h1 className={heroHeadlineClass}>
+                  <span className="block">Vienna Airport Taxi:</span>
+                  <span className="block">Fixed-Price Transfers</span>
+                </h1>
                 <HeroBookingCard />
               </div>
 
@@ -593,7 +632,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="bg-white pt-20 pb-14 md:pt-24 md:pb-18">
+      <section className="bg-[var(--color-page-bg)] pt-20 pb-14 md:pt-24 md:pb-18">
         <div className="app-container">
           <div className="mx-auto max-w-[104rem]">
             <div className="grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-12">
@@ -668,7 +707,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="section-shell-tight-top bg-white">
+      <section className="section-shell-tight-top bg-[var(--color-page-bg)]">
         <div className="app-container">
           <div className="mx-auto max-w-[104rem]">
             <SectionIntro
@@ -700,7 +739,7 @@ export default async function Home({
 
       <PriceTable />
 
-      <section className="bg-white py-8 md:py-10">
+      <section className="bg-[var(--color-page-bg)] py-8 md:py-10">
         <div className="app-container">
           <div className="mx-auto max-w-[104rem]">
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
@@ -824,7 +863,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="bg-white py-14 md:py-18">
+      <section className="bg-[var(--color-page-bg)] py-14 md:py-18">
         <div className="app-container">
           <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)] lg:items-center lg:gap-10">
             <div className="max-w-[44rem]">
@@ -857,7 +896,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="section-shell-tight-top bg-white">
+      <section className="section-shell-tight-top bg-[var(--color-page-bg)]">
         <div className="app-container">
           <div className={homepageSectionWidthClass}>
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
@@ -911,7 +950,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="bg-white py-8 md:py-10">
+      <section className="bg-[var(--color-page-bg)] py-8 md:py-10">
         <div className="app-container">
           <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
             <SectionIntro
@@ -947,7 +986,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="bg-white py-8 md:py-10">
+      <section className="bg-[var(--color-page-bg)] py-8 md:py-10">
         <div className="app-container">
           <div className={homepageSectionWidthClass}>
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
@@ -983,7 +1022,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="section-shell-tight-top bg-white">
+      <section className="section-shell-tight-top bg-[var(--color-page-bg)]">
         <div className="app-container">
           <div className="ui-card-surface-light overflow-hidden lg:grid lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">
             <div className="px-6 py-7 md:px-8 md:py-8">
@@ -1032,7 +1071,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section id="faq" className="bg-white py-14 md:py-18">
+      <section id="faq" className="bg-[var(--color-page-bg)] py-14 md:py-18">
         <div className="app-container">
           <div className={homepageSectionWidthClass}>
             <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
@@ -1073,7 +1112,7 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="bg-white py-14 md:py-18">
+      <section className="bg-[var(--color-page-bg)] py-14 md:py-18">
         <div className="app-container">
           <div className="ui-card-surface-light px-6 py-7 md:px-8 md:py-8">
             <SectionIntro
