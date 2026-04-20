@@ -21,6 +21,7 @@ type StreetAutocompleteProps = {
   autoFocus?: boolean;
   mobileDropdownFullWidth?: boolean;
   mobileSelectedStreetOnly?: boolean;
+  mobileTrailingAction?: boolean;
   menuItems?: StreetAutocompleteMenuItem[];
   onChange: (value: string) => void;
   onSelect: (option: StreetOption) => void;
@@ -40,6 +41,7 @@ export default function StreetAutocomplete({
   autoFocus,
   mobileDropdownFullWidth = false,
   mobileSelectedStreetOnly = false,
+  mobileTrailingAction = false,
   menuItems = [],
   onChange,
   onSelect,
@@ -342,7 +344,7 @@ export default function StreetAutocomplete({
         />
 
         {showMobileSelectedSummary ? (
-          <div className={`pointer-events-none absolute inset-x-0 inset-y-0 flex flex-col justify-center pr-[0.6rem] md:hidden ${hasLeadingIcon ? 'pl-10' : 'pl-[0.6rem]'}`}>
+          <div className={`pointer-events-none absolute inset-x-0 inset-y-0 flex flex-col justify-center md:hidden ${mobileTrailingAction ? 'pr-12' : 'pr-[0.6rem]'} ${hasLeadingIcon ? 'pl-10' : 'pl-[0.6rem]'}`}>
             <span className="truncate text-[18px] font-semibold tracking-[-0.03em] leading-tight text-[#111111]">
               {displayValue}
             </span>

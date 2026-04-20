@@ -6,7 +6,7 @@ type BookingTrustPillsProps = {
 };
 
 const BOOKING_TRUST_ITEMS = [
-  'Fixed price guaranteed',
+  'Fixed price',
   'On-time pickup',
   'Reliable service',
 ] as const;

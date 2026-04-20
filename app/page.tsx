@@ -121,7 +121,7 @@ const whyUsItems = [
 ];
 
 const transferFeatureRows = [
-  'Fixed price guaranteed',
+  'Fixed price',
   'Direct pickup',
   'On-time transfer',
   'Comfortable vehicles',
@@ -217,7 +217,7 @@ const vehicleCategoryHighlights = [
 ];
 
 const heroSectionPaddingClass =
-  'app-container relative pb-10 pt-[calc(66px+48px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
+  'app-container relative pb-10 pt-[calc(66px+18px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
 const heroHeadlineClass =
   'mx-auto mt-[16px] max-w-[24ch] text-center text-[30px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:mt-4 md:max-w-none md:text-[40px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor] lg:mx-0 lg:text-left';
 const heroGridClass =

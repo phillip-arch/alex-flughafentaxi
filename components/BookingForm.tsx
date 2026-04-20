@@ -18,10 +18,10 @@ import {
   Calendar,
   MapPin, 
   House,
+  Check,
   ChevronRight, 
   ChevronLeft, 
   Clock,
-  CheckCircle2,
   Building2,
   ArrowUpDown,
   Info,
@@ -125,7 +125,11 @@ const EMPTY_ACCOUNT_DEFAULTS = {
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
 const STEP_ONE_GRID_CLASS =
-  'grid grid-cols-[1.25rem_minmax(0,1fr)_2.75rem] gap-2.5 md:grid-cols-[1.25rem_minmax(0,9fr)_minmax(2rem,1fr)] md:gap-4';
+  'grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2.5 md:gap-4';
+const FIELD_ACTION_BUTTON_CLASS =
+  'group absolute right-1 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center focus-visible:outline-none';
+const FIELD_ACTION_BUTTON_ICON_CLASS =
+  'inline-flex h-7 w-8 items-center justify-center rounded-[0.65rem] bg-[#edf4ff] text-[#1F7CFF] transition-colors duration-150 group-hover:bg-[#1F7CFF] group-hover:text-white group-focus-visible:bg-[#1F7CFF] group-focus-visible:text-white group-focus-visible:ring-2 group-focus-visible:ring-[#7fb3ff] group-focus-visible:ring-offset-2';
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[#7fb3ff] focus:!bg-white focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-white !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
@@ -1576,11 +1580,11 @@ const BookingForm = ({
       }`}
     >
       <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-        <CheckCircle2 size={15} className="text-[#111827]" strokeWidth={2.4} />
-        Fixed price guaranteed
+        <Check size={15} className="text-[#111827]" strokeWidth={2.6} />
+        Fixed price
       </span>
       <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-        <CheckCircle2 size={15} className="text-[#111827]" strokeWidth={2.4} />
+        <Check size={15} className="text-[#111827]" strokeWidth={2.6} />
         On-time pickup
       </span>
     </div>
@@ -1744,7 +1748,6 @@ const BookingForm = ({
                     {DateTimeFields()}
                     {FlightDetailsFields()}
                   </div>
-                  <div className="min-w-0" aria-hidden="true" />
                 </div>
               </div>
               <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none">
@@ -1774,9 +1777,21 @@ const BookingForm = ({
                               <span className="pointer-events-none absolute left-3 top-1/2 inline-flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center text-[#1e293b]">
                                 <PlaneLanding size={18} strokeWidth={2.1} />
                               </span>
-                              <p className="pl-[1.9rem] leading-[1.2] text-[#111111]">
+                              <p className="truncate pl-[1.9rem] pr-12 leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
                               </p>
+                              {!formData.extraStop ? (
+                                <button
+                                  type="button"
+                                  onClick={openExtraStop}
+                                  className={FIELD_ACTION_BUTTON_CLASS}
+                                  aria-label={copy.addStopLabel}
+                                >
+                                  <span className={FIELD_ACTION_BUTTON_ICON_CLASS}>
+                                    <Plus size={18} strokeWidth={2.5} />
+                                  </span>
+                                </button>
+                              ) : null}
                             </div>
                           </div>
                           {renderExtraStopPanel()}
@@ -1784,12 +1799,13 @@ const BookingForm = ({
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
-                          <div className="mr-[-5px] md:mr-0">
+                          <div className="relative mr-[-5px] md:mr-0">
                             <StreetAutocomplete
                               value={streetInputValue}
                               selectedOption={selectedStreetOption}
                               mobileDropdownFullWidth
                               mobileSelectedStreetOnly
+                              mobileTrailingAction
                               menuItems={favoriteMenuItems}
                               onChange={(value) => clearStreetSelection('street', value)}
                               onSelect={(option) => applyStreetSelection('street', option)}
@@ -1799,9 +1815,21 @@ const BookingForm = ({
                                 handleBlur({} as React.FocusEvent<HTMLInputElement>);
                               }}
                               placeholder={copy.streetPlaceholder}
-                              className={getInputClassName('street')}
+                              className={`${getInputClassName('street')} !pr-12`}
                               leadingIcon={<MapPin className="text-[#1e293b]" size={18} strokeWidth={2.1} />}
                             />
+                            {!formData.extraStop ? (
+                              <button
+                                type="button"
+                                onClick={openExtraStop}
+                                className={FIELD_ACTION_BUTTON_CLASS}
+                                aria-label={copy.addStopLabel}
+                              >
+                                <span className={FIELD_ACTION_BUTTON_ICON_CLASS}>
+                                  <Plus size={18} strokeWidth={2.5} />
+                                </span>
+                              </button>
+                            ) : null}
                           </div>
                           {streetNumberWarning === 'street' ? (
                             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
@@ -1822,12 +1850,13 @@ const BookingForm = ({
                       <p className={BOOKING_FIELD_LABEL_CLASS}>{copy.destinationLabel}</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
-                          <div className="mr-[-5px] md:mr-0">
+                          <div className="relative mr-[-5px] md:mr-0">
                             <StreetAutocomplete
                               value={streetInputValue}
                               selectedOption={selectedStreetOption}
                               mobileDropdownFullWidth
                               mobileSelectedStreetOnly
+                              mobileTrailingAction
                               menuItems={favoriteMenuItems}
                               onChange={(value) => clearStreetSelection('street', value)}
                               onSelect={(option) => applyStreetSelection('street', option)}
@@ -1837,9 +1866,19 @@ const BookingForm = ({
                                 handleBlur({} as React.FocusEvent<HTMLInputElement>);
                               }}
                               placeholder={copy.streetPlaceholder}
-                              className={getInputClassName('street')}
+                              className={`${getInputClassName('street')} !pr-12`}
                               leadingIcon={<MapPin className="text-[#1F7CFF]" size={18} strokeWidth={2.1} />}
                             />
+                            <button
+                              type="button"
+                              onClick={toggleDirection}
+                              className={FIELD_ACTION_BUTTON_CLASS}
+                              aria-label={copy.swapRouteLabel}
+                            >
+                              <span className={FIELD_ACTION_BUTTON_ICON_CLASS}>
+                                <ArrowUpDown size={17} strokeWidth={2.35} />
+                              </span>
+                            </button>
                           </div>
                           {streetNumberWarning === 'street' ? (
                             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
@@ -1859,34 +1898,24 @@ const BookingForm = ({
                               <span className="pointer-events-none absolute left-3 top-1/2 inline-flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center text-[#1F7CFF]">
                                 <PlaneTakeoff size={18} strokeWidth={2.1} />
                               </span>
-                              <p className="pl-[1.9rem] leading-[1.2] text-[#111111]">
+                              <p className="truncate pl-[1.9rem] pr-12 leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
                               </p>
+                              <button
+                                type="button"
+                                onClick={toggleDirection}
+                                className={FIELD_ACTION_BUTTON_CLASS}
+                                aria-label={copy.swapRouteLabel}
+                              >
+                                <span className={FIELD_ACTION_BUTTON_ICON_CLASS}>
+                                  <ArrowUpDown size={17} strokeWidth={2.35} />
+                                </span>
+                              </button>
                             </div>
                           </div>
                         </div>
                       )}
                     </div>
-                  </div>
-                  <div className="relative min-w-0">
-                    {!formData.extraStop ? (
-                      <button
-                        type="button"
-                        onClick={openExtraStop}
-                        className="absolute left-1/2 top-[1.75rem] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:h-8 md:w-8"
-                        aria-label={copy.addStopLabel}
-                      >
-                        <Plus size={19} />
-                      </button>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={toggleDirection}
-                      className="absolute bottom-[0.65rem] left-1/2 inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center text-[#111111] transition-opacity hover:opacity-60 md:bottom-[0.95rem] md:h-8 md:w-8"
-                      aria-label={copy.swapRouteLabel}
-                    >
-                      <ArrowUpDown size={19} />
-                    </button>
                   </div>
                 </div>
               </div>
