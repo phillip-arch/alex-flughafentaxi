@@ -253,14 +253,12 @@ export default function BookingStepTwo({
     const isAtMax = numericValue !== null && numericValue >= max;
 
     return (
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-4">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="grid min-w-0 grid-cols-[auto_auto] items-center justify-between gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-4">
+        <div className="flex min-w-0 items-center">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF]">
             <Icon size={18} />
           </span>
-          <p className="min-w-0 truncate text-[1.05rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
-            {label}
-          </p>
+          <span className="sr-only">{label}</span>
         </div>
         <div className="grid shrink-0 grid-cols-[2.25rem_2rem_2.25rem] items-center gap-2">
           <button
