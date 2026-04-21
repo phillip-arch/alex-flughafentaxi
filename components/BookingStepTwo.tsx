@@ -240,6 +240,55 @@ export default function BookingStepTwo({
     );
   };
 
+  const renderScratchTravelStepper = (
+    name: 'passengers' | 'luggage' | 'handLuggage',
+    label: string,
+    value: number | '',
+    min: number,
+    max: number,
+    Icon: typeof Users
+  ) => {
+    const numericValue = typeof value === 'number' ? value : null;
+    const isAtMin = numericValue !== null && numericValue <= min;
+    const isAtMax = numericValue !== null && numericValue >= max;
+
+    return (
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF]">
+            <Icon size={18} />
+          </span>
+          <p className="min-w-0 truncate text-[1.05rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+            {label}
+          </p>
+        </div>
+        <div className="grid shrink-0 grid-cols-[2.25rem_2rem_2.25rem] items-center gap-2">
+          <button
+            type="button"
+            onClick={() => updateStepperValue(name, -1, min, max)}
+            disabled={isAtMin}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:text-[#c3cad5]"
+            aria-label={`Decrease ${label}`}
+          >
+            <Minus size={17} />
+          </button>
+          <span className="text-center text-[1.1rem] font-semibold leading-none tracking-[-0.04em] text-[#111827]">
+            {value === '' ? '--' : value}
+          </span>
+          <button
+            type="button"
+            onClick={() => updateStepperValue(name, 1, min, max)}
+            disabled={isAtMax}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db]"
+            aria-label={`Increase ${label}`}
+          >
+            <Plus size={17} />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const renderSheetHeader = (title: string, description: string, onClose: () => void) => (
     <div className="mb-8 flex items-start justify-between gap-4">
       <div>
@@ -336,6 +385,134 @@ export default function BookingStepTwo({
         {renderInlineTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
         {renderInlineTravelStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
         {renderInlineTravelStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, 8, ShoppingBag)}
+      </div>
+    </div>
+  );
+
+  const renderScratchStepTwo = () => (
+    <div className="mt-8 w-full min-w-0 max-w-full overflow-hidden rounded-[1.45rem] border border-[#cfe0f6] bg-[#f8fbff] p-3 md:hidden">
+      <p className="mb-3 px-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1F7CFF]">
+        Step 2 rebuild
+      </p>
+      <div className="space-y-4">
+        {inlineVehicleCard ? (
+          <div
+            className={`grid min-w-0 grid-cols-[5.75rem_minmax(0,1fr)] gap-3 rounded-[1.15rem] border bg-white p-3 ${
+              travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
+            }`}
+          >
+            <div className="relative h-[4.4rem] min-w-0 overflow-hidden rounded-[0.85rem] bg-white">
+              <Image
+                src={inlineVehicleCard.imageSrc}
+                alt={inlineVehicleCard.imageAlt}
+                fill
+                className="scale-[1.35] object-contain mix-blend-multiply"
+                sizes="92px"
+              />
+            </div>
+            <div className="flex min-w-0 flex-col items-end justify-center text-right">
+              <p className="max-w-full truncate text-[1.15rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF]">
+                {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
+              </p>
+              <p className="mt-1 text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
+                <AnimatedPrice value={inlineVehiclePrice} />
+              </p>
+            </div>
+            <p className="col-span-2 min-w-0 text-[14px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
+              Max. {inlineVehicleCard.maxPassengers} passengers and {inlineVehicleCard.maxSuitcases} check-in suitcases
+            </p>
+          </div>
+        ) : null}
+
+        <div className="space-y-3">
+          {renderScratchTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
+          {renderScratchTravelStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
+          {renderScratchTravelStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, 8, ShoppingBag)}
+        </div>
+
+        <div className="space-y-3">
+          <p className="px-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Optional</p>
+          <button
+            type="button"
+            onClick={() => setIsChildSeatSheetOpen(true)}
+            className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-4 text-left"
+            aria-haspopup="dialog"
+            aria-expanded={isChildSeatSheetOpen}
+          >
+            <span className="min-w-0">
+              <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+                Free child seats
+              </span>
+              <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
+                Infant, toddler or booster seats.
+              </span>
+            </span>
+            <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1F7CFF]">
+              + {childSeatTotal > 0 ? 'Edit' : 'Add'}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsNoteSheetOpen(true)}
+            className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-4 text-left"
+            aria-haspopup="dialog"
+            aria-expanded={isNoteSheetOpen}
+          >
+            <span className="min-w-0">
+              <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+                Note for driver
+              </span>
+              <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
+                {hasDriverNote ? 'Driver note added.' : 'Pickup details or requests.'}
+              </span>
+            </span>
+            <span className="inline-flex h-10 shrink-0 items-center justify-center gap-1 rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1F7CFF]">
+              <NotebookPen size={15} strokeWidth={2.2} />
+              {hasDriverNote ? 'Edit' : 'Add'}
+            </span>
+          </button>
+
+          {canUseMeetAndGreet ? (
+            <button
+              type="button"
+              onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
+              className={`grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border bg-white px-4 py-4 text-left ${
+                formData.meetAndGreet ? 'border-[#7fb3ff]' : 'border-[#dbe7f8]'
+              }`}
+              aria-pressed={Boolean(formData.meetAndGreet)}
+            >
+              <span className="min-w-0">
+                <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+                  Meet &amp; Greet <span className="text-[#1F7CFF]">+6EUR</span>
+                </span>
+                <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
+                  Driver waits inside arrivals with a name sign.
+                </span>
+              </span>
+              <span
+                className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors ${
+                  formData.meetAndGreet ? 'bg-[#1F7CFF]' : 'bg-[#e9edf3]'
+                }`}
+              >
+                <span
+                  className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white transition-transform ${
+                    formData.meetAndGreet ? 'translate-x-[1.2rem]' : 'translate-x-0'
+                  }`}
+                />
+              </span>
+            </button>
+          ) : null}
+        </div>
+
+        <div className="grid w-full min-w-0 grid-cols-[3.5rem_minmax(0,1fr)] gap-3 pt-1">
+          <button type="button" onClick={prevStep} className={secondaryBackButtonClass}>
+            <ChevronLeft size={24} />
+          </button>
+          <button type="button" onClick={nextStep} className={primaryActionButtonClass}>
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -694,6 +871,8 @@ export default function BookingStepTwo({
         </div>
         {actionTrustLine}
       </div>
+
+      {renderScratchStepTwo()}
     </div>
   );
 }
