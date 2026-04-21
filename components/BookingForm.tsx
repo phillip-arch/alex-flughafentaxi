@@ -123,10 +123,6 @@ const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
 const STEP_ONE_GRID_CLASS =
   'grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2.5 md:gap-4';
-const FIELD_ACTION_BUTTON_CLASS =
-  'group absolute right-1 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center focus-visible:outline-none';
-const FIELD_ACTION_BUTTON_ICON_CLASS =
-  'inline-flex h-7 w-8 items-center justify-center rounded-[0.65rem] bg-[#edf4ff] text-[#1F7CFF] transition-colors duration-150 group-hover:bg-[#1F7CFF] group-hover:text-white group-focus-visible:bg-[#1F7CFF] group-focus-visible:text-white group-focus-visible:ring-2 group-focus-visible:ring-[#7fb3ff] group-focus-visible:ring-offset-2';
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[#7fb3ff] focus:!bg-white focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-white !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
@@ -1827,17 +1823,29 @@ const BookingForm = ({
               </div>
               <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none">
                 <div className={STEP_ONE_GRID_CLASS}>
-                  <div className="relative min-h-full" aria-hidden="true">
-                    <div className="absolute bottom-[1.6rem] left-1/2 top-[50px] w-[3px] -translate-x-1/2 bg-[#cfd7e3]" />
-                    <div className="absolute left-1/2 top-[42px] flex h-4 w-4 -translate-x-1/2 items-center justify-center rounded-full border-[3px] border-[#111111] bg-[var(--color-form-bg)]">
+                  <div className="relative min-h-full">
+                    <div aria-hidden="true" className="absolute bottom-[1.6rem] left-1/2 top-[50px] w-[3px] -translate-x-1/2 bg-[#cfd7e3]" />
+                    <div aria-hidden="true" className="absolute left-1/2 top-[42px] flex h-4 w-4 -translate-x-1/2 items-center justify-center rounded-full border-[3px] border-[#111111] bg-[var(--color-form-bg)]">
                       <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-form-bg)]" />
                     </div>
-                    {formData.extraStop ? (
-                      <div className="absolute left-1/2 top-[9.9rem] flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center rounded-full border border-[#9ca3af] bg-white shadow-[0_0_0_5px_var(--color-form-bg)]">
+                    {!formData.extraStop && !isExtraStopClosing ? (
+                      <button
+                        type="button"
+                        onClick={openExtraStop}
+                        className="group absolute left-1/2 top-[calc(50%+12px)] z-10 inline-flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline-none"
+                        aria-label={copy.addStopLabel}
+                      >
+                        <span className="inline-flex h-[21px] w-[21px] items-center justify-center rounded-full bg-white text-[#1F7CFF] transition-colors duration-150 group-hover:bg-[#f8fbff] group-focus-visible:bg-[#f8fbff] group-focus-visible:ring-2 group-focus-visible:ring-[#7fb3ff] group-focus-visible:ring-offset-2">
+                          <Plus size={11} strokeWidth={2.7} />
+                        </span>
+                      </button>
+                    ) : null}
+                    {formData.extraStop && !isExtraStopClosing ? (
+                      <div aria-hidden="true" className="absolute left-1/2 top-[9.9rem] flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center rounded-full border border-[#9ca3af] bg-white shadow-[0_0_0_5px_var(--color-form-bg)]">
                         <span className="h-1.5 w-1.5 rounded-full bg-[#9ca3af]" />
                       </div>
                     ) : null}
-                    <div className="absolute bottom-[0.95rem] left-1/2 flex h-[21px] w-[21px] -translate-x-1/2 items-center justify-center rounded-full bg-[#e8f1ff]">
+                    <div aria-hidden="true" className="absolute bottom-[0.95rem] left-1/2 flex h-[21px] w-[21px] -translate-x-1/2 items-center justify-center rounded-full bg-[#e8f1ff]">
                       <span className="h-[11.5px] w-[11.5px] rounded-full bg-[#1f7cff]" />
                     </div>
                   </div>
@@ -1849,21 +1857,9 @@ const BookingForm = ({
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="w-full">
                             <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
-                              <p className="truncate pr-12 leading-[1.2] text-[#111111]">
+                              <p className="truncate leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
                               </p>
-                              {!formData.extraStop ? (
-                                <button
-                                  type="button"
-                                  onClick={openExtraStop}
-                                  className={FIELD_ACTION_BUTTON_CLASS}
-                                  aria-label={copy.addStopLabel}
-                                >
-                                  <span className={FIELD_ACTION_BUTTON_ICON_CLASS}>
-                                    <Plus size={18} strokeWidth={2.5} />
-                                  </span>
-                                </button>
-                              ) : null}
                             </div>
                           </div>
                           {renderExtraStopPanel()}
@@ -1886,20 +1882,8 @@ const BookingForm = ({
                                 handleBlur({} as React.FocusEvent<HTMLInputElement>);
                               }}
                               placeholder={copy.streetPlaceholder}
-                              className={`${getInputClassName('street')} !pr-12`}
+                              className={getInputClassName('street')}
                             />
-                            {!formData.extraStop ? (
-                              <button
-                                type="button"
-                                onClick={openExtraStop}
-                                className={FIELD_ACTION_BUTTON_CLASS}
-                                aria-label={copy.addStopLabel}
-                              >
-                                <span className={FIELD_ACTION_BUTTON_ICON_CLASS}>
-                                  <Plus size={18} strokeWidth={2.5} />
-                                </span>
-                              </button>
-                            ) : null}
                           </div>
                           {streetNumberWarning === 'street' ? (
                             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
