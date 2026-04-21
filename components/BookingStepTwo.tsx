@@ -389,12 +389,16 @@ export default function BookingStepTwo({
     </div>
   );
 
+  const renderErrorNotice = () =>
+    error ? (
+      <div className="mt-4 flex items-center gap-2 rounded-xl border border-[#ffd4d8] bg-[#fff2f4] p-3 text-[14px] font-medium text-[#d70015]">
+        <span className="block h-1.5 w-1.5 rounded-full bg-[#d70015]" />
+        {error}
+      </div>
+    ) : null;
+
   const renderScratchStepTwo = () => (
-    <div className="mt-8 w-full min-w-0 max-w-full overflow-hidden rounded-[1.45rem] border border-[#cfe0f6] bg-[#f8fbff] p-3 md:hidden">
-      <p className="mb-3 px-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1F7CFF]">
-        Step 2 rebuild
-      </p>
-      <div className="space-y-4">
+    <div className="w-full min-w-0 max-w-full overflow-hidden space-y-4 md:hidden">
         {inlineVehicleCard ? (
           <div
             className={`grid min-w-0 grid-cols-[5.75rem_minmax(0,1fr)] gap-3 rounded-[1.15rem] border bg-white p-3 ${
@@ -505,6 +509,8 @@ export default function BookingStepTwo({
           ) : null}
         </div>
 
+        {renderErrorNotice()}
+
         <div className="grid w-full min-w-0 grid-cols-[3.5rem_minmax(0,1fr)] gap-3 pt-1">
           <button type="button" onClick={prevStep} className={secondaryBackButtonClass}>
             <ChevronLeft size={24} />
@@ -513,7 +519,7 @@ export default function BookingStepTwo({
             Next
           </button>
         </div>
-      </div>
+        {actionTrustLine}
     </div>
   );
 
@@ -762,7 +768,8 @@ export default function BookingStepTwo({
       : null;
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="hidden space-y-8 md:block [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {renderInlineTravelDetails()}
 
       <div className="space-y-3">
@@ -870,6 +877,8 @@ export default function BookingStepTwo({
           </button>
         </div>
         {actionTrustLine}
+      </div>
+
       </div>
 
       {renderScratchStepTwo()}
