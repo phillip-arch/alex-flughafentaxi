@@ -434,6 +434,37 @@ export default function BookingStepTwo({
 
         <div className="space-y-3">
           <p className="px-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Optional</p>
+          {canUseMeetAndGreet ? (
+            <button
+              type="button"
+              onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
+              className={`grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border bg-white px-4 py-4 text-left ${
+                formData.meetAndGreet ? 'border-[#7fb3ff]' : 'border-[#dbe7f8]'
+              }`}
+              aria-pressed={Boolean(formData.meetAndGreet)}
+            >
+              <span className="min-w-0">
+                <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+                  Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
+                </span>
+                <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
+                  Driver waits inside arrivals with a name sign.
+                </span>
+              </span>
+              <span
+                className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors ${
+                  formData.meetAndGreet ? 'bg-[#1F7CFF]' : 'bg-[#e9edf3]'
+                }`}
+              >
+                <span
+                  className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white transition-transform ${
+                    formData.meetAndGreet ? 'translate-x-[1.2rem]' : 'translate-x-0'
+                  }`}
+                />
+              </span>
+            </button>
+          ) : null}
+
           <button
             type="button"
             onClick={() => setIsChildSeatSheetOpen(true)}
@@ -475,36 +506,6 @@ export default function BookingStepTwo({
             </span>
           </button>
 
-          {canUseMeetAndGreet ? (
-            <button
-              type="button"
-              onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
-              className={`grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border bg-white px-4 py-4 text-left ${
-                formData.meetAndGreet ? 'border-[#7fb3ff]' : 'border-[#dbe7f8]'
-              }`}
-              aria-pressed={Boolean(formData.meetAndGreet)}
-            >
-              <span className="min-w-0">
-                <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
-                  Meet &amp; Greet <span className="text-[#1F7CFF]">+6EUR</span>
-                </span>
-                <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
-                  Driver waits inside arrivals with a name sign.
-                </span>
-              </span>
-              <span
-                className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors ${
-                  formData.meetAndGreet ? 'bg-[#1F7CFF]' : 'bg-[#e9edf3]'
-                }`}
-              >
-                <span
-                  className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white transition-transform ${
-                    formData.meetAndGreet ? 'translate-x-[1.2rem]' : 'translate-x-0'
-                  }`}
-                />
-              </span>
-            </button>
-          ) : null}
         </div>
 
         {renderErrorNotice()}
@@ -773,6 +774,38 @@ export default function BookingStepTwo({
       <div className="space-y-3">
         <p className="ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Optional</p>
         <div className="space-y-4 overflow-x-clip">
+          {canUseMeetAndGreet ? (
+            <div
+              className={`flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border bg-white px-4 py-3 text-left ${
+                formData.meetAndGreet ? 'border-[#7fb3ff]' : 'border-[#dbe7f8]'
+              }`}
+            >
+              <div className="min-w-0">
+                <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+                  Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
+                </p>
+                <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">
+                  Driver waits inside arrivals with a name sign.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
+                className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 ${
+                  formData.meetAndGreet ? 'bg-[#1F7CFF]' : 'bg-[#e9edf3]'
+                }`}
+                aria-pressed={Boolean(formData.meetAndGreet)}
+                aria-label="Toggle Meet and Greet"
+              >
+                <span
+                  className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white shadow-[0_2px_8px_rgba(15,23,42,0.16)] transition-transform ${
+                    formData.meetAndGreet ? 'translate-x-[1.2rem]' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+          ) : null}
+
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3">
               <div className="min-w-0">
@@ -821,37 +854,6 @@ export default function BookingStepTwo({
             </div>
           </div>
 
-          {canUseMeetAndGreet ? (
-            <div
-              className={`flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border bg-white px-4 py-3 text-left ${
-                formData.meetAndGreet ? 'border-[#7fb3ff]' : 'border-[#dbe7f8]'
-              }`}
-            >
-              <div className="min-w-0">
-                <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
-                  Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
-                </p>
-                <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">
-                  Driver waits inside arrivals with a name sign.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
-                className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 ${
-                  formData.meetAndGreet ? 'bg-[#1F7CFF]' : 'bg-[#e9edf3]'
-                }`}
-                aria-pressed={Boolean(formData.meetAndGreet)}
-                aria-label="Toggle Meet and Greet"
-              >
-                <span
-                  className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white shadow-[0_2px_8px_rgba(15,23,42,0.16)] transition-transform ${
-                    formData.meetAndGreet ? 'translate-x-[1.2rem]' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-            </div>
-          ) : null}
         </div>
       </div>
 

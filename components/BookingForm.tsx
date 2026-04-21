@@ -1635,7 +1635,7 @@ const BookingForm = ({
     <div className="grid grid-cols-1 gap-3 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
       <div>
         <label className={BOOKING_FIELD_LABEL_CLASS}>Date</label>
-        <div ref={datePickerAnchorRef} className="relative mr-[-5px] w-full md:mr-0">
+        <div ref={datePickerAnchorRef} className="relative w-full">
           <Calendar
             onClick={() => setIsDatePickerOpen(true)}
             className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer ${isFieldInvalid('date') ? 'text-[#d70015]' : 'text-[#1F7CFF]'}`}
@@ -1667,7 +1667,7 @@ const BookingForm = ({
         <label className={BOOKING_FIELD_LABEL_CLASS}>
           {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
         </label>
-        <div ref={timePickerAnchorRef} className="relative mr-[-5px] w-full md:mr-0">
+        <div ref={timePickerAnchorRef} className="relative w-full">
           <Clock
             onClick={() => setIsTimePickerOpen(true)}
             className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer ${isFieldInvalid('time') ? 'text-[#d70015]' : 'text-[#1F7CFF]'}`}
@@ -1714,7 +1714,7 @@ const BookingForm = ({
         <p className="mb-1.5 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">
           Flight details
         </p>
-        <div className="mr-[-5px] md:mr-0">
+        <div className="w-full">
           <input
             type="text"
             name="flightNumber"
@@ -1818,7 +1818,7 @@ const BookingForm = ({
                       <p className={BOOKING_FIELD_LABEL_CLASS}>{copy.pickupLabel}</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
-                          <div className="mr-[-5px] md:mr-0">
+                          <div className="w-full">
                             <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
                               <p className="truncate pr-12 leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
@@ -1842,7 +1842,7 @@ const BookingForm = ({
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
-                          <div className="relative mr-[-5px] md:mr-0">
+                          <div className="relative w-full">
                             <StreetAutocomplete
                               value={streetInputValue}
                               selectedOption={selectedStreetOption}
@@ -1892,7 +1892,7 @@ const BookingForm = ({
                       <p className={BOOKING_FIELD_LABEL_CLASS}>{copy.destinationLabel}</p>
                       {formData.direction === 'from_airport' ? (
                         <div className="mt-1 min-h-[3.25rem]">
-                          <div className="relative mr-[-5px] md:mr-0">
+                          <div className="relative w-full">
                             <StreetAutocomplete
                               value={streetInputValue}
                               selectedOption={selectedStreetOption}
@@ -1934,7 +1934,7 @@ const BookingForm = ({
                         </div>
                       ) : (
                         <div className="mt-1 min-h-[3.25rem]">
-                          <div className="mr-[-5px] md:mr-0">
+                          <div className="w-full">
                             <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
                               <p className="truncate pr-12 leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
