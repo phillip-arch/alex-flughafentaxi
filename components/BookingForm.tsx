@@ -1591,22 +1591,36 @@ const BookingForm = ({
   const secondaryBackButtonClass =
     'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
 
-  const BookingActionTrustLine = ({ alignWithPrimaryButton = false }: { alignWithPrimaryButton?: boolean }) => (
-    <div
-      className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] font-semibold tracking-[-0.03em] text-[#4b5563] md:justify-start md:text-left md:text-[13px] ${
-        alignWithPrimaryButton ? 'w-[calc(100%-4.25rem)] ml-[4.25rem] md:ml-0 md:w-auto md:pl-0' : ''
-      }`}
-    >
-      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-        <Check size={15} className="text-[#111827]" strokeWidth={2.6} />
-        Fixed price
-      </span>
-      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-        <Check size={15} className="text-[#111827]" strokeWidth={2.6} />
-        On-time pickup
-      </span>
-    </div>
-  );
+  const BookingActionTrustLine = ({ alignWithPrimaryButton = false }: { alignWithPrimaryButton?: boolean }) => {
+    const trustItems = (
+      <>
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+          <Check size={15} className="text-[#111827]" strokeWidth={2.6} />
+          Fixed price
+        </span>
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+          <Check size={15} className="text-[#111827]" strokeWidth={2.6} />
+          On-time pickup
+        </span>
+      </>
+    );
+
+    if (alignWithPrimaryButton) {
+      return (
+        <div className="grid w-full min-w-0 grid-cols-[3.5rem_minmax(0,1fr)] gap-3 md:block md:w-auto">
+          <div className="col-start-2 flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] font-semibold tracking-[-0.03em] text-[#4b5563] md:justify-start md:text-left md:text-[13px]">
+            {trustItems}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] font-semibold tracking-[-0.03em] text-[#4b5563] md:justify-start md:text-left md:text-[13px]">
+        {trustItems}
+      </div>
+    );
+  };
 
   const StepIndicator = () => (
     <span
