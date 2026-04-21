@@ -585,7 +585,7 @@ export default function BookingStepTwo({
       : null;
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip pr-[5px] md:pr-0 space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip pr-[10px] md:pr-0 space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {renderInlineTravelDetails()}
 
       <div className="space-y-3">
