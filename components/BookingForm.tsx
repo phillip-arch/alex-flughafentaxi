@@ -127,7 +127,7 @@ const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.
 const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-white !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const BOOKING_FIELD_LABEL_CLASS =
-  'mb-1.5 ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
+  'mb-1.5 block pl-3 text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 const TIME_VALUE_PATTERN = /^\d{2}:\d{2}$/;
 const NIGHT_LEAD_TIME_ERROR =
@@ -1654,7 +1654,7 @@ const BookingForm = ({
   );
 
   const DateTimeFields = () => (
-    <div className="grid grid-cols-1 gap-3 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
+    <div className="grid grid-cols-1 gap-4 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
       <div>
         <label className={BOOKING_FIELD_LABEL_CLASS}>Date</label>
         <div ref={datePickerAnchorRef} className="relative w-full">
@@ -1723,7 +1723,7 @@ const BookingForm = ({
   const FlightDetailsFields = () => (
     <div
       className={`grid overflow-hidden transition-[grid-template-rows,margin-top,margin-bottom] duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-        isFlightDetailsVisible ? 'mt-4 mb-[15px] grid-rows-[1fr]' : 'mt-0 mb-0 grid-rows-[0fr]'
+        isFlightDetailsVisible ? 'mt-4 mb-0 grid-rows-[1fr]' : 'mt-0 mb-0 grid-rows-[0fr]'
       }`}
       aria-hidden={!isFlightDetailsVisible}
     >
@@ -1733,9 +1733,7 @@ const BookingForm = ({
             isFlightDetailsVisible ? 'translate-y-0 opacity-100 delay-75' : '-translate-y-2 opacity-0'
           }`}
         >
-        <p className="mb-1.5 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">
-          Flight details
-        </p>
+        <p className={BOOKING_FIELD_LABEL_CLASS}>Flight details</p>
         <div className="w-full">
           <input
             type="text"
@@ -1810,8 +1808,8 @@ const BookingForm = ({
                   </div>
                 )}
               <div className="rounded-[2.2rem] bg-transparent pt-[11px] shadow-none">
-                <div className={STEP_ONE_GRID_CLASS}>
-                  <div aria-hidden="true" />
+                <div className="md:grid md:grid-cols-[1.25rem_minmax(0,1fr)] md:gap-4">
+                  <div aria-hidden="true" className="hidden md:block" />
                   <div className="min-w-0 flex-1">
                     {DirectionSelector()}
                     <div className="mt-4">
@@ -1821,7 +1819,7 @@ const BookingForm = ({
                   </div>
                 </div>
               </div>
-              <div className="rounded-[2.2rem] bg-transparent pt-[11px] pb-1 shadow-none">
+              <div className="rounded-[2.2rem] bg-transparent pt-0 pb-1 shadow-none">
                 <div className={STEP_ONE_GRID_CLASS}>
                   <div className="relative min-h-full">
                     <div aria-hidden="true" className="absolute bottom-[1.6rem] left-1/2 top-[50px] w-[3px] -translate-x-1/2 bg-[#cfd7e3]" />
@@ -1832,7 +1830,7 @@ const BookingForm = ({
                       <button
                         type="button"
                         onClick={openExtraStop}
-                        className="group absolute left-1/2 top-[calc(50%+12px)] z-10 inline-flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline-none"
+                        className="group absolute left-1/2 top-[calc((50px+100%-1.6rem)/2)] z-10 inline-flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline-none"
                         aria-label={copy.addStopLabel}
                       >
                         <span className="inline-flex h-[21px] w-[21px] items-center justify-center rounded-full bg-white text-[#1F7CFF] transition-colors duration-150 group-hover:bg-[#f8fbff] group-focus-visible:bg-[#f8fbff] group-focus-visible:ring-2 group-focus-visible:ring-[#7fb3ff] group-focus-visible:ring-offset-2">
@@ -1851,10 +1849,10 @@ const BookingForm = ({
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="min-h-[4.2rem]">
+                    <div>
                       <p className={BOOKING_FIELD_LABEL_CLASS}>{copy.pickupLabel}</p>
                       {formData.direction === 'from_airport' ? (
-                        <div className="mt-1 min-h-[3.25rem]">
+                        <div>
                           <div className="w-full">
                             <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
                               <p className="truncate leading-[1.2] text-[#111111]">
@@ -1866,7 +1864,7 @@ const BookingForm = ({
                         </div>
                       ) : null}
                       {formData.direction !== 'from_airport' ? (
-                        <div className="mt-1 min-h-[3.25rem]">
+                        <div>
                           <div className="relative w-full">
                             <StreetAutocomplete
                               value={streetInputValue}
@@ -1900,10 +1898,10 @@ const BookingForm = ({
                       ) : null}
                     </div>
 
-                    <div className="mt-2.5 min-h-[4.2rem]">
+                    <div className="mt-4">
                       <p className={BOOKING_FIELD_LABEL_CLASS}>{copy.destinationLabel}</p>
                       {formData.direction === 'from_airport' ? (
-                        <div className="mt-1 min-h-[3.25rem]">
+                        <div>
                           <div className="relative w-full">
                             <StreetAutocomplete
                               value={streetInputValue}
@@ -1935,7 +1933,7 @@ const BookingForm = ({
                           ) : null}
                         </div>
                       ) : (
-                        <div className="mt-1 min-h-[3.25rem]">
+                        <div>
                           <div className="w-full">
                             <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
                               <p className="truncate leading-[1.2] text-[#111111]">

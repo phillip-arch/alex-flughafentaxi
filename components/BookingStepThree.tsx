@@ -27,7 +27,7 @@ type BookingStepThreeProps = {
 };
 
 const STEP_THREE_FIELD_LABEL_CLASS =
-  'ml-1 block text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
+  'mb-1.5 block pl-3 text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
 
 export default function BookingStepThree({
   formData,
@@ -74,7 +74,7 @@ export default function BookingStepThree({
       ) : null}
 
       <div className="grid gap-x-4 gap-y-4 md:grid-cols-2">
-        <div className="relative flex flex-col gap-2 md:col-span-2">
+        <div className="relative md:col-span-2">
           <label htmlFor="fullName" className={STEP_THREE_FIELD_LABEL_CLASS}>
             Name
           </label>
@@ -89,7 +89,7 @@ export default function BookingStepThree({
             className={getInputClassName('fullName')}
           />
         </div>
-        <div className="relative flex flex-col gap-2">
+        <div className="relative">
           <label htmlFor="phone" className={STEP_THREE_FIELD_LABEL_CLASS}>
             Phone number
           </label>
@@ -104,7 +104,7 @@ export default function BookingStepThree({
             className={getInputClassName('phone')}
           />
         </div>
-        <div className="relative flex flex-col gap-2">
+        <div className="relative">
           <label htmlFor="email" className={STEP_THREE_FIELD_LABEL_CLASS}>
             E-Mail
           </label>
@@ -121,7 +121,7 @@ export default function BookingStepThree({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div>
         <p className={STEP_THREE_FIELD_LABEL_CLASS}>
           Payment
         </p>
