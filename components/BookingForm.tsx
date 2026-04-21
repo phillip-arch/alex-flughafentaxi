@@ -21,7 +21,6 @@ import {
   ChevronLeft, 
   Clock,
   Building2,
-  ArrowUpDown,
   Info,
   Plus,
   X,
@@ -168,7 +167,6 @@ const BookingForm = ({
     destinationLabel: 'Destination',
     airportLabel: 'Vienna Airport (VIE)',
     streetPlaceholder: 'Select street',
-    swapRouteLabel: 'Swap pickup and destination',
     addStopLabel: 'Add extra stop',
     nextLabel: 'Next',
   };
@@ -1016,11 +1014,6 @@ const BookingForm = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const toggleDirection = () => {
-    const nextDirection = formData.direction === 'from_airport' ? 'to_airport' : 'from_airport';
-    handleDirectionChange(nextDirection);
-  };
-
   const openExtraStop = () => {
     if (extraStopCloseTimeoutRef.current) {
       clearTimeout(extraStopCloseTimeoutRef.current);
@@ -1631,6 +1624,39 @@ const BookingForm = ({
     </span>
   );
 
+  const DirectionSelector = () => (
+    <div className="relative mx-auto grid w-full min-w-0 grid-cols-2 overflow-hidden rounded-[1.15rem] bg-[#edf3f8] p-1 md:w-1/2 md:min-w-[13rem]">
+      <span
+        aria-hidden="true"
+        className={`absolute bottom-1 left-1 top-1 w-[calc(50%-0.25rem)] rounded-[0.95rem] bg-white shadow-[0_8px_18px_rgba(15,23,42,0.05)] transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          formData.direction === 'from_airport' ? 'translate-x-full' : 'translate-x-0'
+        }`}
+      />
+      {[
+        { value: 'to_airport' as Direction, label: 'To Airport' },
+        { value: 'from_airport' as Direction, label: 'From Airport' },
+      ].map((option) => {
+        const isActive = formData.direction === option.value;
+
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => handleDirectionChange(option.value)}
+            className={`relative z-[1] flex h-9 min-w-0 items-center justify-center rounded-[0.95rem] px-1.5 text-[13px] font-semibold tracking-[-0.02em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:h-10 md:px-3 md:text-[14px] ${
+              isActive
+                ? 'text-[#1F5FEA]'
+                : 'text-[#617084] hover:text-[#111827]'
+            }`}
+            aria-pressed={isActive}
+          >
+            <span className="min-w-0 truncate">{option.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+
   const DateTimeFields = () => (
     <div className="grid grid-cols-1 gap-3 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
       <div>
@@ -1791,7 +1817,10 @@ const BookingForm = ({
                 <div className={STEP_ONE_GRID_CLASS}>
                   <div aria-hidden="true" />
                   <div className="min-w-0 flex-1">
+                    {DirectionSelector()}
+                    <div className="mt-4">
                     {DateTimeFields()}
+                    </div>
                     {FlightDetailsFields()}
                   </div>
                 </div>
@@ -1848,7 +1877,6 @@ const BookingForm = ({
                               selectedOption={selectedStreetOption}
                               mobileDropdownFullWidth
                               mobileSelectedStreetOnly
-                              mobileTrailingAction
                               menuItems={favoriteMenuItems}
                               onChange={(value) => clearStreetSelection('street', value)}
                               onSelect={(option) => applyStreetSelection('street', option)}
@@ -1908,18 +1936,8 @@ const BookingForm = ({
                                 handleBlur({} as React.FocusEvent<HTMLInputElement>);
                               }}
                               placeholder={copy.streetPlaceholder}
-                              className={`${getInputClassName('street')} !pr-12`}
+                              className={getInputClassName('street')}
                             />
-                            <button
-                              type="button"
-                              onClick={toggleDirection}
-                              className={FIELD_ACTION_BUTTON_CLASS}
-                              aria-label={copy.swapRouteLabel}
-                            >
-                              <span className={FIELD_ACTION_BUTTON_ICON_CLASS}>
-                                <ArrowUpDown size={17} strokeWidth={2.35} />
-                              </span>
-                            </button>
                           </div>
                           {streetNumberWarning === 'street' ? (
                             <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
@@ -1936,19 +1954,9 @@ const BookingForm = ({
                         <div className="mt-1 min-h-[3.25rem]">
                           <div className="w-full">
                             <div className={`relative flex min-h-[3.25rem] items-center rounded-[var(--radius-field)] ${READONLY_ADDRESS_FIELD_CLASS}`}>
-                              <p className="truncate pr-12 leading-[1.2] text-[#111111]">
+                              <p className="truncate leading-[1.2] text-[#111111]">
                                 {copy.airportLabel}
                               </p>
-                              <button
-                                type="button"
-                                onClick={toggleDirection}
-                                className={FIELD_ACTION_BUTTON_CLASS}
-                                aria-label={copy.swapRouteLabel}
-                              >
-                                <span className={FIELD_ACTION_BUTTON_ICON_CLASS}>
-                                  <ArrowUpDown size={17} strokeWidth={2.35} />
-                                </span>
-                              </button>
                             </div>
                           </div>
                         </div>
