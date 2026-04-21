@@ -1735,7 +1735,7 @@ const BookingForm = ({
     'mb-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
 
   return (
-    <div className={`${BOOKING_FORM_CARD_CLASS} relative max-w-[720px] overflow-x-clip md:max-w-none ${currentStep === 2 ? 'max-md:mx-auto max-md:w-[calc(100%-10px)]' : ''} ${allowExtendedDropdownSpace ? 'overflow-y-visible' : 'overflow-y-hidden'}`}>
+    <div className={`${BOOKING_FORM_CARD_CLASS} relative max-w-[720px] overflow-x-clip max-md:mx-auto max-md:w-[calc(100%-10px)] md:max-w-none ${allowExtendedDropdownSpace ? 'overflow-y-visible' : 'overflow-y-hidden'}`}>
       {shouldShowInfoTrigger ? (
         <button
           type="button"
