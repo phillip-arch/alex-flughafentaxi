@@ -204,7 +204,7 @@ export default function BookingStepTwo({
     const isAtMax = numericValue !== null && numericValue >= max;
 
     return (
-      <div className="flex min-h-[4.65rem] items-center justify-between gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-2 shadow-[0_14px_30px_rgba(15,23,42,0.06)] md:min-h-[6.7rem] md:flex-col md:items-center md:justify-center md:gap-5 md:px-4 md:py-4 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[5.65rem] [@media(min-width:768px)_and_(max-height:850px)]:gap-3 [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-3">
+      <div className="flex min-h-[4.65rem] items-center justify-between gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-2 md:min-h-[6.7rem] md:flex-col md:items-center md:justify-center md:gap-5 md:px-4 md:py-4 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[5.65rem] [@media(min-width:768px)_and_(max-height:850px)]:gap-3 [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-3">
         <div className="flex min-w-0 items-center gap-3 md:justify-center md:gap-2.5">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF] md:h-auto md:w-auto md:bg-transparent">
             <Icon size={18} className="md:h-[17px] md:w-[17px]" />
@@ -213,12 +213,12 @@ export default function BookingStepTwo({
             {label}
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-3 md:w-full md:justify-center md:gap-7 [@media(min-width:768px)_and_(max-height:850px)]:gap-5">
+        <div className="mr-1 flex shrink-0 items-center gap-2.5 md:mr-0 md:w-full md:justify-center md:gap-7 [@media(min-width:768px)_and_(max-height:850px)]:gap-5">
           <button
             type="button"
             onClick={() => updateStepperValue(name, -1, min, max)}
             disabled={isAtMin}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white md:h-11 md:w-11 [@media(min-width:768px)_and_(max-height:850px)]:h-9 [@media(min-width:768px)_and_(max-height:850px)]:w-9"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white md:h-11 md:w-11 [@media(min-width:768px)_and_(max-height:850px)]:h-9 [@media(min-width:768px)_and_(max-height:850px)]:w-9"
             aria-label={`Decrease ${label}`}
           >
             <Minus size={17} className="md:h-[18px] md:w-[18px]" />
@@ -230,7 +230,7 @@ export default function BookingStepTwo({
             type="button"
             onClick={() => updateStepperValue(name, 1, min, max)}
             disabled={isAtMax}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] md:h-11 md:w-11 [@media(min-width:768px)_and_(max-height:850px)]:h-9 [@media(min-width:768px)_and_(max-height:850px)]:w-9"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] md:h-11 md:w-11 [@media(min-width:768px)_and_(max-height:850px)]:h-9 [@media(min-width:768px)_and_(max-height:850px)]:w-9"
             aria-label={`Increase ${label}`}
           >
             <Plus size={17} className="md:h-[18px] md:w-[18px]" />
@@ -299,30 +299,30 @@ export default function BookingStepTwo({
   };
 
   const renderInlineTravelDetails = () => (
-    <div className="w-full max-w-full space-y-6 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-6 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {inlineVehicleCard ? (
         <div
-          className={`flex min-h-[7.25rem] w-full max-w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 overflow-hidden rounded-[1.15rem] border bg-white px-4 py-3.5 shadow-[0_16px_40px_rgba(15,23,42,0.06)] md:min-h-[7.5rem] md:flex-nowrap md:gap-4 md:px-6 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[6rem] [@media(min-width:768px)_and_(max-height:850px)]:px-5 [@media(min-width:768px)_and_(max-height:850px)]:py-3 ${
+          className={`flex min-h-[7.25rem] min-w-0 w-full max-w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 overflow-hidden rounded-[1.15rem] border bg-white px-4 py-3.5 md:min-h-[7.5rem] md:flex-nowrap md:gap-4 md:px-6 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[6rem] [@media(min-width:768px)_and_(max-height:850px)]:px-5 [@media(min-width:768px)_and_(max-height:850px)]:py-3 ${
             travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
           }`}
         >
-          <div className="relative order-1 h-[4.7rem] w-[7.4rem] shrink-0 overflow-visible md:order-none md:h-[6.35rem] md:w-[10.5rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[5.2rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[8.65rem]">
+          <div className="relative order-1 h-[4.35rem] w-[6.6rem] shrink-0 overflow-hidden md:order-none md:h-[6.35rem] md:w-[10.5rem] md:overflow-visible [@media(min-width:768px)_and_(max-height:850px)]:h-[5.2rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[8.65rem]">
             <Image
               src={inlineVehicleCard.imageSrc}
               alt={inlineVehicleCard.imageAlt}
               fill
-              className="scale-[1.875] object-contain mix-blend-multiply"
+              className="scale-[1.42] object-contain mix-blend-multiply md:scale-[1.875]"
               sizes="(min-width: 768px) 194px, 146px"
             />
           </div>
           <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:flex-1 md:basis-auto md:px-2 md:text-center">
-            <p className="whitespace-nowrap overflow-hidden text-ellipsis text-[0.9rem] font-medium leading-snug tracking-[-0.02em] text-[#5f6975] md:whitespace-normal md:overflow-visible md:text-[1rem] md:tracking-normal [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
+            <p className="overflow-hidden text-[15px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975] md:whitespace-normal md:overflow-visible md:text-[1rem] md:tracking-normal [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
               Max. {inlineVehicleCard.maxPassengers} passengers and{' '}
               <br className="hidden md:block" />
               {inlineVehicleCard.maxSuitcases} check-in suitcases
             </p>
           </div>
-          <div className="order-2 min-w-0 shrink-0 text-right md:order-none">
+          <div className="order-2 min-w-0 text-right md:order-none md:shrink-0">
             <p className="truncate text-[1.2rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF] md:text-[1.25rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.05rem]">
               {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
             </p>
@@ -332,7 +332,7 @@ export default function BookingStepTwo({
           </div>
         </div>
       ) : null}
-      <div className="grid gap-4 md:grid-cols-3 md:gap-5">
+      <div className="grid min-w-0 gap-4 md:grid-cols-3 md:gap-5">
         {renderInlineTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
         {renderInlineTravelStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
         {renderInlineTravelStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, 8, ShoppingBag)}
@@ -585,14 +585,14 @@ export default function BookingStepTwo({
       : null;
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-hidden space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {renderInlineTravelDetails()}
 
       <div className="space-y-3">
         <p className="ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Optional</p>
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-x-clip">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3 shadow-[0_12px_28px_rgba(15,23,42,0.045)]">
+            <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3">
               <div className="min-w-0">
                 <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">Free child seats</p>
                 <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">Infant, toddler or booster seats.</p>
@@ -617,7 +617,7 @@ export default function BookingStepTwo({
               ) : null}
             </div>
 
-            <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3 shadow-[0_12px_28px_rgba(15,23,42,0.045)]">
+            <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3">
               <div className="min-w-0">
                 <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
                   Note for driver
@@ -641,7 +641,7 @@ export default function BookingStepTwo({
 
           {canUseMeetAndGreet ? (
             <div
-              className={`flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border bg-white px-4 py-3 text-left shadow-[0_12px_28px_rgba(15,23,42,0.045)] ${
+              className={`flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border bg-white px-4 py-3 text-left ${
                 formData.meetAndGreet ? 'border-[#7fb3ff]' : 'border-[#dbe7f8]'
               }`}
             >

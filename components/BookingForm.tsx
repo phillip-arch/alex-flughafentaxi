@@ -1594,7 +1594,7 @@ const BookingForm = ({
   const BookingActionTrustLine = ({ alignWithPrimaryButton = false }: { alignWithPrimaryButton?: boolean }) => (
     <div
       className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] font-semibold tracking-[-0.03em] text-[#4b5563] md:justify-start md:text-left md:text-[13px] ${
-        alignWithPrimaryButton ? 'w-full md:w-auto md:pl-0' : ''
+        alignWithPrimaryButton ? 'w-[calc(100%-4.25rem)] ml-[4.25rem] md:ml-0 md:w-auto md:pl-0' : ''
       }`}
     >
       <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
@@ -1729,13 +1729,13 @@ const BookingForm = ({
     ? 'p-6 md:p-8 [@media(min-width:768px)_and_(max-height:850px)]:p-6'
     : 'p-6 md:p-8 [@media(min-width:768px)_and_(max-height:850px)]:p-6';
   const stepContentClassName =
-    'w-full min-w-0 max-w-full overflow-x-hidden animate-in fade-in slide-in-from-right-4 duration-500';
+    'w-full min-w-0 max-w-full overflow-x-clip animate-in fade-in slide-in-from-right-4 duration-500';
   const stepHeaderClassName = 'mb-6 flex justify-center md:mb-7 md:justify-end md:pr-1 [@media(min-width:768px)_and_(max-height:850px)]:mb-4';
   const titleHeaderClassName =
     'mb-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
 
   return (
-    <div className={`${BOOKING_FORM_CARD_CLASS} max-w-[720px] md:max-w-none relative ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-hidden'}`}>
+    <div className={`${BOOKING_FORM_CARD_CLASS} relative max-w-[720px] overflow-x-clip md:max-w-none ${allowExtendedDropdownSpace ? 'overflow-y-visible' : 'overflow-y-hidden'}`}>
       {shouldShowInfoTrigger ? (
         <button
           type="button"
@@ -1750,7 +1750,7 @@ const BookingForm = ({
           <Info size={22} strokeWidth={2.2} />
         </button>
       ) : null}
-      <div className={`${formContentSpacingClassName} ${allowExtendedDropdownSpace ? '' : 'pb-2 md:pb-3'}`}>
+      <div className={`overflow-x-clip ${formContentSpacingClassName} ${allowExtendedDropdownSpace ? '' : 'pb-2 md:pb-3'}`}>
         <form onSubmit={handleSubmit}>
           {headerTitle ? (
             <div className={titleHeaderClassName}>
@@ -1967,48 +1967,58 @@ const BookingForm = ({
           )}
 
           {currentStep === 2 && (
-            <BookingStepTwo
-              formData={formData}
-              vehicleType={vehicleType}
-              vehiclePriceOptions={vehiclePriceOptions}
-              onVehicleUpgrade={handleVehicleUpgrade}
-              onTravelDetailsConfirm={handleTravelDetailsConfirm}
-              handleMeetAndGreetChange={handleMeetAndGreetChange}
-              handleNotesChange={handleNotesChange}
-              error={error}
-              isFieldInvalid={isFieldInvalid}
-              updateStepperValue={updateStepperValue}
-              prevStep={prevStep}
-              nextStep={nextStep}
-              actionRowClass={actionRowWithTrustClass}
-              actionButtonGroupClass={actionButtonGroupClass}
-              actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
-              primaryActionButtonClass={primaryActionButtonClass}
-              secondaryBackButtonClass={secondaryBackButtonClass}
-            />
+            <div className="md:grid md:grid-cols-[1.25rem_minmax(0,1fr)] md:gap-4">
+              <div aria-hidden="true" className="hidden md:block" />
+              <div className="min-w-0 md:flex-1">
+                <BookingStepTwo
+                  formData={formData}
+                  vehicleType={vehicleType}
+                  vehiclePriceOptions={vehiclePriceOptions}
+                  onVehicleUpgrade={handleVehicleUpgrade}
+                  onTravelDetailsConfirm={handleTravelDetailsConfirm}
+                  handleMeetAndGreetChange={handleMeetAndGreetChange}
+                  handleNotesChange={handleNotesChange}
+                  error={error}
+                  isFieldInvalid={isFieldInvalid}
+                  updateStepperValue={updateStepperValue}
+                  prevStep={prevStep}
+                  nextStep={nextStep}
+                  actionRowClass={actionRowWithTrustClass}
+                  actionButtonGroupClass={actionButtonGroupClass}
+                  actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
+                  primaryActionButtonClass={primaryActionButtonClass}
+                  secondaryBackButtonClass={secondaryBackButtonClass}
+                />
+              </div>
+            </div>
           )}
 
           {currentStep === 3 && (
-            <BookingStepThree
-              formData={formData}
-              totalPrice={totalPrice}
-              vehicleType={vehicleType}
-              isLoggedIn={isLoggedIn}
-              error={error}
-              loading={loading}
-              handleBookingForMyselfToggle={handleBookingForMyselfToggle}
-              handleChange={handleChange}
-              handleBlur={handleBlur}
-              getInputClassName={getInputClassName}
-              handlePaymentChange={handlePaymentChange}
-              touched={touched}
-              prevStep={prevStep}
-              actionRowClass={actionRowWithTrustClass}
-              actionButtonGroupClass={actionButtonGroupClass}
-              actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
-              secondaryBackButtonClass={secondaryBackButtonClass}
-              primaryActionButtonClass={primaryActionButtonClass}
-            />
+            <div className="md:grid md:grid-cols-[1.25rem_minmax(0,1fr)] md:gap-4">
+              <div aria-hidden="true" className="hidden md:block" />
+              <div className="min-w-0 md:flex-1">
+                <BookingStepThree
+                  formData={formData}
+                  totalPrice={totalPrice}
+                  vehicleType={vehicleType}
+                  isLoggedIn={isLoggedIn}
+                  error={error}
+                  loading={loading}
+                  handleBookingForMyselfToggle={handleBookingForMyselfToggle}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                  getInputClassName={getInputClassName}
+                  handlePaymentChange={handlePaymentChange}
+                  touched={touched}
+                  prevStep={prevStep}
+                  actionRowClass={actionRowWithTrustClass}
+                  actionButtonGroupClass={actionButtonGroupClass}
+                  actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
+                  secondaryBackButtonClass={secondaryBackButtonClass}
+                  primaryActionButtonClass={primaryActionButtonClass}
+                />
+              </div>
+            </div>
           )}
         </form>
       </div>
