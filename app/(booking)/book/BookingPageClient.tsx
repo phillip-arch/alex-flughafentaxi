@@ -55,7 +55,7 @@ export default function BookingPageClient({
         <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-[80px] md:pt-28 [@media(min-width:768px)_and_(max-height:850px)]:pt-[88px]'}`}>
           <div className="grid items-start gap-10 lg:grid-cols-[0.98fr_0.72fr] lg:gap-12">
             <section className="order-1 self-start lg:sticky lg:top-24">
-              <div className="w-full max-w-[46rem]">
+              <div className="mx-auto w-full max-w-[57.5rem] lg:mx-0 lg:max-w-[46rem]">
                 <BookingForm
                   onDirectionChange={setDirection}
                   meetAndGreetSelected={meetAndGreet}
