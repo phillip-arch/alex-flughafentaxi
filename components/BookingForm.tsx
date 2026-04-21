@@ -1728,6 +1728,8 @@ const BookingForm = ({
   const formContentSpacingClassName = showStepIndicator
     ? 'p-6 md:p-8 [@media(min-width:768px)_and_(max-height:850px)]:p-6'
     : 'p-6 md:p-8 [@media(min-width:768px)_and_(max-height:850px)]:p-6';
+  const stepContentClassName =
+    'w-full min-w-0 max-w-full overflow-x-hidden animate-in fade-in slide-in-from-right-4 duration-500';
   const stepHeaderClassName = 'mb-6 flex justify-center md:mb-7 md:justify-end md:pr-1 [@media(min-width:768px)_and_(max-height:850px)]:mb-4';
   const titleHeaderClassName =
     'mb-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
@@ -1764,7 +1766,7 @@ const BookingForm = ({
           ) : null}
           {/* STEP 1: LOCATION */}
             {currentStep === 1 && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+              <div className={`${stepContentClassName} space-y-4`}>
                 {shouldShowStepOneRouteIntro && (
                   <div className="text-center mb-6">
                     <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>

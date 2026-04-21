@@ -316,7 +316,7 @@ export default function BookingStepTwo({
             />
           </div>
           <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:flex-1 md:basis-auto md:px-2 md:text-center">
-            <p className="whitespace-nowrap overflow-hidden text-ellipsis text-[clamp(0.6rem,2.45vw,0.9rem)] font-medium leading-snug tracking-[-0.03em] text-[#5f6975] md:whitespace-normal md:overflow-visible md:text-[1rem] md:tracking-normal [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
+            <p className="whitespace-nowrap overflow-hidden text-ellipsis text-[0.9rem] font-medium leading-snug tracking-[-0.02em] text-[#5f6975] md:whitespace-normal md:overflow-visible md:text-[1rem] md:tracking-normal [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
               Max. {inlineVehicleCard.maxPassengers} passengers and{' '}
               <br className="hidden md:block" />
               {inlineVehicleCard.maxSuitcases} check-in suitcases
@@ -585,7 +585,7 @@ export default function BookingStepTwo({
       : null;
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
+    <div className="w-full min-w-0 max-w-full overflow-x-hidden space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {renderInlineTravelDetails()}
 
       <div className="space-y-3">
