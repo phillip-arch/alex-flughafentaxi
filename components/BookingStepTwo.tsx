@@ -449,7 +449,7 @@ export default function BookingStepTwo({
                   Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
                 </span>
                 <span className="mt-1 block text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-                  Driver waits in arrivals with a name sign
+                  Driver will wait in arrivals with a name sign
                 </span>
               </span>
               <span
@@ -786,7 +786,7 @@ export default function BookingStepTwo({
                   Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
                 </p>
                 <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">
-                  Driver waits in arrivals with a name sign
+                  Driver will wait in arrivals with a name sign
                 </p>
               </div>
               <button
