@@ -6,3 +6,9 @@ export const BOOKING_FORM_INPUT_CLASS =
 
 export const BOOKING_FORM_INPUT_INVALID_CLASS =
   'ui-input ui-input-invalid';
+
+export const BOOKING_FIELD_LABEL_CLASS =
+  'block pl-3 text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
+
+export const BOOKING_FIELD_STACK_CLASS =
+  'space-y-1.5';

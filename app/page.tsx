@@ -540,7 +540,7 @@ function HeroBookingCard() {
     <div id="hero-booking" className="relative w-full max-w-[46rem]">
       <div className={heroBookingCardClass}>
         <div className="min-h-0 lg:flex-1 lg:min-h-0">
-          <BookingForm heroEnglishCopy />
+          <BookingForm />
         </div>
       </div>
     </div>

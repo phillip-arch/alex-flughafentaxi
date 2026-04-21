@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { Armchair, Baby, Briefcase, ChevronLeft, Minus, NotebookPen, Plus, ShieldCheck, ShoppingBag, Users, X } from 'lucide-react';
 import { formatVehicleTypeLabel, type VehicleType } from '@/lib/pricing';
+import { BOOKING_FIELD_LABEL_CLASS } from '@/lib/ui/bookingFormStyles';
 import AnimatedPrice from './AnimatedPrice';
 import { BOOKING_OVERLAY_BACKDROP_CLASS } from './bookingOverlayStyles';
 
@@ -433,7 +434,7 @@ export default function BookingStepTwo({
         </div>
 
         <div className="space-y-3">
-          <p className="px-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Optional</p>
+          <p className={BOOKING_FIELD_LABEL_CLASS}>Optional</p>
           {canUseMeetAndGreet ? (
             <button
               type="button"
@@ -447,7 +448,7 @@ export default function BookingStepTwo({
                 <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
                   Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
                 </span>
-                <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
+                <span className="mt-1 block text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
                   Driver waits inside arrivals with a name sign.
                 </span>
               </span>
@@ -476,7 +477,7 @@ export default function BookingStepTwo({
               <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
                 Free child seats
               </span>
-              <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
+              <span className="mt-1 block text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
                 Infant, toddler or booster seats.
               </span>
             </span>
@@ -496,7 +497,7 @@ export default function BookingStepTwo({
               <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
                 Note for driver
               </span>
-              <span className="mt-1 block text-[0.86rem] leading-snug text-[#5f6975]">
+              <span className="mt-1 block text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
                 {hasDriverNote ? 'Driver note added.' : 'Pickup details or requests.'}
               </span>
             </span>
@@ -772,7 +773,7 @@ export default function BookingStepTwo({
       {renderInlineTravelDetails()}
 
       <div className="space-y-3">
-        <p className="ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">Optional</p>
+        <p className={BOOKING_FIELD_LABEL_CLASS}>Optional</p>
         <div className="space-y-4 overflow-x-clip">
           {canUseMeetAndGreet ? (
             <div

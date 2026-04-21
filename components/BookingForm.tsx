@@ -24,10 +24,15 @@ import {
   Info,
   Plus,
   X,
-  LucideIcon,
 } from 'lucide-react';
 import { determineVehicle, calculateVehiclePrice, type VehicleType } from '@/lib/pricing';
-import { BOOKING_FORM_CARD_CLASS, BOOKING_FORM_INPUT_CLASS, BOOKING_FORM_INPUT_INVALID_CLASS } from '@/lib/ui/bookingFormStyles';
+import {
+  BOOKING_FIELD_LABEL_CLASS,
+  BOOKING_FIELD_STACK_CLASS,
+  BOOKING_FORM_CARD_CLASS,
+  BOOKING_FORM_INPUT_CLASS,
+  BOOKING_FORM_INPUT_INVALID_CLASS,
+} from '@/lib/ui/bookingFormStyles';
 import { BookingInfoPanel } from '@/components/booking/BookingInfoPanel';
 
 import { createBooking } from '@/app/(booking)/actions';
@@ -90,7 +95,6 @@ type BookingFormProps = {
   showInfoTrigger?: boolean;
   headerTitle?: string;
   showStepOneRouteIntro?: boolean;
-  heroEnglishCopy?: boolean;
   isAppSurface?: boolean;
   initialFavorites?: FavoriteAddress[];
   initialIsLoggedIn?: boolean;
@@ -111,8 +115,6 @@ type StepperFieldName =
   | 'childSeats'
   | 'boosterSeats';
 
-type InlineSelectFieldName = StepperFieldName;
-
 const EMPTY_FAVORITES: FavoriteAddress[] = [];
 const EMPTY_ACCOUNT_DEFAULTS = {
   fullName: '',
@@ -126,8 +128,6 @@ const STEP_ONE_GRID_CLASS =
 const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[#7fb3ff] focus:!bg-white focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const READONLY_ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[3.15rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] !bg-white !text-[#111111] !transition-none md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
-const BOOKING_FIELD_LABEL_CLASS =
-  'mb-1.5 block pl-3 text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 const TIME_VALUE_PATTERN = /^\d{2}:\d{2}$/;
 const NIGHT_LEAD_TIME_ERROR =
@@ -141,7 +141,6 @@ const BookingForm = ({
   showInfoTrigger = false,
   headerTitle,
   showStepOneRouteIntro,
-  heroEnglishCopy = false,
   isAppSurface: isAppSurfaceProp,
   initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
@@ -195,7 +194,6 @@ const BookingForm = ({
   const [streetPasteWarning, setStreetPasteWarning] = useState<'street' | 'extraStopStreet' | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
   const [accountDefaults, setAccountDefaults] = useState(initialAccountDefaults);
-  const [openInlineSelect, setOpenInlineSelect] = useState<InlineSelectFieldName | null>(null);
   const [zipPricing, setZipPricing] = useState<{
     city: string;
     basePrice: number;
@@ -282,31 +280,6 @@ const BookingForm = ({
       extraStopInputRef.current?.focus({ preventScroll: true });
     }, 120);
   }, [formData.extraStop, isExtraStopClosing]);
-
-  useEffect(() => {
-    if (!openInlineSelect) return;
-
-    const handlePointerDown = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target?.closest('[data-inline-select-root="true"]')) {
-        setOpenInlineSelect(null);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setOpenInlineSelect(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [openInlineSelect]);
 
   useEffect(() => {
     if (!isInfoPanelOpen) return;
@@ -1077,83 +1050,6 @@ const BookingForm = ({
     });
   };
 
-  const handleInlineSelect = (name: InlineSelectFieldName, value: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setOpenInlineSelect(null);
-  };
-
-  const renderInlineSelect = (
-    name: InlineSelectFieldName,
-    label: string,
-    options: number[],
-    value: number | '',
-    Icon?: LucideIcon
-  ) => {
-    const isOpen = openInlineSelect === name;
-    const isInvalid = touched[name] && value === '';
-    const displayValue = value === '' ? '--' : String(value);
-
-    return (
-      <div className="flex min-w-0 flex-col gap-1.5">
-        <span className={`text-[11px] font-medium uppercase tracking-[0.05em] sm:text-[13px] ${isInvalid ? 'text-[#d70015]' : 'text-[#86868b]'}`}>{label}</span>
-        <div className="relative min-w-0" data-inline-select-root="true">
-          {Icon ? (
-            <div className="pointer-events-none absolute left-3 top-1/2 z-[1] -translate-y-1/2 text-[#86868b]">
-              <Icon size={16} />
-            </div>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => setOpenInlineSelect(isOpen ? null : name)}
-            className={`ui-field-surface flex h-12 w-full items-center justify-between rounded-[var(--radius-field)] border py-0 text-left text-[14px] text-[#1d1d1f] outline-none transition-all sm:text-[15px] md:h-[2.4rem] md:text-[12px] ${
-              Icon ? 'pl-10 md:pl-8' : 'pl-3 md:pl-[0.8rem]'
-            } pr-3 md:pr-[0.8rem] ${
-              isInvalid
-                ? 'border-[#d70015] text-[#d70015]'
-                : value === ''
-                  ? 'border-[#d2d2d7] text-[#86868b]'
-                  : 'border-[#d2d2d7]'
-            }`}
-            aria-expanded={isOpen}
-            aria-haspopup="listbox"
-          >
-            <span className="min-w-0 truncate">{displayValue}</span>
-            <ChevronRight size={14} className={`text-[#86868b] transition-transform ${isOpen ? 'rotate-[270deg]' : 'rotate-90'}`} />
-          </button>
-
-          {isOpen ? (
-            <div className="absolute bottom-[calc(100%+0.45rem)] left-0 right-0 z-30 max-h-52 overflow-hidden rounded-[16px] border border-[#d8d4ca] bg-white p-2 shadow-[0_16px_40px_rgba(17,17,17,0.12)] sm:max-h-60 md:bottom-auto md:top-[calc(100%+0.45rem)]">
-              <div className="grid max-h-48 grid-cols-1 gap-1 overflow-y-auto pr-1 sm:max-h-56">
-                {options.map((option) => {
-                  const selected = option === value;
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => handleInlineSelect(name, option)}
-                      className={`rounded-[12px] px-3 py-2 text-left text-[15px] transition-colors md:px-[0.8rem] md:py-[0.4rem] md:text-[12px] ${
-                        selected
-                          ? 'bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] font-medium text-[#0a63ff]'
-                          : 'text-[#1d1d1f] hover:bg-white'
-                      }`}
-                      role="option"
-                      aria-selected={selected}
-                    >
-                      {option}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
-        </div>
-      </div>
-    );
-  };
-
   const renderExtraStopPanel = () => {
     if (!formData.extraStop) return null;
 
@@ -1655,7 +1551,7 @@ const BookingForm = ({
 
   const DateTimeFields = () => (
     <div className="grid grid-cols-1 gap-4 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
-      <div>
+      <div className={BOOKING_FIELD_STACK_CLASS}>
         <label className={BOOKING_FIELD_LABEL_CLASS}>Date</label>
         <div ref={datePickerAnchorRef} className="relative w-full">
           <Calendar
@@ -1685,7 +1581,7 @@ const BookingForm = ({
           />
         </div>
       </div>
-      <div>
+      <div className={BOOKING_FIELD_STACK_CLASS}>
         <label className={BOOKING_FIELD_LABEL_CLASS}>
           {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
         </label>
@@ -1733,17 +1629,19 @@ const BookingForm = ({
             isFlightDetailsVisible ? 'translate-y-0 opacity-100 delay-75' : '-translate-y-2 opacity-0'
           }`}
         >
-        <p className={BOOKING_FIELD_LABEL_CLASS}>Flight details</p>
-        <div className="w-full">
-          <input
-            type="text"
-            name="flightNumber"
-            value={formData.flightNumber}
-            onChange={handleChange}
-            onBlur={handleFlightNumberBlur}
-            placeholder="e.g. OS123"
-            className={getInputClassName('flightNumber')}
-          />
+        <div className={BOOKING_FIELD_STACK_CLASS}>
+          <p className={BOOKING_FIELD_LABEL_CLASS}>Flight details</p>
+          <div className="w-full">
+            <input
+              type="text"
+              name="flightNumber"
+              value={formData.flightNumber}
+              onChange={handleChange}
+              onBlur={handleFlightNumberBlur}
+              placeholder="e.g. OS123"
+              className={getInputClassName('flightNumber')}
+            />
+          </div>
         </div>
         {isLookingUpFlight ? (
           <p className="mt-2 ml-1 text-[12px] text-[#6d7075]">Loading flight data...</p>
@@ -1849,7 +1747,7 @@ const BookingForm = ({
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div>
+                    <div className={BOOKING_FIELD_STACK_CLASS}>
                       <p className={BOOKING_FIELD_LABEL_CLASS}>{copy.pickupLabel}</p>
                       {formData.direction === 'from_airport' ? (
                         <div>
@@ -1898,7 +1796,7 @@ const BookingForm = ({
                       ) : null}
                     </div>
 
-                    <div className="mt-4">
+                    <div className={`mt-4 ${BOOKING_FIELD_STACK_CLASS}`}>
                       <p className={BOOKING_FIELD_LABEL_CLASS}>{copy.destinationLabel}</p>
                       {formData.direction === 'from_airport' ? (
                         <div>

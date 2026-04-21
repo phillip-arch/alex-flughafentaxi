@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import BookingPriceSummaryCard from '@/components/BookingPriceSummaryCard';
+import { BOOKING_FIELD_LABEL_CLASS, BOOKING_FIELD_STACK_CLASS } from '@/lib/ui/bookingFormStyles';
 
 type BookingStepThreeProps = {
   formData: any;
@@ -25,9 +26,6 @@ type BookingStepThreeProps = {
   secondaryBackButtonClass: string;
   primaryActionButtonClass: string;
 };
-
-const STEP_THREE_FIELD_LABEL_CLASS =
-  'mb-1.5 block pl-3 text-[12px] font-medium uppercase tracking-wide text-[#6d7075]';
 
 export default function BookingStepThree({
   formData,
@@ -74,8 +72,8 @@ export default function BookingStepThree({
       ) : null}
 
       <div className="grid gap-x-4 gap-y-4 md:grid-cols-2">
-        <div className="relative md:col-span-2">
-          <label htmlFor="fullName" className={STEP_THREE_FIELD_LABEL_CLASS}>
+        <div className={`relative md:col-span-2 ${BOOKING_FIELD_STACK_CLASS}`}>
+          <label htmlFor="fullName" className={BOOKING_FIELD_LABEL_CLASS}>
             Name
           </label>
           <input
@@ -89,8 +87,8 @@ export default function BookingStepThree({
             className={getInputClassName('fullName')}
           />
         </div>
-        <div className="relative">
-          <label htmlFor="phone" className={STEP_THREE_FIELD_LABEL_CLASS}>
+        <div className={`relative ${BOOKING_FIELD_STACK_CLASS}`}>
+          <label htmlFor="phone" className={BOOKING_FIELD_LABEL_CLASS}>
             Phone number
           </label>
           <input
@@ -104,8 +102,8 @@ export default function BookingStepThree({
             className={getInputClassName('phone')}
           />
         </div>
-        <div className="relative">
-          <label htmlFor="email" className={STEP_THREE_FIELD_LABEL_CLASS}>
+        <div className={`relative ${BOOKING_FIELD_STACK_CLASS}`}>
+          <label htmlFor="email" className={BOOKING_FIELD_LABEL_CLASS}>
             E-Mail
           </label>
           <input
@@ -121,8 +119,8 @@ export default function BookingStepThree({
         </div>
       </div>
 
-      <div>
-        <p className={STEP_THREE_FIELD_LABEL_CLASS}>
+      <div className={BOOKING_FIELD_STACK_CLASS}>
+        <p className={BOOKING_FIELD_LABEL_CLASS}>
           Payment
         </p>
         <div className="flex gap-3">
