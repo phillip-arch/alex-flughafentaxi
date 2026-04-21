@@ -449,7 +449,7 @@ export default function BookingStepTwo({
                   Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
                 </span>
                 <span className="mt-1 block text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-                  Driver waits inside arrivals with a name sign.
+                  Driver waits in arrivals with a name sign
                 </span>
               </span>
               <span
@@ -478,7 +478,7 @@ export default function BookingStepTwo({
                 Free child seats
               </span>
               <span className="mt-1 block text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-                Infant, toddler or booster seats.
+                3 sizes available
               </span>
             </span>
             <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1F7CFF]">
@@ -786,7 +786,7 @@ export default function BookingStepTwo({
                   Meet &amp; Greet <span className="text-[#1F7CFF]">+6€</span>
                 </p>
                 <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">
-                  Driver waits inside arrivals with a name sign.
+                  Driver waits in arrivals with a name sign
                 </p>
               </div>
               <button
@@ -811,7 +811,7 @@ export default function BookingStepTwo({
             <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3">
               <div className="min-w-0">
                 <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">Free child seats</p>
-                <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">Infant, toddler or booster seats.</p>
+                <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">3 sizes available</p>
               </div>
               <button
                 type="button"
