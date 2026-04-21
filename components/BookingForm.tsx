@@ -582,6 +582,21 @@ const BookingForm = ({
     totalPrice: calculateVehiclePrice(basePrice, optionVehicleType, dbPrices) + extraStopPrice + meetAndGreetPrice,
   }));
   const selectedStreetOption = resolvedStreetOption;
+  const currentPickupDisplayValue =
+    formData.direction === 'from_airport'
+      ? copy.airportLabel
+      : buildStreetOptionValue(
+          selectedStreetOption?.street || streetInputValue || formData.street,
+          selectedStreetOption?.zip || formData.zip,
+          selectedStreetOption?.city || formData.city,
+        );
+  const isFlightDetailsVisible = /airport/i.test(currentPickupDisplayValue);
+
+  useEffect(() => {
+    if (!isFlightDetailsVisible) {
+      setFlightLookupError(null);
+    }
+  }, [isFlightDetailsVisible]);
   const selectedExtraStopStreetOption = resolvedExtraStopStreetOption;
   const favoriteMenuItems =
     isAppSurface && isLoggedIn && favoriteAddresses.length > 0
@@ -1029,7 +1044,7 @@ const BookingForm = ({
       setFormData((prev) => ({ ...prev, extraStop: false }));
       setIsExtraStopClosing(false);
       extraStopCloseTimeoutRef.current = null;
-    }, 280);
+    }, 400);
   };
 
   const updateStepperValue = (name: StepperFieldName, delta: -1 | 1, min: number, max: number) => {
@@ -1155,59 +1170,65 @@ const BookingForm = ({
 
     return (
       <div
-        className={`mt-3 overflow-hidden rounded-[1.35rem] border bg-white shadow-[0_10px_28px_rgba(17,17,17,0.04)] transition-[max-height,opacity,transform,padding,border-color] duration-[280ms] ease-out ${
-          isExtraStopClosing
-            ? 'max-h-0 -translate-y-2 border-transparent p-0 opacity-0'
-            : 'max-h-[18rem] translate-y-0 border-[#dbe7f8] p-3.5 opacity-100'
+        className={`grid overflow-hidden transition-[grid-template-rows,margin-top] duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          isExtraStopClosing ? 'mt-0 grid-rows-[0fr]' : 'mt-3 grid-rows-[1fr]'
         }`}
       >
-        <div className="mb-3 flex items-start justify-between gap-3">
-          <div className="flex min-w-0 flex-col gap-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1679ff]">
-              Extra stop
-            </p>
-            <p className="text-[12px] text-[#6a7d96]">
-              +10 EUR surcharge for an additional address.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={closeExtraStop}
-            className="-mr-1 -mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f6fb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
-            aria-label="Remove extra stop"
+        <div className="min-h-0 overflow-hidden">
+          <div
+            className={`rounded-[1.35rem] border border-[#dbe7f8] bg-white p-3.5 shadow-[0_10px_28px_rgba(17,17,17,0.04)] transition-[opacity,transform] duration-[220ms] ease-out ${
+              isExtraStopClosing ? '-translate-y-2 opacity-0' : 'translate-y-0 opacity-100 delay-75'
+            }`}
           >
-            <X size={18} />
-          </button>
-        </div>
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-col gap-1">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1679ff]">
+                  Extra stop
+                </p>
+                <p className="text-[12px] text-[#6a7d96]">
+                  +10 EUR surcharge for an additional address.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeExtraStop}
+                className="-mr-1 -mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f3f6fb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2"
+                aria-label="Remove extra stop"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-        <div>
-          <StreetAutocomplete
-            inputRef={extraStopInputRef}
-            autoFocus={!isExtraStopClosing}
-            value={extraStopStreetInputValue}
-            selectedOption={selectedExtraStopStreetOption}
-            zipHint={formData.zip}
-            mobileSelectedStreetOnly
-            onChange={(value) => clearStreetSelection('extraStopStreet', value)}
-            onSelect={(option) => applyStreetSelection('extraStopStreet', option)}
-            onPasteText={(text) => handleStreetPaste('extraStopStreet', text)}
-            onBlur={() => {
-              validateStreetNumber('extraStopStreet');
-              handleBlur({} as React.FocusEvent<HTMLInputElement>);
-            }}
-            placeholder={copy.streetPlaceholder}
-            className={getInputClassName('extraStopStreet')}
-          />
-          {streetNumberWarning === 'extraStopStreet' ? (
-            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-              Please add the street number.
+            <div>
+              <StreetAutocomplete
+                inputRef={extraStopInputRef}
+                autoFocus={!isExtraStopClosing}
+                value={extraStopStreetInputValue}
+                selectedOption={selectedExtraStopStreetOption}
+                zipHint={formData.zip}
+                mobileSelectedStreetOnly
+                onChange={(value) => clearStreetSelection('extraStopStreet', value)}
+                onSelect={(option) => applyStreetSelection('extraStopStreet', option)}
+                onPasteText={(text) => handleStreetPaste('extraStopStreet', text)}
+                onBlur={() => {
+                  validateStreetNumber('extraStopStreet');
+                  handleBlur({} as React.FocusEvent<HTMLInputElement>);
+                }}
+                placeholder={copy.streetPlaceholder}
+                className={getInputClassName('extraStopStreet')}
+              />
+              {streetNumberWarning === 'extraStopStreet' ? (
+                <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                  Please add the street number.
+                </div>
+              ) : null}
+              {streetPasteWarning === 'extraStopStreet' ? (
+                <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
+                  Address could not be recognized clearly. Please choose from the list.
+                </div>
+              ) : null}
             </div>
-          ) : null}
-          {streetPasteWarning === 'extraStopStreet' ? (
-            <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015]">
-              Address could not be recognized clearly. Please choose from the list.
-            </div>
-          ) : null}
+          </div>
         </div>
       </div>
     );
@@ -1297,7 +1318,7 @@ const BookingForm = ({
 
     if (step === 1) {
       requiredFields.push('date', 'time', 'street', 'zip');
-      if (formData.direction === 'from_airport') {
+      if (isFlightDetailsVisible) {
         requiredFields.push('flightNumber');
       }
       if (formData.extraStop) {
@@ -1367,7 +1388,7 @@ const BookingForm = ({
   };
 
   const handleMeetAndGreetChange = (checked: boolean) => {
-    if (formData.direction !== 'from_airport') return;
+    if (!isFlightDetailsVisible) return;
     setFormData((prev) => ({ ...prev, meetAndGreet: checked }));
     onMeetAndGreetChange?.(checked);
   };
@@ -1524,7 +1545,7 @@ const BookingForm = ({
                (formData.direction === 'from_airport' && formData.meetAndGreet
                  ? ' (Meet & Greet: Driver waits inside with a name sign)'
                  : '') +
-               (formData.flightNumber ? ` (Flight number: ${formData.flightNumber})` : '') +
+               (isFlightDetailsVisible && formData.flightNumber ? ` (Flight number: ${formData.flightNumber})` : '') +
                (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Hand luggage: ${formData.handLuggage})` : '') +
                (formData.paymentMethod
                  ? ` (Payment: ${
@@ -1663,9 +1684,19 @@ const BookingForm = ({
     </div>
   );
 
-  const FlightDetailsFields = () =>
-    formData.direction === 'from_airport' ? (
-      <div className="mt-4">
+  const FlightDetailsFields = () => (
+    <div
+      className={`grid overflow-hidden transition-[grid-template-rows,margin-top,margin-bottom] duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        isFlightDetailsVisible ? 'mt-4 mb-[15px] grid-rows-[1fr]' : 'mt-0 mb-0 grid-rows-[0fr]'
+      }`}
+      aria-hidden={!isFlightDetailsVisible}
+    >
+      <div className="min-h-0 overflow-hidden">
+        <div
+          className={`transition-[opacity,transform] duration-[220ms] ease-out ${
+            isFlightDetailsVisible ? 'translate-y-0 opacity-100 delay-75' : '-translate-y-2 opacity-0'
+          }`}
+        >
         <p className="mb-1.5 ml-1 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#6d7075]">
           Flight details
         </p>
@@ -1688,8 +1719,10 @@ const BookingForm = ({
             {flightLookupError}
           </div>
         ) : null}
+        </div>
       </div>
-    ) : null;
+    </div>
+  );
 
   const shouldShowInfoTrigger = isAppSurface && hasMounted;
   const formContentSpacingClassName = showStepIndicator
