@@ -253,7 +253,7 @@ export default function BookingStepTwo({
     const isAtMax = numericValue !== null && numericValue >= max;
 
     return (
-      <div className="grid min-w-0 grid-cols-[auto_auto] items-center justify-between gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-4">
+      <div className="grid min-w-0 grid-cols-[auto_auto] items-center justify-between gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3">
         <div className="flex min-w-0 items-center">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF]">
             <Icon size={18} />
@@ -420,7 +420,7 @@ export default function BookingStepTwo({
                 <AnimatedPrice value={inlineVehiclePrice} />
               </p>
             </div>
-            <p className="col-span-2 min-w-0 text-[14px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
+            <p className="col-span-2 min-w-0 text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
               Max. {inlineVehicleCard.maxPassengers} passengers and {inlineVehicleCard.maxSuitcases} check-in suitcases
             </p>
           </div>
