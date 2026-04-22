@@ -205,36 +205,36 @@ export default function BookingStepTwo({
     const isAtMax = numericValue !== null && numericValue >= max;
 
     return (
-      <div className="flex min-h-[4.65rem] items-center justify-between gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-2 md:min-h-[6.7rem] md:flex-col md:items-center md:justify-center md:gap-5 md:px-4 md:py-4 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[5.65rem] [@media(min-width:768px)_and_(max-height:850px)]:gap-3 [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-3">
-        <div className="flex min-w-0 items-center gap-3 md:justify-center md:gap-2.5">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF] md:h-auto md:w-auto md:bg-transparent">
-            <Icon size={18} className="md:h-[17px] md:w-[17px]" />
+      <div className="flex min-h-[4.9rem] items-center justify-between gap-4 px-4 py-3 md:min-h-[5.15rem] md:px-5 md:py-4 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[4.5rem] [@media(min-width:768px)_and_(max-height:850px)]:py-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] bg-[#eef5ff] text-[#1F7CFF]">
+            <Icon size={18} />
           </span>
-          <p className="truncate text-[1.02rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[1rem]">
+          <p className="truncate text-[1.02rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
             {label}
           </p>
         </div>
-        <div className="mr-1 flex shrink-0 items-center gap-2.5 md:mr-0 md:w-full md:justify-center md:gap-7 [@media(min-width:768px)_and_(max-height:850px)]:gap-5">
+        <div className="flex shrink-0 items-center gap-3">
           <button
             type="button"
             onClick={() => updateStepperValue(name, -1, min, max)}
             disabled={isAtMin}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white md:h-11 md:w-11 [@media(min-width:768px)_and_(max-height:850px)]:h-9 [@media(min-width:768px)_and_(max-height:850px)]:w-9"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white"
             aria-label={`Decrease ${label}`}
           >
-            <Minus size={17} className="md:h-[18px] md:w-[18px]" />
+            <Minus size={18} />
           </button>
-          <span className="min-w-[1.7rem] text-center text-[1.12rem] font-semibold leading-none tracking-[-0.04em] text-[#111827] md:min-w-[1.6rem] md:text-[1.15rem]">
+          <span className="min-w-[1.7rem] text-center text-[1.15rem] font-semibold leading-none tracking-[-0.04em] text-[#111827]">
             {value === '' ? '--' : value}
           </span>
           <button
             type="button"
             onClick={() => updateStepperValue(name, 1, min, max)}
             disabled={isAtMax}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] md:h-11 md:w-11 [@media(min-width:768px)_and_(max-height:850px)]:h-9 [@media(min-width:768px)_and_(max-height:850px)]:w-9"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db]"
             aria-label={`Increase ${label}`}
           >
-            <Plus size={17} className="md:h-[18px] md:w-[18px]" />
+            <Plus size={18} />
           </button>
         </div>
       </div>
@@ -254,12 +254,12 @@ export default function BookingStepTwo({
     const isAtMax = numericValue !== null && numericValue >= max;
 
     return (
-      <div className="grid min-w-0 grid-cols-[auto_auto] items-center justify-between gap-3 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3">
-        <div className="flex min-w-0 items-center">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f4f7fb] text-[#1F7CFF]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center justify-between gap-3 px-4 py-3.5">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] bg-[#eef5ff] text-[#1F7CFF]">
             <Icon size={18} />
           </span>
-          <span className="sr-only">{label}</span>
+          <span className="truncate text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">{label}</span>
         </div>
         <div className="grid shrink-0 grid-cols-[2.25rem_2rem_2.25rem] items-center gap-2">
           <button
@@ -380,9 +380,11 @@ export default function BookingStepTwo({
           </div>
         </div>
       ) : null}
-      <div className="grid min-w-0 gap-4 md:grid-cols-3 md:gap-5">
+      <div className="overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white">
         {renderInlineTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
+        <div className="border-t border-[#e8eef7]" />
         {renderInlineTravelStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
+        <div className="border-t border-[#e8eef7]" />
         {renderInlineTravelStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, 8, ShoppingBag)}
       </div>
     </div>
@@ -427,9 +429,11 @@ export default function BookingStepTwo({
           </div>
         ) : null}
 
-        <div className="space-y-3">
+        <div className="overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white">
           {renderScratchTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
+          <div className="border-t border-[#e8eef7]" />
           {renderScratchTravelStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
+          <div className="border-t border-[#e8eef7]" />
           {renderScratchTravelStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, 8, ShoppingBag)}
         </div>
 

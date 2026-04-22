@@ -378,15 +378,17 @@ p {
   .ui-button-booking-primary {
     display: inline-flex;
     width: 100%;
+    min-height: 3rem;
     flex: 1 1 0%;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: var(--radius-field);
+    border-radius: 14px;
     background: #1F7CFF !important;
     padding: 1rem 2rem;
-    font-size: 1.0625rem;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
     color: #ffffff !important;
     transition: background-color 160ms ease, color 160ms ease, opacity 160ms ease;
     text-decoration: none;
@@ -473,10 +475,7 @@ p {
 
 @media (min-width: 768px) {
   .ui-button-booking-primary {
-    width: auto;
-    min-width: 11rem;
-    flex: none;
-    padding: 0.8rem 1.6rem;
+    font-size: 20px;
   }
 
   .ui-input {
@@ -491,8 +490,7 @@ p {
 
 @media (min-width: 768px) and (max-height: 850px) {
   .ui-button-booking-primary {
-    padding-top: 0.65rem;
-    padding-bottom: 0.65rem;
+    font-size: 19px;
   }
 }
 
