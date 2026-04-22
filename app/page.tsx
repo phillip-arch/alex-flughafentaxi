@@ -506,7 +506,7 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
 
 function HeroBookingCard() {
   return (
-    <div id="hero-booking" className="relative w-full max-w-[32rem] md:w-[32rem] md:max-w-[32rem]">
+    <div id="hero-booking" className="relative mx-auto w-full max-w-[32rem] md:mx-0 md:w-[32rem] md:max-w-[32rem]">
       <div className={heroBookingCardClass}>
         <div className="min-h-0 lg:flex-1 lg:min-h-0">
           <BookingForm />

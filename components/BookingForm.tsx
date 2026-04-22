@@ -1401,7 +1401,7 @@ const BookingForm = ({
   );
 
   const DateTimeFields = () => (
-    <div className="grid grid-cols-1 gap-4 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
+    <div className="grid grid-cols-2 gap-3 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
       <div className={BOOKING_FIELD_STACK_CLASS}>
         <label className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[16px] [@media(min-width:768px)_and_(max-height:900px)]:text-[13px]">Date</label>
         <div ref={datePickerAnchorRef} className="relative w-full">
@@ -1508,7 +1508,7 @@ const BookingForm = ({
     'mb-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
 
   return (
-    <div className={`${BOOKING_FORM_CARD_CLASS} relative w-full max-w-[32rem] shrink-0 overflow-x-clip max-md:mx-auto max-md:w-[calc(100%-24px)] md:w-[32rem] md:max-w-[32rem] ${allowExtendedDropdownSpace ? 'overflow-y-visible' : 'overflow-y-hidden'}`}>
+    <div className={`${BOOKING_FORM_CARD_CLASS} relative w-full max-w-[32rem] shrink-0 overflow-x-clip md:w-[32rem] md:max-w-[32rem] ${allowExtendedDropdownSpace ? 'overflow-y-visible' : 'overflow-y-hidden'}`}>
       {shouldShowInfoTrigger ? (
         <button
           type="button"
@@ -1562,7 +1562,7 @@ const BookingForm = ({
                       {airportRowLabel}
                     </span>
                     <AirportRowIcon className="h-4 w-4 shrink-0 text-[#2563eb] md:h-6 md:w-6 [@media(min-width:768px)_and_(max-height:900px)]:h-5 [@media(min-width:768px)_and_(max-height:900px)]:w-5" strokeWidth={2.2} />
-                    <p className="min-w-0 truncate text-[17px] font-semibold leading-tight tracking-[-0.03em] text-[#111111] md:text-[25px] [@media(min-width:768px)_and_(max-height:900px)]:text-[20px]">
+                    <p className="min-w-0 truncate text-[15px] font-semibold leading-tight tracking-[-0.03em] text-[#111111] md:text-[25px] [@media(min-width:768px)_and_(max-height:900px)]:text-[20px]">
                       {copy.airportLabel}
                     </p>
                   </div>
