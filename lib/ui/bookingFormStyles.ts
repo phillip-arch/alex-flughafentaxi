@@ -1,5 +1,5 @@
 export const BOOKING_FORM_CARD_CLASS =
-  'rounded-[24px] border border-[#e2e8f0] bg-[var(--color-form-bg)] shadow-[0_10px_30px_rgba(15,23,42,0.04)] md:rounded-[32px]';
+  'rounded-[24px] border border-[#f0f1f3] !bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)] md:rounded-[32px]';
 
 export const BOOKING_FORM_INPUT_CLASS =
   'ui-input';

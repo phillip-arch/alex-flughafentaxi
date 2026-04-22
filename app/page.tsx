@@ -2,20 +2,16 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-  Baby,
   Check,
   ChevronDown,
   ChevronRight,
   Briefcase,
-  CreditCard,
-  Hourglass,
   Info,
   MapPin,
   Phone,
   ShieldCheck,
   ShoppingBag,
   Star,
-  Wifi,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
@@ -217,42 +213,15 @@ const vehicleCategoryHighlights = [
 ];
 
 const heroSectionPaddingClass =
-  'app-container relative pb-10 pt-[calc(66px+18px)] md:pb-12 md:pt-[calc(72px+48px)] lg:pb-14 lg:pt-[calc(72px+48px)]';
+  'app-container relative pb-10 pt-[calc(66px+28px)] md:pb-12 md:pt-[calc(72px+12px)] lg:pb-14 lg:pt-[calc(72px+10px)]';
 const heroHeadlineClass =
-  'mx-auto mt-[16px] max-w-[24ch] text-center text-[30px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:mt-4 md:max-w-none md:text-[40px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor] lg:mx-0 lg:text-left';
+  'mx-auto mt-[4px] mb-[30px] max-w-[23ch] text-center text-[27px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:mt-4 md:max-w-none md:text-[32px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor] lg:mx-0 lg:mb-0 lg:text-left';
 const heroGridClass =
-  'grid items-start gap-10 lg:grid-cols-[0.98fr_0.72fr] lg:items-stretch lg:gap-20 xl:gap-24';
-const heroBookingColumnClass = 'mt-10 self-start text-left lg:mt-12';
+  'grid items-start gap-10 lg:grid-cols-[0.62fr_1fr] lg:items-stretch lg:gap-20 xl:gap-24';
+const heroBookingColumnClass = 'mt-4 self-start text-left lg:mt-0';
 const heroBookingCardClass =
-  'relative mt-8 w-full max-w-[46rem] text-left md:mt-10';
+  'relative mt-8 w-full max-w-[32rem] text-left md:mt-10 md:w-[32rem] md:max-w-[32rem]';
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
-
-const heroBenefitCards = [
-  {
-    title: 'Child Seats',
-    description: 'Free on request',
-    icon: Baby,
-    iconClassName: 'text-[#f59e0b]',
-  },
-  {
-    title: 'Free WiFi',
-    description: 'In all vehicles',
-    icon: Wifi,
-    iconClassName: 'text-[#1F7CFF]',
-  },
-  {
-    title: 'All Payments',
-    description: 'Cash, card, Apple Pay',
-    icon: CreditCard,
-    iconClassName: 'text-[#1679FF]',
-  },
-  {
-    title: 'Flight Tracking',
-    description: 'We adjust for delays',
-    icon: ShieldCheck,
-    iconClassName: 'text-[#1F7CFF]',
-  },
-] as const;
 
 const vehicleCategories: VehicleCategory[] = [
   {
@@ -537,7 +506,7 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
 
 function HeroBookingCard() {
   return (
-    <div id="hero-booking" className="relative w-full max-w-[46rem]">
+    <div id="hero-booking" className="relative w-full max-w-[32rem] md:w-[32rem] md:max-w-[32rem]">
       <div className={heroBookingCardClass}>
         <div className="min-h-0 lg:flex-1 lg:min-h-0">
           <BookingForm />
@@ -549,52 +518,39 @@ function HeroBookingCard() {
 
 function HeroImageCard() {
   return (
-    <div className="relative mx-auto flex h-full w-full max-w-[35rem] flex-col lg:mt-12">
-      <div className="relative h-[17rem] overflow-hidden rounded-[1.9rem] shadow-[0_30px_80px_rgba(15,23,42,0.13)] md:h-[22rem] md:rounded-[2.25rem]">
-        <Image
-          src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
-          alt="Alex Flughafentaxi Wien"
-          fill
-          priority
-          fetchPriority="high"
-          quality={72}
-          className="object-cover"
-          sizes="(min-width: 1024px) 35rem, (min-width: 768px) 46vw, 92vw"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(15,23,42,0.12)_100%)]" />
-      </div>
+    <div className="relative mx-auto flex h-full w-full max-w-[52rem] flex-col lg:mt-12 lg:gap-[40px]">
+      <h1 className={`${heroHeadlineClass} hidden lg:block`}>
+        Vienna Airport Taxi: Fixed-Price Transfers
+      </h1>
 
-      <div className="absolute left-4 top-5 z-10 inline-flex items-center gap-3 rounded-[1.15rem] bg-white px-4 py-3 text-[#0f172a] shadow-[0_18px_40px_rgba(15,23,42,0.14)] md:-left-6 md:top-7 md:px-5">
-        <Star size={18} className="fill-[#eab308] text-[#eab308]" strokeWidth={2.2} />
-        <span className="text-[1rem] font-black tracking-[-0.03em] md:text-[1.05rem]">
-          4.9/5 Rating
-        </span>
-      </div>
+      <div className="relative">
+        <div className="relative h-[17rem] overflow-hidden rounded-[1.9rem] shadow-[0_30px_80px_rgba(15,23,42,0.13)] md:h-[22rem] md:rounded-[2.25rem]">
+          <Image
+            src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
+            alt="Alex Flughafentaxi Wien"
+            fill
+            priority
+            fetchPriority="high"
+            quality={72}
+            className="object-cover"
+            sizes="(min-width: 1024px) 52rem, (min-width: 768px) 58vw, 92vw"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(15,23,42,0.12)_100%)]" />
+        </div>
 
-      <div className="absolute right-4 top-[13.5rem] z-10 inline-flex items-center gap-3 rounded-[1.15rem] bg-white px-4 py-3 text-[#0f172a] shadow-[0_18px_40px_rgba(15,23,42,0.14)] md:-right-5 md:top-[16.5rem] md:px-5">
-        <Hourglass size={18} className="text-[#38bdf8]" strokeWidth={2.2} />
-        <span className="text-[1rem] font-black tracking-[-0.03em] md:text-[1.05rem]">
-          60m Free Waiting
-        </span>
-      </div>
+        <div className="absolute left-4 top-5 z-10 inline-flex items-center gap-3 rounded-[1.15rem] bg-white px-4 py-3 text-[#0f172a] shadow-[0_18px_40px_rgba(15,23,42,0.14)] md:-left-6 md:top-7 md:px-5">
+          <Star size={18} className="fill-[#eab308] text-[#eab308]" strokeWidth={2.2} />
+          <span className="text-[1rem] font-black tracking-[-0.03em] md:text-[1.05rem]">
+            4.9/5 Rating
+          </span>
+        </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-10">
-        {heroBenefitCards.map(({ title, description, icon: Icon, iconClassName }) => (
-          <div
-            key={title}
-            className="rounded-[1.35rem] border border-[#dfe7f2] bg-[#f8fbff]/70 px-5 py-5 shadow-[0_8px_24px_rgba(15,23,42,0.035)]"
-          >
-            <div className="flex items-center gap-2.5">
-              <Icon size={18} className={iconClassName} strokeWidth={2.25} />
-              <p className="text-[1rem] font-black leading-tight tracking-[-0.035em] text-[#0f172a]">
-                {title}
-              </p>
-            </div>
-            <p className="mt-3 text-[0.92rem] leading-6 text-[#64748b]">
-              {description}
-            </p>
-          </div>
-        ))}
+        <div className="absolute right-4 top-[13.5rem] z-10 inline-flex items-center gap-3 rounded-[1.15rem] bg-white px-4 py-3 text-[#0f172a] shadow-[0_18px_40px_rgba(15,23,42,0.14)] md:-right-5 md:top-[16.5rem] md:px-5">
+          <ShieldCheck size={18} className="text-[#1F7CFF]" strokeWidth={2.2} />
+          <span className="text-[1rem] font-black tracking-[-0.03em] md:text-[1.05rem]">
+            Flight Tracking
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -617,12 +573,11 @@ export default async function Home({
       <section id="hero" className="relative overflow-hidden bg-[var(--color-page-bg)] text-[var(--color-text)]">
         <div className={heroSectionPaddingClass}>
           <div className="mx-auto max-w-[104rem]">
+            <h1 className={`${heroHeadlineClass} lg:hidden`}>
+              Vienna Airport Taxi: Fixed-Price Transfers
+            </h1>
             <div className={heroGridClass}>
               <div className={heroBookingColumnClass}>
-                <h1 className={heroHeadlineClass}>
-                  <span className="block">Vienna Airport Taxi:</span>
-                  <span className="block">Fixed-Price Transfers</span>
-                </h1>
                 <HeroBookingCard />
               </div>
 
