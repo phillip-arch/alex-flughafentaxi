@@ -55,6 +55,12 @@
   --space-8: 2rem;
   --space-10: 2.5rem;
   --space-12: 3rem;
+
+  --ease-premium: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-speed: 0.4s;
+  --anim-fast: 0.2s;
+  --anim-odometer: 0.3s;
 }
 
 * {
@@ -354,6 +360,105 @@ p {
     animation: ui-price-grow 340ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
   }
 
+  .ui-step-indicator-pill {
+    transition:
+      width var(--anim-speed) var(--ease-premium),
+      background-color var(--anim-speed) var(--ease-premium),
+      transform var(--anim-speed) var(--ease-premium),
+      opacity var(--anim-speed) var(--ease-premium);
+  }
+
+  .ui-form-viewport {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    transition: height 0.5s var(--ease-premium);
+  }
+
+  .ui-form-track {
+    display: flex;
+    width: 300%;
+    will-change: transform;
+    transition: transform 0.5s var(--ease-premium);
+  }
+
+  .ui-form-step {
+    flex: 0 0 33.333333%;
+    width: 33.333333%;
+    transition: opacity 0.4s ease;
+  }
+
+  .ui-form-step-active {
+    opacity: 1;
+  }
+
+  .ui-form-step-inactive {
+    opacity: 0.28;
+    pointer-events: none;
+  }
+
+  .ui-odometer-window {
+    display: inline-flex;
+    height: 1em;
+    overflow: hidden;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .ui-odometer-strip {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+    transition: transform var(--anim-odometer) var(--ease-out-back);
+  }
+
+  .ui-odometer-digit {
+    display: flex;
+    height: 1em;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .ui-counter-button-pulse {
+    animation: ui-counter-button-pulse var(--anim-fast) var(--ease-out-back);
+  }
+
+  .ui-info-sync-shell {
+    width: 100%;
+  }
+
+  .ui-info-card-transition {
+    transition:
+      opacity 0.3s ease,
+      transform var(--anim-speed) var(--ease-premium);
+    opacity: 1;
+    transform: translateX(0);
+    will-change: transform, opacity;
+  }
+
+  .ui-info-card-exit-next {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  .ui-info-card-exit-prev {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  .ui-info-card-prepare-next {
+    transition: none !important;
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  .ui-info-card-prepare-prev {
+    transition: none !important;
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
   @keyframes ui-price-grow {
     0% {
       transform: scale(1);
@@ -361,6 +466,20 @@ p {
 
     45% {
       transform: scale(1.12);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes ui-counter-button-pulse {
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.1);
     }
 
     100% {
@@ -497,5 +616,19 @@ p {
 @media (min-width: 1024px) {
   .app-container {
     padding-inline: 3.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

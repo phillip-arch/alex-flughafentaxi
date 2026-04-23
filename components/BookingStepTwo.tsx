@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import { Armchair, Baby, Briefcase, ChevronLeft, Minus, NotebookPen, Plus, ShieldCheck, ShoppingBag, Users, X } from 'lucide-react';
+import { Armchair, Baby, Briefcase, ChevronLeft, Minus, NotebookPen, Plus, ShieldCheck, Users, X } from 'lucide-react';
+import { usePrefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion';
 import { formatVehicleTypeLabel, type VehicleType } from '@/lib/pricing';
 import { BOOKING_FIELD_LABEL_CLASS } from '@/lib/ui/bookingFormStyles';
 import AnimatedPrice from './AnimatedPrice';
@@ -16,6 +17,33 @@ type VehiclePriceOption = {
 
 // Keep the upgrade card styling in place for a later upsell return.
 const ENABLE_TRAVEL_UPSELL = false;
+const ROLLING_DIGITS = Array.from({ length: 10 }, (_, index) => index);
+
+function RollingCounter({
+  value,
+  className,
+  prefersReducedMotion,
+}: {
+  value: number | '';
+  className: string;
+  prefersReducedMotion: boolean;
+}) {
+  if (value === '' || prefersReducedMotion) {
+    return <span className={className}>{value === '' ? '--' : value}</span>;
+  }
+
+  return (
+    <span className={`ui-odometer-window ${className}`} aria-live="polite" aria-atomic="true">
+      <span className="ui-odometer-strip" style={{ transform: `translateY(-${value * 10}%)` }}>
+        {ROLLING_DIGITS.map((digit) => (
+          <span key={digit} className="ui-odometer-digit">
+            {digit}
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
 
 type BookingStepTwoProps = {
   formData: any;
@@ -62,11 +90,13 @@ export default function BookingStepTwo({
   const [activeTravelVehicleType, setActiveTravelVehicleType] = useState<VehicleType | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [draftNotes, setDraftNotes] = useState(formData.notes || '');
+  const [pressedButtonKey, setPressedButtonKey] = useState<string | null>(null);
+  const pulseResetTimeoutRef = useRef<number | null>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const childSeatTotal = formData.babySeats + formData.childSeats + formData.boosterSeats;
   const hasDriverNote = Boolean(formData.notes?.trim());
   const hasSelectedTravelDetails = Boolean(formData.travelDetailsSelected);
-  const travelSummaryInvalid =
-    isFieldInvalid('passengers') || isFieldInvalid('luggage') || isFieldInvalid('handLuggage');
+  const travelSummaryInvalid = isFieldInvalid('passengers') || isFieldInvalid('luggage');
   const vehicleOrder: VehicleType[] = ['Limo', 'Kombi', 'Bus'];
   const vehicleCards: Array<{
     vehicleType: VehicleType;
@@ -100,6 +130,14 @@ export default function BookingStepTwo({
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (pulseResetTimeoutRef.current !== null) {
+        window.clearTimeout(pulseResetTimeoutRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -145,6 +183,28 @@ export default function BookingStepTwo({
     setIsNoteSheetOpen(false);
   };
 
+  const handleStepperAdjust = (
+    name: 'passengers' | 'luggage' | 'handLuggage' | 'babySeats' | 'childSeats' | 'boosterSeats',
+    delta: -1 | 1,
+    min: number,
+    max: number,
+  ) => {
+    const pulseKey = `${name}:${delta}`;
+
+    setPressedButtonKey(null);
+    if (typeof window !== 'undefined' && !prefersReducedMotion) {
+      window.requestAnimationFrame(() => setPressedButtonKey(pulseKey));
+      if (pulseResetTimeoutRef.current !== null) {
+        window.clearTimeout(pulseResetTimeoutRef.current);
+      }
+      pulseResetTimeoutRef.current = window.setTimeout(() => {
+        setPressedButtonKey(null);
+      }, 220);
+    }
+
+    updateStepperValue(name, delta, min, max);
+  };
+
   const renderSheetStepper = (
     name: 'passengers' | 'luggage' | 'handLuggage' | 'babySeats' | 'childSeats' | 'boosterSeats',
     label: string,
@@ -168,21 +228,23 @@ export default function BookingStepTwo({
         <div className="flex shrink-0 items-center gap-3">
           <button
             type="button"
-            onClick={() => updateStepperValue(name, -1, min, max)}
+            onClick={() => handleStepperAdjust(name, -1, min, max)}
             disabled={isAtMin}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-[#f3f4f6] disabled:text-[#b6bcc6] disabled:hover:bg-[#f3f4f6]"
+            className={`flex h-12 w-12 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-[#f3f4f6] disabled:text-[#b6bcc6] disabled:hover:bg-[#f3f4f6] ${pressedButtonKey === `${name}:-1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Decrease ${label}`}
           >
             <Minus size={20} />
           </button>
-          <span className="min-w-[2.4rem] text-center text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">
-            {value === '' ? '--' : value}
-          </span>
+          <RollingCounter
+            value={value}
+            prefersReducedMotion={prefersReducedMotion}
+            className="min-w-[2.4rem] text-center text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]"
+          />
           <button
             type="button"
-            onClick={() => updateStepperValue(name, 1, min, max)}
+            onClick={() => handleStepperAdjust(name, 1, min, max)}
             disabled={isAtMax}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db]"
+            className={`flex h-12 w-12 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] ${pressedButtonKey === `${name}:1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Increase ${label}`}
           >
             <Plus size={20} />
@@ -217,21 +279,23 @@ export default function BookingStepTwo({
         <div className="flex shrink-0 items-center gap-3">
           <button
             type="button"
-            onClick={() => updateStepperValue(name, -1, min, max)}
+            onClick={() => handleStepperAdjust(name, -1, min, max)}
             disabled={isAtMin}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white"
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white ${pressedButtonKey === `${name}:-1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Decrease ${label}`}
           >
             <Minus size={18} />
           </button>
-          <span className="min-w-[1.7rem] text-center text-[1.15rem] font-semibold leading-none tracking-[-0.04em] text-[#111827]">
-            {value === '' ? '--' : value}
-          </span>
+          <RollingCounter
+            value={value}
+            prefersReducedMotion={prefersReducedMotion}
+            className="min-w-[1.7rem] text-center text-[1.15rem] font-semibold leading-none tracking-[-0.04em] text-[#111827]"
+          />
           <button
             type="button"
-            onClick={() => updateStepperValue(name, 1, min, max)}
+            onClick={() => handleStepperAdjust(name, 1, min, max)}
             disabled={isAtMax}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db]"
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] ${pressedButtonKey === `${name}:1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Increase ${label}`}
           >
             <Plus size={18} />
@@ -264,21 +328,23 @@ export default function BookingStepTwo({
         <div className="grid shrink-0 grid-cols-[2.25rem_2rem_2.25rem] items-center gap-2">
           <button
             type="button"
-            onClick={() => updateStepperValue(name, -1, min, max)}
+            onClick={() => handleStepperAdjust(name, -1, min, max)}
             disabled={isAtMin}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:text-[#c3cad5]"
+            className={`flex h-9 w-9 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:text-[#c3cad5] ${pressedButtonKey === `${name}:-1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Decrease ${label}`}
           >
             <Minus size={17} />
           </button>
-          <span className="text-center text-[1.1rem] font-semibold leading-none tracking-[-0.04em] text-[#111827]">
-            {value === '' ? '--' : value}
-          </span>
+          <RollingCounter
+            value={value}
+            prefersReducedMotion={prefersReducedMotion}
+            className="text-center text-[1.1rem] font-semibold leading-none tracking-[-0.04em] text-[#111827]"
+          />
           <button
             type="button"
-            onClick={() => updateStepperValue(name, 1, min, max)}
+            onClick={() => handleStepperAdjust(name, 1, min, max)}
             disabled={isAtMax}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db]"
+            className={`flex h-9 w-9 items-center justify-center rounded-full bg-[#1F7CFF] text-white transition-colors hover:bg-[#176be0] disabled:cursor-not-allowed disabled:bg-[#d1d5db] ${pressedButtonKey === `${name}:1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Increase ${label}`}
           >
             <Plus size={17} />
@@ -367,7 +433,7 @@ export default function BookingStepTwo({
             <p className="overflow-hidden text-[14px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975] md:whitespace-normal md:overflow-visible md:text-[1rem] md:tracking-normal [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
               Max. {inlineVehicleCard.maxPassengers} passengers and{' '}
               <br className="hidden md:block" />
-              {inlineVehicleCard.maxSuitcases} check-in suitcases
+              {inlineVehicleCard.maxSuitcases} check-in luggage
             </p>
           </div>
           <div className="order-2 min-w-0 text-right md:order-none md:shrink-0">
@@ -383,9 +449,8 @@ export default function BookingStepTwo({
       <div className="overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white">
         {renderInlineTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
         <div className="border-t border-[#e8eef7]" />
-        {renderInlineTravelStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
+        {renderInlineTravelStepper('luggage', 'Check-in luggage', formData.luggage, 0, 8, Briefcase)}
         <div className="border-t border-[#e8eef7]" />
-        {renderInlineTravelStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, 8, ShoppingBag)}
       </div>
     </div>
   );
@@ -424,7 +489,7 @@ export default function BookingStepTwo({
               </p>
             </div>
             <p className="col-span-2 min-w-0 text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-              Max. {inlineVehicleCard.maxPassengers} passengers and {inlineVehicleCard.maxSuitcases} check-in suitcases
+              Max. {inlineVehicleCard.maxPassengers} passengers and {inlineVehicleCard.maxSuitcases} check-in luggage
             </p>
           </div>
         ) : null}
@@ -432,9 +497,8 @@ export default function BookingStepTwo({
         <div className="overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white">
           {renderScratchTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
           <div className="border-t border-[#e8eef7]" />
-          {renderScratchTravelStepper('luggage', 'Suitcases', formData.luggage, 0, 8, Briefcase)}
+          {renderScratchTravelStepper('luggage', 'Check-in luggage', formData.luggage, 0, 8, Briefcase)}
           <div className="border-t border-[#e8eef7]" />
-          {renderScratchTravelStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, 8, ShoppingBag)}
         </div>
 
         <div className="space-y-3">
@@ -595,7 +659,7 @@ export default function BookingStepTwo({
                         <p className="mt-1 text-[0.86rem] font-medium leading-snug text-[#5f6975] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.78rem]">
                           Max. {card.maxPassengers} passengers and{' '}
                           <br />
-                          {card.maxSuitcases} check-in suitcases
+                          {card.maxSuitcases} check-in luggage
                         </p>
                       )}
                     </div>
@@ -666,8 +730,7 @@ export default function BookingStepTwo({
               ) : null}
               <div className="space-y-3">
                 {renderSheetStepper('passengers', 'Passengers', formData.passengers, 1, currentVehicleCard?.maxPassengers ?? 8, Users)}
-                {renderSheetStepper('luggage', 'Suitcases', formData.luggage, 0, currentVehicleCard?.maxSuitcases ?? 8, Briefcase)}
-                {renderSheetStepper('handLuggage', 'Hand luggage', formData.handLuggage, 0, currentVehicleCard?.maxSuitcases ?? 8, ShoppingBag)}
+                {renderSheetStepper('luggage', 'Check-in luggage', formData.luggage, 0, currentVehicleCard?.maxSuitcases ?? 8, Briefcase)}
               </div>
               {shouldShowTravelUpsell && nextVehicleType ? (
                 <div className="hidden">
@@ -772,7 +835,7 @@ export default function BookingStepTwo({
       : null;
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip">
       <div className="hidden space-y-8 md:block [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
       {renderInlineTravelDetails()}
 

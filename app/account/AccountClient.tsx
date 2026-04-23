@@ -192,6 +192,7 @@ export default function AccountClient({
   const [activeTab, setActiveTab] = useState<AccountTab>(initialRequestedTab);
   const [bookingDirection, setBookingDirection] = useState<BookingDirection>('to_airport');
   const [meetAndGreet, setMeetAndGreet] = useState(false);
+  const [bookingStep, setBookingStep] = useState(1);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
   const [openPanel, setOpenPanel] = useState<AccountPanel>(initialOpenPanel);
@@ -631,6 +632,7 @@ export default function AccountClient({
                   <div className="w-full">
                     <BookingForm
                       onDirectionChange={setBookingDirection}
+                      onStepChange={setBookingStep}
                       meetAndGreetSelected={meetAndGreet}
                       onMeetAndGreetChange={setMeetAndGreet}
                       showStepIndicator
@@ -650,6 +652,7 @@ export default function AccountClient({
                   <BookingInfoPanel
                     direction={bookingDirection}
                     meetAndGreet={meetAndGreet}
+                    currentStep={bookingStep}
                   />
                 </aside>
               </div>

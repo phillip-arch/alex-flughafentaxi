@@ -2,16 +2,19 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-  Check,
+  Baby,
   ChevronDown,
   ChevronRight,
   Briefcase,
+  CreditCard,
   Info,
   MapPin,
+  Plane,
   Phone,
   ShieldCheck,
   ShoppingBag,
   Star,
+  type LucideIcon,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
@@ -116,31 +119,36 @@ const whyUsItems = [
   },
 ];
 
-const transferFeatureRows = [
-  'Fixed price',
-  'Direct pickup',
-  'On-time transfer',
-  'Comfortable vehicles',
-] as const;
-
-const transferFeatureCards = [
+const alexStandardCards: {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+}[] = [
   {
-    title: 'Vienna -> Schwechat Airport',
-    description: 'Fast and direct to your departure, without unnecessary detours.',
+    title: 'Hand-Vetted Drivers',
+    description:
+      'Every driver in our boutique team is personally reviewed by Alex to ensure they meet our strict standards for punctuality and professional conduct.',
+    icon: ShieldCheck,
   },
   {
-    title: 'Pickup after landing',
-    description: 'Direct onward travel from Vienna Airport back into the city.',
+    title: 'Real-Time Flight Sync',
+    description:
+      'We monitor your flight status continuously. Whether you land early or late, your driver will be waiting at the arrival hall without delay penalties.',
+    icon: Plane,
   },
   {
-    title: 'Fixed price known in advance',
-    description: 'Calculated and clearly communicated before your ride, with no hidden costs.',
+    title: 'Upfront Fixed Pricing',
+    description:
+      'What you see is what you pay. Our Vienna airport taxi rates include the essentials up front, with no hidden costs and no surge pricing.',
+    icon: CreditCard,
   },
   {
-    title: 'Reliably planned',
-    description: 'Dependably organized for a relaxed and punctual journey.',
+    title: 'Child Seats & Safety',
+    description:
+      'Traveling with family? We provide properly fitted child and booster seats on request at no extra charge so every transfer stays safe and comfortable.',
+    icon: Baby,
   },
-] as const;
+];
 
 const whyUsEditorialItems = [
   {
@@ -214,8 +222,12 @@ const vehicleCategoryHighlights = [
 
 const heroSectionPaddingClass =
   'app-container relative pb-10 pt-[calc(66px+28px)] md:pb-12 md:pt-[calc(72px+12px)] lg:pb-14 lg:pt-[calc(72px+10px)]';
+const heroIntroClass =
+  'ui-section-intro mx-auto max-w-[42rem] text-center lg:mx-0 lg:text-left';
 const heroHeadlineClass =
-  'mx-auto mt-[4px] mb-[30px] max-w-[23ch] text-center text-[27px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:mt-4 md:max-w-none md:text-[32px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor] lg:mx-0 lg:mb-0 lg:text-left';
+  'max-w-[23ch] text-[27px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:max-w-none md:text-[32px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor]';
+const heroSubheadlineClass =
+  'max-w-[38rem] text-[1rem] leading-[1.7] text-[#5e6f86] md:text-[1.05rem]';
 const heroGridClass =
   'grid items-start gap-10 lg:grid-cols-[0.62fr_1fr] lg:items-stretch lg:gap-20 xl:gap-24';
 const heroBookingColumnClass = 'mt-4 self-start text-left lg:mt-0';
@@ -518,13 +530,17 @@ function HeroBookingCard() {
 
 function HeroImageCard() {
   return (
-    <div className="relative mx-auto flex h-full w-full max-w-[52rem] flex-col lg:mt-12 lg:gap-[40px]">
-      <h1 className={`${heroHeadlineClass} hidden lg:block`}>
-        Vienna Airport Taxi: Fixed-Price Transfers
-      </h1>
+    <div className="relative mx-auto flex w-full max-w-[52rem] flex-col lg:mt-8">
+      <div className={`${heroIntroClass} hidden lg:flex`}>
+        <h1 className={`ui-section-intro-title mt-0 !mb-[1.35rem] md:!mb-[1.5rem] ${heroHeadlineClass}`}>Vienna Airport Taxi: Fixed-Price Transfers</h1>
+        <p className={`ui-section-intro-copy m-0 ${heroSubheadlineClass}`}>
+          Stress-free vienna airport taxi transfer with guaranteed fixed prices and
+          reliable 24/7 flight tracking timed perfectly to your arrival.
+        </p>
+      </div>
 
-      <div className="relative">
-        <div className="relative h-[17rem] overflow-hidden rounded-[1.9rem] shadow-[0_30px_80px_rgba(15,23,42,0.13)] md:h-[22rem] md:rounded-[2.25rem]">
+      <div className="relative lg:mt-auto">
+        <div className="relative h-[17rem] overflow-hidden rounded-[1.9rem] md:h-[22rem] md:rounded-[2.25rem]">
           <Image
             src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
             alt="Alex Flughafentaxi Wien"
@@ -573,9 +589,13 @@ export default async function Home({
       <section id="hero" className="relative overflow-hidden bg-[var(--color-page-bg)] text-[var(--color-text)]">
         <div className={heroSectionPaddingClass}>
           <div className="mx-auto max-w-[104rem]">
-            <h1 className={`${heroHeadlineClass} lg:hidden`}>
-              Vienna Airport Taxi: Fixed-Price Transfers
-            </h1>
+            <div className={`${heroIntroClass} lg:hidden`}>
+              <h1 className={`ui-section-intro-title mt-0 !mb-[1.35rem] md:!mb-[1.5rem] ${heroHeadlineClass}`}>Vienna Airport Taxi: Fixed-Price Transfers</h1>
+              <p className={`ui-section-intro-copy m-0 ${heroSubheadlineClass}`}>
+                Stress-free vienna airport taxi transfer with guaranteed fixed prices and
+                reliable 24/7 flight tracking timed perfectly to your arrival.
+              </p>
+            </div>
             <div className={heroGridClass}>
               <div className={heroBookingColumnClass}>
                 <HeroBookingCard />
@@ -587,76 +607,44 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="bg-[var(--color-page-bg)] pt-20 pb-14 md:pt-24 md:pb-18">
+      <section className="bg-[var(--color-page-bg)] py-16 md:py-20 lg:py-24">
         <div className="app-container">
           <div className="mx-auto max-w-[104rem]">
-            <div className="grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-start lg:gap-12">
-              <div>
-                <h2 className="max-w-[630px] text-[24px] font-black leading-[1.04] tracking-[-0.06em] text-[#111111] md:text-[32px]">
-                  Reliable transfer to Vienna Airport (Schwechat)
-                </h2>
-                <div className="mt-6 max-w-[42rem] space-y-6 text-[1rem] leading-[1.8] text-[#5e6f86] md:text-[1.05rem]">
-                  <p>
-                    With Alex and his team, you can plan your <span className="font-semibold text-[#111111]">Vienna airport taxi</span> transfer easily and stress-free in advance.
-                    <br />
-                    <br />
-                    You benefit from a clearly calculated fixed price, on-time pickup, and a direct ride without detours.
-                  </p>
-                  <p>
-                    Whether you are travelling from Vienna to the airport or being picked up after landing, our Vienna airport taxi gets you reliably to your destination. No waiting, no transfers and no hidden costs.
-                  </p>
-                </div>
+            <div className="mx-auto max-w-[72rem] text-center">
+              <span className="inline-flex items-center rounded-full border border-[#dbe7ff] bg-[#f3f7ff] px-5 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.16em] text-[#1679FF] md:px-6">
+                The Alex Standard
+              </span>
+              <h2 className="ui-heading-lg mx-auto mt-7 max-w-[24ch] text-[#182033] lg:max-w-none">
+                Your Premier Vienna Airport Taxi Service
+              </h2>
+              <p className="ui-copy-compact mx-auto mt-[30px] max-w-[57rem] text-[#5c718d]">
+                Direct transfers to Schwechat (VIE) managed by a driver with 10+ years of
+                experience. We do not just provide rides; we provide peace of mind.
+              </p>
+            </div>
 
-                <div className="mt-8 flex flex-wrap gap-x-[14px] gap-y-4">
-                  {transferFeatureRows.map((title, index) => (
-                    <div
-                      key={title}
-                      className={`flex w-full max-w-full items-center gap-3 rounded-[999px] border px-4 py-3.5 shadow-[0_2px_8px_rgba(17,17,17,0.045)] transition-all hover:-translate-y-px hover:shadow-[0_8px_18px_rgba(17,17,17,0.07)] sm:w-fit ${
-                        index === 0
-                          ? 'border-[#7fb3ff] bg-[#f0f6ff] shadow-[0_2px_10px_rgba(17,17,17,0.04),0_0_0_1px_rgba(127,179,255,0.18),0_10px_26px_rgba(22,121,255,0.12)]'
-                          : 'border-[#e8edf3] bg-white'
-                      }`}
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#111827] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-                        <Check size={15} strokeWidth={2.55} />
-                      </span>
-                      <strong className="min-w-0 leading-none text-[15px] font-semibold tracking-[-0.01em] text-[#111111]">
+            <div className="mt-12 grid gap-5 lg:mt-14 lg:grid-cols-2 lg:gap-7">
+              {alexStandardCards.map(({ title, description, icon: Icon }) => (
+                <article
+                  key={title}
+                  className="group rounded-[2rem] border border-[#dbe4ef] bg-[#f5f8fc] px-6 py-7 shadow-[0_18px_40px_rgba(17,17,17,0.035)] transition-all duration-200 hover:-translate-y-[2px] hover:border-[#4f86ff] hover:bg-white hover:shadow-[0_22px_50px_rgba(22,121,255,0.08)] md:px-8 md:py-9 lg:px-10"
+                >
+                  <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-7">
+                    <span className="flex h-[5.2rem] w-[5.2rem] shrink-0 items-center justify-center rounded-[1.45rem] border border-[#eef3f9] bg-white text-[#1679FF] shadow-[0_16px_34px_rgba(17,17,17,0.06)] transition-all duration-200 group-hover:border-[#dce8ff] group-hover:shadow-[0_18px_38px_rgba(22,121,255,0.09)]">
+                      <Icon size={31} strokeWidth={2.1} />
+                    </span>
+
+                    <div className="min-w-0">
+                      <h3 className="text-[1.65rem] font-semibold leading-[1.08] tracking-[-0.05em] text-[#182033] md:text-[2rem]">
                         {title}
-                      </strong>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid gap-4">
-                <div className="overflow-hidden rounded-[1.7rem] border border-[#262a33] bg-[linear-gradient(180deg,#111111_0%,#232a34_100%)] px-6 py-6 text-white shadow-[0_24px_60px_rgba(17,17,17,0.18)] md:px-7 md:py-7">
-                  <p className="text-[0.82rem] font-semibold tracking-[-0.01em] text-white/58">
-                    Your Vienna airport taxi service
-                  </p>
-                  <strong className="mt-3 block text-[1.75rem] font-black leading-[1.15] tracking-[-0.05em] !text-white md:text-[2.15rem]">
-                    Directly to Vienna Airport without stress or detours
-                  </strong>
-                  <p className="mt-5 max-w-[28rem] text-[1rem] leading-[1.7] text-white/74">
-                    Clear prices, simple booking and a reliable transfer to Vienna Airport Schwechat.
-                  </p>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {transferFeatureCards.map(({ title, description }) => (
-                    <div
-                      key={title}
-                      className="rounded-[1.45rem] border border-[#e7edf5] bg-white px-5 py-5 shadow-[0_10px_24px_rgba(17,17,17,0.04)]"
-                    >
-                      <strong className="block max-w-[16ch] text-[1.15rem] font-semibold leading-[1.35] tracking-[-0.04em] text-[#111111]">
-                        {title}
-                      </strong>
-                      <p className="mt-3 text-[0.95rem] leading-[1.65] text-[#6b7c92]">
+                      </h3>
+                      <p className="ui-copy-compact mt-[30px] max-w-[31rem] text-[#5f718a]">
                         {description}
                       </p>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
         </div>
@@ -1098,4 +1086,3 @@ export default async function Home({
     </div>
   );
 }
-

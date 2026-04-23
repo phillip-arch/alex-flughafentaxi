@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { usePrefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion';
 import StreetAutocomplete from '@/components/address/StreetAutocomplete';
 import { getAppSurface } from '@/lib/routing/surfaces';
 import {
@@ -98,6 +99,7 @@ type BookingFormProps = {
   initialIsLoggedIn?: boolean;
   meetAndGreetSelected?: boolean;
   onMeetAndGreetChange?: (checked: boolean) => void;
+  onStepChange?: (step: number) => void;
   initialAccountDefaults?: {
     fullName: string;
     phone: string;
@@ -141,12 +143,15 @@ const BookingForm = ({
   initialIsLoggedIn = false,
   meetAndGreetSelected,
   onMeetAndGreetChange,
+  onStepChange,
   initialAccountDefaults = EMPTY_ACCOUNT_DEFAULTS,
 }: BookingFormProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const isHomepageForm = pathname === '/';
+  const shouldUseSlidingWizard = !isHomepageForm;
   const isAppSurface = isAppSurfaceProp ?? getAppSurface() === 'app';
+  const prefersReducedMotion = usePrefersReducedMotion();
   const shouldShowStepOneRouteIntro = showStepOneRouteIntro ?? !isHomepageForm;
   const allowExtendedDropdownSpace = true;
   const copy = {
@@ -171,8 +176,10 @@ const BookingForm = ({
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const datePickerAnchorRef = useRef<HTMLDivElement | null>(null);
   const timePickerAnchorRef = useRef<HTMLDivElement | null>(null);
+  const stepPanelRefs = useRef<Array<HTMLElement | null>>([]);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [formViewportHeight, setFormViewportHeight] = useState<number | null>(null);
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(
     sortFavoriteAddresses(initialFavorites),
   );
@@ -207,7 +214,7 @@ const BookingForm = ({
     time: '',
     passengers: 1,
     luggage: 0,
-    handLuggage: 1,
+    handLuggage: 0,
     travelDetailsSelected: false,
     vehicleOverride: null,
     childSeat: false,
@@ -525,12 +532,39 @@ const BookingForm = ({
   const addressPlaceholder =
     formData.direction === 'from_airport' ? 'Where should we take you?' : 'Where should we pick you up?';
   const AirportRowIcon = formData.direction === 'from_airport' ? PlaneLanding : PlaneTakeoff;
-
   useEffect(() => {
     if (!isFlightDetailsVisible) {
       setFlightLookupError(null);
     }
   }, [isFlightDetailsVisible]);
+
+  useEffect(() => {
+    onStepChange?.(currentStep);
+  }, [currentStep, onStepChange]);
+
+  useEffect(() => {
+    if (!shouldUseSlidingWizard) {
+      setFormViewportHeight(null);
+      return;
+    }
+
+    const activePanel = stepPanelRefs.current[currentStep - 1];
+    if (!activePanel) return;
+
+    const updateHeight = () => setFormViewportHeight(activePanel.offsetHeight);
+    let frameId = window.requestAnimationFrame(updateHeight);
+    let observer: ResizeObserver | null = null;
+
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => updateHeight());
+      observer.observe(activePanel);
+    }
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      observer?.disconnect();
+    };
+  }, [currentStep, shouldUseSlidingWizard]);
   const favoriteMenuItems =
     isAppSurface && isLoggedIn && favoriteAddresses.length > 0
       ? favoriteAddresses.map((favorite, index) => {
@@ -1078,7 +1112,7 @@ const BookingForm = ({
         requiredFields.push('flightNumber');
       }
     } else if (step === 2) {
-      requiredFields.push('passengers', 'luggage', 'handLuggage');
+      requiredFields.push('passengers', 'luggage');
     } else if (step === 3) {
       requiredFields.push('fullName', 'email', 'phone', 'paymentMethod');
     }
@@ -1288,7 +1322,6 @@ const BookingForm = ({
                  ? ' (Meet & Greet: Driver waits inside with a name sign)'
                  : '') +
                (isFlightDetailsVisible && formData.flightNumber ? ` (Flight number: ${formData.flightNumber})` : '') +
-               (formData.handLuggage !== '' && formData.handLuggage > 0 ? ` (Hand luggage: ${formData.handLuggage})` : '') +
                (formData.paymentMethod
                  ? ` (Payment: ${
                      formData.paymentMethod === 'cash'
@@ -1367,16 +1400,28 @@ const BookingForm = ({
   };
 
   const StepIndicator = () => (
-    <span
-      className="inline-flex w-[7.5rem] shrink-0 items-center justify-center text-center text-[12px] font-bold tracking-[0.08em] text-[#2563eb] md:w-[9rem] md:text-[15px] [@media(min-width:768px)_and_(max-height:900px)]:text-[13px]"
+    <div
+      className="inline-flex shrink-0 items-center gap-4"
+      aria-label={copy.stepLabel(currentStep)}
       aria-current="step"
     >
-      {copy.stepLabel(currentStep)}
-    </span>
+      {[1, 2, 3].map((step) => {
+        const isActive = currentStep === step;
+        return (
+          <span
+            key={step}
+            aria-hidden="true"
+            className={`ui-step-indicator-pill inline-flex h-[12px] rounded-full ${
+              isActive ? 'w-[32px] scale-100 bg-[#2E63F5] opacity-100' : 'w-[20px] scale-[0.94] bg-[#D8E1ED] opacity-80'
+            }`}
+          />
+        );
+      })}
+    </div>
   );
 
   const DirectionSelector = () => (
-    <div className="relative mx-auto grid h-14 w-full min-w-0 grid-cols-2 overflow-hidden rounded-[1.35rem] bg-[#f2f3f5] p-1.5 md:h-[4.65rem] md:rounded-[1.65rem] md:p-2 [@media(min-width:768px)_and_(max-height:900px)]:h-[3.25rem] [@media(min-width:768px)_and_(max-height:900px)]:rounded-[1.15rem] [@media(min-width:768px)_and_(max-height:900px)]:p-1.5">
+    <div className="relative mx-auto grid h-14 w-full min-w-0 grid-cols-2 overflow-hidden rounded-[1.35rem] bg-[#f2f3f5] p-1.5 md:h-[3.25rem] md:rounded-[1.15rem] md:p-1.5">
       {[
         { value: 'to_airport' as Direction, label: 'To Airport' },
         { value: 'from_airport' as Direction, label: 'From Airport' },
@@ -1388,7 +1433,7 @@ const BookingForm = ({
             key={option.value}
             type="button"
             onClick={() => handleDirectionChange(option.value)}
-            className={`relative z-[1] flex min-w-0 items-center justify-center rounded-[1.05rem] px-2 text-[15px] font-bold tracking-[-0.02em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:rounded-[1.35rem] md:px-4 md:text-[22px] [@media(min-width:768px)_and_(max-height:900px)]:rounded-[0.9rem] [@media(min-width:768px)_and_(max-height:900px)]:text-[17px] ${
+            className={`relative z-[1] flex min-w-0 items-center justify-center rounded-[1.05rem] px-2 text-[15px] font-bold tracking-[-0.02em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:rounded-[0.9rem] md:px-4 md:text-[17px] ${
               isActive
                 ? 'bg-white text-[#1F5FEA]'
                 : 'text-[#617084] hover:text-[#111827]'
@@ -1405,7 +1450,7 @@ const BookingForm = ({
   const DateTimeFields = () => (
     <div className="grid grid-cols-2 gap-3 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
       <div className={BOOKING_FIELD_STACK_CLASS}>
-        <label className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[16px] [@media(min-width:768px)_and_(max-height:900px)]:text-[13px]">Date</label>
+        <label className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[13px]">Date</label>
         <div ref={datePickerAnchorRef} className="relative w-full">
           <input
             type="text"
@@ -1414,7 +1459,7 @@ const BookingForm = ({
             readOnly
             placeholder="DD.MM.YYYY"
             onClick={() => setIsDatePickerOpen(true)}
-            className={`ui-field-surface h-[3.35rem] w-full cursor-pointer rounded-[1.05rem] border bg-[#f9fafb] px-5 py-0 text-[18px] font-semibold tracking-[0.02em] text-[#0f172a] outline-none transition-all placeholder:text-[#717982] md:h-[4.65rem] md:rounded-[1.35rem] md:px-7 md:text-[24px] [@media(min-width:768px)_and_(max-height:900px)]:h-[3.25rem] [@media(min-width:768px)_and_(max-height:900px)]:rounded-[1rem] [@media(min-width:768px)_and_(max-height:900px)]:px-5 [@media(min-width:768px)_and_(max-height:900px)]:text-[18px] ${
+            className={`ui-field-surface h-[3.35rem] w-full cursor-pointer rounded-[1.05rem] border bg-[#f9fafb] px-5 py-0 text-[18px] font-semibold tracking-[0.02em] text-[#0f172a] outline-none transition-all placeholder:text-[#717982] md:h-[3.25rem] md:rounded-[1rem] md:px-5 md:text-[18px] ${
               isFieldInvalid('date')
                 ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
                 : 'border-[#e4e6ea] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
@@ -1430,7 +1475,7 @@ const BookingForm = ({
         </div>
       </div>
       <div className={BOOKING_FIELD_STACK_CLASS}>
-        <label className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[16px] [@media(min-width:768px)_and_(max-height:900px)]:text-[13px]">
+        <label className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[13px]">
           {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
         </label>
         <div ref={timePickerAnchorRef} className="relative w-full">
@@ -1441,7 +1486,7 @@ const BookingForm = ({
             readOnly
             placeholder="--:--"
             onClick={() => setIsTimePickerOpen(true)}
-            className={`ui-field-surface h-[3.35rem] w-full cursor-pointer rounded-[1.05rem] border bg-[#f9fafb] px-5 py-0 text-[18px] font-semibold tracking-[0.02em] text-[#0f172a] outline-none transition-all placeholder:text-[#717982] md:h-[4.65rem] md:rounded-[1.35rem] md:px-7 md:text-[24px] [@media(min-width:768px)_and_(max-height:900px)]:h-[3.25rem] [@media(min-width:768px)_and_(max-height:900px)]:rounded-[1rem] [@media(min-width:768px)_and_(max-height:900px)]:px-5 [@media(min-width:768px)_and_(max-height:900px)]:text-[18px] ${
+            className={`ui-field-surface h-[3.35rem] w-full cursor-pointer rounded-[1.05rem] border bg-[#f9fafb] px-5 py-0 text-[18px] font-semibold tracking-[0.02em] text-[#0f172a] outline-none transition-all placeholder:text-[#717982] md:h-[3.25rem] md:rounded-[1rem] md:px-5 md:text-[18px] ${
               isFieldInvalid('time')
                 ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
                 : 'border-[#e4e6ea] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
@@ -1462,7 +1507,7 @@ const BookingForm = ({
   const FlightDetailsFields = () => (
     <div
       className={`grid overflow-hidden transition-[grid-template-rows,margin-top,margin-bottom] duration-[400ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-        isFlightDetailsVisible ? 'mt-4 mb-0 grid-rows-[1fr] [@media(min-width:768px)_and_(max-height:900px)]:mt-3' : 'mt-0 mb-0 grid-rows-[0fr]'
+        isFlightDetailsVisible ? 'mt-4 mb-0 grid-rows-[1fr] md:mt-3' : 'mt-0 mb-0 grid-rows-[0fr]'
       }`}
       aria-hidden={!isFlightDetailsVisible}
     >
@@ -1473,7 +1518,7 @@ const BookingForm = ({
           }`}
         >
         <div className={BOOKING_FIELD_STACK_CLASS}>
-          <p className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[16px] [@media(min-width:768px)_and_(max-height:900px)]:text-[13px]">Flight number</p>
+          <p className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[13px]">Flight number</p>
           <div className="w-full">
             <input
               type="text"
@@ -1482,7 +1527,7 @@ const BookingForm = ({
               onChange={handleChange}
               onBlur={handleFlightNumberBlur}
               placeholder="e.g. OS 123"
-              className={`${getInputClassName('flightNumber')} !h-[3.35rem] !rounded-[1.05rem] !border-[#e4e6ea] !bg-[#f9fafb] !px-5 !text-[18px] !font-semibold !tracking-[0.02em] !text-[#717982] placeholder:!text-[#717982] md:!h-[4.65rem] md:!rounded-[1.35rem] md:!px-7 md:!text-[24px] [@media(min-width:768px)_and_(max-height:900px)]:!h-[3.25rem] [@media(min-width:768px)_and_(max-height:900px)]:!rounded-[1rem] [@media(min-width:768px)_and_(max-height:900px)]:!px-5 [@media(min-width:768px)_and_(max-height:900px)]:!text-[18px]`}
+              className={`${getInputClassName('flightNumber')} !h-[3.35rem] !rounded-[1.05rem] !border-[#e4e6ea] !bg-[#f9fafb] !px-5 !text-[18px] !font-semibold !tracking-[0.02em] !text-[#717982] placeholder:!text-[#717982] md:!h-[3.25rem] md:!rounded-[1rem] md:!px-5 md:!text-[18px]`}
             />
           </div>
         </div>
@@ -1490,7 +1535,7 @@ const BookingForm = ({
           <p className="mt-2 ml-1 text-[12px] text-[#6d7075]">Loading flight data...</p>
         ) : null}
         {flightLookupError ? (
-          <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] [@media(min-width:768px)_and_(max-height:900px)]:py-2 [@media(min-width:768px)_and_(max-height:900px)]:text-[0.82rem]">
+          <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
             {flightLookupError}
           </div>
         ) : null}
@@ -1501,13 +1546,142 @@ const BookingForm = ({
 
   const shouldShowInfoTrigger = isAppSurface && hasMounted;
   const formContentSpacingClassName = showStepIndicator
-    ? 'p-6 md:p-10 [@media(min-width:768px)_and_(max-height:900px)]:p-5'
-    : 'p-6 md:p-10 [@media(min-width:768px)_and_(max-height:900px)]:p-5';
+    ? 'p-6 md:p-5'
+    : 'p-6 md:p-5';
   const stepContentClassName =
-    'w-full min-w-0 max-w-full overflow-x-clip animate-in fade-in slide-in-from-right-4 duration-500';
-  const stepHeaderClassName = 'mb-6 flex justify-center md:mb-7 md:justify-end md:pr-1 [@media(min-width:768px)_and_(max-height:900px)]:mb-4';
+    'w-full min-w-0 max-w-full overflow-x-clip';
+  const stepHeaderClassName = 'mb-6 flex justify-center md:mb-4';
   const titleHeaderClassName =
     'mb-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
+  const stepOneContent = (
+    <div className={`${stepContentClassName} space-y-6 md:space-y-4`}>
+      {shouldShowStepOneRouteIntro && (
+        <div className="text-center mb-6">
+          <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
+          <p className="text-[12px] text-[#6d7075]">{copy.routeDescription}</p>
+        </div>
+      )}
+      <div className="rounded-[2.2rem] bg-transparent pt-0 shadow-none">
+        <div className="min-w-0">
+          {DirectionSelector()}
+          <div className="mt-6 md:mt-5">
+            {DateTimeFields()}
+          </div>
+          {FlightDetailsFields()}
+        </div>
+      </div>
+      <div className="rounded-[2.2rem] bg-transparent pt-0 pb-1 shadow-none">
+        <div className="rounded-[1.55rem] border border-[#e4e6ea] bg-[#f9fafb] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:rounded-[1.35rem] md:px-5 md:py-5">
+          <div className="flex min-w-0 items-center gap-2 md:gap-3">
+            <span className="shrink-0 rounded-md bg-[#eef5ff] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.05em] text-[#2563eb] md:px-2.5 md:text-[12px]">
+              {airportRowLabel}
+            </span>
+            <AirportRowIcon className="h-4 w-4 shrink-0 text-[#2563eb] md:h-5 md:w-5" strokeWidth={2.2} />
+            <p className="min-w-0 truncate text-[15px] font-semibold leading-tight tracking-[-0.03em] text-[#111111] md:text-[20px]">
+              {copy.airportLabel}
+            </p>
+          </div>
+          <div className="my-5 h-px bg-[#e2e8f0] md:my-4" />
+          <div className="relative w-full">
+            <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.08em] text-[#687384] md:mb-2 md:text-[13px]">
+              {addressFieldLabel}
+            </p>
+            <StreetAutocomplete
+              value={streetInputValue}
+              selectedOption={selectedStreetOption}
+              mobileDropdownFullWidth
+              mobileSelectedStreetOnly
+              menuItems={favoriteMenuItems}
+              onChange={(value) => clearStreetSelection('street', value)}
+              onSelect={(option) => applyStreetSelection('street', option)}
+              onPasteText={(text) => handleStreetPaste('street', text)}
+              onBlur={() => {
+                validateStreetNumber('street');
+                handleBlur({} as React.FocusEvent<HTMLInputElement>);
+              }}
+              placeholder={addressPlaceholder}
+              className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#6f7782] focus:outline-none md:text-[21px] md:font-semibold"
+            />
+          </div>
+          {streetNumberWarning === 'street' ? (
+            <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
+              Please add the street number.
+            </div>
+          ) : null}
+          {streetPasteWarning === 'street' ? (
+            <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
+              Address could not be recognized clearly. Please choose from the list.
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      {error && (
+        <div className="mt-4 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8]">
+          <span className="block w-1.5 h-1.5 bg-[#d70015] rounded-full" />
+          {error}
+        </div>
+      )}
+
+      <div className="mt-5 flex flex-col items-center gap-4 md:mt-3 md:gap-2">
+        <div className="flex w-full items-center justify-center">
+          <button
+            type="button"
+            onClick={nextStep}
+            className={`${primaryActionButtonClass} !min-w-0 !flex-none`}
+          >
+            {copy.nextLabel}
+          </button>
+        </div>
+        <BookingActionTrustLine />
+      </div>
+    </div>
+  );
+  const stepTwoContent = (
+    <BookingStepTwo
+      formData={formData}
+      vehicleType={vehicleType}
+      vehiclePriceOptions={vehiclePriceOptions}
+      onVehicleUpgrade={handleVehicleUpgrade}
+      onTravelDetailsConfirm={handleTravelDetailsConfirm}
+      handleMeetAndGreetChange={handleMeetAndGreetChange}
+      handleNotesChange={handleNotesChange}
+      error={error}
+      isFieldInvalid={isFieldInvalid}
+      updateStepperValue={updateStepperValue}
+      prevStep={prevStep}
+      nextStep={nextStep}
+      actionRowClass={actionRowStackedTrustClass}
+      actionButtonGroupClass={actionButtonGroupClass}
+      actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
+      primaryActionButtonClass={primaryActionButtonClass}
+      secondaryBackButtonClass={secondaryBackButtonClass}
+    />
+  );
+  const stepThreeContent = (
+    <BookingStepThree
+      formData={formData}
+      totalPrice={totalPrice}
+      vehicleType={vehicleType}
+      isLoggedIn={isLoggedIn}
+      error={error}
+      loading={loading}
+      handleBookingForMyselfToggle={handleBookingForMyselfToggle}
+      handleChange={handleChange}
+      handleBlur={handleBlur}
+      getInputClassName={getInputClassName}
+      handlePaymentChange={handlePaymentChange}
+      touched={touched}
+      prevStep={prevStep}
+      actionRowClass={actionRowStackedTrustClass}
+      actionButtonGroupClass={actionButtonGroupClass}
+      actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
+      secondaryBackButtonClass={secondaryBackButtonClass}
+      primaryActionButtonClass={primaryActionButtonClass}
+    />
+  );
+  const activeStepContent =
+    currentStep === 1 ? stepOneContent : currentStep === 2 ? stepTwoContent : stepThreeContent;
 
   return (
     <div className={`${BOOKING_FORM_CARD_CLASS} relative w-full max-w-[32rem] shrink-0 overflow-x-clip md:w-[33.6rem] md:max-w-[33.6rem] ${allowExtendedDropdownSpace ? 'overflow-y-visible' : 'overflow-y-hidden'}`}>
@@ -1539,135 +1713,45 @@ const BookingForm = ({
               <StepIndicator />
             </div>
           ) : null}
-          {/* STEP 1: LOCATION */}
-            {currentStep === 1 && (
-              <div className={`${stepContentClassName} space-y-6 md:space-y-7 [@media(min-width:768px)_and_(max-height:900px)]:space-y-4`}>
-                {shouldShowStepOneRouteIntro && (
-                  <div className="text-center mb-6">
-                    <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
-                    <p className="text-[12px] text-[#6d7075]">{copy.routeDescription}</p>
-                  </div>
-              )}
-              <div className="rounded-[2.2rem] bg-transparent pt-0 shadow-none">
-                <div className="min-w-0">
-                  {DirectionSelector()}
-                  <div className="mt-6 md:mt-7 [@media(min-width:768px)_and_(max-height:900px)]:mt-5">
-                  {DateTimeFields()}
-                  </div>
-                  {FlightDetailsFields()}
-                </div>
-              </div>
-              <div className="rounded-[2.2rem] bg-transparent pt-0 pb-1 shadow-none">
-                <div className="rounded-[1.55rem] border border-[#e4e6ea] bg-[#f9fafb] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:rounded-[2rem] md:px-8 md:py-8 [@media(min-width:768px)_and_(max-height:900px)]:rounded-[1.35rem] [@media(min-width:768px)_and_(max-height:900px)]:px-5 [@media(min-width:768px)_and_(max-height:900px)]:py-5">
-                  <div className="flex min-w-0 items-center gap-2 md:gap-3">
-                    <span className="shrink-0 rounded-md bg-[#eef5ff] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.05em] text-[#2563eb] md:px-2.5 md:text-[15px] [@media(min-width:768px)_and_(max-height:900px)]:text-[12px]">
-                      {airportRowLabel}
-                    </span>
-                    <AirportRowIcon className="h-4 w-4 shrink-0 text-[#2563eb] md:h-6 md:w-6 [@media(min-width:768px)_and_(max-height:900px)]:h-5 [@media(min-width:768px)_and_(max-height:900px)]:w-5" strokeWidth={2.2} />
-                    <p className="min-w-0 truncate text-[15px] font-semibold leading-tight tracking-[-0.03em] text-[#111111] md:text-[25px] [@media(min-width:768px)_and_(max-height:900px)]:text-[20px]">
-                      {copy.airportLabel}
-                    </p>
-                  </div>
-                  <div className="my-5 h-px bg-[#e2e8f0] md:my-7 [@media(min-width:768px)_and_(max-height:900px)]:my-4" />
-                  <div className="relative w-full">
-                    <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.08em] text-[#687384] md:text-[16px] [@media(min-width:768px)_and_(max-height:900px)]:mb-2 [@media(min-width:768px)_and_(max-height:900px)]:text-[13px]">
-                      {addressFieldLabel}
-                    </p>
-                    <StreetAutocomplete
-                      value={streetInputValue}
-                      selectedOption={selectedStreetOption}
-                      mobileDropdownFullWidth
-                      mobileSelectedStreetOnly
-                      menuItems={favoriteMenuItems}
-                      onChange={(value) => clearStreetSelection('street', value)}
-                      onSelect={(option) => applyStreetSelection('street', option)}
-                      onPasteText={(text) => handleStreetPaste('street', text)}
-                      onBlur={() => {
-                        validateStreetNumber('street');
-                        handleBlur({} as React.FocusEvent<HTMLInputElement>);
+          {shouldUseSlidingWizard ? (
+            <div
+              className="ui-form-viewport"
+              style={
+                formViewportHeight
+                  ? { height: `${formViewportHeight}px` }
+                  : undefined
+              }
+            >
+              <div
+                className="ui-form-track"
+                style={
+                  prefersReducedMotion
+                    ? { transform: `translateX(-${(currentStep - 1) * 33.333333}%)`, transition: 'none' }
+                    : { transform: `translateX(-${(currentStep - 1) * 33.333333}%)` }
+                }
+              >
+                {[stepOneContent, stepTwoContent, stepThreeContent].map((content, index) => {
+                  const stepNumber = index + 1;
+                  const isActive = currentStep === stepNumber;
+
+                  return (
+                    <section
+                      key={stepNumber}
+                      ref={(node) => {
+                        stepPanelRefs.current[index] = node;
                       }}
-                      placeholder={addressPlaceholder}
-                      className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#6f7782] focus:outline-none md:text-[26px] md:font-semibold [@media(min-width:768px)_and_(max-height:900px)]:text-[21px]"
-                    />
-                  </div>
-                  {streetNumberWarning === 'street' ? (
-                    <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] [@media(min-width:768px)_and_(max-height:900px)]:py-2 [@media(min-width:768px)_and_(max-height:900px)]:text-[0.82rem]">
-                      Please add the street number.
-                    </div>
-                  ) : null}
-                  {streetPasteWarning === 'street' ? (
-                    <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] [@media(min-width:768px)_and_(max-height:900px)]:py-2 [@media(min-width:768px)_and_(max-height:900px)]:text-[0.82rem]">
-                      Address could not be recognized clearly. Please choose from the list.
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-
-              {error && (
-                <div className="mt-4 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8]">
-                  <span className="block w-1.5 h-1.5 bg-[#d70015] rounded-full" />
-                  {error}
-                </div>
-              )}
-
-              <div className="mt-5 flex flex-col items-center gap-4 [@media(min-width:768px)_and_(max-height:900px)]:mt-3 [@media(min-width:768px)_and_(max-height:900px)]:gap-2">
-                <div className="flex w-full items-center justify-center">
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className={`${primaryActionButtonClass} !min-w-0 !flex-none`}
-                  >
-                    {copy.nextLabel}
-                  </button>
-                </div>
-                <BookingActionTrustLine />
+                      aria-hidden={!isActive}
+                      inert={!isActive}
+                      className={`ui-form-step ${isActive ? 'ui-form-step-active' : 'ui-form-step-inactive'}`}
+                    >
+                      {content}
+                    </section>
+                  );
+                })}
               </div>
             </div>
-          )}
-
-          {currentStep === 2 && (
-            <BookingStepTwo
-              formData={formData}
-              vehicleType={vehicleType}
-              vehiclePriceOptions={vehiclePriceOptions}
-              onVehicleUpgrade={handleVehicleUpgrade}
-              onTravelDetailsConfirm={handleTravelDetailsConfirm}
-              handleMeetAndGreetChange={handleMeetAndGreetChange}
-              handleNotesChange={handleNotesChange}
-              error={error}
-              isFieldInvalid={isFieldInvalid}
-              updateStepperValue={updateStepperValue}
-              prevStep={prevStep}
-              nextStep={nextStep}
-              actionRowClass={actionRowStackedTrustClass}
-              actionButtonGroupClass={actionButtonGroupClass}
-              actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
-              primaryActionButtonClass={primaryActionButtonClass}
-              secondaryBackButtonClass={secondaryBackButtonClass}
-            />
-          )}
-
-          {currentStep === 3 && (
-            <BookingStepThree
-              formData={formData}
-              totalPrice={totalPrice}
-              vehicleType={vehicleType}
-              isLoggedIn={isLoggedIn}
-              error={error}
-              loading={loading}
-              handleBookingForMyselfToggle={handleBookingForMyselfToggle}
-              handleChange={handleChange}
-              handleBlur={handleBlur}
-              getInputClassName={getInputClassName}
-              handlePaymentChange={handlePaymentChange}
-              touched={touched}
-              prevStep={prevStep}
-              actionRowClass={actionRowStackedTrustClass}
-              actionButtonGroupClass={actionButtonGroupClass}
-              actionTrustLine={<BookingActionTrustLine alignWithPrimaryButton />}
-              secondaryBackButtonClass={secondaryBackButtonClass}
-              primaryActionButtonClass={primaryActionButtonClass}
-            />
+          ) : (
+            activeStepContent
           )}
         </form>
       </div>
@@ -1696,7 +1780,11 @@ const BookingForm = ({
                   </button>
                 </div>
               </div>
-              <BookingInfoPanel direction={formData.direction} meetAndGreet={formData.meetAndGreet} />
+              <BookingInfoPanel
+                direction={formData.direction}
+                meetAndGreet={formData.meetAndGreet}
+                currentStep={currentStep}
+              />
               </div>
             </div>
           </div>

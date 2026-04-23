@@ -16,14 +16,14 @@ export default function SectionIntro({
   const alignClass = align === 'center' ? 'mx-auto text-center' : '';
 
   return (
-    <div className={`ui-text-block-sm ${alignClass} ${className}`.trim()}>
+    <div className={`ui-section-intro ${alignClass} ${className}`.trim()}>
       {eyebrow ? (
-        <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1679FF] md:text-[13px]">
+        <p className="ui-section-intro-eyebrow text-[12px] font-semibold uppercase tracking-[0.18em] text-[#1679FF] md:text-[13px]">
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="ui-heading-lg text-[#111827]">{title}</h2>
-      {description ? <p className="ui-copy-compact text-[#6a7d96]">{description}</p> : null}
+      <h2 className="ui-section-intro-title mt-0 ui-heading-lg text-[#111827]">{title}</h2>
+      {description ? <p className="ui-section-intro-copy m-0 ui-copy-compact text-[#6a7d96]">{description}</p> : null}
     </div>
   );
 }

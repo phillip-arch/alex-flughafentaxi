@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Briefcase, CreditCard, Pencil, ShoppingBag, Users, Wallet } from 'lucide-react';
+import { Briefcase, CreditCard, Pencil, Users, Wallet } from 'lucide-react';
 import { formatVehicleTypeLabel } from '@/lib/pricing';
 import AnimatedPrice from './AnimatedPrice';
 
@@ -22,7 +22,6 @@ export default function BookingPriceSummaryCard({
 }: BookingPriceSummaryCardProps) {
   const passengerValue = formData.passengers === '' ? '--' : formData.passengers;
   const luggageValue = formData.luggage === '' ? '--' : formData.luggage;
-  const handLuggageValue = formData.handLuggage === '' ? '--' : formData.handLuggage;
   const cityLabel = formData.city?.trim() || formData.zip?.trim() || 'Pickup';
   const compactRoute =
     formData.direction === 'to_airport' ? `${cityLabel} \u2192 VIE` : `VIE \u2192 ${cityLabel}`;
@@ -81,14 +80,9 @@ export default function BookingPriceSummaryCard({
             {passengerValue}
           </span>
           <span className="text-[#b7bec8]">|</span>
-          <span className="inline-flex items-center gap-0.5 md:gap-1" title="Suitcases">
+          <span className="inline-flex items-center gap-0.5 md:gap-1" title="Check-in luggage">
             <Briefcase className="h-2.5 w-2.5 text-[#1F7CFF] md:h-[14px] md:w-[14px]" />
             {luggageValue}
-          </span>
-          <span className="text-[#b7bec8]">|</span>
-          <span className="inline-flex items-center gap-0.5 md:gap-1" title="Hand luggage">
-            <ShoppingBag className="h-2.5 w-2.5 text-[#1F7CFF] md:h-[14px] md:w-[14px]" />
-            {handLuggageValue}
           </span>
         </div>
       </div>
@@ -113,7 +107,7 @@ export default function BookingPriceSummaryCard({
           type="button"
           onClick={onEdit}
           className="absolute right-2 top-2 z-20 inline-flex min-h-8 items-center gap-1 rounded-[0.45rem] border border-[#dbe7f8] bg-white px-2 text-[0.68rem] font-semibold text-[#1F7CFF] shadow-[0_6px_14px_rgba(17,17,17,0.05)] transition-colors hover:bg-[#eef5ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:right-3 md:top-3 md:h-8 md:min-h-0 md:gap-1.5 md:rounded-[0.5rem] md:px-3 md:text-[0.78rem] md:shadow-[0_8px_18px_rgba(17,17,17,0.05)]"
-          aria-label="Edit passengers and luggage"
+          aria-label="Edit passengers and check-in luggage"
         >
           <Pencil className="h-3 w-3 md:h-3.5 md:w-3.5" />
           Edit

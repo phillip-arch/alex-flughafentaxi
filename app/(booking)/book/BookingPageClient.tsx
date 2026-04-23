@@ -34,6 +34,7 @@ export default function BookingPageClient({
 }) {
   const [direction, setDirection] = useState<BookingDirection>('to_airport');
   const [meetAndGreet, setMeetAndGreet] = useState(false);
+  const [bookingStep, setBookingStep] = useState(1);
   const isAppSurface = getAppSurface() === 'app';
   const searchParams = useSearchParams();
   const activeLang = searchParams.get('lang')?.toLowerCase() === 'de' ? 'de' : 'en';
@@ -53,11 +54,12 @@ export default function BookingPageClient({
       {!isAppSurface ? <NavbarClient /> : null}
       <section className="bg-[var(--color-page-bg)]">
         <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-[80px] md:pt-28 [@media(min-width:768px)_and_(max-height:850px)]:pt-[88px]'}`}>
-          <div className="grid items-start gap-10 lg:grid-cols-[0.98fr_0.72fr] lg:gap-12">
+          <div className="grid items-start gap-10 lg:grid-cols-[0.98fr_0.98fr] lg:gap-12">
             <section className="order-1 self-start lg:sticky lg:top-24">
               <div className="mx-auto w-full max-w-[57.5rem] lg:mx-0 lg:max-w-[46rem]">
                 <BookingForm
                   onDirectionChange={setDirection}
+                  onStepChange={setBookingStep}
                   meetAndGreetSelected={meetAndGreet}
                   onMeetAndGreetChange={setMeetAndGreet}
                   showStepOneRouteIntro={isAppSurface}
@@ -69,11 +71,14 @@ export default function BookingPageClient({
             </section>
 
             <aside className="order-3 hidden self-start lg:order-2 lg:sticky lg:top-24 lg:block">
-              <BookingInfoPanel
-                direction={direction}
-                meetAndGreet={meetAndGreet}
-                variant="book"
-              />
+              <div className="w-full lg:max-w-[46rem]">
+                <BookingInfoPanel
+                  direction={direction}
+                  meetAndGreet={meetAndGreet}
+                  currentStep={bookingStep}
+                  variant="book"
+                />
+              </div>
             </aside>
           </div>
         </div>
@@ -85,6 +90,7 @@ export default function BookingPageClient({
             <BookingInfoPanel
               direction={direction}
               meetAndGreet={meetAndGreet}
+              currentStep={bookingStep}
               variant="book"
             />
           </section>
