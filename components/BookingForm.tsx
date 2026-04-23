@@ -149,7 +149,6 @@ const BookingForm = ({
   const router = useRouter();
   const pathname = usePathname();
   const isHomepageForm = pathname === '/';
-  const shouldUseSlidingWizard = !isHomepageForm;
   const isAppSurface = isAppSurfaceProp ?? getAppSurface() === 'app';
   const prefersReducedMotion = usePrefersReducedMotion();
   const shouldShowStepOneRouteIntro = showStepOneRouteIntro ?? !isHomepageForm;
@@ -179,6 +178,7 @@ const BookingForm = ({
   const stepPanelRefs = useRef<Array<HTMLElement | null>>([]);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [isDesktopWizard, setIsDesktopWizard] = useState(false);
   const [formViewportHeight, setFormViewportHeight] = useState<number | null>(null);
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(
     sortFavoriteAddresses(initialFavorites),
@@ -541,6 +541,26 @@ const BookingForm = ({
   useEffect(() => {
     onStepChange?.(currentStep);
   }, [currentStep, onStepChange]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    const syncViewportMode = () => setIsDesktopWizard(mediaQuery.matches);
+    syncViewportMode();
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', syncViewportMode);
+      return () => mediaQuery.removeEventListener('change', syncViewportMode);
+    }
+
+    mediaQuery.addListener(syncViewportMode);
+    return () => mediaQuery.removeListener(syncViewportMode);
+  }, []);
+
+  const shouldUseSlidingWizard = !isHomepageForm && isDesktopWizard;
 
   useEffect(() => {
     if (!shouldUseSlidingWizard) {
