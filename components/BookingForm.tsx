@@ -1726,8 +1726,8 @@ const BookingForm = ({
                 className="ui-form-track"
                 style={
                   prefersReducedMotion
-                    ? { transform: `translateX(-${(currentStep - 1) * 100}%)`, transition: 'none' }
-                    : { transform: `translateX(-${(currentStep - 1) * 100}%)` }
+                    ? { transform: `translateX(-${(currentStep - 1) * 33.333333}%)`, transition: 'none' }
+                    : { transform: `translateX(-${(currentStep - 1) * 33.333333}%)` }
                 }
               >
                 {[stepOneContent, stepTwoContent, stepThreeContent].map((content, index) => {
