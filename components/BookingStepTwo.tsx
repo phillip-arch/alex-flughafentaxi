@@ -416,11 +416,11 @@ export default function BookingStepTwo({
     <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-5">
       {inlineVehicleCard ? (
         <div
-          className={`flex min-h-[6.55rem] min-w-0 w-full max-w-full flex-wrap items-center justify-between gap-x-3 gap-y-1.5 overflow-hidden rounded-[1.15rem] border bg-white px-4 py-1.5 md:grid md:min-h-[6.1rem] md:grid-cols-[11.5rem_minmax(0,1fr)_6.5rem] md:items-center md:gap-3 md:px-4 md:py-1 ${
+          className={`relative grid min-h-[6.55rem] min-w-0 w-full max-w-full grid-cols-[9.8rem_auto] grid-rows-[auto_auto] items-start justify-between gap-x-3 gap-y-1.5 overflow-hidden rounded-[1.15rem] border bg-white px-4 py-1.5 md:min-h-[6.1rem] md:grid-cols-[11.5rem_minmax(0,1fr)_6.5rem] md:grid-rows-none md:items-center md:justify-normal md:gap-3 md:px-4 md:py-1 ${
             travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
           }`}
         >
-          <div className="relative order-1 h-[5.9rem] w-[9.8rem] shrink-0 overflow-hidden md:order-none md:h-[7.1rem] md:w-full md:max-w-[11.5rem]">
+          <div className="relative row-span-2 h-[5.9rem] w-[9.8rem] shrink-0 self-center overflow-hidden md:row-span-1 md:h-[7.1rem] md:w-full md:max-w-[11.5rem]">
             <Image
               src={inlineVehicleCard.imageSrc}
               alt={inlineVehicleCard.imageAlt}
@@ -429,9 +429,9 @@ export default function BookingStepTwo({
               sizes="(min-width: 768px) 208px, 196px"
             />
           </div>
-          <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:px-2 md:text-center">
+          <div className="col-start-2 row-start-2 hidden min-w-0 px-0 text-right md:col-start-auto md:row-start-auto md:block md:px-2 md:text-center">
             <p className="overflow-hidden text-[14px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975] md:overflow-visible md:text-[0.88rem] md:tracking-normal">
-              <span className="flex items-center justify-start gap-2 whitespace-nowrap md:justify-center">
+              <span className="flex items-center justify-end gap-2 whitespace-nowrap md:justify-center">
                 <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[#5f6975]">Max.</span>
                 <span className="whitespace-nowrap">{inlineVehicleCard.maxPassengers}</span>
                 <Users size={15} className="shrink-0 text-[#1F7CFF]" />
@@ -440,13 +440,22 @@ export default function BookingStepTwo({
               </span>
             </p>
           </div>
-          <div className="order-2 min-w-0 text-right md:order-none md:w-full md:max-w-[6.5rem] md:justify-self-end">
+          <div className="absolute right-4 top-4 flex w-[8.4rem] flex-col items-end text-right md:static md:col-start-auto md:row-span-1 md:row-start-auto md:block md:w-full md:max-w-[6.5rem] md:justify-self-end">
             <p className="truncate whitespace-nowrap text-[1.02rem] font-medium leading-tight tracking-[-0.02em] text-[#1F7CFF] md:text-[0.98rem]">
               {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
             </p>
             <p className="mt-1.5 whitespace-nowrap text-right text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2rem]">
               <AnimatedPrice value={inlineVehiclePrice} currencyDisplay="symbol" />
             </p>
+          </div>
+          <div className="absolute bottom-3 right-4 md:hidden">
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[14px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
+              <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[#5f6975]">Max.</span>
+              <span className="whitespace-nowrap">{inlineVehicleCard.maxPassengers}</span>
+              <Users size={15} className="shrink-0 text-[#1F7CFF]" />
+              <span className="whitespace-nowrap">{inlineVehicleCard.maxSuitcases}</span>
+              <Briefcase size={15} className="shrink-0 text-[#1F7CFF]" />
+            </span>
           </div>
         </div>
       ) : null}
@@ -484,20 +493,18 @@ export default function BookingStepTwo({
                 sizes="112px"
               />
             </div>
-            <div className="flex min-w-0 flex-col items-end justify-center text-right">
+            <div className="flex min-w-0 flex-col items-end justify-center gap-1.5 text-right">
               <p className="max-w-full truncate text-[0.98rem] font-medium leading-tight tracking-[-0.02em] text-[#1F7CFF]">
                 {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
               </p>
-              <p className="mt-1 text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
+              <p className="text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
                 <AnimatedPrice value={inlineVehiclePrice} currencyDisplay="symbol" />
               </p>
-            </div>
-            <div className="col-span-2 min-w-0 text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-              <span className="flex items-center gap-2 whitespace-nowrap overflow-hidden">
+              <span className="inline-flex items-center gap-2 whitespace-nowrap text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
                 <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[#5f6975]">Max.</span>
-                <span className="truncate">{inlineVehicleCard.maxPassengers}</span>
+                <span className="whitespace-nowrap">{inlineVehicleCard.maxPassengers}</span>
                 <Users size={14} className="shrink-0 text-[#1F7CFF]" />
-                <span className="truncate">{inlineVehicleCard.maxSuitcases}</span>
+                <span className="whitespace-nowrap">{inlineVehicleCard.maxSuitcases}</span>
                 <Briefcase size={14} className="shrink-0 text-[#1F7CFF]" />
               </span>
             </div>
@@ -555,9 +562,6 @@ export default function BookingStepTwo({
               <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
                 Free child seats
               </span>
-              <span className="mt-1 block text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-                3 sizes available
-              </span>
             </span>
             <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1F7CFF]">
               + {childSeatTotal > 0 ? 'Edit' : 'Add'}
@@ -574,9 +578,6 @@ export default function BookingStepTwo({
             <span className="min-w-0">
               <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
                 Note for driver
-              </span>
-              <span className="mt-1 block text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-                {hasDriverNote ? 'Driver note added.' : 'Pickup details or requests.'}
               </span>
             </span>
             <span className="inline-flex h-10 shrink-0 items-center justify-center gap-1 rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1F7CFF]">
@@ -887,7 +888,6 @@ export default function BookingStepTwo({
             <div className="flex min-h-[5.1rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-2.5">
               <div className="min-w-0">
                 <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">Free child seats</p>
-                <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">3 sizes available</p>
               </div>
               <button
                 type="button"
@@ -913,9 +913,6 @@ export default function BookingStepTwo({
               <div className="min-w-0">
                 <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
                   Note for driver
-                </p>
-                <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">
-                  {hasDriverNote ? 'Driver note added.' : 'Pickup details or requests.'}
                 </p>
               </div>
               <button

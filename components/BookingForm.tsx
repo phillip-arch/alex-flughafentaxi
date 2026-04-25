@@ -1464,26 +1464,48 @@ const BookingForm = ({
     );
   };
 
-  const StepIndicator = () => (
-    <div
-      className="inline-flex shrink-0 items-center gap-4"
-      aria-label={copy.stepLabel(currentStep)}
-      aria-current="step"
-    >
-      {[1, 2, 3].map((step) => {
-        const isActive = currentStep === step;
-        return (
-          <span
-            key={step}
-            aria-hidden="true"
-            className={`ui-step-indicator-pill inline-flex h-[8px] rounded-full ${
-              isActive ? 'w-[32px] scale-100 bg-[#2E63F5] opacity-100' : 'w-[20px] scale-[0.94] bg-[#D8E1ED] opacity-80'
-            }`}
+  const StepIndicator = () => {
+    const steps = [
+      { number: 1, label: 'Trip' },
+      { number: 2, label: 'Price' },
+      { number: 3, label: 'Details' },
+    ] as const;
+
+    const progressWidth = currentStep === 1 ? '33.333%' : currentStep === 2 ? '66.666%' : '100%';
+
+    return (
+      <div
+        className="w-full"
+        aria-label={copy.stepLabel(currentStep)}
+        aria-current="step"
+      >
+        <div className="grid grid-cols-3 items-center gap-3 text-[12px] font-black uppercase tracking-[0.08em] md:text-[13px]">
+          {steps.map((step) => {
+            const isActive = currentStep === step.number;
+            return (
+              <div
+                key={step.number}
+                className={`min-w-0 ${
+                  step.number === 1 ? 'text-left' : step.number === 2 ? 'text-center' : 'text-right'
+                } ${isActive ? 'text-[#1679FF]' : 'text-[#9AA7B7]'}`}
+              >
+                <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                  <span>{step.number}.</span>
+                  <span>{step.label}</span>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-3 h-[8px] overflow-hidden rounded-full bg-[#E8EDF5]">
+          <div
+            className="h-full rounded-full bg-[#1679FF] transition-[width] duration-300 ease-out"
+            style={{ width: progressWidth }}
           />
-        );
-      })}
-    </div>
-  );
+        </div>
+      </div>
+    );
+  };
 
   const DirectionSelector = () => (
     <div className="relative mx-auto grid h-14 w-full min-w-0 grid-cols-2 overflow-hidden rounded-[1.35rem] bg-[#f2f3f5] p-1.5 md:h-[3.25rem] md:rounded-[1.15rem] md:p-1.5">
@@ -1500,8 +1522,8 @@ const BookingForm = ({
             onClick={() => handleDirectionChange(option.value)}
             className={`relative z-[1] flex min-w-0 items-center justify-center rounded-[1.05rem] px-2 text-[15px] font-bold tracking-[-0.02em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:rounded-[0.9rem] md:px-4 md:text-[17px] ${
               isActive
-                ? 'bg-white text-[#1F5FEA]'
-                : 'text-[#617084] hover:text-[#111827]'
+                ? 'border-2 border-[#1679FF] bg-white text-[#1F5FEA]'
+                : 'text-[#111827]'
             }`}
             aria-pressed={isActive}
           >
@@ -1615,9 +1637,8 @@ const BookingForm = ({
   const formContentSpacingClassName = showStepIndicator
     ? 'p-6 md:px-5 md:py-4'
     : 'p-6 md:px-5 md:py-4';
-  const stepContentClassName =
-    'w-full min-w-0 max-w-full overflow-x-clip';
-  const stepHeaderClassName = 'mb-5 flex justify-center md:mb-3';
+  const stepContentClassName = `w-full min-w-0 max-w-full ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-x-clip'}`;
+  const stepHeaderClassName = 'mb-7 flex justify-center md:mb-5';
   const titleHeaderClassName =
     'mb-5 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[8px]';
   const stepOneContent = (
@@ -1765,10 +1786,10 @@ const BookingForm = ({
 
   return (
     <div
-      className={`${BOOKING_FORM_CARD_CLASS} relative w-full max-w-[32rem] shrink-0 overflow-x-clip ${
+      className={`${BOOKING_FORM_CARD_CLASS} relative isolate w-full max-w-[32rem] shrink-0 ${
         fluidDesktopWidth ? 'lg:max-w-none lg:w-full' : 'md:w-[33.6rem] md:max-w-[33.6rem]'
       } ${shouldLockDesktopFormHeight ? 'md:flex md:min-h-[660px] md:flex-col' : ''} ${
-        allowExtendedDropdownSpace ? 'overflow-y-visible' : 'overflow-y-hidden'
+        allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-x-clip overflow-y-hidden'
       }`}
     >
       {shouldShowInfoTrigger ? (
@@ -1786,7 +1807,7 @@ const BookingForm = ({
         </button>
       ) : null}
       <div
-        className={`overflow-x-clip ${formContentSpacingClassName} ${
+        className={`${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-x-clip'} ${formContentSpacingClassName} ${
           shouldLockDesktopFormHeight ? 'md:flex md:h-full md:flex-col' : ''
         } ${allowExtendedDropdownSpace ? '' : 'pb-2 md:pb-3'}`}
       >
