@@ -171,6 +171,7 @@ const BookingForm = ({
   };
   const supabase = supabaseBrowser();
   const [currentStep, setCurrentStep] = useState(1);
+  const [mobileStepDirection, setMobileStepDirection] = useState<'next' | 'prev'>('next');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [leadTimeAdjustmentNotice, setLeadTimeAdjustmentNotice] = useState<string | null>(null);
@@ -1313,6 +1314,7 @@ const BookingForm = ({
     }
 
     if (currentStep < 3) {
+      setMobileStepDirection('next');
       setCurrentStep((prev) => prev + 1);
       requestAnimationFrame(scrollToPageTop);
     }
@@ -1320,6 +1322,7 @@ const BookingForm = ({
 
   const prevStep = () => {
     setError(null);
+    setMobileStepDirection('prev');
     setCurrentStep((prev) => prev - 1);
     requestAnimationFrame(scrollToPageTop);
   };
@@ -1340,6 +1343,7 @@ const BookingForm = ({
     const selectedDateTime = parseSelectedDateTime(formData.date, formData.time);
     if (!selectedDateTime || !hasSufficientLeadTime(selectedDateTime)) {
       setTouched((prev) => ({ ...prev, date: true, time: true }));
+      setMobileStepDirection('prev');
       setCurrentStep(1);
       setError(TIME_EXPIRED_ERROR);
       requestAnimationFrame(scrollToPageTop);
@@ -1416,6 +1420,7 @@ const BookingForm = ({
       const message = err.message || 'An error occurred.';
       if (isLeadTimeErrorMessage(message)) {
         setTouched((prev) => ({ ...prev, date: true, time: true }));
+        setMobileStepDirection('prev');
         setCurrentStep(1);
         setError(TIME_EXPIRED_ERROR);
         requestAnimationFrame(scrollToPageTop);
@@ -1831,7 +1836,15 @@ const BookingForm = ({
           ) : (
             <div
               key={!isHomepageForm ? currentStep : 0}
-              className={!isHomepageForm ? 'ui-form-mobile-transition' : undefined}
+              className={
+                !isHomepageForm
+                  ? `ui-form-mobile-transition ${
+                      mobileStepDirection === 'prev'
+                        ? 'ui-form-mobile-transition-prev'
+                        : 'ui-form-mobile-transition-next'
+                    }`
+                  : undefined
+              }
             >
               {activeStepContent}
             </div>

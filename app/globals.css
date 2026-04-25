@@ -401,7 +401,14 @@ p {
 
   .ui-form-mobile-transition {
     will-change: transform, opacity;
-    animation: ui-form-mobile-transition var(--anim-speed) var(--ease-premium) both;
+  }
+
+  .ui-form-mobile-transition-next {
+    animation: ui-form-mobile-transition-next var(--anim-speed) var(--ease-premium) both;
+  }
+
+  .ui-form-mobile-transition-prev {
+    animation: ui-form-mobile-transition-prev var(--anim-speed) var(--ease-premium) both;
   }
 
   .ui-odometer-window {
@@ -470,15 +477,27 @@ p {
     animation: ui-error-notice-shake 220ms var(--ease-premium);
   }
 
-  @keyframes ui-form-mobile-transition {
+  @keyframes ui-form-mobile-transition-next {
     from {
       opacity: 0;
-      transform: translateY(10px) scale(0.985);
+      transform: translateX(22px);
     }
 
     to {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes ui-form-mobile-transition-prev {
+    from {
+      opacity: 0;
+      transform: translateX(-22px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
     }
   }
 
