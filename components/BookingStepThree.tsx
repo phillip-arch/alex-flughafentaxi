@@ -53,7 +53,7 @@ export default function BookingStepThree({
   const privacyHref = `/datenschutz?lang=${currentLang}`;
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-5">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-4 md:space-y-3.5">
       <BookingPriceSummaryCard formData={formData} totalPrice={totalPrice} vehicleType={vehicleType} />
 
       {isLoggedIn ? (
@@ -71,7 +71,7 @@ export default function BookingStepThree({
         </div>
       ) : null}
 
-      <div className="grid gap-x-4 gap-y-4 md:grid-cols-2">
+      <div className="grid gap-x-4 gap-y-4 md:grid-cols-2 md:gap-y-3">
         <div className={`relative md:col-span-2 ${BOOKING_FIELD_STACK_CLASS}`}>
           <label htmlFor="fullName" className={BOOKING_FIELD_LABEL_CLASS}>
             Name
@@ -127,7 +127,7 @@ export default function BookingStepThree({
           <button
             type="button"
             onClick={() => handlePaymentChange('cash')}
-            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
+            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
               formData.paymentMethod === 'cash'
                 ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] ring-2 ring-inset ring-[#7fb3ff]'
                 : touched['paymentMethod'] && !formData.paymentMethod
@@ -140,7 +140,7 @@ export default function BookingStepThree({
           <button
             type="button"
             onClick={() => handlePaymentChange('card')}
-            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.4rem] md:py-[0.6rem] ${
+            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
               formData.paymentMethod === 'card'
                 ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] ring-2 ring-inset ring-[#7fb3ff]'
                 : touched['paymentMethod'] && !formData.paymentMethod
@@ -160,7 +160,7 @@ export default function BookingStepThree({
         </div>
       ) : null}
 
-      <p className="mt-4 text-left text-[12px] leading-[1.5] text-[#5f6975] md:text-[13px]">
+      <p className="mt-3 text-left text-[12px] leading-[1.5] text-[#5f6975] md:text-[13px]">
         By booking, you accept our{' '}
         <Link href={agbHref} className="font-medium !text-[#1678ff] underline underline-offset-2 hover:!text-[#0f5fcc]">
           Terms and Conditions

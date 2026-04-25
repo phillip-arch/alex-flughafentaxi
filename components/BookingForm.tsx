@@ -27,6 +27,14 @@ import {
 } from 'lucide-react';
 import { determineVehicle, calculateVehiclePrice, type VehicleType } from '@/lib/pricing';
 import {
+  DAYTIME_LEAD_TIME_ERROR,
+  formatLeadTimeTimeValue,
+  getEarliestAllowedDateTimeForDay,
+  getLeadTimeErrorMessage,
+  hasSufficientLeadTime,
+  NIGHT_LEAD_TIME_ERROR,
+} from '@/lib/booking/leadTime';
+import {
   BOOKING_FIELD_STACK_CLASS,
   BOOKING_FORM_CARD_CLASS,
   BOOKING_FORM_INPUT_CLASS,
@@ -127,10 +135,8 @@ const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 const TIME_VALUE_PATTERN = /^\d{2}:\d{2}$/;
-const NIGHT_LEAD_TIME_ERROR =
-  'For rides between 22:00 and 07:00, booking at least 8 hours in advance is required.';
-const DAYTIME_LEAD_TIME_ERROR =
-  'Short-notice bookings are only possible up to 3 hours before pickup.';
+const TIME_EXPIRED_ERROR =
+  'Your selected pickup time expired while you were filling out the form. Please adjust the time to meet our notice requirement.';
 
 const BookingForm = ({
   onDirectionChange,
@@ -167,6 +173,7 @@ const BookingForm = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [leadTimeAdjustmentNotice, setLeadTimeAdjustmentNotice] = useState<string | null>(null);
   const [flightLookupError, setFlightLookupError] = useState<string | null>(null);
   const [isLookingUpFlight, setIsLookingUpFlight] = useState(false);
   
@@ -307,11 +314,21 @@ const BookingForm = ({
             city: restoredCity || 'Wien',
           });
         }
-
       }
 
       if (parsed.currentStep && parsed.currentStep >= 1 && parsed.currentStep <= 3) {
-        setCurrentStep(parsed.currentStep);
+        const restoredLeadTimeError = getLeadTimeError(
+          String(parsed.formData?.date || ''),
+          String(parsed.formData?.time || ''),
+        );
+
+        if (parsed.currentStep > 1 && restoredLeadTimeError && restoredLeadTimeError !== REQUIRED_FIELDS_ERROR) {
+          setTouched((prev) => ({ ...prev, date: true, time: true }));
+          setError(restoredLeadTimeError);
+          setCurrentStep(1);
+        } else {
+          setCurrentStep(parsed.currentStep);
+        }
       }
     } catch {
       // Ignore malformed persisted state.
@@ -905,13 +922,13 @@ const BookingForm = ({
 
   const handleDateSelect = (date: string) => {
     setFlightLookupError(null);
+    setLeadTimeAdjustmentNotice(null);
     setFormData(prev => ({ ...prev, date }));
-    validateLeadTimeSelection(date, formData.time);
   };
 
   const handleTimeSelect = (time: string) => {
+    setLeadTimeAdjustmentNotice(null);
     setFormData(prev => ({ ...prev, time }));
-    validateLeadTimeSelection(formData.date, time);
   };
 
   const handleNotesChange = (notes: string) => {
@@ -1094,34 +1111,48 @@ const BookingForm = ({
     const selectedDate = parseSelectedDateTime(date, time);
     if (!selectedDate) return REQUIRED_FIELDS_ERROR;
 
-    const now = new Date();
-    const selectedHour = selectedDate.getHours();
-    const isNightTime = selectedHour >= 22 || selectedHour < 7;
-    const minLeadTimeHours = isNightTime ? 8 : 3;
-    const minBookingTime = new Date(now.getTime() + minLeadTimeHours * 60 * 60 * 1000);
-
-    if (selectedDate >= minBookingTime) {
+    if (hasSufficientLeadTime(selectedDate)) {
       return null;
     }
 
-    return isNightTime ? NIGHT_LEAD_TIME_ERROR : DAYTIME_LEAD_TIME_ERROR;
+    return getLeadTimeErrorMessage(selectedDate);
   };
 
   const isLeadTimeErrorMessage = (message: string | null) =>
     message === NIGHT_LEAD_TIME_ERROR || message === DAYTIME_LEAD_TIME_ERROR;
 
-  const validateLeadTimeSelection = (date: string, time: string) => {
-    if (!date || !TIME_VALUE_PATTERN.test(time)) return;
+  useEffect(() => {
+    if (!formData.date || !TIME_VALUE_PATTERN.test(formData.time)) return;
 
-    const leadTimeError = getLeadTimeError(date, time);
-    if (leadTimeError && leadTimeError !== REQUIRED_FIELDS_ERROR) {
-      setTouched((prev) => ({ ...prev, date: true, time: true }));
-      setError(leadTimeError);
+    const selectedDate = parseSelectedDateTime(formData.date, formData.time);
+    if (!selectedDate) return;
+
+    if (hasSufficientLeadTime(selectedDate)) {
+      setError((prev) => (isLeadTimeErrorMessage(prev) || prev === TIME_EXPIRED_ERROR ? null : prev));
       return;
     }
 
-    setError((prev) => (isLeadTimeErrorMessage(prev) ? null : prev));
-  };
+    const selectedDay = parseSelectedDateTime(formData.date, '00:00');
+    if (!selectedDay) return;
+
+    const earliestAllowedDateTime = getEarliestAllowedDateTimeForDay(selectedDay);
+    if (!earliestAllowedDateTime) {
+      setTouched((prev) => ({ ...prev, date: true, time: true }));
+      setError(getLeadTimeError(selectedDate ? formData.date : '', formData.time));
+      return;
+    }
+
+    const adjustedTime = formatLeadTimeTimeValue(earliestAllowedDateTime);
+    if (adjustedTime === formData.time) {
+      setTouched((prev) => ({ ...prev, date: true, time: true }));
+      setError(getLeadTimeError(formData.date, formData.time));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, time: adjustedTime }));
+    setError((prev) => (isLeadTimeErrorMessage(prev) || prev === TIME_EXPIRED_ERROR ? null : prev));
+    setLeadTimeAdjustmentNotice('Time adjusted to the earliest available slot for the selected date.');
+  }, [formData.date, formData.time]);
 
   const getStepValidation = (step: number) => {
     const requiredFields: (keyof ExtendedBookingInput)[] = [];
@@ -1306,6 +1337,15 @@ const BookingForm = ({
       return;
     }
 
+    const selectedDateTime = parseSelectedDateTime(formData.date, formData.time);
+    if (!selectedDateTime || !hasSufficientLeadTime(selectedDateTime)) {
+      setTouched((prev) => ({ ...prev, date: true, time: true }));
+      setCurrentStep(1);
+      setError(TIME_EXPIRED_ERROR);
+      requestAnimationFrame(scrollToPageTop);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -1373,20 +1413,28 @@ const BookingForm = ({
       router.push('/book/success');
       
     } catch (err: any) {
-      setError(err.message || 'An error occurred.');
+      const message = err.message || 'An error occurred.';
+      if (isLeadTimeErrorMessage(message)) {
+        setTouched((prev) => ({ ...prev, date: true, time: true }));
+        setCurrentStep(1);
+        setError(TIME_EXPIRED_ERROR);
+        requestAnimationFrame(scrollToPageTop);
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const actionRowWithTrustClass =
-    'mt-4 flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-7 [@media(min-width:768px)_and_(max-height:900px)]:mt-3';
+    'mt-3 flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-6';
   const actionRowStackedTrustClass =
-    'mt-4 flex flex-col items-center gap-2 [@media(min-width:768px)_and_(max-height:900px)]:mt-3';
+    'mt-3 flex flex-col items-center gap-2';
   const actionButtonGroupClass = 'flex w-full items-center justify-center gap-3';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
-    'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.8rem] md:w-[2.8rem]';
+    'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.7rem] md:w-[2.7rem]';
 
   const BookingActionTrustLine = ({ alignWithPrimaryButton = false }: { alignWithPrimaryButton?: boolean }) => {
     const trustItems = (
@@ -1431,7 +1479,7 @@ const BookingForm = ({
           <span
             key={step}
             aria-hidden="true"
-            className={`ui-step-indicator-pill inline-flex h-[12px] rounded-full ${
+            className={`ui-step-indicator-pill inline-flex h-[8px] rounded-full ${
               isActive ? 'w-[32px] scale-100 bg-[#2E63F5] opacity-100' : 'w-[20px] scale-[0.94] bg-[#D8E1ED] opacity-80'
             }`}
           />
@@ -1468,7 +1516,7 @@ const BookingForm = ({
   );
 
   const DateTimeFields = () => (
-    <div className="grid grid-cols-2 gap-3 md:gap-5 md:[grid-template-columns:calc(50%_-_10px)_calc(50%_-_10px)]">
+    <div className="grid grid-cols-2 gap-3 md:gap-4 md:[grid-template-columns:calc(50%_-_8px)_calc(50%_-_8px)]">
       <div className={BOOKING_FIELD_STACK_CLASS}>
         <label className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[13px]">Date</label>
         <div ref={datePickerAnchorRef} className="relative w-full">
@@ -1517,9 +1565,15 @@ const BookingForm = ({
             onClose={() => setIsTimePickerOpen(false)}
             onSelect={handleTimeSelect}
             selectedTime={formData.time}
+            selectedDate={formData.date}
             anchorRef={timePickerAnchorRef}
           />
         </div>
+        {leadTimeAdjustmentNotice ? (
+          <p className="mt-2 pl-1 text-[12px] font-medium text-[#1679FF] md:text-[12.5px]">
+            {leadTimeAdjustmentNotice}
+          </p>
+        ) : null}
       </div>
     </div>
   );
@@ -1566,15 +1620,15 @@ const BookingForm = ({
 
   const shouldShowInfoTrigger = isAppSurface && hasMounted;
   const formContentSpacingClassName = showStepIndicator
-    ? 'p-6 md:p-5'
-    : 'p-6 md:p-5';
+    ? 'p-6 md:px-5 md:py-4'
+    : 'p-6 md:px-5 md:py-4';
   const stepContentClassName =
     'w-full min-w-0 max-w-full overflow-x-clip';
-  const stepHeaderClassName = 'mb-6 flex justify-center md:mb-4';
+  const stepHeaderClassName = 'mb-5 flex justify-center md:mb-3';
   const titleHeaderClassName =
-    'mb-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[10px]';
+    'mb-5 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[8px]';
   const stepOneContent = (
-    <div className={`${stepContentClassName} space-y-6 md:space-y-4`}>
+    <div className={`${stepContentClassName} space-y-5 md:space-y-3`}>
       {shouldShowStepOneRouteIntro && (
         <div className="text-center mb-6">
           <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
@@ -1637,13 +1691,17 @@ const BookingForm = ({
       </div>
 
       {error && (
-        <div className="mt-4 p-3 bg-[#fff2f4] text-[#d70015] rounded-xl text-[14px] font-medium flex items-center gap-2 border border-[#ffd4d8]">
+        <div
+          className={`mt-4 flex items-center gap-2 rounded-xl border border-[#ffd4d8] bg-[#fff2f4] p-3 text-[14px] font-medium text-[#d70015] ${
+            isLeadTimeErrorMessage(error) ? 'ui-error-notice-shake' : ''
+          }`}
+        >
           <span className="block w-1.5 h-1.5 bg-[#d70015] rounded-full" />
           {error}
         </div>
       )}
 
-      <div className="mt-5 flex flex-col items-center gap-4 md:mt-3 md:gap-2">
+      <div className="mt-4 flex flex-col items-center gap-3 md:mt-2 md:gap-2">
         <div className="flex w-full items-center justify-center">
           <button
             type="button"
@@ -1771,7 +1829,12 @@ const BookingForm = ({
               </div>
             </div>
           ) : (
-            activeStepContent
+            <div
+              key={!isHomepageForm ? currentStep : 0}
+              className={!isHomepageForm ? 'ui-form-mobile-transition' : undefined}
+            >
+              {activeStepContent}
+            </div>
           )}
         </form>
       </div>

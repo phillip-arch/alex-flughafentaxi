@@ -372,7 +372,7 @@ p {
     position: relative;
     width: 100%;
     overflow: hidden;
-    transition: height 0.5s var(--ease-premium);
+    transition: height var(--anim-speed) var(--ease-premium);
   }
 
   .ui-form-track {
@@ -380,14 +380,14 @@ p {
     align-items: flex-start;
     width: 300%;
     will-change: transform;
-    transition: transform 0.5s var(--ease-premium);
+    transition: transform var(--anim-speed) var(--ease-premium);
   }
 
   .ui-form-step {
     align-self: flex-start;
     flex: 0 0 33.333333%;
     width: 33.333333%;
-    transition: opacity 0.4s ease;
+    transition: opacity var(--anim-speed) var(--ease-premium);
   }
 
   .ui-form-step-active {
@@ -397,6 +397,11 @@ p {
   .ui-form-step-inactive {
     opacity: 0.28;
     pointer-events: none;
+  }
+
+  .ui-form-mobile-transition {
+    will-change: transform, opacity;
+    animation: ui-form-mobile-transition var(--anim-speed) var(--ease-premium) both;
   }
 
   .ui-odometer-window {
@@ -432,33 +437,64 @@ p {
 
   .ui-info-card-transition {
     transition:
-      opacity 0.3s ease,
+      opacity 220ms var(--ease-premium),
       transform var(--anim-speed) var(--ease-premium);
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
     will-change: transform, opacity;
   }
 
   .ui-info-card-exit-next {
     opacity: 0;
-    transform: translateX(-30px);
+    transform: translateY(-5px);
   }
 
   .ui-info-card-exit-prev {
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateY(-5px);
   }
 
   .ui-info-card-prepare-next {
     transition: none !important;
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateY(5px);
   }
 
   .ui-info-card-prepare-prev {
     transition: none !important;
     opacity: 0;
-    transform: translateX(-30px);
+    transform: translateY(5px);
+  }
+
+  .ui-error-notice-shake {
+    animation: ui-error-notice-shake 220ms var(--ease-premium);
+  }
+
+  @keyframes ui-form-mobile-transition {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.985);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes ui-error-notice-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+
+    25% {
+      transform: translateX(-4px);
+    }
+
+    75% {
+      transform: translateX(4px);
+    }
   }
 
   @keyframes ui-price-grow {

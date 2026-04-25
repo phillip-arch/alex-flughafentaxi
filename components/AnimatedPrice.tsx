@@ -5,9 +5,14 @@ import { useEffect, useRef, useState } from 'react';
 type AnimatedPriceProps = {
   value: number;
   className?: string;
+  currencyDisplay?: 'code' | 'symbol';
 };
 
-export default function AnimatedPrice({ value, className = '' }: AnimatedPriceProps) {
+export default function AnimatedPrice({
+  value,
+  className = '',
+  currencyDisplay = 'code',
+}: AnimatedPriceProps) {
   const previousValueRef = useRef<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -32,8 +37,10 @@ export default function AnimatedPrice({ value, className = '' }: AnimatedPricePr
   }, [value]);
 
   return (
-    <span className={`inline-block origin-center will-change-transform ${isAnimating ? 'ui-price-grow' : ''} ${className}`}>
-      {value} EUR
+    <span
+      className={`inline-block origin-center tabular-nums will-change-transform ${isAnimating ? 'ui-price-grow' : ''} ${className}`}
+    >
+      {currencyDisplay === 'symbol' ? `${value} €` : `${value} EUR`}
     </span>
   );
 }

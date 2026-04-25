@@ -267,7 +267,7 @@ export default function BookingStepTwo({
     const isAtMax = numericValue !== null && numericValue >= max;
 
     return (
-      <div className="flex min-h-[4.9rem] items-center justify-between gap-4 px-4 py-3 md:min-h-[5.15rem] md:px-5 md:py-4 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[4.5rem] [@media(min-width:768px)_and_(max-height:850px)]:py-3">
+      <div className="flex min-h-[4.9rem] items-center justify-between gap-4 px-4 py-3 md:min-h-[4.75rem] md:px-4 md:py-3">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] bg-[#eef5ff] text-[#1F7CFF]">
             <Icon size={18} />
@@ -413,35 +413,39 @@ export default function BookingStepTwo({
   };
 
   const renderInlineTravelDetails = () => (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-6 [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-5">
       {inlineVehicleCard ? (
         <div
-          className={`flex min-h-[7.25rem] min-w-0 w-full max-w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 overflow-hidden rounded-[1.15rem] border bg-white px-4 py-3.5 md:min-h-[7.5rem] md:flex-nowrap md:gap-4 md:px-6 [@media(min-width:768px)_and_(max-height:850px)]:min-h-[6rem] [@media(min-width:768px)_and_(max-height:850px)]:px-5 [@media(min-width:768px)_and_(max-height:850px)]:py-3 ${
+          className={`flex min-h-[6.55rem] min-w-0 w-full max-w-full flex-wrap items-center justify-between gap-x-3 gap-y-1.5 overflow-hidden rounded-[1.15rem] border bg-white px-4 py-1.5 md:grid md:min-h-[6.1rem] md:grid-cols-[11.5rem_minmax(0,1fr)_6.5rem] md:items-center md:gap-3 md:px-4 md:py-1 ${
             travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
           }`}
         >
-          <div className="relative order-1 h-[4.35rem] w-[6.6rem] shrink-0 overflow-hidden md:order-none md:h-[6.35rem] md:w-[10.5rem] md:overflow-visible [@media(min-width:768px)_and_(max-height:850px)]:h-[5.2rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[8.65rem]">
+          <div className="relative order-1 h-[5.9rem] w-[9.8rem] shrink-0 overflow-hidden md:order-none md:h-[7.1rem] md:w-full md:max-w-[11.5rem]">
             <Image
               src={inlineVehicleCard.imageSrc}
               alt={inlineVehicleCard.imageAlt}
               fill
-              className="scale-[1.42] object-contain mix-blend-multiply md:scale-[1.875]"
-              sizes="(min-width: 768px) 194px, 146px"
+              className="scale-[1.57] object-contain object-center mix-blend-multiply p-0 md:p-[2px]"
+              sizes="(min-width: 768px) 208px, 196px"
             />
           </div>
-          <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:flex-1 md:basis-auto md:px-2 md:text-center">
-            <p className="overflow-hidden text-[14px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975] md:whitespace-normal md:overflow-visible md:text-[1rem] md:tracking-normal [@media(min-width:768px)_and_(max-height:850px)]:text-[0.86rem]">
-              Max. {inlineVehicleCard.maxPassengers} passengers and{' '}
-              <br className="hidden md:block" />
-              {inlineVehicleCard.maxSuitcases} check-in luggage
+          <div className="order-3 min-w-0 basis-full px-0 text-left md:order-none md:px-2 md:text-center">
+            <p className="overflow-hidden text-[14px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975] md:overflow-visible md:text-[0.88rem] md:tracking-normal">
+              <span className="flex items-center justify-start gap-2 whitespace-nowrap md:justify-center">
+                <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[#5f6975]">Max.</span>
+                <span className="whitespace-nowrap">{inlineVehicleCard.maxPassengers}</span>
+                <Users size={15} className="shrink-0 text-[#1F7CFF]" />
+                <span className="whitespace-nowrap">{inlineVehicleCard.maxSuitcases}</span>
+                <Briefcase size={15} className="shrink-0 text-[#1F7CFF]" />
+              </span>
             </p>
           </div>
-          <div className="order-2 min-w-0 text-right md:order-none md:shrink-0">
-            <p className="truncate text-[1.2rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF] md:text-[1.25rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.05rem]">
+          <div className="order-2 min-w-0 text-right md:order-none md:w-full md:max-w-[6.5rem] md:justify-self-end">
+            <p className="truncate whitespace-nowrap text-[1.02rem] font-medium leading-tight tracking-[-0.02em] text-[#1F7CFF] md:text-[0.98rem]">
               {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
             </p>
-            <p className="mt-2 text-right text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2.25rem] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.7rem]">
-              <AnimatedPrice value={inlineVehiclePrice} />
+            <p className="mt-1.5 whitespace-nowrap text-right text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2rem]">
+              <AnimatedPrice value={inlineVehiclePrice} currencyDisplay="symbol" />
             </p>
           </div>
         </div>
@@ -467,30 +471,36 @@ export default function BookingStepTwo({
     <div className="w-full min-w-0 max-w-full overflow-hidden space-y-4 md:hidden">
         {inlineVehicleCard ? (
           <div
-            className={`grid min-w-0 grid-cols-[5.75rem_minmax(0,1fr)] gap-3 rounded-[1.15rem] border bg-white p-3 ${
+            className={`grid min-w-0 grid-cols-[7rem_minmax(0,1fr)] gap-3 rounded-[1.15rem] border bg-white px-3 py-1.5 ${
               travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
             }`}
           >
-            <div className="relative h-[4.4rem] min-w-0 overflow-hidden rounded-[0.85rem] bg-white">
+            <div className="relative h-[5.3rem] min-w-0 overflow-hidden rounded-[0.85rem] bg-white">
               <Image
                 src={inlineVehicleCard.imageSrc}
                 alt={inlineVehicleCard.imageAlt}
                 fill
-                className="scale-[1.35] object-contain mix-blend-multiply"
-                sizes="92px"
+                className="scale-[1.57] object-contain object-center mix-blend-multiply p-0"
+                sizes="112px"
               />
             </div>
             <div className="flex min-w-0 flex-col items-end justify-center text-right">
-              <p className="max-w-full truncate text-[1.15rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF]">
+              <p className="max-w-full truncate text-[0.98rem] font-medium leading-tight tracking-[-0.02em] text-[#1F7CFF]">
                 {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
               </p>
               <p className="mt-1 text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
-                <AnimatedPrice value={inlineVehiclePrice} />
+                <AnimatedPrice value={inlineVehiclePrice} currencyDisplay="symbol" />
               </p>
             </div>
-            <p className="col-span-2 min-w-0 text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-              Max. {inlineVehicleCard.maxPassengers} passengers and {inlineVehicleCard.maxSuitcases} check-in luggage
-            </p>
+            <div className="col-span-2 min-w-0 text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
+              <span className="flex items-center gap-2 whitespace-nowrap overflow-hidden">
+                <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[#5f6975]">Max.</span>
+                <span className="truncate">{inlineVehicleCard.maxPassengers}</span>
+                <Users size={14} className="shrink-0 text-[#1F7CFF]" />
+                <span className="truncate">{inlineVehicleCard.maxSuitcases}</span>
+                <Briefcase size={14} className="shrink-0 text-[#1F7CFF]" />
+              </span>
+            </div>
           </div>
         ) : null}
 
@@ -592,7 +602,7 @@ export default function BookingStepTwo({
   );
 
   const renderVehiclePriceCards = () => (
-    <div className="space-y-3 [@media(min-width:768px)_and_(max-height:850px)]:space-y-2">
+    <div className="space-y-3">
       {vehicleCards.map((card) => {
         const isSelected = hasSelectedTravelDetails && card.vehicleType === vehicleType;
         const isUnavailable =
@@ -606,7 +616,7 @@ export default function BookingStepTwo({
         return (
           <div
             key={card.vehicleType}
-            className={`relative h-[6.55rem] rounded-[0.95rem] border bg-[#f8fbff] px-4 py-4 shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-colors md:h-[8.5rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[5.65rem] [@media(min-width:768px)_and_(max-height:850px)]:px-3 [@media(min-width:768px)_and_(max-height:850px)]:py-2.5 ${
+            className={`relative h-[6.55rem] rounded-[0.95rem] border bg-[#f8fbff] px-4 py-4 shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-colors md:h-[8.5rem] ${
               isUnavailable
                 ? 'border-[#e5e7eb] bg-[#f3f4f6] opacity-60'
                 : travelSummaryInvalid && isSelected
@@ -620,19 +630,19 @@ export default function BookingStepTwo({
               type="button"
               onClick={() => openTravelSheet(card.vehicleType)}
               disabled={isUnavailable}
-              className="flex h-full w-full items-center gap-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 disabled:cursor-not-allowed [@media(min-width:768px)_and_(max-height:850px)]:gap-3"
+              className="flex h-full w-full items-center gap-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 disabled:cursor-not-allowed"
               aria-label={`Edit passengers and luggage for ${formatVehicleTypeLabel(card.vehicleType)}`}
             >
-              <div className="relative h-[4.55rem] w-[6.37rem] shrink-0 overflow-visible md:h-[6.5rem] md:w-[9.1rem] [@media(min-width:768px)_and_(max-height:850px)]:h-[4.4rem] [@media(min-width:768px)_and_(max-height:850px)]:w-[7.2rem]">
+              <div className="relative h-[4.55rem] w-[6.37rem] shrink-0 overflow-hidden md:h-[6.5rem] md:w-[9.1rem]">
                 <Image
                   src={card.imageSrc}
                   alt={card.imageAlt}
                   fill
-                  className="scale-150 object-contain mix-blend-multiply"
+                  className="object-contain object-center mix-blend-multiply p-[3px] md:p-[5px]"
                   sizes="(min-width: 768px) 146px, 102px"
                 />
                 {isUnavailable ? (
-                  <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-[0.45rem] bg-white/90 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-[#6b7280] shadow-[0_4px_10px_rgba(17,17,17,0.08)] md:text-[0.72rem] [@media(min-width:768px)_and_(max-height:850px)]:py-0.5 [@media(min-width:768px)_and_(max-height:850px)]:text-[0.64rem]">
+                  <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-[0.45rem] bg-white/90 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-[#6b7280] shadow-[0_4px_10px_rgba(17,17,17,0.08)] md:text-[0.72rem]">
                     Too Small
                   </span>
                 ) : null}
@@ -640,12 +650,12 @@ export default function BookingStepTwo({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[1.1rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF] [@media(min-width:768px)_and_(max-height:850px)]:text-[1rem]">
+                    <p className="text-[1.1rem] font-semibold leading-tight tracking-[-0.03em] text-[#1F7CFF]">
                       {formatVehicleTypeLabel(card.vehicleType)}
                     </p>
-                    <div className="mt-1 flex min-h-[3rem] flex-col justify-start [@media(min-width:768px)_and_(max-height:850px)]:min-h-[2.35rem]">
+                    <div className="mt-1 flex min-h-[3rem] flex-col justify-start">
                       {isSelected ? (
-                        <div className="flex items-center gap-3 text-[0.9rem] font-semibold text-[#1f2937] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.82rem]">
+                        <div className="flex items-center gap-3 text-[0.9rem] font-semibold text-[#1f2937]">
                           <span className="inline-flex items-center gap-1">
                             <Users size={17} className="ui-icon-accent" />
                             {passengerValue}
@@ -656,16 +666,15 @@ export default function BookingStepTwo({
                           </span>
                         </div>
                       ) : (
-                        <p className="mt-1 text-[0.86rem] font-medium leading-snug text-[#5f6975] [@media(min-width:768px)_and_(max-height:850px)]:text-[0.78rem]">
-                          Max. {card.maxPassengers} passengers and{' '}
-                          <br />
-                          {card.maxSuitcases} check-in luggage
+                        <p className="mt-1 text-[0.86rem] font-medium leading-snug text-[#5f6975]">
+                          <span className="block whitespace-nowrap">Max. {card.maxPassengers} passengers</span>
+                          <span className="block whitespace-nowrap">{card.maxSuitcases} check-in luggage</span>
                         </p>
                       )}
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
-                    <p className="text-right text-[1.35rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] [@media(min-width:768px)_and_(max-height:850px)]:text-[1.12rem]">
+                    <p className="text-right text-[1.35rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
                       <AnimatedPrice value={price} />
                     </p>
                   </div>
@@ -836,15 +845,15 @@ export default function BookingStepTwo({
 
   return (
     <div className="w-full min-w-0 max-w-full overflow-x-clip">
-      <div className="hidden space-y-8 md:block [@media(min-width:768px)_and_(max-height:850px)]:space-y-4">
+      <div className="hidden space-y-7 md:block">
       {renderInlineTravelDetails()}
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         <p className={BOOKING_FIELD_LABEL_CLASS}>Optional</p>
-        <div className="space-y-4 overflow-x-clip">
+        <div className="space-y-3 overflow-x-clip">
           {canUseMeetAndGreet ? (
             <div
-              className={`flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border bg-white px-4 py-3 text-left ${
+              className={`flex min-h-[5.1rem] items-center justify-between gap-4 rounded-[1.15rem] border bg-white px-4 py-2.5 text-left ${
                 formData.meetAndGreet ? 'border-[#7fb3ff]' : 'border-[#dbe7f8]'
               }`}
             >
@@ -874,8 +883,8 @@ export default function BookingStepTwo({
             </div>
           ) : null}
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="flex min-h-[5.1rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-2.5">
               <div className="min-w-0">
                 <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">Free child seats</p>
                 <p className="mt-1 text-[0.86rem] leading-snug text-[#5f6975]">3 sizes available</p>
@@ -900,7 +909,7 @@ export default function BookingStepTwo({
               ) : null}
             </div>
 
-            <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3">
+            <div className="flex min-h-[5.1rem] items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-2.5">
               <div className="min-w-0">
                 <p className="text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
                   Note for driver

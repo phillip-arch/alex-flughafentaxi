@@ -10,6 +10,10 @@ import { buildPassengerConfirmationEmailHtml } from '@/lib/booking/passengerEmai
 
 import { z } from 'zod';
 import { calculateVehiclePrice, type VehicleType } from '@/lib/pricing';
+import {
+  getLeadTimeErrorMessage,
+  hasSufficientLeadTime,
+} from '@/lib/booking/leadTime';
 
 // Helper to generate a readable, collision-resistant reference
 // Excludes 0, O, 1, I to avoid confusion
@@ -89,6 +93,11 @@ export async function createBooking(payload: any) {
   }
   
   const { _zip, _extraStop, _meetAndGreet, ...bookingData } = validated.data;
+
+  const pickupAtDate = new Date(bookingData.pickup_at);
+  if (!hasSufficientLeadTime(pickupAtDate)) {
+    return { error: getLeadTimeErrorMessage(pickupAtDate) };
+  }
 
   // 2. Rate Limiting (Spam Protection)
   const headersList = await headers();

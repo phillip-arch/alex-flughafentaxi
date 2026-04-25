@@ -13,6 +13,7 @@ type InfoTransitionPhase =
   | 'prepare-enter-prev';
 
 type InfoSection = {
+  id: string;
   title: string;
   body?: string;
   items: string[];
@@ -101,6 +102,158 @@ function PaymentMethodsGrid({ isBookVariant }: { isBookVariant: boolean }) {
   );
 }
 
+function StaticInfoSectionCard({
+  section,
+  isBookVariant,
+  marginClassName,
+}: {
+  section: InfoSection;
+  isBookVariant: boolean;
+  marginClassName: string;
+}) {
+  return (
+    <div
+      className={`${marginClassName} ${isBookVariant ? 'rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`}
+    >
+      <p
+        className={`${isBookVariant ? 'text-[1rem] tracking-[0.04em]' : 'text-[12px] tracking-[0.18em] md:text-[13px]'} font-semibold uppercase text-[#1679FF]`}
+      >
+        {section.title}
+      </p>
+      {section.body ? (
+        <p className={`${isBookVariant ? 'mt-3 text-[1rem] md:text-[1.08rem]' : 'mt-2 text-sm'} font-medium text-[var(--color-text)]`}>
+          {section.body}
+        </p>
+      ) : null}
+      <div
+        className={`${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-2 text-sm leading-6'} text-[#64748b]`}
+      >
+        {section.items.map((item) => (
+          <p key={item}>{item}</p>
+        ))}
+      </div>
+      {section.id === 'payment-options' ? (
+        <PaymentMethodsGrid isBookVariant={isBookVariant} />
+      ) : null}
+    </div>
+  );
+}
+
+function AnimatedInfoSectionCard({
+  section,
+  isBookVariant,
+  marginClassName,
+}: {
+  section: InfoSection;
+  isBookVariant: boolean;
+  marginClassName: string;
+}) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const contentSignature = useMemo(
+    () => JSON.stringify({ body: section.body, items: section.items }),
+    [section.body, section.items],
+  );
+  const [visibleSection, setVisibleSection] = useState(section);
+  const [visibleSignature, setVisibleSignature] = useState(contentSignature);
+  const [phase, setPhase] = useState<InfoTransitionPhase>('idle');
+  const [lockedHeight, setLockedHeight] = useState<number | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const exitTimeoutRef = useRef<number | null>(null);
+  const unlockTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (exitTimeoutRef.current !== null) {
+        window.clearTimeout(exitTimeoutRef.current);
+      }
+      if (unlockTimeoutRef.current !== null) {
+        window.clearTimeout(unlockTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (contentSignature === visibleSignature) {
+      return;
+    }
+
+    if (prefersReducedMotion) {
+      setVisibleSection(section);
+      setVisibleSignature(contentSignature);
+      setPhase('idle');
+      setLockedHeight(null);
+      return;
+    }
+
+    if (cardRef.current) {
+      setLockedHeight(cardRef.current.offsetHeight);
+    }
+
+    if (exitTimeoutRef.current !== null) {
+      window.clearTimeout(exitTimeoutRef.current);
+    }
+    if (unlockTimeoutRef.current !== null) {
+      window.clearTimeout(unlockTimeoutRef.current);
+    }
+
+    setPhase('exit-next');
+
+    exitTimeoutRef.current = window.setTimeout(() => {
+      setVisibleSection(section);
+      setVisibleSignature(contentSignature);
+      setPhase('prepare-enter-next');
+
+      window.requestAnimationFrame(() => {
+        if (cardRef.current) {
+          void cardRef.current.offsetWidth;
+        }
+
+        window.requestAnimationFrame(() => {
+          setPhase('idle');
+        });
+      });
+
+      unlockTimeoutRef.current = window.setTimeout(() => {
+        setLockedHeight(null);
+      }, 360);
+    }, 220);
+  }, [contentSignature, prefersReducedMotion, section, visibleSignature]);
+
+  const phaseClassName =
+    phase === 'exit-next'
+      ? 'ui-info-card-exit-next'
+      : phase === 'prepare-enter-next'
+        ? 'ui-info-card-prepare-next'
+        : '';
+
+  return (
+    <div
+      className={`${marginClassName} ${isBookVariant ? 'rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`}
+      style={lockedHeight ? { minHeight: `${lockedHeight}px` } : undefined}
+    >
+      <div ref={cardRef} className={`ui-info-card-transition ${phaseClassName}`}>
+        <p
+          className={`${isBookVariant ? 'text-[1rem] tracking-[0.04em]' : 'text-[12px] tracking-[0.18em] md:text-[13px]'} font-semibold uppercase text-[#1679FF]`}
+        >
+          {visibleSection.title}
+        </p>
+        {visibleSection.body ? (
+          <p className={`${isBookVariant ? 'mt-3 text-[1rem] md:text-[1.08rem]' : 'mt-2 text-sm'} font-medium text-[var(--color-text)]`}>
+            {visibleSection.body}
+          </p>
+        ) : null}
+        <div
+          className={`${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-2 text-sm leading-6'} text-[#64748b]`}
+        >
+          {visibleSection.items.map((item) => (
+            <p key={item}>{item}</p>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function InfoSectionCards({
   sections,
   isBookVariant,
@@ -111,31 +264,21 @@ function InfoSectionCards({
   return (
     <>
       {sections.map((section, index) => (
-        <div
-          key={section.title}
-          className={`${index === 0 ? 'mt-0' : isBookVariant ? 'mt-7' : 'mt-4'} ${isBookVariant ? 'rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`}
-        >
-          <p
-            className={`${isBookVariant ? 'text-[1rem] tracking-[0.04em]' : 'text-[12px] tracking-[0.18em] md:text-[13px]'} font-semibold uppercase text-[#1679FF]`}
-          >
-            {section.title}
-          </p>
-          {section.body ? (
-            <p className={`${isBookVariant ? 'mt-3 text-[1rem] md:text-[1.08rem]' : 'mt-2 text-sm'} font-medium text-[var(--color-text)]`}>
-              {section.body}
-            </p>
-          ) : null}
-          <div
-            className={`${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-2 text-sm leading-6'} text-[#64748b]`}
-          >
-            {section.items.map((item) => (
-              <p key={item}>{item}</p>
-            ))}
-          </div>
-          {section.title === 'Payment options' ? (
-            <PaymentMethodsGrid isBookVariant={isBookVariant} />
-          ) : null}
-        </div>
+        section.id === 'airport-pickup' ? (
+          <AnimatedInfoSectionCard
+            key={section.id}
+            section={section}
+            isBookVariant={isBookVariant}
+            marginClassName={index === 0 ? 'mt-0' : isBookVariant ? 'mt-7' : 'mt-4'}
+          />
+        ) : (
+          <StaticInfoSectionCard
+            key={section.id}
+            section={section}
+            isBookVariant={isBookVariant}
+            marginClassName={index === 0 ? 'mt-0' : isBookVariant ? 'mt-7' : 'mt-4'}
+          />
+        )
       ))}
     </>
   );
@@ -149,24 +292,28 @@ function getStepSections(
   if (currentStep === 2) {
     const sections: InfoSection[] = [
       {
+        id: 'child-seats',
         title: 'Child seats',
         body: 'Travel details that matter for planning',
         items: [
           'Child seats are available on request and should be selected here so the driver arrives prepared.',
         ],
       },
-      {
-        title: 'Check-in luggage',
-        body: 'Why this information matters',
-        items: [
-          'Check-in luggage means the bags you hand over at the airline counter.',
-          'Please enter the luggage count correctly. It affects vehicle planning and, for airport pickups, how much time passengers need from aircraft to driver.',
-        ],
-      },
     ];
 
     if (direction === 'from_airport') {
       sections.push({
+        id: 'check-in-luggage',
+        title: 'Check-in luggage',
+        body: 'Why this information matters',
+        items: [
+          'Check-in luggage means the bags you hand over at the airline counter. A standard suitcase is checked luggage with a total size of up to 158 cm (length + width + height).',
+          'Please enter the luggage count correctly. It affects vehicle planning and, for airport pickups, how much time passengers need from aircraft to driver.',
+        ],
+      });
+
+      sections.push({
+        id: 'airport-pickup',
         title: 'Airport pickup',
         body: meetAndGreet ? 'Meet & Greet selected' : 'Standard pickup',
         items: meetAndGreet
@@ -186,6 +333,7 @@ function getStepSections(
   if (currentStep === 3) {
     return [
       {
+        id: 'payment-options',
         title: 'Payment options',
         body: 'When payment is made',
         items: [
@@ -198,6 +346,7 @@ function getStepSections(
 
   return [
     {
+      id: 'lead-time',
       title: 'Minimum booking lead time',
       body: 'Required notice before pickup',
       items: [
@@ -206,12 +355,19 @@ function getStepSections(
       ],
     },
     {
-      title: 'Timing guidance',
-      body: 'Suggested planning for your ride',
-      items: [
-        'For local pickups inside Vienna, leave extra buffer for traffic, especially during rush hour.',
-        'Suggested airport arrival: usually 2 hours before European flights and 3 hours before international flights.',
-      ],
+      id: 'timing-guidance',
+      title: direction === 'from_airport' ? 'Flight monitoring' : 'Timing guidance',
+      body: direction === 'from_airport' ? 'We track your arrival automatically' : 'Suggested planning for your ride',
+      items:
+        direction === 'from_airport'
+          ? [
+              'We monitor your flight for delays and early arrivals.',
+              'Your pickup time is adjusted based on the actual landing status, so the driver is scheduled for the real arrival.',
+            ]
+          : [
+              'For local pickups inside Vienna, leave extra buffer for traffic, especially during rush hour.',
+              'Suggested airport arrival: usually 2 hours before European flights and 3 hours before international flights.',
+            ],
     },
   ];
 }
@@ -233,9 +389,12 @@ export function BookingInfoPanel({
   );
   const isBookVariant = variant === 'book';
   const prefersReducedMotion = usePrefersReducedMotion();
-  const sectionsSignature = useMemo(() => JSON.stringify(sections), [sections]);
+  const sectionsStructureSignature = useMemo(
+    () => JSON.stringify(sections.map((section) => section.id)),
+    [sections],
+  );
   const [visibleSections, setVisibleSections] = useState<InfoSection[]>(sections);
-  const [visibleSignature, setVisibleSignature] = useState(sectionsSignature);
+  const [visibleStructureSignature, setVisibleStructureSignature] = useState(sectionsStructureSignature);
   const [phase, setPhase] = useState<InfoTransitionPhase>('idle');
   const [lockedHeight, setLockedHeight] = useState<number | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
@@ -255,7 +414,8 @@ export function BookingInfoPanel({
   }, []);
 
   useEffect(() => {
-    if (sectionsSignature === visibleSignature) {
+    if (sectionsStructureSignature === visibleStructureSignature) {
+      setVisibleSections(sections);
       previousStepRef.current = currentStep;
       return;
     }
@@ -265,7 +425,7 @@ export function BookingInfoPanel({
 
     if (prefersReducedMotion) {
       setVisibleSections(sections);
-      setVisibleSignature(sectionsSignature);
+      setVisibleStructureSignature(sectionsStructureSignature);
       setPhase('idle');
       setLockedHeight(null);
       return;
@@ -286,7 +446,7 @@ export function BookingInfoPanel({
 
     exitTimeoutRef.current = window.setTimeout(() => {
       setVisibleSections(sections);
-      setVisibleSignature(sectionsSignature);
+      setVisibleStructureSignature(sectionsStructureSignature);
       setPhase(navigationDirection === 'prev' ? 'prepare-enter-prev' : 'prepare-enter-next');
 
       window.requestAnimationFrame(() => {
@@ -301,9 +461,9 @@ export function BookingInfoPanel({
 
       unlockTimeoutRef.current = window.setTimeout(() => {
         setLockedHeight(null);
-      }, 400);
-    }, 300);
-  }, [currentStep, prefersReducedMotion, sections, sectionsSignature, visibleSignature]);
+      }, 360);
+    }, 220);
+  }, [currentStep, prefersReducedMotion, sections, sectionsStructureSignature, visibleStructureSignature]);
 
   const phaseClassName =
     phase === 'exit-next'
