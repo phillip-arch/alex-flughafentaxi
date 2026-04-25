@@ -83,7 +83,7 @@ export default async function BookingSuccessPage() {
                 <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
                   <Link
                     href={bookAnotherRideHref}
-                    className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#1F7CFF] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#176be0] hover:text-white visited:text-white"
+                    className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#1679FF] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#176be0] hover:text-white visited:text-white"
                   >
                     <span className="text-white">Book another ride</span>
                     <ArrowRight size={17} className="text-white" />

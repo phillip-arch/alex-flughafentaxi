@@ -1,28 +1,27 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Baby,
+  Briefcase,
+  Check,
   ChevronDown,
   ChevronRight,
-  Briefcase,
   CreditCard,
   Info,
   MapPin,
-  Plane,
   Phone,
+  Plane,
   ShieldCheck,
-  ShoppingBag,
   Star,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import BookingForm from '@/components/BookingForm';
 import Navbar from '@/components/Navbar';
 import PriceTable from '@/components/PriceTable';
-import VehicleCategoryCard from '@/components/VehicleCategoryCard';
 import { buildAbsoluteMetadata } from '@/lib/seo/metadata';
 import { WhatsAppIcon } from '@/components/ui/ContactIcons';
-import SectionIntro from '@/components/ui/SectionIntro';
 
 export async function generateMetadata({
   searchParams,
@@ -33,35 +32,102 @@ export async function generateMetadata({
   return buildAbsoluteMetadata('home', params?.lang);
 }
 
-type VehicleCategory = {
-  key: 'limousine' | 'kombi' | 'bus';
-  title: string;
-  description: string;
-  imageSrc: string;
-  specs: { icon: 'users' | 'briefcase' | 'shoppingBag'; value: string }[];
-  prices: { district: string; price: string }[];
-};
+const features: { num: string; title: string; description: string; icon: LucideIcon }[] = [
+  {
+    num: '01',
+    title: 'Hand-Vetted Drivers',
+    description:
+      'Every driver is personally reviewed for punctuality and professional conduct before joining our team.',
+    icon: ShieldCheck,
+  },
+  {
+    num: '02',
+    title: 'Real-Time Flight Sync',
+    description:
+      'We monitor your flight continuously. Land early or late — your driver adjusts without extra charges.',
+    icon: Plane,
+  },
+  {
+    num: '03',
+    title: 'Upfront Fixed Pricing',
+    description:
+      'What you see is what you pay. No hidden fees, no surge pricing, no surprises at the end of your ride.',
+    icon: CreditCard,
+  },
+  {
+    num: '04',
+    title: 'Child Seats & Safety',
+    description:
+      'Properly fitted child and booster seats provided on request at no extra charge, every time.',
+    icon: Baby,
+  },
+];
 
-type HomeLang = 'de' | 'en';
-type ChildSeatKey = 'babySeat' | 'childSeat' | 'boosterSeat';
-type ChildSeatOption = {
-  key: ChildSeatKey;
-  title: string;
-  weightRange: string;
-  ageLabel: string;
-  description: string;
-  imageAlt: string;
-};
-type ChildSeatSectionContent = {
-  eyebrow: string;
-  title: string;
-  description: string;
-  lead: string;
-  detailTitle: string;
-  options: ChildSeatOption[];
-  disclaimerTitle: string;
-  disclaimer: string;
-};
+const vehicles = [
+  {
+    type: 'SEDAN',
+    title: 'Limousine',
+    imageSrc: '/limo.jpg',
+    summary: 'Compact, always available, ideal for solo travelers or couples with standard luggage.',
+    passengers: '1 – 2',
+    suitcases: '2',
+    prices: [
+      { district: '1st – 10th district', price: '€42' },
+      { district: '11th district', price: '€39' },
+      { district: '12th – 23rd district', price: '€45' },
+    ],
+  },
+  {
+    type: 'WAGON',
+    title: 'Station Wagon',
+    imageSrc: '/kombi.jpg',
+    summary: 'More space for luggage, strollers, or extra passengers — no comfort lost.',
+    passengers: '1 – 4',
+    suitcases: '4',
+    prices: [
+      { district: '1st – 10th district', price: '€48' },
+      { district: '11th district', price: '€45' },
+      { district: '12th – 23rd district', price: '€51' },
+    ],
+  },
+  {
+    type: 'MINIVAN',
+    title: 'Minivan',
+    imageSrc: '/bus.jpg',
+    summary: 'The right choice for larger groups arriving together, with plenty of room for all bags.',
+    passengers: '1 – 8',
+    suitcases: '8',
+    prices: [
+      { district: '1st – 10th district', price: '€72' },
+      { district: '11th district', price: '€69' },
+      { district: '12th – 23rd district', price: '€75' },
+    ],
+  },
+];
+
+const bookingSteps = [
+  {
+    num: '01',
+    title: 'Choose your route',
+    description: 'Select to or from Vienna Airport, enter your address, date, and time of travel.',
+  },
+  {
+    num: '02',
+    title: 'Confirm & pay',
+    description: 'Review your fixed price, add passengers and luggage, then confirm your booking.',
+  },
+  {
+    num: '03',
+    title: 'Arrive stress-free',
+    description: 'Your driver tracks your flight and meets you punctually — no waiting, no stress.',
+  },
+];
+
+const reviewItems = [
+  { name: 'Anna M.', review: 'Top service, always on time and super easy to book.' },
+  { name: 'David K.', review: 'Clean car, fair fixed price and smooth pickup at the airport.' },
+  { name: 'Sophie R.', review: 'Very reliable. WhatsApp support was fast and helpful.' },
+];
 
 const faqItems = [
   {
@@ -76,8 +142,7 @@ const faqItems = [
   },
   {
     question: 'Can pets travel with me?',
-    answer:
-      'Pets can travel in suitable transport boxes. Please let us know in advance.',
+    answer: 'Pets can travel in suitable transport boxes. Please let us know in advance.',
   },
   {
     question: 'Are there extra costs for delays?',
@@ -86,331 +151,65 @@ const faqItems = [
   },
   {
     question: 'Can I also book from my hotel to the airport?',
-    answer:
-      'Yes, our service works in both directions. Enter your pickup address when booking.',
+    answer: 'Yes, our service works in both directions. Enter your pickup address when booking.',
   },
   {
     question: 'Which payment methods are available?',
-    answer:
-      'You can pay by cash, card, or mobile payment and receive a digital invoice.',
+    answer: 'You can pay by cash, card, or mobile payment and receive a digital invoice.',
   },
 ];
 
-const whyUsItems = [
+const childSeats = [
   {
-    title: 'Fixpreis garantiert',
+    title: 'Baby Seat',
+    weightRange: '0 – 13 kg',
+    ageLabel: 'For newborns & infants',
     description:
-      'Der Preis wird vorab vereinbart, sodass Sie keine versteckten Gebuehren erwarten.',
+      'Rear-facing installation protects the sensitive neck area during braking. Required for all infant airport transfers.',
   },
   {
-    title: 'Puenktlich und planbar',
+    title: 'Child Seat',
+    weightRange: '9 – 18 kg',
+    ageLabel: 'For toddlers',
     description:
-      'Wir verfolgen Ihren Flug und holen Sie puenktlich am Terminal ab. Persoenliche Abholung mit Namensschild ist gegen Aufpreis moeglich.',
+      '5-point harness with reinforced side-impact protection provides maximum stability throughout the journey.',
   },
   {
-    title: 'Komfort und Sicherheit',
+    title: 'Booster Seat',
+    weightRange: '15 – 36 kg',
+    ageLabel: 'For school-age children (up to ~12 yrs)',
     description:
-      'Moderne, klimatisierte Fahrzeuge mit regelmaessiger Wartung, Kindersitzen auf Anfrage und erfahrenen Fahrer*innen.',
-  },
-  {
-    title: '24/7-Verfuegbarkeit',
-    description:
-      'Unser Service steht rund um die Uhr an sieben Tagen der Woche bereit, erreichbar per Telefon und WhatsApp.',
+      'Ergonomic booster positions the seat belt correctly over shoulder and pelvis for proper protection.',
   },
 ];
 
-const alexStandardCards: {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-}[] = [
+const terminalPickupInfo = [
   {
-    title: 'Hand-Vetted Drivers',
+    title: 'Where will I be dropped off?',
     description:
-      'Every driver in our boutique team is personally reviewed by Alex to ensure they meet our strict standards for punctuality and professional conduct.',
-    icon: ShieldCheck,
+      "You'll be dropped off curbside at the terminal you specify when booking. If you don't know your terminal, add your airline in the notes field.",
   },
   {
-    title: 'Real-Time Flight Sync',
+    title: 'Where will I be picked up?',
     description:
-      'We monitor your flight status continuously. Whether you land early or late, your driver will be waiting at the arrival hall without delay penalties.',
-    icon: Plane,
-  },
-  {
-    title: 'Upfront Fixed Pricing',
-    description:
-      'What you see is what you pay. Our Vienna airport taxi rates include the essentials up front, with no hidden costs and no surge pricing.',
-    icon: CreditCard,
-  },
-  {
-    title: 'Child Seats & Safety',
-    description:
-      'Traveling with family? We provide properly fitted child and booster seats on request at no extra charge so every transfer stays safe and comfortable.',
-    icon: Baby,
+      'After baggage claim, turn right toward Burger King. Exit the terminal, cross the street, and proceed toward the parking area.',
+    linkLabel: 'View exact pickup location on Google Maps',
+    linkHref: 'https://maps.app.goo.gl/Yzv6rhxJBWNjLLMP7',
   },
 ];
 
-const whyUsEditorialItems = [
+const airportTips = [
   {
-    title: 'Direkter Kontakt statt Callcenter',
+    title: 'Terminal guide',
     description:
-      'Sie erreichen uns schnell per Telefon oder WhatsApp und erhalten klare Rueckmeldung zu Ihrer Fahrt.',
+      'Gates B/C/D → Terminal 1. Gates F/G → Terminal 3. Star Alliance airlines (Austrian) primarily use T3; budget & charter airlines often use T1A.',
   },
   {
-    title: 'Abholung mit Blick auf Ihren Flug',
+    title: 'When to arrive at the airport',
     description:
-      'Wir verfolgen Ankunftszeiten und passen die Abholung bei veraenderten Landungen entsprechend an.',
-  },
-  {
-    title: 'Sauberer Auftritt bis zur Ankunft',
-    description:
-      'Gepflegte Fahrzeuge, ruhige Fahrweise und ein planbarer Ablauf sorgen fuer einen entspannten Transfer.',
+      'Europe: 2 hours before departure. Non-Schengen & long-haul: 3 hours. USA flights: 3.5–4 hours. Add extra time for special luggage or groups.',
   },
 ];
-
-const whyUsStats = [
-  { value: '24/7', label: 'Erreichbar fuer Buchung und Rueckfragen' },
-  { value: 'Fixpreis', label: 'Vor Fahrtbeginn transparent abgestimmt' },
-  { value: 'Direkt', label: 'Ohne Umwege zu Hotel, Bahnhof oder Flughafen' },
-  { value: 'Flexibel', label: 'Kindersitze und Sonderwuensche auf Anfrage' },
-];
-
-const whyUsTimelineItems = [
-  {
-    step: '01',
-    title: 'Einfach anfragen',
-    description:
-      'Route, Uhrzeit und Sonderwuensche werden in wenigen Schritten uebermittelt, ohne komplizierten Buchungsprozess.',
-  },
-  {
-    step: '02',
-    title: 'Verbindlich bestaetigt',
-    description:
-      'Sie erhalten eine klare Rueckmeldung zum Preis und zur Abholung, damit vor Fahrtbeginn alles abgestimmt ist.',
-  },
-  {
-    step: '03',
-    title: 'Stressfrei ankommen',
-    description:
-      'Am Fahrtag laeuft der Transfer ruhig und planbar ab, vom Treffpunkt bis zur Ankunft am Ziel.',
-  },
-];
-
-const vehicleCategoryHighlights = [
-  {
-    title: 'Sedan',
-    audience: 'Fuer Einzelpersonen und Paare',
-    summary: 'Kompakt, schnell verfuegbar und ideal fuer klassische Transfers mit wenig Gepaeck.',
-    price: 'ab 39 EUR',
-    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
-  },
-  {
-    title: 'Station wagon',
-    audience: 'Fuer Familien und Gruppen',
-    summary: 'Mehr Platz fuer Koffer, Kinderwagen oder mehrere Mitreisende ohne Komfortverlust.',
-    price: 'ab 45 EUR',
-    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
-  },
-  {
-    title: 'Minivan',
-    audience: 'Fuer groessere Gruppen',
-    summary: 'Die passende Wahl, wenn mehrere Fahrgaeste gemeinsam und planbar ankommen sollen.',
-    price: 'ab 69 EUR',
-    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
-  },
-];
-
-const heroSectionPaddingClass =
-  'app-container relative pb-10 pt-[calc(66px+28px)] md:pb-12 md:pt-[calc(72px+12px)] lg:pb-14 lg:pt-[calc(72px+10px)]';
-const heroIntroClass =
-  'ui-section-intro mx-auto max-w-[42rem] text-center lg:mx-0 lg:text-left';
-const heroHeadlineClass =
-  'max-w-[23ch] text-[27px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:max-w-none md:text-[32px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor]';
-const heroSubheadlineClass =
-  'max-w-[38rem] text-[1rem] leading-[1.7] text-[#5e6f86] md:text-[1.05rem]';
-const heroGridClass = 'grid items-start gap-10';
-const heroDesktopGridClass =
-  'grid items-start gap-10 lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-8 xl:gap-10';
-const heroBookingColumnClass = 'mt-4 self-start text-left';
-const heroBookingCardClass =
-  'relative mt-8 w-full max-w-[32rem] text-left md:mt-10 md:w-[32rem] md:max-w-[32rem] lg:w-full lg:max-w-none';
-const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
-
-const vehicleCategories: VehicleCategory[] = [
-  {
-    key: 'limousine',
-    title: 'Sedan',
-    description: 'Affordable option for solo travelers or couples',
-    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/limo.jpg',
-    specs: [
-      { icon: 'users', value: '2' },
-      { icon: 'briefcase', value: '2' },
-      { icon: 'shoppingBag', value: '2' },
-    ],
-    prices: [
-      { district: '1st - 10th district', price: '42 EUR' },
-      { district: '11th district', price: '39 EUR' },
-      { district: '12th - 23rd district', price: '45 EUR' },
-    ],
-  },
-  {
-    key: 'kombi',
-    title: 'Station Wagon',
-    description: 'Ideal for groups and families - more room for luggage.',
-    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/kombi.jpg',
-    specs: [
-      { icon: 'users', value: '4' },
-      { icon: 'briefcase', value: '4' },
-      { icon: 'shoppingBag', value: '4' },
-    ],
-    prices: [
-      { district: '1st - 10th district', price: '48 EUR' },
-      { district: '11th district', price: '45 EUR' },
-      { district: '12th - 23rd district', price: '51 EUR' },
-    ],
-  },
-  {
-    key: 'bus',
-    title: 'Minivan',
-    description: 'Ideal for larger groups - plenty of space for passengers and luggage.',
-    imageSrc: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/bus.jpg',
-    specs: [
-      { icon: 'users', value: '8' },
-      { icon: 'briefcase', value: '8' },
-      { icon: 'shoppingBag', value: '8' },
-    ],
-    prices: [
-      { district: '1st - 10th district', price: '72 EUR' },
-      { district: '11th district', price: '69 EUR' },
-      { district: '12th - 23rd district', price: '75 EUR' },
-    ],
-  },
-];
-
-const childSeatImageSources = {
-  babySeat: '/alex-flughafentaxi-wien-babyschale-gratis.jpg',
-  childSeat: '/alex-flughafentaxi-wien-kindersitz-sicherheit.jpg',
-  boosterSeat: '/alex-flughafentaxi-wien-sitzerhoehung-gratis.jpg',
-} as const;
-
-const childSeatMobileHeaderGapClass = 'gap-4';
-const childSeatDesktopSubtitleGapClass = 'md:mt-4';
-const childSeatDesktopDescriptionGapClass = 'md:mt-5';
-
-const localizedHomeMediaContent: Record<
-  HomeLang,
-  {
-    vehicleImageAlts: {
-      limousine: string;
-      kombi: string;
-      bus: string;
-    };
-    childSeatSection: ChildSeatSectionContent;
-  }
-> = {
-  de: {
-    vehicleImageAlts: {
-      limousine: 'Alex Flughafentaxi Wien Limousine Fixpreis',
-      kombi: 'Alex Flughafentaxi Wien Kombi fuer viel Gepaeck',
-      bus: 'Alex Flughafentaxi Wien Bus fuer Gruppen und viel Gepaeck',
-    },
-    childSeatSection: {
-      eyebrow: 'Child Seats',
-      title: 'Travel safely with Alex Airport Taxi Vienna',
-      description:
-        'If you are looking for an airport taxi in Vienna for your family, safety comes first. Alex Airport Taxi provides only certified, regularly checked child restraint systems so you can travel comfortably at a fixed price.',
-      lead:
-        'Trust Alex Airport Taxi to bring your whole family safely, on time, and comfortably to your destination.',
-      detailTitle: 'Detailed seat specifications:',
-      options: [
-        {
-          key: 'babySeat',
-          title: 'Baby Seat',
-          weightRange: '0-13 kg',
-          ageLabel: 'For newborns & infants.',
-          description:
-            'Group 0+: These seats are designed for newborns from day one. They are installed rear-facing to protect the sensitive neck area during braking. Essential for a safe first transfer in our airport taxi.',
-          imageAlt:
-            'Free baby seat in Alex Airport Taxi Vienna for a safe baby transfer.',
-        },
-        {
-          key: 'childSeat',
-          title: 'Child Seat',
-          weightRange: '9-18 kg',
-          ageLabel: 'Secure support for toddlers.',
-          description:
-            'Group 1/2: Once your child can sit steadily, we use our toddler seat. With a robust 5-point harness and reinforced side-impact protection, it provides maximum stability during the ride.',
-          imageAlt:
-            'Certified child seat for toddlers in Alex Airport Taxi Vienna - safety comes first.',
-        },
-        {
-          key: 'boosterSeat',
-          title: 'Booster Seat',
-          weightRange: '15-36 kg',
-          ageLabel: 'Optimal belt positioning for school-age children.',
-          description:
-            'Group 2/3: For older children up to approx. 12 years old (or 150 cm), we provide ergonomic booster seats. They help position the vehicle seat belt correctly over the shoulder and pelvis, which is essential for protection.',
-          imageAlt:
-            'Free booster seat for older children during a ride with Alex Airport Taxi Vienna.',
-        },
-      ],
-      disclaimerTitle: '',
-      disclaimer:
-        'Please enter the exact number and type of child seats required in the booking form (baby seat, child seat, or booster seat). Only with advance information can we guarantee availability and a legally compliant, safe ride. Please also note the maximum luggage capacity of your selected vehicle.',
-    },
-  },
-  en: {
-    vehicleImageAlts: {
-      limousine: 'Alex airport taxi Vienna limousine fixed price',
-      kombi: 'Alex airport taxi Vienna estate car for extra luggage',
-      bus: 'Alex airport taxi Vienna minibus for groups and extra luggage',
-    },
-    childSeatSection: {
-      eyebrow: 'Child Seats',
-      title: 'Travel safely with Alex airport taxi Vienna',
-      description:
-        'If you are looking for an airport taxi in Vienna for your family, safety comes first. Alex Flughafentaxi therefore provides only certified, regularly checked child restraint systems to ensure a relaxed ride at a fixed price.',
-      lead:
-        'Trust Alex Flughafentaxi to bring your whole family safely, on time and in comfort to the destination.',
-      detailTitle: 'Detailed seat specifications:',
-      options: [
-        {
-          key: 'babySeat',
-          title: 'Baby Seat',
-          weightRange: '0-13 kg',
-          ageLabel: 'For newborns & infants.',
-          description:
-            'Group 0+: These seats are designed for newborns from day one. Installation is always rear-facing to protect the sensitive neck area during braking. A must for the first safe transfer in our airport taxi.',
-          imageAlt:
-            'Free baby seat in Alex airport taxi Vienna for a safe baby transfer.',
-        },
-        {
-          key: 'childSeat',
-          title: 'Child Seat',
-          weightRange: '9-18 kg',
-          ageLabel: 'Secure hold for toddlers.',
-          description:
-            'Group 1/2: Once your child can sit steadily, our toddler seat is used. With a robust 5-point harness and reinforced side-impact protection, it provides maximum stability during the ride.',
-          imageAlt:
-            'Certified child seat for toddlers in Alex airport taxi Vienna - safety comes first.',
-        },
-        {
-          key: 'boosterSeat',
-          title: 'Booster Seat',
-          weightRange: '15-36 kg',
-          ageLabel: 'Optimal belt positioning for school kids.',
-          description:
-            'Group 2/3: For older children up to approx. 12 years (or 150 cm), we provide ergonomic boosters. They ensure that the vehicle seat belt runs correctly over the shoulder and hips, which is crucial for protection.',
-          imageAlt:
-            'Free booster seat for older children during a ride with Alex airport taxi Vienna.',
-        },
-      ],
-      disclaimerTitle: 'Important for your Vienna airport taxi:',
-      disclaimer:
-        'Please enter the exact number and type of child seats required in the booking form (baby seat, child seat or booster seat). Only with advance notice can we guarantee availability and a legally compliant, safe ride. Please also note the maximum luggage capacity of your chosen vehicle.',
-    },
-  },
-};
 
 const popularTrips = [
   'Von Terminal 1 Vienna Airport nach Wien Hauptbahnhof',
@@ -425,229 +224,32 @@ const popularTrips = [
   'Von Vienna Central Train Station nach Terminal 3 Vienna Airport',
 ];
 
-const bookingSteps = ['1. Route waehlen', '2. Details eingeben', '3. Bestaetigen'];
-
-const reviewItems = [
-  {
-    name: 'Anna M.',
-    review: 'Top service, always on time and super easy to book.',
-  },
-  {
-    name: 'David K.',
-    review: 'Clean car, fair fixed price and smooth pickup at the airport.',
-  },
-  {
-    name: 'Sophie R.',
-    review: 'Very reliable. WhatsApp support was fast and helpful.',
-  },
-];
-
-function ChildSeatWeightChip({ weightRange }: { weightRange: string }) {
+function SectionEyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex whitespace-nowrap rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.82rem] font-semibold tracking-[-0.01em] text-[#111827] shadow-[0_8px_18px_rgba(17,17,17,0.06)]">
-      {weightRange}
+    <span className="inline-flex items-center gap-2 text-[0.75rem] font-bold uppercase tracking-[0.2em] text-[#1679FF]">
+      <span className="h-1 w-4 rounded-full bg-[#1679FF]" />
+      {children}
     </span>
   );
 }
 
-function ChildSeatPreviewImage({
-  seat,
-  frameClassName,
-  imageClassName = 'object-contain p-[12%]',
-  pillClassName = 'absolute right-2 top-2 z-10',
-}: {
-  seat: ChildSeatOption;
-  frameClassName: string;
-  imageClassName?: string;
-  pillClassName?: string;
-}) {
+function SectionHeading({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
   return (
-    <div className={frameClassName}>
-      <div className={pillClassName}>
-        <ChildSeatWeightChip weightRange={seat.weightRange} />
-      </div>
-      <div className="relative h-full w-full">
-        <Image
-          src={childSeatImageSources[seat.key]}
-          alt={seat.imageAlt}
-          fill
-          className={`${imageClassName} transition-transform duration-500 ease-out group-hover:scale-[1.06]`}
-          sizes="(min-width: 1280px) 24vw, (min-width: 768px) 36vw, 100vw"
-        />
-      </div>
-    </div>
-  );
-}
-
-const terminalPickupInfo = [
-  {
-    title: 'Where will I be dropped off?',
-    description:
-      "You'll be dropped off curbside at the terminal that you specify when requesting your ride. If you don't know your terminal, you can input your airline in note field when booking your ride or share directly with driver.",
-  },
-  {
-    title: 'Where will I be picked up?',
-    description:
-      'After exiting the baggage claim area into the arrivals hall, turn right and you will see Burger King. Exit the terminal at this point, cross the street to the opposite side, and proceed toward the parking area.',
-    linkLabel: 'Click here to view the exact pickup location',
-    linkHref: 'https://maps.app.goo.gl/Yzv6rhxJBWNjLLMP7',
-  },
-];
-
-const airportTips = [
-  {
-    title: 'Terminal-Tipps',
-    description:
-      'Ihr Boardingpass zeigt Ihnen den richtigen Terminal: Gates B/C/D bedeuten Check-in in Terminal 1; Gates F/G bedeuten Check-in in Terminal 3. Star-Alliance-Fluggesellschaften wie Austrian Airlines nutzen vorrangig T3, waehrend Billig- und Charterairlines oftmals T1A waehlen.',
-  },
-  {
-    title: 'Wann sollte ich am Flughafen sein?',
-    description:
-      'Fuer Fluege innerhalb Europas wird empfohlen, etwa 2 Stunden vor Abflug am Flughafen zu sein. Fuer Non-Schengen- und Langstreckenfluege sind 3 Stunden ratsam, fuer USA-Fluege sogar 3 1/2-4 Stunden. Reisen Sie mit Sondergepaeck oder in Gruppen, planen Sie zusaetzliche Zeit ein.',
-  },
-];
-
-function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: { className?: string }) {
-  return (
-    <div className={className}>
-      <Link href="/book" className="ui-button-booking-primary">
-        Book Now
-      </Link>
-    </div>
-  );
-}
-
-function HeroBookingCard() {
-  return (
-    <div
-      id="hero-booking"
-      className="relative mx-auto w-full max-w-[32rem] lg:mx-0 lg:max-w-none"
+    <h2
+      className={`mt-3 text-[2.1rem] font-black leading-[1.0] tracking-[-0.05em] [text-shadow:0.012em_0_currentColor] md:text-[2.6rem] ${
+        light ? '!text-white' : 'text-[#0c111e]'
+      }`}
     >
-      <div className={heroBookingCardClass}>
-        <div className="min-h-0 lg:flex-1 lg:min-h-0">
-          <BookingForm fluidDesktopWidth lockDesktopHeight />
-        </div>
-      </div>
-    </div>
+      {children}
+    </h2>
   );
 }
 
-function AlexStandardSection({ className = '' }: { className?: string }) {
+function BookingCta({ className = '' }: { className?: string }) {
   return (
-    <div className={className}>
-      <div className="mx-auto max-w-[72rem] text-center">
-        <span className="inline-flex items-center rounded-full border border-[#dbe7ff] bg-[#f3f7ff] px-5 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.16em] text-[#1679FF] md:px-6">
-          The Alex Standard
-        </span>
-        <h2 className="ui-heading-lg mx-auto mt-7 max-w-[24ch] text-[#182033] lg:max-w-none">
-          Your Premier Vienna Airport Taxi Service
-        </h2>
-        <p className="ui-copy-compact mx-auto mt-[30px] max-w-[57rem] text-[#5c718d]">
-          Direct transfers to Schwechat (VIE) managed by a driver with 10+ years of
-          experience. We do not just provide rides; we provide peace of mind.
-        </p>
-      </div>
-
-      <div className="mt-12 grid gap-5 lg:mt-14 lg:grid-cols-2 lg:gap-7">
-        {alexStandardCards.map(({ title, description, icon: Icon }) => (
-          <article
-            key={title}
-            className="group rounded-[2rem] border border-[#dbe4ef] bg-[#f5f8fc] px-6 py-7 shadow-[0_18px_40px_rgba(17,17,17,0.035)] transition-all duration-200 hover:-translate-y-[2px] hover:border-[#4f86ff] hover:bg-white hover:shadow-[0_22px_50px_rgba(22,121,255,0.08)] md:px-8 md:py-9 lg:px-10"
-          >
-            <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-7">
-              <span className="flex h-[5.2rem] w-[5.2rem] shrink-0 items-center justify-center rounded-[1.45rem] border border-[#eef3f9] bg-white text-[#1679FF] shadow-[0_16px_34px_rgba(17,17,17,0.06)] transition-all duration-200 group-hover:border-[#dce8ff] group-hover:shadow-[0_18px_38px_rgba(22,121,255,0.09)]">
-                <Icon size={31} strokeWidth={2.1} />
-              </span>
-
-              <div className="min-w-0">
-                <h3 className="text-[1.65rem] font-semibold leading-[1.08] tracking-[-0.05em] text-[#182033] md:text-[2rem]">
-                  {title}
-                </h3>
-                <p className="ui-copy-compact mt-[30px] max-w-[31rem] text-[#5f718a]">
-                  {description}
-                </p>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function HeroImageCard() {
-  return (
-    <div className="relative mx-auto flex w-full max-w-[52rem] flex-col lg:mt-8 lg:max-w-none">
-      <div className={`${heroIntroClass} hidden lg:flex`}>
-        <h1 className={`ui-section-intro-title mt-0 !mb-[1.35rem] md:!mb-[1.5rem] ${heroHeadlineClass}`}>Vienna Airport Taxi: Fixed-Price Transfers</h1>
-        <p className={`ui-section-intro-copy m-0 ${heroSubheadlineClass}`}>
-          Stress-free vienna airport taxi transfer with guaranteed fixed prices and
-          reliable 24/7 flight tracking timed perfectly to your arrival.
-        </p>
-      </div>
-
-      <div className="relative lg:mt-auto">
-        <div className="relative h-[17rem] overflow-hidden rounded-[1.9rem] md:h-[22rem] md:rounded-[2.25rem]">
-          <Image
-            src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/heroimage.jpg"
-            alt="Alex Flughafentaxi Wien"
-            fill
-            priority
-            fetchPriority="high"
-            quality={72}
-            className="object-cover"
-            sizes="(min-width: 1024px) 52rem, (min-width: 768px) 58vw, 92vw"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(15,23,42,0.12)_100%)]" />
-        </div>
-
-        <div className="absolute left-4 top-5 z-10 inline-flex items-center gap-3 rounded-[1.15rem] bg-white px-4 py-3 text-[#0f172a] shadow-[0_18px_40px_rgba(15,23,42,0.14)] md:-left-6 md:top-7 md:px-5">
-          <Star size={18} className="fill-[#eab308] text-[#eab308]" strokeWidth={2.2} />
-          <span className="text-[1rem] font-black tracking-[-0.03em] md:text-[1.05rem]">
-            4.9/5 Rating
-          </span>
-        </div>
-
-        <div className="absolute right-4 top-[13.5rem] z-10 inline-flex items-center gap-3 rounded-[1.15rem] bg-white px-4 py-3 text-[#0f172a] shadow-[0_18px_40px_rgba(15,23,42,0.14)] md:-right-5 md:top-[16.5rem] md:px-5">
-          <ShieldCheck size={18} className="text-[#1F7CFF]" strokeWidth={2.2} />
-          <span className="text-[1rem] font-black tracking-[-0.03em] md:text-[1.05rem]">
-            Flight Tracking
-          </span>
-        </div>
-      </div>
-
-      <AlexStandardSection className="hidden lg:block lg:pt-14" />
-
-      <div className="hidden lg:block lg:pt-16">
-        <SectionIntro
-          eyebrow="Vehicle categories"
-          title="Vienna Airport Taxi Prices & Vehicles"
-          description="Our vehicles fit every need. Compare space, luggage capacity, and fixed prices for Vienna at a glance."
-          align="center"
-          className="max-w-[46rem]"
-        />
-      </div>
-    </div>
-  );
-}
-
-function DesktopStickyHeroSection() {
-  return (
-    <section className="hidden bg-[var(--color-page-bg)] text-[var(--color-text)] lg:block">
-      <div className={heroSectionPaddingClass}>
-        <div className="mx-auto max-w-[104rem]">
-          <div className={heroDesktopGridClass}>
-            <div className="self-stretch text-left">
-              <div className="sticky top-24 h-fit">
-                <HeroBookingCard />
-              </div>
-            </div>
-
-            <HeroImageCard />
-          </div>
-        </div>
-      </div>
-    </section>
+    <Link href="/book" className={`ui-button-booking-primary ${className}`}>
+      Book Now
+    </Link>
   );
 }
 
@@ -656,480 +258,515 @@ export default async function Home({
 }: {
   searchParams: Promise<{ lang?: string }>;
 }) {
-  const params = await searchParams;
-  const activeLang: HomeLang = params?.lang?.toLowerCase() === 'en' ? 'en' : 'de';
-  const localizedMediaContent = localizedHomeMediaContent[activeLang];
-
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
+    <div className="min-h-screen bg-[#f3f7fc] text-[#111111]">
       <Navbar />
       <main>
 
-      <section id="hero" className="relative bg-[var(--color-page-bg)] text-[var(--color-text)] lg:hidden">
-        <div className={heroSectionPaddingClass}>
-          <div className="mx-auto max-w-[104rem]">
-            <div className={heroIntroClass}>
-              <h1 className={`ui-section-intro-title mt-0 !mb-[1.35rem] md:!mb-[1.5rem] ${heroHeadlineClass}`}>Vienna Airport Taxi: Fixed-Price Transfers</h1>
-              <p className={`ui-section-intro-copy m-0 ${heroSubheadlineClass}`}>
-                Stress-free vienna airport taxi transfer with guaranteed fixed prices and
-                reliable 24/7 flight tracking timed perfectly to your arrival.
-              </p>
-            </div>
-            <div className={heroGridClass}>
-              <div className={heroBookingColumnClass}>
-                <HeroBookingCard />
-              </div>
+        {/* ── HERO ─────────────────────────────────────────────────────── */}
+        <section className="relative bg-[#080e1c] text-white">
+          <div className="app-container pb-14 pt-[calc(72px+2.5rem)] md:pb-16 md:pt-[calc(72px+3rem)] lg:pb-20 lg:pt-[calc(72px+3.5rem)]">
+            <div className="mx-auto max-w-[108rem]">
+              <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.88fr)] lg:items-center lg:gap-10 xl:gap-16">
 
-              <HeroImageCard />
-            </div>
-          </div>
-        </div>
-      </section>
+                {/* Left: editorial headline */}
+                <div className="flex flex-col gap-8 lg:py-6">
+                  <SectionEyebrow>Vienna, Austria · VIE · Schwechat</SectionEyebrow>
 
-      <DesktopStickyHeroSection />
+                  <h1 className="text-[3.4rem] font-black leading-[0.93] tracking-[-0.055em] !text-white sm:text-[4.2rem] md:text-[5rem] lg:text-[3.8rem] xl:text-[4.6rem]">
+                    Vienna<br />
+                    Airport<br />
+                    Taxi.
+                  </h1>
 
-      <section className="bg-[var(--color-page-bg)] py-16 md:py-20 lg:hidden">
-        <div className="app-container">
-          <div className="mx-auto max-w-[104rem]">
-            <AlexStandardSection />
-          </div>
-        </div>
-      </section>
+                  <p className="max-w-[36rem] text-[1rem] leading-[1.72] text-[#8da4c0] lg:max-w-[28rem]">
+                    Fixed-price transfers to and from Vienna International Airport — tracked in real time, on time, every time.
+                  </p>
 
-      <section className="section-shell-tight-top bg-[var(--color-page-bg)]">
-        <div className="app-container">
-          <div className="mx-auto max-w-[104rem]">
-            <div className="lg:hidden">
-              <SectionIntro
-                eyebrow="Vehicle categories"
-                title="Vienna Airport Taxi Prices & Vehicles"
-                description="Our vehicles fit every need. Compare space, luggage capacity, and fixed prices for Vienna at a glance."
-                align="center"
-                className="max-w-[46rem]"
-              />
-            </div>
-
-            <div className="mt-10 space-y-5 lg:mt-0">
-              {vehicleCategories.map(({ key, title, description, imageSrc, specs, prices }) => (
-                <VehicleCategoryCard
-                  key={key}
-                  title={title}
-                  description={description}
-                  imageSrc={imageSrc}
-                  imageAlt={localizedMediaContent.vehicleImageAlts[key]}
-                  specs={specs}
-                  prices={prices}
-                />
-              ))}
-            </div>
-
-            <PrimaryBookingCta />
-          </div>
-        </div>
-      </section>
-
-      <PriceTable />
-
-      <section className="bg-[var(--color-page-bg)] py-8 md:py-10">
-        <div className="app-container">
-          <div className="mx-auto max-w-[104rem]">
-            <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
-              <SectionIntro
-                eyebrow="Luggage"
-                title="Will all my luggage fit?"
-                description="To avoid delays on the way to the airport, please choose the right vehicle option for your luggage needs."
-                className="max-w-[58rem]"
-              />
-
-              <div className="mt-8 grid gap-5 md:grid-cols-2 md:gap-6">
-                <div className="rounded-[1.75rem] border border-[#e6edf7] bg-[#F0F6FF] px-6 py-7 md:px-8 md:py-8">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)]">
-                    <Briefcase size={24} strokeWidth={2.2} />
-                  </span>
-                  <div className="ui-text-block-sm mt-5">
-                    <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827]">
-                      Standard Suitcase
-                    </h3>
-                    <p className="ui-copy-compact mt-3 text-[#58708d]">
-                      A standard suitcase is checked luggage with a total size of up to 158 cm
-                      (length + width + height).
-                      <br />
-                      This matches the usual requirements of most airlines.
-                    </p>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                    {[
+                      { icon: Star, label: '4.9 Rating' },
+                      { icon: Check, label: 'Fixed price' },
+                      { icon: Plane, label: '24 / 7 service' },
+                      { icon: ShieldCheck, label: '10 + years' },
+                    ].map(({ icon: Icon, label }) => (
+                      <span
+                        key={label}
+                        className="inline-flex items-center gap-2 text-[0.875rem] font-semibold text-[#b0c8e0]"
+                      >
+                        <Icon size={14} className="text-[#1679FF]" strokeWidth={2.4} />
+                        {label}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
-                <div className="rounded-[1.75rem] border border-[#e6edf7] bg-[#F0F6FF] px-6 py-7 md:px-8 md:py-8">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)]">
-                    <ShoppingBag size={24} strokeWidth={2.2} />
-                  </span>
-                  <div className="ui-text-block-sm mt-5">
-                    <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827]">
-                      Hand Luggage
-                    </h3>
-                    <p className="ui-copy-compact mt-3 text-[#58708d]">
-                      Hand luggage usually has the following maximum size: 55 x 40 x 23 cm,
-                      depending on the airline.
-                    </p>
-                  </div>
+                {/* Right: booking form */}
+                <div>
+                  <BookingForm fluidDesktopWidth lockDesktopHeight />
                 </div>
-              </div>
-
-              <div className="mt-10 border-t border-[#e6edf7] pt-10">
-                <SectionIntro
-                  eyebrow={localizedMediaContent.childSeatSection.eyebrow}
-                  title={localizedMediaContent.childSeatSection.title}
-                  description={localizedMediaContent.childSeatSection.description}
-                  className="max-w-[62rem]"
-                />
-
-                <p className="mt-5 max-w-[62rem] text-[1rem] leading-[1.75] text-[#58708d] md:text-[1.05rem]">
-                  {localizedMediaContent.childSeatSection.lead}
-                </p>
-
-                <p className="mt-8 text-[0.92rem] font-semibold uppercase tracking-[0.14em] text-[#1679FF]">
-                  {localizedMediaContent.childSeatSection.detailTitle}
-                </p>
-
-                <div className="mt-8 space-y-4">
-                  {localizedMediaContent.childSeatSection.options.map((seat) => (
-                    <article
-                      key={`seat-${seat.key}`}
-                      className="group w-full max-w-full overflow-hidden rounded-[1.75rem] border border-[#e6edf7] bg-[#F0F6FF] p-4 md:p-5"
-                    >
-                      <div className="grid gap-4 md:grid-cols-[8rem_minmax(0,1fr)] md:items-center">
-                        <div className="grid w-full max-w-full grid-cols-[minmax(0,8rem)_minmax(0,1fr)] items-start gap-2 md:flex md:flex-col md:items-center">
-                          <ChildSeatPreviewImage
-                            seat={seat}
-                            frameClassName="relative h-[10.25rem] w-full max-w-[8rem] overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white sm:h-[10.75rem] sm:max-w-[8.5rem] md:h-[8rem] md:w-[6.75rem] md:max-w-none"
-                            imageClassName="object-contain px-0 py-[9%]"
-                            pillClassName="hidden"
-                          />
-                          <div className="min-w-0 pt-1 text-left md:pt-0 md:text-center">
-                            <ChildSeatWeightChip weightRange={seat.weightRange} />
-                            <div className={`mt-4 flex max-w-full flex-col ${childSeatMobileHeaderGapClass} md:hidden`}>
-                              <h4 className="pr-2 text-[1rem] font-semibold leading-[1.08] tracking-[-0.04em] text-[#111827]">
-                                {seat.title}
-                              </h4>
-                              <p className="text-[0.8rem] font-medium leading-[1.4] tracking-[-0.02em] text-[#111827]">
-                                {seat.ageLabel}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="min-w-0 mx-auto w-full max-w-full rounded-[1.35rem] border border-[#edf2f8] bg-white px-4 py-4 sm:px-5 sm:py-5 md:mx-0 md:max-w-none md:px-6 md:py-6">
-                          <h4 className="hidden pr-2 text-[1.25rem] font-semibold tracking-[-0.04em] text-[#111827] md:block md:text-[1.32rem]">
-                            {seat.title}
-                          </h4>
-                          <p
-                            className={`mt-4 hidden text-[0.98rem] font-medium text-[#111827] ${childSeatDesktopSubtitleGapClass} md:block`}
-                          >
-                            {seat.ageLabel}
-                          </p>
-                          <p
-                            className={`ui-copy-compact mt-4 leading-[1.78] text-[#58708d] ${childSeatDesktopDescriptionGapClass}`}
-                          >
-                            {seat.description}
-                          </p>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-
-                <div className="mt-8 rounded-[1.5rem] border border-[#dbe7f8] bg-[#f4f8ff] px-5 py-5 md:px-6 md:py-6">
-                  <div className="md:flex md:items-start md:gap-4">
-                    <span className="float-left mb-2 mr-4 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d8e4f6] bg-white text-[#1679FF] shadow-[0_10px_24px_rgba(17,17,17,0.04)] md:float-none md:mb-0 md:mr-0">
-                      <Info size={20} strokeWidth={2.2} />
-                    </span>
-                    <p className="text-[0.98rem] leading-[1.7] text-[#58708d] md:mt-3 md:min-w-0">
-                      {localizedMediaContent.childSeatSection.disclaimer}
-                    </p>
-                  </div>
-                </div>
-
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="bg-[var(--color-page-bg)] py-14 md:py-18">
-        <div className="app-container">
-          <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)] lg:items-center lg:gap-10">
-            <div className="max-w-[44rem]">
-                <SectionIntro
-                  eyebrow="Contact"
-                  title="Questions about booking?"
-                  description="You can book your airport transfer conveniently online. If you prefer to speak directly or need quick help, we are available immediately by phone and WhatsApp."
-                  className="max-w-[34rem]"
-                />
-              </div>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3 lg:mt-0 lg:justify-center lg:self-stretch lg:border-l lg:border-[#edf2f7] lg:pl-8">
-              <a
-                href="tel:+436764826069"
-                aria-label="Call"
-                className="ui-contact-fab ui-contact-fab-phone"
-              >
-                <Phone size={26} className="text-white md:h-[18px] md:w-[18px]" />
-              </a>
-
-              <a
-                href="https://wa.me/436764826069"
-                aria-label="WhatsApp"
-                className="ui-contact-fab ui-contact-fab-whatsapp"
-              >
-                <WhatsAppIcon className="h-[26px] w-[26px] text-white md:h-[18px] md:w-[18px]" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-shell-tight-top bg-[var(--color-page-bg)]">
-        <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
-              <SectionIntro
-                eyebrow="Terminal 3"
-                title="Terminal 3 map"
-                description="Guidance for pickup at Vienna Airport."
-                className="max-w-[42rem]"
-              />
-
-              <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-[#e9edf3] bg-white">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1331.7548403878466!2d16.56207266809108!3d48.11969249664487!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476c54530fff4bc5%3A0xf4c32d1659fb4805!2sVIE%20Terminal%203%2C%201300%20Schwechat!5e0!3m2!1sen!2sat!4v1774133487794!5m2!1sen!2sat"
-                  title="Google Maps Karte fuer den Abholpunkt am Flughafen Wien"
-                  width="600"
-                  height="450"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="h-[360px] w-full md:h-[450px]"
-                />
-              </div>
-
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {terminalPickupInfo.map(({ title, description, linkLabel, linkHref }) => (
-                  <div
-                    key={title}
-                    className="rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5"
-                  >
-                    <div className="ui-text-block-sm gap-3">
-                      <h3 className="ui-heading-md text-[#111827]">{title}</h3>
-                      <p className="ui-copy-compact text-[#6a7d96]">{description}</p>
-                      {linkLabel && linkHref ? (
-                        <a
-                          href={linkHref}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="ui-copy-compact inline-flex items-center gap-2 font-semibold text-[#1679FF] transition-colors hover:text-[#0f5fcc]"
-                        >
-                          <MapPin size={16} className="ui-icon-accent" />
-                          {linkLabel}
-                        </a>
-                      ) : null}
+        {/* ── PHOTO STRIP ──────────────────────────────────────────────── */}
+        <section className="bg-[#080e1c] pb-16 md:pb-20">
+          <div className="app-container">
+            <div className="mx-auto max-w-[108rem]">
+              <div className="grid gap-3 md:grid-cols-3 md:gap-4">
+                {[
+                  {
+                    src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/vienna-city.jpg',
+                    alt: 'Vienna city centre',
+                    label: 'Vienna city',
+                    bg: 'bg-[#1a2236]',
+                  },
+                  {
+                    src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/vienna-airport.jpg',
+                    alt: 'Vienna International Airport',
+                    label: 'Vienna airport',
+                    bg: 'bg-[#151e30]',
+                  },
+                  {
+                    src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/car-interior.jpg',
+                    alt: 'Premium car interior',
+                    label: 'Premium interior',
+                    bg: 'bg-[#111827]',
+                  },
+                ].map(({ src, alt, label, bg }) => (
+                  <div key={label} className={`relative overflow-hidden rounded-[1.5rem] md:rounded-[1.75rem] ${bg}`}>
+                    <div className="relative h-[13rem] w-full md:h-[16rem]">
+                      <Image
+                        src={src}
+                        alt={alt}
+                        fill
+                        className="object-cover opacity-90"
+                        sizes="(min-width: 768px) 33vw, 100vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <span className="absolute bottom-4 left-5 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/80">
+                        {label}
+                      </span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="bg-[var(--color-page-bg)] py-8 md:py-10">
-        <div className="app-container">
-          <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
-            <SectionIntro
-              eyebrow="Reviews"
-              title="Passenger reviews."
-              description="Real feedback from our passengers before you book."
-              className="max-w-[42rem]"
-            />
+        {/* ── FEATURES ─────────────────────────────────────────────────── */}
+        <section className="bg-white py-20 md:py-24">
+          <div className="app-container">
+            <div className="mx-auto max-w-[108rem]">
+              <div className="mb-12 lg:mb-14">
+                <SectionEyebrow>The Alex Standard</SectionEyebrow>
+                <SectionHeading>Your premier Vienna<br className="hidden md:block" /> airport taxi service.</SectionHeading>
+              </div>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
-              {reviewItems.map(({ name, review }) => (
-                <div
-                  key={name}
-                  className="rounded-[1.5rem] border border-[#e7edf5] bg-white px-5 py-5"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[1rem] font-semibold text-[#111827]">{name}</p>
-                      <p className="mt-1 text-[0.9rem] text-[#5d6b7c]">Google Review</p>
+              <div className="grid gap-5 md:grid-cols-2 lg:gap-6">
+                {features.map(({ num, title, description, icon: Icon }) => (
+                  <article
+                    key={title}
+                    className="group flex flex-col gap-6 rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-7 py-7 transition-all duration-200 hover:border-[#bdd4ff] hover:bg-white hover:shadow-[0_20px_50px_rgba(22,121,255,0.07)] md:px-8 md:py-8"
+                  >
+                    <div className="flex items-start justify-between">
+                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[#dde9f8] bg-white text-[#1679FF] shadow-[0_8px_20px_rgba(22,121,255,0.1)]">
+                        <Icon size={21} strokeWidth={2.1} />
+                      </span>
+                      <span className="text-[2.6rem] font-black leading-none tracking-[-0.06em] text-[#eaf0f8] transition-colors group-hover:text-[#dde9ff]">
+                        {num}
+                      </span>
                     </div>
-                    <span className="rounded-full border border-[#dbe7f8] bg-white px-3 py-1 text-[0.82rem] font-semibold text-[#1679FF]">
-                      Google
-                    </span>
-                  </div>
-                  <p className="mt-4 text-[1rem] tracking-[0.08em] text-[#f4b400]">
-                    {'\u2605\u2605\u2605\u2605\u2605'}
-                  </p>
-                  <p className="mt-3 text-[1rem] leading-[1.65] text-[#42566f]">&quot;{review}&quot;</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[var(--color-page-bg)] py-8 md:py-10">
-        <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
-              <div className="ui-text-block-lg max-w-[62rem]">
-                <SectionIntro
-                  eyebrow="Vienna Airport"
-                  title="Vienna airport taxi - stress-free to Vienna Airport (VIE)"
-                />
-                <div className="ui-text-block-sm">
-                  <p className="text-[1rem] font-semibold text-[#111827]">
-                    Vienna International Airport (VIE)
-                  </p>
-                  <p className="ui-copy-compact text-[#58708d]">1300 Schwechat, Austria</p>
-                </div>
-                <div className="ui-copy-group max-w-[56rem] text-[#58708d]">
-                  <p className="ui-copy-compact">
-                    With a Vienna airport taxi, you can reach the airport quickly and comfortably.
-                    Book your ride in just a few steps - immediately or in advance.
-                  </p>
-                  <p className="ui-copy-compact">
-                    On-time pickup, a fixed price, and reliable transfer service for the perfect
-                    start to your journey.
-                  </p>
-                </div>
-                <div className="mt-8">
-                  <Link href="/book" className="ui-button-booking-primary">
-                    Book Now
-                  </Link>
-                </div>
+                    <div>
+                      <h3 className="text-[1.2rem] font-bold tracking-[-0.04em] text-[#0c111e]">{title}</h3>
+                      <p className="mt-2.5 text-[0.9rem] leading-[1.65] text-[#5e718a]">{description}</p>
+                    </div>
+                  </article>
+                ))}
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="section-shell-tight-top bg-[var(--color-page-bg)]">
-        <div className="app-container">
-          <div className="ui-card-surface-light overflow-hidden lg:grid lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch">
-            <div className="px-6 py-7 md:px-8 md:py-8">
-              <div className="ui-text-block-lg max-w-[36rem]">
-                <SectionIntro
-                  eyebrow="Orientation"
-                  title="Overview of Vienna Airport (VIE)"
-                  description="The key information about terminals, gates, and your arrival time at a glance."
-                />
-                <p className="ui-copy-compact text-[#6a7d96]">
-                  Der Flughafen Wien verfuegt ueber drei Eingaenge: Terminal 1 (T1), Terminal 1A
-                  (T1A) und Terminal 3 (T3). Von dort fuehren Wege zu zwei grossen
-                  Gate-Bereichen. Passagiere, die ueber Terminal 1 abfliegen, gelangen
-                  normalerweise in die Schengen-Bereiche B, C und D; Reisende ueber Terminal 3
-                  bewegen sich zu den Non-Schengen-Bereichen F und G. Bewegliche Gehwege,
-                  Rolltreppen und klare Beschilderung erleichtern die Orientierung.
-                </p>
+        {/* ── VEHICLES ─────────────────────────────────────────────────── */}
+        <section className="bg-[#f3f7fc] py-20 md:py-24">
+          <div className="app-container">
+            <div className="mx-auto max-w-[108rem]">
+              <div className="mb-12 lg:mb-14">
+                <SectionEyebrow>Vehicle categories</SectionEyebrow>
+                <SectionHeading>Choose your vehicle.</SectionHeading>
+              </div>
 
-                <div className="grid gap-4 pt-1">
-                  {airportTips.map(({ title, description }) => (
-                    <div
-                      key={title}
-                      className="rounded-[1.35rem] border border-[#e8edf3] bg-white/80 px-5 py-5"
-                    >
-                      <div className="flex flex-col gap-3">
-                        <h3 className="ui-heading-sm text-[#111827]">{title}</h3>
-                        <p className="ui-copy-compact text-[#6a7d96]">{description}</p>
+              <div className="space-y-4">
+                {vehicles.map((v) => (
+                  <div
+                    key={v.type}
+                    className="grid gap-6 rounded-[1.75rem] border border-[#e0eaf6] bg-white px-6 py-6 shadow-[0_6px_20px_rgba(17,17,17,0.04)] transition-shadow hover:shadow-[0_10px_30px_rgba(22,121,255,0.07)] md:px-8 md:py-7 lg:grid-cols-[20rem_minmax(0,1fr)_minmax(16rem,0.8fr)] lg:items-center lg:gap-8"
+                  >
+                    {/* Vehicle image */}
+                    <div className="flex items-center gap-4 lg:block">
+                      <div className="relative h-[9rem] w-[14rem] shrink-0 lg:h-[13rem] lg:w-full">
+                        <Image
+                          src={v.imageSrc}
+                          alt={v.title}
+                          fill
+                          className="scale-[1.15] object-contain object-center mix-blend-multiply"
+                          sizes="(min-width: 1024px) 320px, 224px"
+                        />
+                      </div>
+                      {/* Mobile title next to image */}
+                      <div className="lg:hidden">
+                        <h3 className="text-[1.45rem] font-bold tracking-[-0.04em] text-[#0c111e]">{v.title}</h3>
+                        <p className="mt-1 text-[0.84rem] leading-[1.5] text-[#6a7d96]">{v.summary}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
+
+                    {/* Description + specs */}
+                    <div>
+                      <h3 className="hidden text-[1.55rem] font-bold tracking-[-0.05em] text-[#0c111e] lg:block">{v.title}</h3>
+                      <p className="hidden mt-2 text-[0.9rem] leading-[1.6] text-[#6a7d96] lg:block">{v.summary}</p>
+                      <div className="mt-4 flex flex-wrap gap-2 lg:mt-5">
+                        {[
+                          { icon: Users, value: `${v.passengers} passengers` },
+                          { icon: Briefcase, value: `${v.suitcases} suitcases` },
+                        ].map(({ icon: Icon, value }) => (
+                          <span
+                            key={value}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-[#dde8f6] bg-[#f2f7ff] px-3 py-1.5 text-[0.78rem] font-semibold text-[#2d4a6e]"
+                          >
+                            <Icon size={12} className="text-[#1679FF]" strokeWidth={2.3} />
+                            {value}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Price list */}
+                    <div className="rounded-[1.2rem] border border-[#e0eaf6] bg-[#f5f9ff] px-5 py-4">
+                      <p className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#1679FF]">
+                        Fixed prices · Vienna
+                      </p>
+                      <div className="mt-3 space-y-2.5">
+                        {v.prices.map(({ district, price }) => (
+                          <div
+                            key={district}
+                            className="flex items-center justify-between border-b border-[#e0eaf6] pb-2 last:border-0 last:pb-0"
+                          >
+                            <span className="text-[0.85rem] text-[#4b6080]">{district}</span>
+                            <span className="text-[0.98rem] font-bold text-[#0c111e]">{price}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-10 flex justify-center">
+                <BookingCta />
               </div>
             </div>
+          </div>
+        </section>
 
-            <div className="relative min-h-[260px] border-t border-[#e9edf3] lg:min-h-full lg:border-l lg:border-t-0">
-              <Image
-                src="https://images.pexels.com/photos/358319/pexels-photo-358319.jpeg?auto=compress&cs=tinysrgb&w=1400"
-                alt="Flughafen Wien Terminal"
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 40vw, 100vw"
-              />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(17,17,17,0.08)_100%)]" />
+        {/* ── PRICE TABLE ──────────────────────────────────────────────── */}
+        <PriceTable />
+
+        {/* ── HOW IT WORKS ─────────────────────────────────────────────── */}
+        <section className="bg-white py-20 md:py-24">
+          <div className="app-container">
+            <div className="mx-auto max-w-[108rem]">
+              <div className="mb-12 lg:mb-14">
+                <SectionEyebrow>How it works</SectionEyebrow>
+                <SectionHeading>Book in three steps.</SectionHeading>
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-3">
+                {bookingSteps.map(({ num, title, description }) => (
+                  <div
+                    key={num}
+                    className="flex flex-col gap-5 rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-7 py-7 md:px-8 md:py-8"
+                  >
+                    <span className="text-[3.8rem] font-black leading-none tracking-[-0.07em] text-[#e8f0fa]">
+                      {num}
+                    </span>
+                    <div>
+                      <h3 className="text-[1.12rem] font-bold tracking-[-0.03em] text-[#0c111e]">{title}</h3>
+                      <p className="mt-2 text-[0.9rem] leading-[1.65] text-[#5e718a]">{description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="faq" className="bg-[var(--color-page-bg)] py-14 md:py-18">
-        <div className="app-container">
-          <div className={homepageSectionWidthClass}>
-            <div className="ui-card-surface-light px-6 py-8 md:px-8 md:py-10">
-              <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-10">
-                <SectionIntro
-                  eyebrow="FAQ"
-                  title="Frequently asked questions before booking."
-                  description="The most important answers about booking lead time, flight tracking, child seats, and payment are available directly on the homepage."
-                  className="max-w-xl"
-                />
+        {/* ── REVIEWS ──────────────────────────────────────────────────── */}
+        <section className="bg-[#f3f7fc] py-20 md:py-24">
+          <div className="app-container">
+            <div className="mx-auto max-w-[108rem]">
+              <div className="mb-12">
+                <SectionEyebrow>Reviews</SectionEyebrow>
+                <SectionHeading>What passengers say.</SectionHeading>
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-3">
+                {reviewItems.map(({ name, review }) => (
+                  <div
+                    key={name}
+                    className="flex flex-col gap-5 rounded-[1.75rem] border border-[#e0eaf6] bg-white px-6 py-6 md:px-7 md:py-7"
+                  >
+                    <p className="text-[1.35rem] tracking-wide text-[#f4b400]">★★★★★</p>
+                    <p className="flex-1 text-[0.97rem] leading-[1.7] text-[#3a5070]">&quot;{review}&quot;</p>
+                    <div className="flex items-center justify-between border-t border-[#edf2f8] pt-4">
+                      <span className="text-[0.88rem] font-semibold text-[#0c111e]">{name}</span>
+                      <span className="rounded-full border border-[#dde9f8] bg-[#f2f7ff] px-3 py-1 text-[0.72rem] font-semibold text-[#1679FF]">
+                        Google
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FAQ ──────────────────────────────────────────────────────── */}
+        <section id="faq" className="bg-white py-20 md:py-24">
+          <div className="app-container">
+            <div className="mx-auto max-w-[76rem]">
+              <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+                <div className="flex flex-col gap-6">
+                  <div>
+                    <SectionEyebrow>FAQ</SectionEyebrow>
+                    <SectionHeading>Frequently asked questions.</SectionHeading>
+                  </div>
+                  <p className="text-[0.93rem] leading-[1.7] text-[#5e718a]">
+                    Answers about booking lead time, flight tracking, child seats, and payment methods.
+                  </p>
+                  <div className="mt-2">
+                    <BookingCta />
+                  </div>
+                </div>
 
                 <div className="space-y-3">
                   {faqItems.map((item) => (
                     <details
                       key={item.question}
-                      className="group rounded-[1.5rem] border border-[#e8edf3] bg-white px-5 py-4"
+                      className="group rounded-[1.35rem] border border-[#e6edf7] bg-[#f8fbff] px-5 py-4 open:border-[#cdd9f0] open:bg-white"
                     >
                       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
-                        <span className="text-lg font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+                        <span className="text-[0.96rem] font-semibold tracking-[-0.02em] text-[#0c111e]">
                           {item.question}
                         </span>
                         <ChevronDown
-                          size={18}
-                          className="shrink-0 text-[var(--color-text-muted)] transition-transform duration-200 group-open:rotate-180"
+                          size={16}
+                          className="shrink-0 text-[#9ab0c8] transition-transform duration-200 group-open:rotate-180"
                         />
                       </summary>
-                      <p className="ui-copy-compact mt-4 pr-8 text-[var(--color-text-muted)]">
+                      <p className="mt-3 pr-6 text-[0.88rem] leading-[1.7] text-[#5e718a]">
                         {item.answer}
                       </p>
                     </details>
                   ))}
                 </div>
               </div>
-
-              <PrimaryBookingCta className="mt-10 flex justify-center lg:mt-12" />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="bg-[var(--color-page-bg)] py-14 md:py-18">
-        <div className="app-container">
-          <div className="ui-card-surface-light px-6 py-7 md:px-8 md:py-8">
-            <SectionIntro
-              eyebrow="Routes"
-              title="Popular routes"
-              description="Explore our detailed route guides. Each page includes a comparison table, tips, and FAQs."
-              className="max-w-[40rem]"
-            />
+        {/* ── CHILD SEATS ──────────────────────────────────────────────── */}
+        <section className="bg-[#f3f7fc] py-20 md:py-24">
+          <div className="app-container">
+            <div className="mx-auto max-w-[108rem]">
+              <div className="mb-12">
+                <SectionEyebrow>Child seats</SectionEyebrow>
+                <SectionHeading>Travel safely with your family.</SectionHeading>
+                <p className="mt-4 max-w-[50rem] text-[0.95rem] leading-[1.7] text-[#5e718a]">
+                  All restraint systems are certified, regularly inspected, and provided at no extra charge on request.
+                </p>
+              </div>
 
-            <div className="mt-8 grid gap-x-10 gap-y-0 lg:grid-cols-2">
-              {popularTrips.map((trip) => (
-                <a
-                  key={trip}
-                  href="/book"
-                  className="flex items-center justify-between gap-4 border-b border-[#e8edf3] py-3 text-[#2d3345] transition-colors hover:text-[#111827]"
-                >
-                  <span className="text-[0.78rem] leading-[1.25] md:text-[0.82rem]">{trip}</span>
-                  <span className="flex h-[1.35rem] w-[1.35rem] shrink-0 items-center justify-center rounded-full bg-[#2e3445] text-white">
-                    <ChevronRight size={11} />
-                  </span>
-                </a>
-              ))}
+              <div className="grid gap-5 md:grid-cols-3">
+                {childSeats.map((seat) => (
+                  <div
+                    key={seat.title}
+                    className="flex flex-col gap-5 rounded-[1.75rem] border border-[#e0eaf6] bg-white px-6 py-6 md:px-7 md:py-7"
+                  >
+                    <span className="inline-flex w-fit rounded-full border border-[#dbe7f8] bg-[#eef5ff] px-3.5 py-1.5 text-[0.77rem] font-bold text-[#1679FF]">
+                      {seat.weightRange}
+                    </span>
+                    <div>
+                      <h3 className="text-[1.15rem] font-bold tracking-[-0.04em] text-[#0c111e]">{seat.title}</h3>
+                      <p className="mt-0.5 text-[0.8rem] font-medium text-[#7a90a8]">{seat.ageLabel}</p>
+                    </div>
+                    <p className="text-[0.88rem] leading-[1.7] text-[#5e718a]">{seat.description}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 flex items-start gap-4 rounded-[1.4rem] border border-[#dbe7f8] bg-white px-5 py-5 md:px-6 md:py-6">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#dde9f8] bg-[#eef5ff] text-[#1679FF]">
+                  <Info size={15} strokeWidth={2.3} />
+                </span>
+                <p className="text-[0.87rem] leading-[1.72] text-[#5e718a]">
+                  Please specify the exact number and type of child seats in the booking form. Only with advance notice can we guarantee availability and a legally compliant, safe ride.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* ── CONTACT ──────────────────────────────────────────────────── */}
+        <section className="bg-[#080e1c] py-20 text-white md:py-24">
+          <div className="app-container">
+            <div className="mx-auto max-w-[108rem]">
+              <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-16">
+                <div>
+                  <SectionEyebrow>Contact</SectionEyebrow>
+                  <SectionHeading light>Questions about your booking?</SectionHeading>
+                  <p className="mt-4 max-w-[40rem] text-[0.95rem] leading-[1.72] text-[#8da4c0]">
+                    Book online in minutes. Or reach us directly by phone and WhatsApp — available 24 / 7.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <a
+                    href="tel:+436764826069"
+                    aria-label="Call"
+                    className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#1679FF] text-white shadow-[0_12px_30px_rgba(22,121,255,0.35)] transition-colors hover:bg-[#0f6ae8]"
+                  >
+                    <Phone size={22} strokeWidth={2.2} />
+                  </a>
+                  <a
+                    href="https://wa.me/436764826069"
+                    aria-label="WhatsApp"
+                    className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#25d366] text-white shadow-[0_12px_30px_rgba(37,211,102,0.28)] transition-colors hover:bg-[#1fb959]"
+                  >
+                    <WhatsAppIcon className="h-6 w-6" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── TERMINAL INFO ────────────────────────────────────────────── */}
+        <section className="bg-white py-20 md:py-24">
+          <div className="app-container">
+            <div className="mx-auto max-w-[76rem]">
+              <div className="mb-10">
+                <SectionEyebrow>Terminal 3</SectionEyebrow>
+                <SectionHeading>Pickup guide for Vienna Airport.</SectionHeading>
+              </div>
+
+              <div className="overflow-hidden rounded-[1.75rem] border border-[#e0eaf6]">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1331.7548403878466!2d16.56207266809108!3d48.11969249664487!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476c54530fff4bc5%3A0xf4c32d1659fb4805!2sVIE%20Terminal%203%2C%201300%20Schwechat!5e0!3m2!1sen!2sat!4v1774133487794!5m2!1sen!2sat"
+                  title="Google Maps - Vienna Airport Terminal 3 pickup location"
+                  width="600"
+                  height="450"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="h-[300px] w-full md:h-[400px]"
+                />
+                <div className="grid gap-4 bg-[#f5f9ff] p-5 md:grid-cols-2 md:p-6">
+                  {terminalPickupInfo.map(({ title, description, linkLabel, linkHref }) => (
+                    <div key={title} className="rounded-[1.2rem] border border-[#dde9f6] bg-white px-5 py-5">
+                      <h3 className="text-[0.95rem] font-bold tracking-[-0.02em] text-[#0c111e]">{title}</h3>
+                      <p className="mt-2 text-[0.86rem] leading-[1.65] text-[#5e718a]">{description}</p>
+                      {linkLabel && linkHref ? (
+                        <a
+                          href={linkHref}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3 inline-flex items-center gap-2 text-[0.84rem] font-semibold text-[#1679FF] hover:text-[#0f5fcc]"
+                        >
+                          <MapPin size={13} />
+                          {linkLabel}
+                        </a>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                {airportTips.map(({ title, description }) => (
+                  <div key={title} className="rounded-[1.4rem] border border-[#e6edf7] bg-[#f8fbff] px-5 py-5">
+                    <h3 className="text-[0.92rem] font-bold tracking-[-0.02em] text-[#0c111e]">{title}</h3>
+                    <p className="mt-2 text-[0.86rem] leading-[1.65] text-[#5e718a]">{description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SEO TEXT BLOCK ───────────────────────────────────────────── */}
+        <section className="bg-[#f3f7fc] py-16 md:py-20">
+          <div className="app-container">
+            <div className="mx-auto max-w-[76rem]">
+              <div className="rounded-[1.75rem] border border-[#e0eaf6] bg-white px-7 py-8 md:px-10 md:py-10">
+                <SectionEyebrow>Vienna Airport</SectionEyebrow>
+                <h2 className="mt-3 text-[1.85rem] font-black leading-[1.04] tracking-[-0.05em] text-[#0c111e] md:text-[2.1rem]">
+                  Vienna airport taxi — stress-free to Vienna Airport (VIE)
+                </h2>
+                <div className="mt-5 space-y-3">
+                  <p className="text-[0.9rem] font-semibold text-[#0c111e]">
+                    Vienna International Airport (VIE) · 1300 Schwechat, Austria
+                  </p>
+                  <p className="text-[0.93rem] leading-[1.72] text-[#5e718a]">
+                    With a Vienna airport taxi, you can reach the airport quickly and comfortably. Book your ride in just a few steps — immediately or in advance.
+                  </p>
+                  <p className="text-[0.93rem] leading-[1.72] text-[#5e718a]">
+                    On-time pickup, a fixed price, and reliable transfer service for the perfect start to your journey.
+                  </p>
+                </div>
+                <div className="mt-8">
+                  <BookingCta />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── POPULAR ROUTES ───────────────────────────────────────────── */}
+        <section className="bg-white py-16 md:py-20">
+          <div className="app-container">
+            <div className="mx-auto max-w-[76rem]">
+              <div className="rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-7 py-8 md:px-10 md:py-10">
+                <SectionEyebrow>Routes</SectionEyebrow>
+                <h2 className="mt-3 text-[2rem] font-black leading-[1.02] tracking-[-0.05em] text-[#0c111e] md:text-[2.3rem]">
+                  Popular routes.
+                </h2>
+                <p className="mt-2 text-[0.88rem] text-[#5e718a]">
+                  Most-booked transfers from and to Vienna Airport.
+                </p>
+
+                <div className="mt-8 grid gap-x-10 lg:grid-cols-2">
+                  {popularTrips.map((trip) => (
+                    <a
+                      key={trip}
+                      href="/book"
+                      className="group flex items-center justify-between gap-4 border-b border-[#e6edf7] py-3 text-[#2d3f58] transition-colors hover:text-[#1679FF]"
+                    >
+                      <span className="text-[0.8rem] leading-[1.3]">{trip}</span>
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#e6edf7] text-[#2d3f58] transition-colors group-hover:bg-[#1679FF] group-hover:text-white">
+                        <ChevronRight size={11} />
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   );

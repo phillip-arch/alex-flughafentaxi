@@ -17,10 +17,13 @@ import {
   MapPin, 
   House,
   Check,
+  ChevronDown,
   ChevronRight, 
   ChevronLeft, 
   Building2,
   Info,
+  CalendarDays,
+  Clock3,
   PlaneLanding,
   PlaneTakeoff,
   X,
@@ -80,7 +83,7 @@ interface ExtendedBookingInput {
   time: string;
   passengers: number | '';
   luggage: number | '';
-  handLuggage: number | '';
+
   travelDetailsSelected: boolean;
   vehicleOverride: VehicleType | null;
   childSeat: boolean;
@@ -121,7 +124,7 @@ type BookingFormProps = {
 type StepperFieldName =
   | 'passengers'
   | 'luggage'
-  | 'handLuggage'
+
   | 'babySeats'
   | 'childSeats'
   | 'boosterSeats';
@@ -172,7 +175,7 @@ const BookingForm = ({
     destinationLabel: 'Destination',
     airportLabel: 'Vienna Airport (VIE)',
     streetPlaceholder: 'Select street',
-    nextLabel: 'Next Step',
+    nextLabel: 'Continue',
   };
   const supabase = supabaseBrowser();
   const [currentStep, setCurrentStep] = useState(1);
@@ -226,7 +229,6 @@ const BookingForm = ({
     time: '',
     passengers: 1,
     luggage: 0,
-    handLuggage: 0,
     travelDetailsSelected: false,
     vehicleOverride: null,
     childSeat: false,
@@ -520,9 +522,8 @@ const BookingForm = ({
   // Determine vehicle type
   const passengers = typeof formData.passengers === 'number' ? formData.passengers : 0;
   const suitcases = typeof formData.luggage === 'number' ? formData.luggage : 0;
-  const handLuggage = typeof formData.handLuggage === 'number' ? formData.handLuggage : 0;
-  
-  const requiredVehicleType = determineVehicle(passengers, suitcases, handLuggage);
+
+  const requiredVehicleType = determineVehicle(passengers, suitcases);
   const requiredVehicleIndex = VEHICLE_ORDER.indexOf(requiredVehicleType);
   const overrideVehicleIndex = formData.vehicleOverride ? VEHICLE_ORDER.indexOf(formData.vehicleOverride) : -1;
   const vehicleType =
@@ -547,13 +548,11 @@ const BookingForm = ({
           selectedStreetOption?.city || formData.city,
         );
   const isFlightDetailsVisible = /airport/i.test(currentPickupDisplayValue);
-  const airportRowLabel =
-    formData.direction === 'from_airport' ? copy.pickupLabel : copy.destinationLabel;
-  const addressFieldLabel =
-    formData.direction === 'from_airport' ? 'Destination address' : 'Pickup address';
   const addressPlaceholder =
     formData.direction === 'from_airport' ? 'Where should we take you?' : 'Where should we pick you up?';
-  const AirportRowIcon = formData.direction === 'from_airport' ? PlaneLanding : PlaneTakeoff;
+  const addressInputPlaceholder =
+    formData.direction === 'from_airport' ? 'Enter destination address' : 'Enter pickup address';
+  const timeFieldLabel = formData.direction === 'from_airport' ? 'Landing time' : 'Time';
   useEffect(() => {
     if (!isFlightDetailsVisible) {
       setFlightLookupError(null);
@@ -786,7 +785,7 @@ const BookingForm = ({
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
-               name === 'passengers' || name === 'luggage' || name === 'handLuggage' || name === 'babySeats' || name === 'childSeats' || name === 'boosterSeats' ? (normalizedValue === '' ? '' : parseInt(normalizedValue)) : normalizedValue,
+               name === 'passengers' || name === 'luggage' || name === 'babySeats' || name === 'childSeats' || name === 'boosterSeats' ? (normalizedValue === '' ? '' : parseInt(normalizedValue)) : normalizedValue,
     }));
   };
 
@@ -1431,7 +1430,7 @@ const BookingForm = ({
   const actionButtonGroupClass = 'flex w-full items-center justify-center gap-3';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
-    'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0a63ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.7rem] md:w-[2.7rem]';
+    'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0f6ae8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.7rem] md:w-[2.7rem]';
 
   const BookingActionTrustLine = ({ alignWithPrimaryButton = false }: { alignWithPrimaryButton?: boolean }) => {
     const trustItems = (
@@ -1465,12 +1464,6 @@ const BookingForm = ({
   };
 
   const StepIndicator = () => {
-    const steps = [
-      { number: 1, label: 'Trip' },
-      { number: 2, label: 'Price' },
-      { number: 3, label: 'Details' },
-    ] as const;
-
     const progressWidth = currentStep === 1 ? '33.333%' : currentStep === 2 ? '66.666%' : '100%';
 
     return (
@@ -1479,25 +1472,10 @@ const BookingForm = ({
         aria-label={copy.stepLabel(currentStep)}
         aria-current="step"
       >
-        <div className="grid grid-cols-3 items-center gap-3 text-[12px] font-black uppercase tracking-[0.08em] md:text-[13px]">
-          {steps.map((step) => {
-            const isActive = currentStep === step.number;
-            return (
-              <div
-                key={step.number}
-                className={`min-w-0 ${
-                  step.number === 1 ? 'text-left' : step.number === 2 ? 'text-center' : 'text-right'
-                } ${isActive ? 'text-[#1679FF]' : 'text-[#9AA7B7]'}`}
-              >
-                <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                  <span>{step.number}.</span>
-                  <span>{step.label}</span>
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        <div className="mt-3 h-[8px] overflow-hidden rounded-full bg-[#E8EDF5]">
+        <p className="text-[13px] font-semibold tracking-[-0.02em] text-[#6b7280] md:text-[14px]">
+          Step {currentStep} of 3
+        </p>
+        <div className="mt-3 h-[6px] overflow-hidden rounded-full bg-[#E8EDF5]">
           <div
             className="h-full rounded-full bg-[#1679FF] transition-[width] duration-300 ease-out"
             style={{ width: progressWidth }}
@@ -1508,25 +1486,27 @@ const BookingForm = ({
   };
 
   const DirectionSelector = () => (
-    <div className="relative mx-auto grid h-14 w-full min-w-0 grid-cols-2 overflow-hidden rounded-[1.35rem] bg-[#f2f3f5] p-1.5 md:h-[3.25rem] md:rounded-[1.15rem] md:p-1.5">
+    <div className="relative mx-auto grid h-[3.45rem] w-full min-w-0 grid-cols-2 overflow-hidden rounded-[1.1rem] border border-[#e7ebf1] bg-white p-0.5 md:h-[3.45rem] md:rounded-[1.1rem]">
       {[
         { value: 'to_airport' as Direction, label: 'To Airport' },
         { value: 'from_airport' as Direction, label: 'From Airport' },
       ].map((option) => {
         const isActive = formData.direction === option.value;
+        const Icon = option.value === 'from_airport' ? PlaneLanding : PlaneTakeoff;
 
         return (
           <button
             key={option.value}
             type="button"
             onClick={() => handleDirectionChange(option.value)}
-            className={`relative z-[1] flex min-w-0 items-center justify-center rounded-[1.05rem] px-2 text-[15px] font-bold tracking-[-0.02em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:rounded-[0.9rem] md:px-4 md:text-[17px] ${
+            className={`relative z-[1] flex min-w-0 items-center justify-center gap-2 rounded-[0.95rem] px-3 text-[15px] font-semibold tracking-[-0.02em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:px-4 md:text-[16px] ${
               isActive
-                ? 'border-2 border-[#1679FF] bg-white text-[#1F5FEA]'
-                : 'text-[#111827]'
+                ? 'bg-[#1679FF] text-white'
+                : 'bg-white text-[#374151]'
             }`}
             aria-pressed={isActive}
           >
+            <Icon className="h-[16px] w-[16px] shrink-0" strokeWidth={2.2} />
             <span className="min-w-0 truncate">{option.label}</span>
           </button>
         );
@@ -1538,19 +1518,28 @@ const BookingForm = ({
     <div className="grid grid-cols-2 gap-3 md:gap-4 md:[grid-template-columns:calc(50%_-_8px)_calc(50%_-_8px)]">
       <div className={BOOKING_FIELD_STACK_CLASS}>
         <div ref={datePickerAnchorRef} className="relative w-full">
-          <input
-            type="text"
-            name="date"
-            value={formData.date}
-            readOnly
-            placeholder="DATE"
+          <button
+            type="button"
             onClick={() => setIsDatePickerOpen(true)}
-            className={`ui-field-surface h-[3.35rem] w-full cursor-pointer rounded-[1.05rem] border bg-[#f9fafb] px-5 py-0 text-[18px] font-semibold tracking-[0.02em] text-[#0f172a] outline-none transition-all placeholder:text-[#717982] md:h-[3.25rem] md:rounded-[1rem] md:px-5 md:text-[18px] ${
+            className={`ui-field-surface flex h-[4.35rem] w-full items-center justify-between rounded-[1.05rem] border bg-white px-4 text-left outline-none transition-all md:h-[4.2rem] md:rounded-[1rem] ${
               isFieldInvalid('date')
-                ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
-                : 'border-[#e4e6ea] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
+                ? 'border-[#d70015]'
+                : 'border-[#e4e6ea] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
             }`}
-          />
+          >
+            <span className="flex min-w-0 items-center gap-3">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-[#1679FF]">
+                <CalendarDays className="h-[18px] w-[18px]" strokeWidth={2.2} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[12px] font-semibold leading-none text-[#7b8798]">Date</span>
+                <span className={`mt-1 block truncate text-[17px] font-semibold leading-none ${formData.date ? 'text-[#111827]' : 'text-[#9aa3ae]'}`}>
+                  {formData.date || 'Select date'}
+                </span>
+              </span>
+            </span>
+            <ChevronDown className="h-[18px] w-[18px] shrink-0 text-[#6b7280]" strokeWidth={2.2} />
+          </button>
           <DatePicker
             isOpen={isDatePickerOpen}
             onClose={() => setIsDatePickerOpen(false)}
@@ -1562,19 +1551,28 @@ const BookingForm = ({
       </div>
       <div className={BOOKING_FIELD_STACK_CLASS}>
         <div ref={timePickerAnchorRef} className="relative w-full">
-          <input
-            type="text"
-            name="time"
-            value={formData.time}
-            readOnly
-            placeholder="TIME"
+          <button
+            type="button"
             onClick={() => setIsTimePickerOpen(true)}
-            className={`ui-field-surface h-[3.35rem] w-full cursor-pointer rounded-[1.05rem] border bg-[#f9fafb] px-5 py-0 text-[18px] font-semibold tracking-[0.02em] text-[#0f172a] outline-none transition-all placeholder:text-[#717982] md:h-[3.25rem] md:rounded-[1rem] md:px-5 md:text-[18px] ${
+            className={`ui-field-surface flex h-[4.35rem] w-full items-center justify-between rounded-[1.05rem] border bg-white px-4 text-left outline-none transition-all md:h-[4.2rem] md:rounded-[1rem] ${
               isFieldInvalid('time')
-                ? 'border-[#d70015] placeholder:text-[#d70015]/60 focus:border-[#d70015] focus:ring-1 focus:ring-[#d70015]'
-                : 'border-[#e4e6ea] focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]'
+                ? 'border-[#d70015]'
+                : 'border-[#e4e6ea] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
             }`}
-          />
+          >
+            <span className="flex min-w-0 items-center gap-3">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-[#1679FF]">
+                <Clock3 className="h-[18px] w-[18px]" strokeWidth={2.2} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[12px] font-semibold leading-none text-[#7b8798]">{timeFieldLabel}</span>
+                <span className={`mt-1 block truncate text-[17px] font-semibold leading-none ${formData.time ? 'text-[#111827]' : 'text-[#9aa3ae]'}`}>
+                  {formData.time || 'Select time'}
+                </span>
+              </span>
+            </span>
+            <ChevronDown className="h-[18px] w-[18px] shrink-0 text-[#6b7280]" strokeWidth={2.2} />
+          </button>
           <TimePicker
             isOpen={isTimePickerOpen}
             onClose={() => setIsTimePickerOpen(false)}
@@ -1652,50 +1650,34 @@ const BookingForm = ({
       <div className="rounded-[2.2rem] bg-transparent pt-0 shadow-none">
         <div className="min-w-0">
           {DirectionSelector()}
-          <div className="mt-6 md:mt-5">
-            {DateTimeFields()}
-          </div>
-          {FlightDetailsFields()}
-        </div>
-      </div>
-      <div className="rounded-[2.2rem] bg-transparent pt-0 pb-1 shadow-none">
-        <div className="space-y-4 md:space-y-3">
-          <div className="rounded-[1.55rem] border border-[#dfe8f6] bg-[#f3f7ff] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)] md:rounded-[1.35rem] md:px-5 md:py-4.5">
-            <div className="flex min-w-0 items-center gap-3 md:gap-3.5">
-              <span className="inline-flex h-7 shrink-0 items-center justify-center rounded-[0.7rem] bg-[#2E63F5] px-3 text-[12px] font-black uppercase tracking-[0.04em] text-white md:h-8 md:px-3.5 md:text-[13px]">
-                {formData.direction === 'from_airport' ? 'From' : 'To'}
-              </span>
-              <AirportRowIcon className="h-5 w-5 shrink-0 text-[#2E63F5] md:h-6 md:w-6" strokeWidth={2.2} />
-              <p className="min-w-0 truncate text-[16px] font-semibold leading-tight tracking-[-0.03em] text-[#111111] md:text-[20px]">
-                {copy.airportLabel}
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-3 md:space-y-2.5">
-            <p className="px-1 text-[13px] font-bold uppercase tracking-[0.08em] text-[#687384] md:text-[13px]">
-              {addressFieldLabel}
-            </p>
-            <div className="rounded-[1.55rem] border border-[#e4e6ea] bg-white px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:rounded-[1.35rem] md:px-5 md:py-4">
-              <div className="flex min-w-0 items-center gap-3">
-                <MapPin className="h-5 w-5 shrink-0 text-[#6f86a6] md:h-6 md:w-6" strokeWidth={2.2} />
-                <div className="relative min-w-0 flex-1">
-                  <StreetAutocomplete
-                    value={streetInputValue}
-                    selectedOption={selectedStreetOption}
-                    mobileDropdownFullWidth
-                    mobileSelectedStreetOnly
-                    menuItems={favoriteMenuItems}
-                    onChange={(value) => clearStreetSelection('street', value)}
-                    onSelect={(option) => applyStreetSelection('street', option)}
-                    onPasteText={(text) => handleStreetPaste('street', text)}
-                    onBlur={() => {
-                      validateStreetNumber('street');
-                      handleBlur({} as React.FocusEvent<HTMLInputElement>);
-                    }}
-                    placeholder={addressPlaceholder}
-                    className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:text-[21px] md:font-medium"
-                  />
+          <div className="mt-7 space-y-6 md:mt-6 md:space-y-5">
+            <div className="space-y-3">
+              <h2 className="text-[2rem] font-semibold leading-[1.02] tracking-[-0.05em] text-[#111827] md:text-[2.15rem]">
+                {addressPlaceholder}
+              </h2>
+              <div className="rounded-[1.35rem] border border-[#c8d3e0] bg-white px-5 py-4 shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] transition-shadow hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)] md:px-5 md:py-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-[#1679FF]">
+                    <MapPin className="h-[18px] w-[18px]" strokeWidth={2.2} />
+                  </span>
+                  <div className="relative min-w-0 flex-1">
+                    <StreetAutocomplete
+                      value={streetInputValue}
+                      selectedOption={selectedStreetOption}
+                      mobileDropdownFullWidth
+                      mobileSelectedStreetOnly
+                      menuItems={favoriteMenuItems}
+                      onChange={(value) => clearStreetSelection('street', value)}
+                      onSelect={(option) => applyStreetSelection('street', option)}
+                      onPasteText={(text) => handleStreetPaste('street', text)}
+                      onBlur={() => {
+                        validateStreetNumber('street');
+                        handleBlur({} as React.FocusEvent<HTMLInputElement>);
+                      }}
+                      placeholder={addressInputPlaceholder}
+                      className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:text-[18px]"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1709,6 +1691,13 @@ const BookingForm = ({
                 Address could not be recognized clearly. Please choose from the list.
               </div>
             ) : null}
+            <div className="space-y-3">
+              <h3 className="text-[1.4rem] font-bold leading-[1.08] tracking-[-0.04em] text-[#111827] md:text-[1.35rem]">
+                When do you need a ride?
+              </h3>
+              {DateTimeFields()}
+            </div>
+            {FlightDetailsFields()}
           </div>
         </div>
       </div>
@@ -1724,7 +1713,7 @@ const BookingForm = ({
         </div>
       )}
 
-      <div className="mt-4 flex flex-col items-center gap-3 md:mt-auto md:gap-2 md:pt-4">
+      <div className="flex flex-col items-center gap-3 md:mt-auto md:gap-2 md:pt-4">
         <div className="flex w-full items-center justify-center">
           <button
             type="button"
@@ -1797,7 +1786,7 @@ const BookingForm = ({
           type="button"
           aria-label="Information"
           onClick={() => setIsInfoPanelOpen(true)}
-          className={`absolute z-10 inline-flex items-center justify-center text-[#1679ff] transition-colors hover:text-[#0a63ff] ${
+          className={`absolute z-10 inline-flex items-center justify-center text-[#1679ff] transition-colors hover:text-[#0f6ae8] ${
             isAppSurface
               ? 'right-4 top-4 md:hidden'
               : 'right-3 top-3 md:hidden'

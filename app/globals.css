@@ -22,8 +22,8 @@
   --color-border: rgba(17, 17, 17, 0.08);
   --color-border-strong: #d2d2d7;
   --color-border-soft: #d9d4c8;
-  --color-primary: #0a63ff;
-  --color-primary-strong: #2490ff;
+  --color-primary: #1679ff;
+  --color-primary-strong: #1679ff;
   --color-primary-soft: rgba(10, 99, 255, 0.12);
   --color-booking-accent: #1679ff;
   --color-booking-accent-soft: #edf4ff;
@@ -562,7 +562,7 @@ p {
     justify-content: center;
     gap: 0.5rem;
     border-radius: 14px;
-    background: #1F7CFF !important;
+    background: #1679FF !important;
     padding: 1rem 2rem;
     font-size: 18px;
     font-weight: 700;
@@ -579,7 +579,7 @@ p {
   }
 
   .ui-button-booking-primary:hover {
-    background: #176be0 !important;
+    background: #0f6ae8 !important;
   }
 
   .ui-button-secondary {

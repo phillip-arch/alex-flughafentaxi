@@ -66,7 +66,7 @@ export default function BookingStepThree({
               onChange={(e) => handleBookingForMyselfToggle(e.target.checked)}
               className="peer sr-only"
             />
-            <div className="h-[31px] w-[51px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[linear-gradient(135deg,#0a63ff_0%,#2490ff_100%)] peer-focus:outline-none peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[27px] after:w-[27px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
+            <div className="h-[31px] w-[51px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[#1679FF] peer-focus:outline-none peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[27px] after:w-[27px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
           </label>
         </div>
       ) : null}
@@ -129,7 +129,7 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('cash')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
               formData.paymentMethod === 'cash'
-                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] ring-2 ring-inset ring-[#7fb3ff]'
+                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1679FF] ring-2 ring-inset ring-[#7fb3ff]'
                 : touched['paymentMethod'] && !formData.paymentMethod
                   ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                   : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
@@ -142,7 +142,7 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('card')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
               formData.paymentMethod === 'card'
-                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1F7CFF] ring-2 ring-inset ring-[#7fb3ff]'
+                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1679FF] ring-2 ring-inset ring-[#7fb3ff]'
                 : touched['paymentMethod'] && !formData.paymentMethod
                   ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
                   : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'

@@ -9,17 +9,16 @@ import { SVG_WIDTH } from '@/lib/maps/viennaDistricts';
 type Point = { x: number; y: number };
 type MapFeature = ViennaDistrictMapGeometry['features'][number];
 
-const DESKTOP_MAP_WIDTH = 'lg:w-[54.7%]';
-const DESKTOP_TABLE_WIDTH = 'lg:w-[45.3%]';
-const MAP_SECTION_BASE_CLASS =
-  'sticky z-10 overflow-hidden border border-[#e5e7eb] bg-[#f8fafc] shadow-[0_10px_24px_rgba(17,17,17,0.04)]';
-const MOBILE_MAP_SECTION_CLASS = 'w-full max-w-full rounded-none';
-const NON_MOBILE_MAP_SECTION_CLASS = 'sm:left-auto sm:w-full sm:translate-x-0 sm:rounded-[1.5rem]';
+const DESKTOP_MAP_WIDTH = 'lg:w-[62%]';
+const DESKTOP_TABLE_WIDTH = 'lg:w-[38%]';
+const MAP_SECTION_BASE_CLASS = 'overflow-hidden';
+const MOBILE_MAP_SECTION_CLASS = 'w-full max-w-full';
+const NON_MOBILE_MAP_SECTION_CLASS = 'sm:w-full';
 const MAP_SVG_BASE_CLASS =
   'absolute inset-x-0 top-[6px] bottom-[6px] h-[calc(100%-12px)] w-full transition-transform duration-300 ease-out md:top-[20px] md:bottom-[20px] md:h-[calc(100%-40px)]';
 const MAP_SVG_SCALE_CLASS = 'scale-[1.177] sm:scale-[1.08]';
-const DEFAULT_DESKTOP_TOP_CLASS = 'sm:top-3 lg:top-5';
-const DEFAULT_MOBILE_TOP_CLASS = 'top-0';
+const DEFAULT_DESKTOP_TOP_CLASS = '';
+const DEFAULT_MOBILE_TOP_CLASS = '';
 const DISTRICT_LABEL_OFFSETS: Record<string, Point> = {
   '6': { x: -8, y: 6 },
   '7': { x: 0, y: 2 },
@@ -102,7 +101,6 @@ export default function DistrictMapPriceExplorer({
   const [shouldRenderMap, setShouldRenderMap] = useState(!lazyMountMap);
   const [isMobileTooltip, setIsMobileTooltip] = useState(false);
   const mapSectionRef = useRef<HTMLElement | null>(null);
-  const mapAspectRatio = `${SVG_WIDTH} / ${mapGeometry.svgHeight}`;
 
   useEffect(() => {
     if (!lazyMountMap || shouldRenderMap) return;
@@ -153,11 +151,10 @@ export default function DistrictMapPriceExplorer({
   const tooltipY = activeFeature ? getTooltipY(activeFeature, tooltipHeight, mapGeometry.svgHeight) : 0;
 
   return (
-    <div className="flex flex-col items-start gap-8 lg:flex-row">
+    <div className="flex flex-col items-start gap-8 lg:flex-row lg:items-stretch">
       <section ref={mapSectionRef} className={mapSectionClassName}>
         <div
-          className="relative min-h-[17.5rem] w-full overflow-hidden bg-[#f8fafc] md:min-h-[26rem]"
-          style={{ aspectRatio: mapAspectRatio }}
+          className="relative min-h-[17.5rem] w-full overflow-hidden md:min-h-[26rem] lg:h-full lg:min-h-0"
         >
           {shouldRenderMap && mapGeometry.features.length > 0 ? (
             <svg
@@ -258,7 +255,7 @@ export default function DistrictMapPriceExplorer({
         </div>
       </section>
 
-      <section className={`w-full ${DESKTOP_TABLE_WIDTH}`}>
+      <section className={`w-full ${DESKTOP_TABLE_WIDTH} lg:flex lg:flex-col`}>
         <DistrictPriceTable activeId={activeId} onActiveIdChange={setActiveId} />
 
         <div className="pt-6">

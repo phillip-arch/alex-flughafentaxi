@@ -233,7 +233,7 @@ export default function StreetAutocomplete({
     >
       <div className="relative">
         {leadingIcon ? (
-          <span className="pointer-events-none absolute left-3 top-1/2 z-10 inline-flex -translate-y-1/2 text-[#1F7CFF]">
+          <span className="pointer-events-none absolute left-3 top-1/2 z-10 inline-flex -translate-y-1/2 text-[#1679FF]">
             {leadingIcon}
           </span>
         ) : null}

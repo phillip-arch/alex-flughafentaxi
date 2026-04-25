@@ -114,11 +114,11 @@ function MonthGrid({
               onClick={() => !disabled && onSelect(date)}
               disabled={disabled}
               className={`mx-auto flex h-[2.35rem] w-[2.35rem] items-center justify-center rounded-full text-[15px] font-medium transition-all md:h-[2.5rem] md:w-[2.5rem] md:text-[16px] ${
-                isSelected ? 'bg-[#0a63ff] text-white shadow-md' : ''
+                isSelected ? 'bg-[#1679FF] text-white shadow-md' : ''
               } ${
                 !isSelected && !disabled ? 'text-[#1d1d1f] hover:bg-[#f5f5f7]' : ''
               } ${
-                isToday && !isSelected && !disabled ? 'font-bold text-[#0a63ff]' : ''
+                isToday && !isSelected && !disabled ? 'font-bold text-[#1679FF]' : ''
               } ${
                 disabled ? 'cursor-not-allowed text-[#d2d2d7]' : ''
               }`}
