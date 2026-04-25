@@ -844,8 +844,8 @@ export default function BookingStepTwo({
       : null;
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip">
-      <div className="hidden space-y-7 md:block">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip md:flex md:h-full md:flex-col">
+      <div className="hidden space-y-7 md:flex md:h-full md:flex-col">
       {renderInlineTravelDetails()}
 
       <div className="space-y-2.5">

@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { BOOKING_OVERLAY_BACKDROP_CLASS } from './bookingOverlayStyles';
 
 interface DatePickerProps {
   isOpen: boolean;
@@ -13,8 +12,149 @@ interface DatePickerProps {
   anchorRef?: React.RefObject<HTMLElement | null>;
 }
 
-export default function DatePicker({ isOpen, onClose, onSelect, selectedDate, anchorRef }: DatePickerProps) {
-  const [currentDate, setCurrentDate] = useState(new Date());
+const PICKER_OVERLAY_CLASS = 'fixed inset-0 bg-transparent';
+
+const MONTH_NAMES = [
+  'Jänner',
+  'Februar',
+  'März',
+  'April',
+  'Mai',
+  'Juni',
+  'Juli',
+  'August',
+  'September',
+  'Oktober',
+  'November',
+  'Dezember',
+];
+
+const DAY_NAMES = ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'];
+
+function startOfDay(date: Date) {
+  const next = new Date(date);
+  next.setHours(0, 0, 0, 0);
+  return next;
+}
+
+function startOfMonth(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function addMonths(date: Date, months: number) {
+  return new Date(date.getFullYear(), date.getMonth() + months, 1);
+}
+
+function formatDate(date: Date) {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}.${month}.${date.getFullYear()}`;
+}
+
+function parseSelectedDate(value: string) {
+  const [day, month, year] = value.split('.');
+  if (!day || !month || !year) return null;
+
+  const parsed = new Date(Number(year), Number(month) - 1, Number(day));
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function buildMonthDays(monthDate: Date) {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const startDayIndex = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+
+  return {
+    year,
+    month,
+    daysInMonth,
+    startDayIndex,
+  };
+}
+
+function MonthGrid({
+  monthDate,
+  selectedDate,
+  minDate,
+  maxDate,
+  onSelect,
+}: {
+  monthDate: Date;
+  selectedDate: string;
+  minDate: Date;
+  maxDate: Date;
+  onSelect: (date: Date) => void;
+}) {
+  const { year, month, daysInMonth, startDayIndex } = buildMonthDays(monthDate);
+
+  return (
+    <div className="min-w-0">
+      <div className="mb-3 text-center">
+        <h2 className="text-[16px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
+          {MONTH_NAMES[month]} {year}
+        </h2>
+      </div>
+
+      <div className="mb-1 grid grid-cols-7">
+        {DAY_NAMES.map((day) => (
+          <div key={day} className="py-1 text-center text-[10px] font-bold text-[#86868b]">
+            {day}
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-7 gap-y-1">
+        {Array.from({ length: startDayIndex }).map((_, index) => (
+          <div key={`empty-${month}-${index}`} />
+        ))}
+
+        {Array.from({ length: daysInMonth }).map((_, index) => {
+          const day = index + 1;
+          const date = new Date(year, month, day);
+          const dateStr = formatDate(date);
+          const isSelected = selectedDate === dateStr;
+          const isToday = startOfDay(date).getTime() === minDate.getTime();
+          const disabled = date < minDate || date > maxDate;
+
+          return (
+            <button
+              type="button"
+              key={dateStr}
+              onClick={() => !disabled && onSelect(date)}
+              disabled={disabled}
+              className={`
+                mx-auto flex h-[2rem] w-[2rem] items-center justify-center rounded-full text-[13px] font-medium transition-all
+                ${isSelected ? 'bg-[#0a63ff] text-white shadow-md' : ''}
+                ${!isSelected && !disabled ? 'text-[#1d1d1f] hover:bg-[#f5f5f7]' : ''}
+                ${isToday && !isSelected && !disabled ? 'font-bold text-[#0a63ff]' : ''}
+                ${disabled ? 'cursor-not-allowed text-[#d2d2d7]' : ''}
+              `}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export default function DatePicker({
+  isOpen,
+  onClose,
+  onSelect,
+  selectedDate,
+  anchorRef,
+}: DatePickerProps) {
+  const today = useMemo(() => startOfDay(new Date()), []);
+  const maxSelectableDate = useMemo(() => {
+    const next = new Date(today);
+    next.setMonth(next.getMonth() + 3);
+    return startOfDay(next);
+  }, [today]);
+  const [currentDate, setCurrentDate] = useState(startOfMonth(today));
   const [isMounted, setIsMounted] = useState(false);
   const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties | undefined>(undefined);
 
@@ -23,13 +163,24 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate, an
   }, []);
 
   useEffect(() => {
-    if (!selectedDate) return;
-
-    const [d, m, y] = selectedDate.split('.');
-    if (d && m && y) {
-      setCurrentDate(new Date(parseInt(y, 10), parseInt(m, 10) - 1, parseInt(d, 10)));
+    if (!selectedDate) {
+      setCurrentDate(startOfMonth(today));
+      return;
     }
-  }, [selectedDate, isOpen]);
+
+    const parsed = parseSelectedDate(selectedDate);
+    if (!parsed) return;
+
+    const clamped =
+      parsed < today ? today : parsed > maxSelectableDate ? maxSelectableDate : parsed;
+    const nextMonth = startOfMonth(clamped);
+
+    setCurrentDate((prev) =>
+      prev.getFullYear() === nextMonth.getFullYear() && prev.getMonth() === nextMonth.getMonth()
+        ? prev
+        : nextMonth,
+    );
+  }, [maxSelectableDate, selectedDate, today]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -41,7 +192,6 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate, an
     };
 
     document.addEventListener('keydown', handleEscape);
-
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
@@ -60,14 +210,26 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate, an
       }
 
       const rect = anchor.getBoundingClientRect();
-      const panelWidth = Math.min(304, window.innerWidth - 32);
+      const panelWidth = Math.min(704, window.innerWidth - 32);
       const left = Math.min(Math.max(rect.left, 16), window.innerWidth - panelWidth - 16);
-
-      setPopoverStyle({
+      const nextStyle: React.CSSProperties = {
         left,
         position: 'fixed',
         top: rect.bottom + 12,
         width: panelWidth,
+      };
+
+      setPopoverStyle((currentStyle) => {
+        if (
+          currentStyle?.left === nextStyle.left &&
+          currentStyle?.top === nextStyle.top &&
+          currentStyle?.width === nextStyle.width &&
+          currentStyle?.position === nextStyle.position
+        ) {
+          return currentStyle;
+        }
+
+        return nextStyle;
       });
     };
 
@@ -83,54 +245,38 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate, an
 
   if (!isOpen || !isMounted) return null;
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+  const primaryMonth = startOfMonth(currentDate);
+  const secondaryMonth = addMonths(primaryMonth, 1);
+  const minMonth = startOfMonth(today);
+  const maxMonth = startOfMonth(maxSelectableDate);
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDayOfMonth = new Date(year, month, 1).getDay();
-  const startDayIndex = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+  const canGoPrev =
+    primaryMonth.getFullYear() > minMonth.getFullYear() ||
+    (primaryMonth.getFullYear() === minMonth.getFullYear() &&
+      primaryMonth.getMonth() > minMonth.getMonth());
 
-  const monthNames = [
-    'Jänner',
-    'Februar',
-    'März',
-    'April',
-    'Mai',
-    'Juni',
-    'Juli',
-    'August',
-    'September',
-    'Oktober',
-    'November',
-    'Dezember',
-  ];
-
-  const dayNames = ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'];
+  const canGoNext =
+    secondaryMonth.getFullYear() < maxMonth.getFullYear() ||
+    (secondaryMonth.getFullYear() === maxMonth.getFullYear() &&
+      secondaryMonth.getMonth() < maxMonth.getMonth());
 
   const handlePrevMonth = () => {
-    setCurrentDate(new Date(year, month - 1, 1));
+    if (!canGoPrev) return;
+    setCurrentDate((prev) => addMonths(prev, -1));
   };
 
   const handleNextMonth = () => {
-    setCurrentDate(new Date(year, month + 1, 1));
+    if (!canGoNext) return;
+    setCurrentDate((prev) => addMonths(prev, 1));
   };
 
-  const handleDayClick = (day: number) => {
-    const m = (month + 1).toString().padStart(2, '0');
-    const d = day.toString().padStart(2, '0');
-    onSelect(`${d}.${m}.${year}`);
+  const handleDaySelect = (date: Date) => {
+    onSelect(formatDate(date));
     onClose();
   };
 
-  const isDateDisabled = (day: number) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkDate = new Date(year, month, day);
-    return checkDate < today;
-  };
-
   return createPortal(
-    <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-center justify-center px-4 py-10`}>
+    <div className={`${PICKER_OVERLAY_CLASS} z-[9999] flex items-center justify-center px-4 py-10`}>
       <button
         type="button"
         aria-label="Close calendar"
@@ -138,78 +284,61 @@ export default function DatePicker({ isOpen, onClose, onSelect, selectedDate, an
         onClick={onClose}
       />
       <div
-        className="relative z-10 w-[min(19rem,calc(100vw-3rem))] rounded-[1.375rem] border border-[#e6e1d7] bg-white p-2.5 shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-bottom-4 duration-200 md:slide-in-from-top-2"
+        className="relative z-10 w-[min(22rem,calc(100vw-2rem))] rounded-[1.375rem] border border-[#e6e1d7] bg-white p-3 shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-bottom-4 duration-200 md:w-[min(44rem,calc(100vw-2rem))] md:rounded-[1.5rem] md:p-4 md:slide-in-from-top-2"
         style={popoverStyle}
         role="dialog"
         aria-modal="true"
         aria-label="Calendar"
       >
-      <div className="mb-2 flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-[16px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-            {monthNames[month]} {year}
-          </h2>
-        </div>
-
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handlePrevMonth}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            type="button"
-            onClick={handleNextMonth}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
-
-      <div className="mb-1 grid grid-cols-7">
-        {dayNames.map((day) => (
-          <div key={day} className="py-0.5 text-center text-[10px] font-bold text-[#86868b]">
-            {day}
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#7b8798]">
+              Select date
+            </p>
           </div>
-        ))}
-      </div>
 
-      <div className="grid grid-cols-7 gap-y-0.5">
-        {Array.from({ length: startDayIndex }).map((_, index) => (
-          <div key={`empty-${index}`} />
-        ))}
-
-        {Array.from({ length: daysInMonth }).map((_, index) => {
-          const day = index + 1;
-          const m = (month + 1).toString().padStart(2, '0');
-          const d = day.toString().padStart(2, '0');
-          const dateStr = `${d}.${m}.${year}`;
-          const isSelected = selectedDate === dateStr;
-          const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
-          const disabled = isDateDisabled(day);
-
-          return (
+          <div className="flex gap-2">
             <button
               type="button"
-              key={day}
-              onClick={() => !disabled && handleDayClick(day)}
-              disabled={disabled}
-              className={`
-                mx-auto flex h-[1.8rem] w-[1.8rem] items-center justify-center rounded-full text-[13px] font-medium transition-all
-                ${isSelected ? 'bg-[#0a63ff] text-white shadow-md' : ''}
-                ${!isSelected && !disabled ? 'text-[#1d1d1f] hover:bg-[#f5f5f7]' : ''}
-                ${isToday && !isSelected && !disabled ? 'font-bold text-[#0a63ff]' : ''}
-                ${disabled ? 'cursor-not-allowed text-[#d2d2d7]' : ''}
-              `}
+              onClick={handlePrevMonth}
+              disabled={!canGoPrev}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#d2d2d7] disabled:hover:bg-transparent"
             >
-              {day}
+              <ChevronLeft size={18} />
             </button>
-          );
-        })}
-      </div>
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              disabled={!canGoNext}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#d2d2d7] disabled:hover:bg-transparent"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 md:gap-5">
+          <MonthGrid
+            monthDate={primaryMonth}
+            selectedDate={selectedDate}
+            minDate={today}
+            maxDate={maxSelectableDate}
+            onSelect={handleDaySelect}
+          />
+          <div className="hidden md:block">
+            <MonthGrid
+              monthDate={secondaryMonth}
+              selectedDate={selectedDate}
+              minDate={today}
+              maxDate={maxSelectableDate}
+              onSelect={handleDaySelect}
+            />
+          </div>
+        </div>
+
+        <p className="mt-4 text-center text-[12px] font-medium text-[#7b8798] md:text-[12.5px]">
+          Reserve your ride up to 90 days in advance
+        </p>
       </div>
     </div>,
     document.body,

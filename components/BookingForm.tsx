@@ -29,8 +29,8 @@ import { determineVehicle, calculateVehiclePrice, type VehicleType } from '@/lib
 import {
   DAYTIME_LEAD_TIME_ERROR,
   formatLeadTimeTimeValue,
-  getEarliestAllowedDateTimeForDay,
   getLeadTimeErrorMessage,
+  getNextAllowedDateTime,
   hasSufficientLeadTime,
   NIGHT_LEAD_TIME_ERROR,
 } from '@/lib/booking/leadTime';
@@ -55,6 +55,7 @@ type PaymentMethod = 'cash' | 'card' | null;
 
 const PENDING_BOOKING_STORAGE_KEY = 'pending-booking-form';
 const VEHICLE_ORDER: VehicleType[] = ['Limo', 'Kombi', 'Bus'];
+const DESKTOP_BOOKING_VIEWPORT_HEIGHT_PX = 660;
 
 interface FavoriteAddress {
   id: string;
@@ -102,6 +103,8 @@ type BookingFormProps = {
   showInfoTrigger?: boolean;
   headerTitle?: string;
   showStepOneRouteIntro?: boolean;
+  fluidDesktopWidth?: boolean;
+  lockDesktopHeight?: boolean;
   isAppSurface?: boolean;
   initialFavorites?: FavoriteAddress[];
   initialIsLoggedIn?: boolean;
@@ -144,6 +147,8 @@ const BookingForm = ({
   showInfoTrigger = false,
   headerTitle,
   showStepOneRouteIntro,
+  fluidDesktopWidth = false,
+  lockDesktopHeight = false,
   isAppSurface: isAppSurfaceProp,
   initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
@@ -187,7 +192,6 @@ const BookingForm = ({
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [isDesktopWizard, setIsDesktopWizard] = useState(false);
-  const [formViewportHeight, setFormViewportHeight] = useState<number | null>(null);
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(
     sortFavoriteAddresses(initialFavorites),
   );
@@ -579,30 +583,10 @@ const BookingForm = ({
   }, []);
 
   const shouldUseSlidingWizard = !isHomepageForm && isDesktopWizard;
-
-  useEffect(() => {
-    if (!shouldUseSlidingWizard) {
-      setFormViewportHeight(null);
-      return;
-    }
-
-    const activePanel = stepPanelRefs.current[currentStep - 1];
-    if (!activePanel) return;
-
-    const updateHeight = () => setFormViewportHeight(activePanel.offsetHeight);
-    let frameId = window.requestAnimationFrame(updateHeight);
-    let observer: ResizeObserver | null = null;
-
-    if (typeof ResizeObserver !== 'undefined') {
-      observer = new ResizeObserver(() => updateHeight());
-      observer.observe(activePanel);
-    }
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      observer?.disconnect();
-    };
-  }, [currentStep, shouldUseSlidingWizard]);
+  const shouldLockDesktopFormHeight = shouldUseSlidingWizard || lockDesktopHeight;
+  const formViewportStyle = shouldUseSlidingWizard
+    ? { height: `${DESKTOP_BOOKING_VIEWPORT_HEIGHT_PX}px` }
+    : undefined;
   const favoriteMenuItems =
     isAppSurface && isLoggedIn && favoriteAddresses.length > 0
       ? favoriteAddresses.map((favorite, index) => {
@@ -932,6 +916,12 @@ const BookingForm = ({
     setFormData(prev => ({ ...prev, time }));
   };
 
+  const formatAdjustmentDateValue = (value: Date) => {
+    const day = String(value.getDate()).padStart(2, '0');
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    return `${day}.${month}.${value.getFullYear()}`;
+  };
+
   const handleNotesChange = (notes: string) => {
     setFormData((prev) => ({ ...prev, notes }));
   };
@@ -1133,26 +1123,28 @@ const BookingForm = ({
       return;
     }
 
-    const selectedDay = parseSelectedDateTime(formData.date, '00:00');
-    if (!selectedDay) return;
-
-    const earliestAllowedDateTime = getEarliestAllowedDateTimeForDay(selectedDay);
-    if (!earliestAllowedDateTime) {
+    const nextAllowedDateTime = getNextAllowedDateTime(selectedDate);
+    if (!nextAllowedDateTime) {
       setTouched((prev) => ({ ...prev, date: true, time: true }));
       setError(getLeadTimeError(selectedDate ? formData.date : '', formData.time));
       return;
     }
 
-    const adjustedTime = formatLeadTimeTimeValue(earliestAllowedDateTime);
-    if (adjustedTime === formData.time) {
+    const adjustedDate = formatAdjustmentDateValue(nextAllowedDateTime);
+    const adjustedTime = formatLeadTimeTimeValue(nextAllowedDateTime);
+    if (adjustedDate === formData.date && adjustedTime === formData.time) {
       setTouched((prev) => ({ ...prev, date: true, time: true }));
       setError(getLeadTimeError(formData.date, formData.time));
       return;
     }
 
-    setFormData((prev) => ({ ...prev, time: adjustedTime }));
+    setFormData((prev) => ({ ...prev, date: adjustedDate, time: adjustedTime }));
     setError((prev) => (isLeadTimeErrorMessage(prev) || prev === TIME_EXPIRED_ERROR ? null : prev));
-    setLeadTimeAdjustmentNotice('Time adjusted to the earliest available slot for the selected date.');
+    setLeadTimeAdjustmentNotice(
+      adjustedDate === formData.date
+        ? 'Time adjusted to the earliest available slot for the selected date.'
+        : `Selected time is not available on ${formData.date}. Moved to the next available slot on ${adjustedDate} at ${adjustedTime}.`,
+    );
   }, [formData.date, formData.time]);
 
   const getStepValidation = (step: number) => {
@@ -1433,9 +1425,9 @@ const BookingForm = ({
   };
 
   const actionRowWithTrustClass =
-    'mt-3 flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-6';
+    'mt-3 flex flex-col items-center gap-2 md:mt-auto md:flex-row md:items-center md:gap-6 md:pt-4';
   const actionRowStackedTrustClass =
-    'mt-3 flex flex-col items-center gap-2';
+    'mt-3 flex flex-col items-center gap-2 md:mt-auto md:pt-4';
   const actionButtonGroupClass = 'flex w-full items-center justify-center gap-3';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
@@ -1523,14 +1515,13 @@ const BookingForm = ({
   const DateTimeFields = () => (
     <div className="grid grid-cols-2 gap-3 md:gap-4 md:[grid-template-columns:calc(50%_-_8px)_calc(50%_-_8px)]">
       <div className={BOOKING_FIELD_STACK_CLASS}>
-        <label className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[13px]">Date</label>
         <div ref={datePickerAnchorRef} className="relative w-full">
           <input
             type="text"
             name="date"
             value={formData.date}
             readOnly
-            placeholder="DD.MM.YYYY"
+            placeholder="DATE"
             onClick={() => setIsDatePickerOpen(true)}
             className={`ui-field-surface h-[3.35rem] w-full cursor-pointer rounded-[1.05rem] border bg-[#f9fafb] px-5 py-0 text-[18px] font-semibold tracking-[0.02em] text-[#0f172a] outline-none transition-all placeholder:text-[#717982] md:h-[3.25rem] md:rounded-[1rem] md:px-5 md:text-[18px] ${
               isFieldInvalid('date')
@@ -1548,16 +1539,13 @@ const BookingForm = ({
         </div>
       </div>
       <div className={BOOKING_FIELD_STACK_CLASS}>
-        <label className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[13px]">
-          {formData.direction === 'from_airport' ? 'Landing time' : 'Time'}
-        </label>
         <div ref={timePickerAnchorRef} className="relative w-full">
           <input
             type="text"
             name="time"
             value={formData.time}
             readOnly
-            placeholder="--:--"
+            placeholder="TIME"
             onClick={() => setIsTimePickerOpen(true)}
             className={`ui-field-surface h-[3.35rem] w-full cursor-pointer rounded-[1.05rem] border bg-[#f9fafb] px-5 py-0 text-[18px] font-semibold tracking-[0.02em] text-[#0f172a] outline-none transition-all placeholder:text-[#717982] md:h-[3.25rem] md:rounded-[1rem] md:px-5 md:text-[18px] ${
               isFieldInvalid('time')
@@ -1633,7 +1621,7 @@ const BookingForm = ({
   const titleHeaderClassName =
     'mb-5 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[8px]';
   const stepOneContent = (
-    <div className={`${stepContentClassName} space-y-5 md:space-y-3`}>
+    <div className={`${stepContentClassName} space-y-5 md:flex md:h-full md:flex-col md:space-y-3`}>
       {shouldShowStepOneRouteIntro && (
         <div className="text-center mb-6">
           <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
@@ -1715,7 +1703,7 @@ const BookingForm = ({
         </div>
       )}
 
-      <div className="mt-4 flex flex-col items-center gap-3 md:mt-2 md:gap-2">
+      <div className="mt-4 flex flex-col items-center gap-3 md:mt-auto md:gap-2 md:pt-4">
         <div className="flex w-full items-center justify-center">
           <button
             type="button"
@@ -1776,7 +1764,13 @@ const BookingForm = ({
     currentStep === 1 ? stepOneContent : currentStep === 2 ? stepTwoContent : stepThreeContent;
 
   return (
-    <div className={`${BOOKING_FORM_CARD_CLASS} relative w-full max-w-[32rem] shrink-0 overflow-x-clip md:w-[33.6rem] md:max-w-[33.6rem] ${allowExtendedDropdownSpace ? 'overflow-y-visible' : 'overflow-y-hidden'}`}>
+    <div
+      className={`${BOOKING_FORM_CARD_CLASS} relative w-full max-w-[32rem] shrink-0 overflow-x-clip ${
+        fluidDesktopWidth ? 'lg:max-w-none lg:w-full' : 'md:w-[33.6rem] md:max-w-[33.6rem]'
+      } ${shouldLockDesktopFormHeight ? 'md:flex md:min-h-[660px] md:flex-col' : ''} ${
+        allowExtendedDropdownSpace ? 'overflow-y-visible' : 'overflow-y-hidden'
+      }`}
+    >
       {shouldShowInfoTrigger ? (
         <button
           type="button"
@@ -1791,8 +1785,12 @@ const BookingForm = ({
           <Info size={22} strokeWidth={2.2} />
         </button>
       ) : null}
-      <div className={`overflow-x-clip ${formContentSpacingClassName} ${allowExtendedDropdownSpace ? '' : 'pb-2 md:pb-3'}`}>
-        <form onSubmit={handleSubmit}>
+      <div
+        className={`overflow-x-clip ${formContentSpacingClassName} ${
+          shouldLockDesktopFormHeight ? 'md:flex md:h-full md:flex-col' : ''
+        } ${allowExtendedDropdownSpace ? '' : 'pb-2 md:pb-3'}`}
+      >
+        <form onSubmit={handleSubmit} className={shouldLockDesktopFormHeight ? 'md:flex md:h-full md:flex-col' : undefined}>
           {headerTitle ? (
             <div className={titleHeaderClassName}>
               <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
@@ -1808,11 +1806,7 @@ const BookingForm = ({
           {shouldUseSlidingWizard ? (
             <div
               className="ui-form-viewport"
-              style={
-                formViewportHeight
-                  ? { height: `${formViewportHeight}px` }
-                  : undefined
-              }
+              style={formViewportStyle}
             >
               <div
                 className="ui-form-track"
@@ -1851,7 +1845,9 @@ const BookingForm = ({
                       mobileStepDirection === 'prev'
                         ? 'ui-form-mobile-transition-prev'
                         : 'ui-form-mobile-transition-next'
-                    }`
+                    } ${shouldLockDesktopFormHeight ? 'md:h-full' : ''}`
+                  : shouldLockDesktopFormHeight
+                    ? 'md:h-full'
                   : undefined
               }
             >

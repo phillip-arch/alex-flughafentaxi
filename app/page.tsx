@@ -228,11 +228,12 @@ const heroHeadlineClass =
   'max-w-[23ch] text-[27px] font-black leading-[1.02] tracking-normal text-[#111111] [-webkit-text-stroke:1px_currentColor] [text-shadow:0.015em_0_currentColor] md:max-w-none md:text-[32px] md:leading-[0.98] md:[-webkit-text-stroke:1px_currentColor] md:[text-shadow:0.012em_0_currentColor]';
 const heroSubheadlineClass =
   'max-w-[38rem] text-[1rem] leading-[1.7] text-[#5e6f86] md:text-[1.05rem]';
-const heroGridClass =
-  'grid items-start gap-10 lg:grid-cols-[0.62fr_1fr] lg:items-stretch lg:gap-20 xl:gap-24';
-const heroBookingColumnClass = 'mt-4 self-start text-left lg:mt-0';
+const heroGridClass = 'grid items-start gap-10';
+const heroDesktopGridClass =
+  'grid items-start gap-10 lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-8 xl:gap-10';
+const heroBookingColumnClass = 'mt-4 self-start text-left';
 const heroBookingCardClass =
-  'relative mt-8 w-full max-w-[32rem] text-left md:mt-10 md:w-[32rem] md:max-w-[32rem]';
+  'relative mt-8 w-full max-w-[32rem] text-left md:mt-10 md:w-[32rem] md:max-w-[32rem] lg:w-full lg:max-w-none';
 const homepageSectionWidthClass = 'mx-auto max-w-[57.5rem]';
 
 const vehicleCategories: VehicleCategory[] = [
@@ -518,11 +519,57 @@ function PrimaryBookingCta({ className = 'mt-8 flex justify-center md:mt-10' }: 
 
 function HeroBookingCard() {
   return (
-    <div id="hero-booking" className="relative mx-auto w-full max-w-[32rem] md:mx-0 md:w-[32rem] md:max-w-[32rem]">
+    <div
+      id="hero-booking"
+      className="relative mx-auto w-full max-w-[32rem] lg:mx-0 lg:max-w-none"
+    >
       <div className={heroBookingCardClass}>
         <div className="min-h-0 lg:flex-1 lg:min-h-0">
-          <BookingForm />
+          <BookingForm fluidDesktopWidth lockDesktopHeight />
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AlexStandardSection({ className = '' }: { className?: string }) {
+  return (
+    <div className={className}>
+      <div className="mx-auto max-w-[72rem] text-center">
+        <span className="inline-flex items-center rounded-full border border-[#dbe7ff] bg-[#f3f7ff] px-5 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.16em] text-[#1679FF] md:px-6">
+          The Alex Standard
+        </span>
+        <h2 className="ui-heading-lg mx-auto mt-7 max-w-[24ch] text-[#182033] lg:max-w-none">
+          Your Premier Vienna Airport Taxi Service
+        </h2>
+        <p className="ui-copy-compact mx-auto mt-[30px] max-w-[57rem] text-[#5c718d]">
+          Direct transfers to Schwechat (VIE) managed by a driver with 10+ years of
+          experience. We do not just provide rides; we provide peace of mind.
+        </p>
+      </div>
+
+      <div className="mt-12 grid gap-5 lg:mt-14 lg:grid-cols-2 lg:gap-7">
+        {alexStandardCards.map(({ title, description, icon: Icon }) => (
+          <article
+            key={title}
+            className="group rounded-[2rem] border border-[#dbe4ef] bg-[#f5f8fc] px-6 py-7 shadow-[0_18px_40px_rgba(17,17,17,0.035)] transition-all duration-200 hover:-translate-y-[2px] hover:border-[#4f86ff] hover:bg-white hover:shadow-[0_22px_50px_rgba(22,121,255,0.08)] md:px-8 md:py-9 lg:px-10"
+          >
+            <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-7">
+              <span className="flex h-[5.2rem] w-[5.2rem] shrink-0 items-center justify-center rounded-[1.45rem] border border-[#eef3f9] bg-white text-[#1679FF] shadow-[0_16px_34px_rgba(17,17,17,0.06)] transition-all duration-200 group-hover:border-[#dce8ff] group-hover:shadow-[0_18px_38px_rgba(22,121,255,0.09)]">
+                <Icon size={31} strokeWidth={2.1} />
+              </span>
+
+              <div className="min-w-0">
+                <h3 className="text-[1.65rem] font-semibold leading-[1.08] tracking-[-0.05em] text-[#182033] md:text-[2rem]">
+                  {title}
+                </h3>
+                <p className="ui-copy-compact mt-[30px] max-w-[31rem] text-[#5f718a]">
+                  {description}
+                </p>
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   );
@@ -530,7 +577,7 @@ function HeroBookingCard() {
 
 function HeroImageCard() {
   return (
-    <div className="relative mx-auto flex w-full max-w-[52rem] flex-col lg:mt-8">
+    <div className="relative mx-auto flex w-full max-w-[52rem] flex-col lg:mt-8 lg:max-w-none">
       <div className={`${heroIntroClass} hidden lg:flex`}>
         <h1 className={`ui-section-intro-title mt-0 !mb-[1.35rem] md:!mb-[1.5rem] ${heroHeadlineClass}`}>Vienna Airport Taxi: Fixed-Price Transfers</h1>
         <p className={`ui-section-intro-copy m-0 ${heroSubheadlineClass}`}>
@@ -568,7 +615,39 @@ function HeroImageCard() {
           </span>
         </div>
       </div>
+
+      <AlexStandardSection className="hidden lg:block lg:pt-14" />
+
+      <div className="hidden lg:block lg:pt-16">
+        <SectionIntro
+          eyebrow="Vehicle categories"
+          title="Vienna Airport Taxi Prices & Vehicles"
+          description="Our vehicles fit every need. Compare space, luggage capacity, and fixed prices for Vienna at a glance."
+          align="center"
+          className="max-w-[46rem]"
+        />
+      </div>
     </div>
+  );
+}
+
+function DesktopStickyHeroSection() {
+  return (
+    <section className="hidden bg-[var(--color-page-bg)] text-[var(--color-text)] lg:block">
+      <div className={heroSectionPaddingClass}>
+        <div className="mx-auto max-w-[104rem]">
+          <div className={heroDesktopGridClass}>
+            <div className="self-stretch text-left">
+              <div className="sticky top-24 h-fit">
+                <HeroBookingCard />
+              </div>
+            </div>
+
+            <HeroImageCard />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -586,10 +665,10 @@ export default async function Home({
       <Navbar />
       <main>
 
-      <section id="hero" className="relative overflow-hidden bg-[var(--color-page-bg)] text-[var(--color-text)]">
+      <section id="hero" className="relative bg-[var(--color-page-bg)] text-[var(--color-text)] lg:hidden">
         <div className={heroSectionPaddingClass}>
           <div className="mx-auto max-w-[104rem]">
-            <div className={`${heroIntroClass} lg:hidden`}>
+            <div className={heroIntroClass}>
               <h1 className={`ui-section-intro-title mt-0 !mb-[1.35rem] md:!mb-[1.5rem] ${heroHeadlineClass}`}>Vienna Airport Taxi: Fixed-Price Transfers</h1>
               <p className={`ui-section-intro-copy m-0 ${heroSubheadlineClass}`}>
                 Stress-free vienna airport taxi transfer with guaranteed fixed prices and
@@ -607,45 +686,12 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="bg-[var(--color-page-bg)] py-16 md:py-20 lg:py-24">
+      <DesktopStickyHeroSection />
+
+      <section className="bg-[var(--color-page-bg)] py-16 md:py-20 lg:hidden">
         <div className="app-container">
           <div className="mx-auto max-w-[104rem]">
-            <div className="mx-auto max-w-[72rem] text-center">
-              <span className="inline-flex items-center rounded-full border border-[#dbe7ff] bg-[#f3f7ff] px-5 py-2 text-[0.82rem] font-semibold uppercase tracking-[0.16em] text-[#1679FF] md:px-6">
-                The Alex Standard
-              </span>
-              <h2 className="ui-heading-lg mx-auto mt-7 max-w-[24ch] text-[#182033] lg:max-w-none">
-                Your Premier Vienna Airport Taxi Service
-              </h2>
-              <p className="ui-copy-compact mx-auto mt-[30px] max-w-[57rem] text-[#5c718d]">
-                Direct transfers to Schwechat (VIE) managed by a driver with 10+ years of
-                experience. We do not just provide rides; we provide peace of mind.
-              </p>
-            </div>
-
-            <div className="mt-12 grid gap-5 lg:mt-14 lg:grid-cols-2 lg:gap-7">
-              {alexStandardCards.map(({ title, description, icon: Icon }) => (
-                <article
-                  key={title}
-                  className="group rounded-[2rem] border border-[#dbe4ef] bg-[#f5f8fc] px-6 py-7 shadow-[0_18px_40px_rgba(17,17,17,0.035)] transition-all duration-200 hover:-translate-y-[2px] hover:border-[#4f86ff] hover:bg-white hover:shadow-[0_22px_50px_rgba(22,121,255,0.08)] md:px-8 md:py-9 lg:px-10"
-                >
-                  <div className="flex flex-col gap-5 md:flex-row md:items-start md:gap-7">
-                    <span className="flex h-[5.2rem] w-[5.2rem] shrink-0 items-center justify-center rounded-[1.45rem] border border-[#eef3f9] bg-white text-[#1679FF] shadow-[0_16px_34px_rgba(17,17,17,0.06)] transition-all duration-200 group-hover:border-[#dce8ff] group-hover:shadow-[0_18px_38px_rgba(22,121,255,0.09)]">
-                      <Icon size={31} strokeWidth={2.1} />
-                    </span>
-
-                    <div className="min-w-0">
-                      <h3 className="text-[1.65rem] font-semibold leading-[1.08] tracking-[-0.05em] text-[#182033] md:text-[2rem]">
-                        {title}
-                      </h3>
-                      <p className="ui-copy-compact mt-[30px] max-w-[31rem] text-[#5f718a]">
-                        {description}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <AlexStandardSection />
           </div>
         </div>
       </section>
@@ -653,15 +699,17 @@ export default async function Home({
       <section className="section-shell-tight-top bg-[var(--color-page-bg)]">
         <div className="app-container">
           <div className="mx-auto max-w-[104rem]">
-            <SectionIntro
-              eyebrow="Vehicle categories"
-              title="Vienna Airport Taxi Prices & Vehicles"
-              description="Our vehicles fit every need. Compare space, luggage capacity, and fixed prices for Vienna at a glance."
-              align="center"
-              className="max-w-[46rem]"
-            />
+            <div className="lg:hidden">
+              <SectionIntro
+                eyebrow="Vehicle categories"
+                title="Vienna Airport Taxi Prices & Vehicles"
+                description="Our vehicles fit every need. Compare space, luggage capacity, and fixed prices for Vienna at a glance."
+                align="center"
+                className="max-w-[46rem]"
+              />
+            </div>
 
-            <div className="mt-10 space-y-5">
+            <div className="mt-10 space-y-5 lg:mt-0">
               {vehicleCategories.map(({ key, title, description, imageSrc, specs, prices }) => (
                 <VehicleCategoryCard
                   key={key}

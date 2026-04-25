@@ -377,15 +377,17 @@ p {
 
   .ui-form-track {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
+    height: 100%;
     width: 300%;
     will-change: transform;
     transition: transform var(--anim-speed) var(--ease-premium);
   }
 
   .ui-form-step {
-    align-self: flex-start;
+    align-self: stretch;
     flex: 0 0 33.333333%;
+    height: 100%;
     width: 33.333333%;
     transition: opacity var(--anim-speed) var(--ease-premium);
   }

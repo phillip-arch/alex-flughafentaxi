@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Minus, Plus } from 'lucide-react';
-import { BOOKING_OVERLAY_BACKDROP_CLASS } from './bookingOverlayStyles';
 import {
   formatLeadTimeTimeValue,
   getEarliestAllowedDateTimeForDay,
   hasSufficientLeadTime,
+  roundUpToNextFiveMinutes,
 } from '@/lib/booking/leadTime';
 
 interface TimePickerProps {
@@ -19,20 +18,64 @@ interface TimePickerProps {
   anchorRef?: React.RefObject<HTMLElement | null>;
 }
 
-function parseSelectedDateTime(date: string, time: string) {
-  const [day, month, year] = date.split('.');
-  const [hours, minutes] = time.split(':');
-  if (!day || !month || !year || !hours || !minutes) return null;
+const PICKER_OVERLAY_CLASS = 'fixed inset-0 bg-transparent';
 
-  const selectedDate = new Date(
-    Number.parseInt(year, 10),
-    Number.parseInt(month, 10) - 1,
-    Number.parseInt(day, 10),
-    Number.parseInt(hours, 10),
-    Number.parseInt(minutes, 10),
+function parseSelectedDate(value?: string) {
+  if (!value) return null;
+
+  const [day, month, year] = value.split('.');
+  if (!day || !month || !year) return null;
+
+  const parsed = new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+type TimeOption = {
+  value: string;
+  isAvailable: boolean;
+};
+
+function isSameCalendarDay(left: Date, right: Date) {
+  return (
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate()
+  );
+}
+
+function buildTimeOptions(selectedDate?: string, now = new Date()) {
+  const parsedDate = parseSelectedDate(selectedDate);
+  const baseDate = parsedDate ?? now;
+  const isToday = parsedDate ? isSameCalendarDay(parsedDate, now) : false;
+  const startOfList = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), 0, 0, 0, 0);
+  const endOfDay = new Date(
+    baseDate.getFullYear(),
+    baseDate.getMonth(),
+    baseDate.getDate(),
+    23,
+    55,
+    0,
+    0,
   );
 
-  return Number.isNaN(selectedDate.getTime()) ? null : selectedDate;
+  const firstAllowed = parsedDate ? getEarliestAllowedDateTimeForDay(parsedDate, now) : null;
+
+  if (!firstAllowed && isToday) {
+    return [];
+  }
+
+  const values: TimeOption[] = [];
+  let cursor = new Date(startOfList);
+
+  while (cursor.getTime() <= endOfDay.getTime()) {
+    values.push({
+      value: formatLeadTimeTimeValue(cursor),
+      isAvailable: parsedDate ? hasSufficientLeadTime(cursor, now) : true,
+    });
+    cursor = new Date(cursor.getTime() + 5 * 60 * 1000);
+  }
+
+  return values;
 }
 
 export default function TimePicker({
@@ -43,43 +86,32 @@ export default function TimePicker({
   selectedDate,
   anchorRef,
 }: TimePickerProps) {
-  const [hour, setHour] = useState<string | null>(null);
-  const [minute, setMinute] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties | undefined>(undefined);
+  const [showUnavailableNotice, setShowUnavailableNotice] = useState(false);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const timeOptions = useMemo(() => buildTimeOptions(selectedDate), [selectedDate]);
+  const parsedDate = useMemo(() => parseSelectedDate(selectedDate), [selectedDate]);
+  const isTodaySelection = parsedDate ? isSameCalendarDay(parsedDate, new Date()) : false;
+  const hasUnavailableTimes = timeOptions.some((option) => !option.isAvailable);
+  const firstAvailableValue = timeOptions.find((option) => option.isAvailable)?.value ?? null;
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (selectedTime) {
-      const [h, m] = selectedTime.split(':');
-      if (h && m) {
-        setHour(h);
-        setMinute(m);
-      }
-    } else if (selectedDate) {
-      const selectedDay = parseSelectedDateTime(selectedDate, '00:00');
-      const firstAllowedTime = selectedDay ? getEarliestAllowedDateTimeForDay(selectedDay) : null;
-      const formattedFirstAllowedTime = firstAllowedTime ? formatLeadTimeTimeValue(firstAllowedTime) : null;
-      const [defaultHour, defaultMinute] = formattedFirstAllowedTime?.split(':') ?? [];
-      setHour(defaultHour ?? null);
-      setMinute(defaultMinute ?? null);
-    } else {
-      setHour(null);
-      setMinute(null);
-    }
-  }, [selectedDate, selectedTime, isOpen]);
+    if (!isOpen) return;
 
-  useEffect(() => {
-    if (!isOpen || !hour || !minute) return;
+    if (!parsedDate) return;
 
-    const nextValue = `${hour}:${minute}`;
-    if (nextValue !== selectedTime) {
-      onSelect(nextValue);
+    const nextDefault = timeOptions.find((option) => option.isAvailable)?.value;
+    if (!nextDefault) return;
+
+    if (!selectedTime || !timeOptions.some((option) => option.value === selectedTime && option.isAvailable)) {
+      onSelect(nextDefault);
     }
-  }, [hour, minute, isOpen, onSelect, selectedTime]);
+  }, [isOpen, onSelect, parsedDate, selectedTime, timeOptions]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -91,7 +123,6 @@ export default function TimePicker({
     };
 
     document.addEventListener('keydown', handleEscape);
-
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
@@ -102,22 +133,33 @@ export default function TimePicker({
 
     const updatePopoverPosition = () => {
       const anchor = anchorRef?.current;
-      const isDesktop = window.matchMedia('(min-width: 768px)').matches;
 
-      if (!anchor || !isDesktop) {
-        setPopoverStyle(undefined);
+      if (!anchor) {
+        setPopoverStyle((current) => (current === undefined ? current : undefined));
         return;
       }
 
       const rect = anchor.getBoundingClientRect();
-      const panelWidth = Math.min(144, window.innerWidth - 32);
+      const panelWidth = Math.min(rect.width, window.innerWidth - 32);
       const left = Math.min(Math.max(rect.left, 16), window.innerWidth - panelWidth - 16);
-
-      setPopoverStyle({
+      const nextStyle: React.CSSProperties = {
         left,
         position: 'fixed',
-        top: rect.bottom + 12,
+        top: rect.bottom + 6,
         width: panelWidth,
+      };
+
+      setPopoverStyle((current) => {
+        if (
+          current?.left === nextStyle.left &&
+          current?.top === nextStyle.top &&
+          current?.width === nextStyle.width &&
+          current?.position === nextStyle.position
+        ) {
+          return current;
+        }
+
+        return nextStyle;
       });
     };
 
@@ -131,53 +173,70 @@ export default function TimePicker({
     };
   }, [anchorRef, isMounted, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const list = listRef.current;
+    if (!list) return;
+
+    const activeValue = isTodaySelection
+      ? timeOptions.find((option) => option.value === selectedTime && option.isAvailable)?.value ??
+        firstAvailableValue
+      : '12:00';
+
+    if (!activeValue) {
+      list.scrollTop = 0;
+      setShowUnavailableNotice(false);
+      return;
+    }
+
+    const activeOption = list.querySelector<HTMLElement>(`[data-time-option="${activeValue}"]`);
+    if (!activeOption) return;
+
+    const targetTop = Math.max(0, activeOption.offsetTop);
+
+    list.scrollTop = targetTop;
+    setShowUnavailableNotice(false);
+  }, [firstAvailableValue, isOpen, selectedTime, timeOptions]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const list = listRef.current;
+    if (!list || !hasUnavailableTimes) {
+      setShowUnavailableNotice(false);
+      return;
+    }
+
+    const updateUnavailableNotice = () => {
+      const viewportTop = list.scrollTop;
+      const viewportBottom = viewportTop + list.clientHeight;
+      const unavailableOptions = Array.from(
+        list.querySelectorAll<HTMLElement>('[data-time-unavailable="true"]'),
+      );
+
+      const hasVisibleUnavailable = unavailableOptions.some((option) => {
+        const optionTop = option.offsetTop;
+        const optionBottom = optionTop + option.offsetHeight;
+
+        return optionBottom > viewportTop && optionTop < viewportBottom;
+      });
+
+      setShowUnavailableNotice(hasVisibleUnavailable);
+    };
+
+    updateUnavailableNotice();
+    list.addEventListener('scroll', updateUnavailableNotice, { passive: true });
+
+    return () => {
+      list.removeEventListener('scroll', updateUnavailableNotice);
+    };
+  }, [hasUnavailableTimes, isOpen]);
+
   if (!isOpen || !isMounted) return null;
 
-  const canSelectCandidateTime = (nextHour: string, nextMinute: string) => {
-    if (!selectedDate) return true;
-    const candidateDate = parseSelectedDateTime(selectedDate, `${nextHour}:${nextMinute}`);
-    if (!candidateDate) return true;
-    return hasSufficientLeadTime(candidateDate);
-  };
-
-  const canDecrementHour =
-    hour !== null &&
-    minute !== null &&
-    canSelectCandidateTime(((Number.parseInt(hour, 10) - 1 + 24) % 24).toString().padStart(2, '0'), minute);
-
-  const canDecrementMinute =
-    hour !== null &&
-    minute !== null &&
-    canSelectCandidateTime(hour, ((Number.parseInt(minute, 10) - 5 + 60) % 60).toString().padStart(2, '0'));
-
-  const incrementHour = () => {
-    let value = hour ? parseInt(hour, 10) : 12;
-    value = (value + 1) % 24;
-    setHour(value.toString().padStart(2, '0'));
-  };
-
-  const decrementHour = () => {
-    if (!canDecrementHour) return;
-    let value = hour ? parseInt(hour, 10) : 12;
-    value = (value - 1 + 24) % 24;
-    setHour(value.toString().padStart(2, '0'));
-  };
-
-  const incrementMinute = () => {
-    let value = minute ? parseInt(minute, 10) : 0;
-    value = (value + 5) % 60;
-    setMinute(value.toString().padStart(2, '0'));
-  };
-
-  const decrementMinute = () => {
-    if (!canDecrementMinute) return;
-    let value = minute ? parseInt(minute, 10) : 0;
-    value = (value - 5 + 60) % 60;
-    setMinute(value.toString().padStart(2, '0'));
-  };
-
   return createPortal(
-    <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-center justify-center px-4 py-10`}>
+    <div className={`${PICKER_OVERLAY_CLASS} z-[9999]`}>
       <button
         type="button"
         aria-label="Close time picker"
@@ -185,61 +244,54 @@ export default function TimePicker({
         onClick={onClose}
       />
       <div
-        className="relative z-10 w-[9rem] max-w-[calc(100vw-2rem)] rounded-[0.9rem] border border-[#e6e1d7] bg-white p-[0.7rem] shadow-[0_16px_34px_rgba(17,17,17,0.14)]"
+        className="relative z-10 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-[1.1rem] border border-[#e6e1d7] bg-white shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-bottom-4 duration-200 md:slide-in-from-top-2"
         style={popoverStyle}
         role="dialog"
         aria-modal="true"
         aria-label="Time picker"
       >
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-2">
-        <div className="flex flex-col items-center justify-between gap-4">
-          <button
-            type="button"
-            onClick={incrementHour}
-            className="flex h-[1.6rem] w-[1.6rem] items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f5f5f7]"
-          >
-            <Plus size={18} strokeWidth={2.4} />
-          </button>
+        <div ref={listRef} className="relative max-h-[18.5rem] overflow-y-auto py-1">
+          {showUnavailableNotice ? (
+            <div className="pointer-events-none sticky top-0 z-10 px-3 pt-2">
+              <div className="rounded-[0.85rem] border border-[#edf1f6] bg-white/96 px-3 py-2 text-[0.8rem] font-medium leading-[1.35] text-[#6b7280] shadow-[0_8px_20px_rgba(17,17,17,0.06)]">
+                Unavailable time due to the minimum booking notice.
+              </div>
+            </div>
+          ) : null}
+          {timeOptions.length > 0 ? (
+            timeOptions.map(({ value, isAvailable }) => {
+              const isSelected = value === selectedTime;
 
-          <span className={`text-[1.9rem] font-medium leading-none tracking-[-0.06em] ${hour ? 'text-[#111111]' : 'text-[#d2d2d7]'}`}>
-            {hour || '--'}
-          </span>
-
-          <button
-            type="button"
-            onClick={decrementHour}
-            disabled={!canDecrementHour}
-            className="flex h-[1.6rem] w-[1.6rem] items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#c4c9d1] disabled:hover:bg-transparent"
-          >
-            <Minus size={18} strokeWidth={2.4} />
-          </button>
+              return (
+                <button
+                  type="button"
+                  key={value}
+                  onClick={() => {
+                    if (!isAvailable) return;
+                    onSelect(value);
+                    onClose();
+                  }}
+                  disabled={!isAvailable}
+                  data-time-option={value}
+                  data-time-unavailable={isAvailable ? undefined : 'true'}
+                  className={`flex w-full items-center px-4 py-3 text-left text-[1.05rem] font-medium tracking-[-0.03em] transition-colors ${
+                    isSelected
+                      ? 'text-[#111827]'
+                      : isAvailable
+                        ? 'text-[#1f2937] hover:bg-[#f8fafc]'
+                        : 'cursor-not-allowed text-[#c7cfdb]'
+                  }`}
+                >
+                  <span>{value}</span>
+                </button>
+              );
+            })
+          ) : (
+            <div className="px-4 py-4 text-[0.95rem] font-medium text-[#7b8798]">
+              No times available for the selected date.
+            </div>
+          )}
         </div>
-
-        <div className="text-[1.75rem] font-light leading-none text-[#111111]">:</div>
-
-        <div className="flex flex-col items-center justify-between gap-4">
-          <button
-            type="button"
-            onClick={incrementMinute}
-            className="flex h-[1.6rem] w-[1.6rem] items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f5f5f7]"
-          >
-            <Plus size={18} strokeWidth={2.4} />
-          </button>
-
-          <span className={`text-[1.9rem] font-medium leading-none tracking-[-0.06em] ${minute ? 'text-[#111111]' : 'text-[#d2d2d7]'}`}>
-            {minute || '--'}
-          </span>
-
-          <button
-            type="button"
-            onClick={decrementMinute}
-            disabled={!canDecrementMinute}
-            className="flex h-[1.6rem] w-[1.6rem] items-center justify-center rounded-full text-[#111111] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#c4c9d1] disabled:hover:bg-transparent"
-          >
-            <Minus size={18} strokeWidth={2.4} />
-          </button>
-        </div>
-      </div>
       </div>
     </div>,
     document.body,

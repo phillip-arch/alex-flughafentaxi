@@ -62,6 +62,24 @@ export function getEarliestAllowedDateTimeForDay(dayDate: Date, now = new Date()
   return null;
 }
 
+export function getNextAllowedDateTime(startDate: Date, now = new Date(), maxDaysAhead = 90) {
+  const latestAllowed = new Date(now);
+  latestAllowed.setDate(latestAllowed.getDate() + maxDaysAhead);
+  latestAllowed.setHours(23, 55, 0, 0);
+
+  let cursor = roundUpToNextFiveMinutes(new Date(Math.max(startDate.getTime(), now.getTime())));
+
+  while (cursor.getTime() <= latestAllowed.getTime()) {
+    if (hasSufficientLeadTime(cursor, now)) {
+      return cursor;
+    }
+
+    cursor = new Date(cursor.getTime() + 5 * 60 * 1000);
+  }
+
+  return null;
+}
+
 export function formatLeadTimeTimeValue(value: Date) {
   return `${String(value.getHours()).padStart(2, '0')}:${String(value.getMinutes()).padStart(2, '0')}`;
 }
