@@ -1650,48 +1650,57 @@ const BookingForm = ({
         </div>
       </div>
       <div className="rounded-[2.2rem] bg-transparent pt-0 pb-1 shadow-none">
-        <div className="rounded-[1.55rem] border border-[#e4e6ea] bg-[#f9fafb] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:rounded-[1.35rem] md:px-5 md:py-5">
-          <div className="flex min-w-0 items-center gap-2 md:gap-3">
-            <span className="shrink-0 rounded-md bg-[#eef5ff] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.05em] text-[#2563eb] md:px-2.5 md:text-[12px]">
-              {airportRowLabel}
-            </span>
-            <AirportRowIcon className="h-4 w-4 shrink-0 text-[#2563eb] md:h-5 md:w-5" strokeWidth={2.2} />
-            <p className="min-w-0 truncate text-[15px] font-semibold leading-tight tracking-[-0.03em] text-[#111111] md:text-[20px]">
-              {copy.airportLabel}
-            </p>
+        <div className="space-y-4 md:space-y-3">
+          <div className="rounded-[1.55rem] border border-[#dfe8f6] bg-[#f3f7ff] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)] md:rounded-[1.35rem] md:px-5 md:py-4.5">
+            <div className="flex min-w-0 items-center gap-3 md:gap-3.5">
+              <span className="inline-flex h-7 shrink-0 items-center justify-center rounded-[0.7rem] bg-[#2E63F5] px-3 text-[12px] font-black uppercase tracking-[0.04em] text-white md:h-8 md:px-3.5 md:text-[13px]">
+                {formData.direction === 'from_airport' ? 'From' : 'To'}
+              </span>
+              <AirportRowIcon className="h-5 w-5 shrink-0 text-[#2E63F5] md:h-6 md:w-6" strokeWidth={2.2} />
+              <p className="min-w-0 truncate text-[16px] font-semibold leading-tight tracking-[-0.03em] text-[#111111] md:text-[20px]">
+                {copy.airportLabel}
+              </p>
+            </div>
           </div>
-          <div className="my-5 h-px bg-[#e2e8f0] md:my-4" />
-          <div className="relative w-full">
-            <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.08em] text-[#687384] md:mb-2 md:text-[13px]">
+
+          <div className="space-y-3 md:space-y-2.5">
+            <p className="px-1 text-[13px] font-bold uppercase tracking-[0.08em] text-[#687384] md:text-[13px]">
               {addressFieldLabel}
             </p>
-            <StreetAutocomplete
-              value={streetInputValue}
-              selectedOption={selectedStreetOption}
-              mobileDropdownFullWidth
-              mobileSelectedStreetOnly
-              menuItems={favoriteMenuItems}
-              onChange={(value) => clearStreetSelection('street', value)}
-              onSelect={(option) => applyStreetSelection('street', option)}
-              onPasteText={(text) => handleStreetPaste('street', text)}
-              onBlur={() => {
-                validateStreetNumber('street');
-                handleBlur({} as React.FocusEvent<HTMLInputElement>);
-              }}
-              placeholder={addressPlaceholder}
-              className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#6f7782] focus:outline-none md:text-[21px] md:font-semibold"
-            />
+            <div className="rounded-[1.55rem] border border-[#e4e6ea] bg-white px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:rounded-[1.35rem] md:px-5 md:py-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <MapPin className="h-5 w-5 shrink-0 text-[#6f86a6] md:h-6 md:w-6" strokeWidth={2.2} />
+                <div className="relative min-w-0 flex-1">
+                  <StreetAutocomplete
+                    value={streetInputValue}
+                    selectedOption={selectedStreetOption}
+                    mobileDropdownFullWidth
+                    mobileSelectedStreetOnly
+                    menuItems={favoriteMenuItems}
+                    onChange={(value) => clearStreetSelection('street', value)}
+                    onSelect={(option) => applyStreetSelection('street', option)}
+                    onPasteText={(text) => handleStreetPaste('street', text)}
+                    onBlur={() => {
+                      validateStreetNumber('street');
+                      handleBlur({} as React.FocusEvent<HTMLInputElement>);
+                    }}
+                    placeholder={addressPlaceholder}
+                    className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:text-[21px] md:font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+            {streetNumberWarning === 'street' ? (
+              <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
+                Please add the street number.
+              </div>
+            ) : null}
+            {streetPasteWarning === 'street' ? (
+              <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
+                Address could not be recognized clearly. Please choose from the list.
+              </div>
+            ) : null}
           </div>
-          {streetNumberWarning === 'street' ? (
-            <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
-              Please add the street number.
-            </div>
-          ) : null}
-          {streetPasteWarning === 'street' ? (
-            <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
-              Address could not be recognized clearly. Please choose from the list.
-            </div>
-          ) : null}
         </div>
       </div>
 
