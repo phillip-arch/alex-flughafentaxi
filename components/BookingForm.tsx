@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { usePrefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion';
 import StreetAutocomplete from '@/components/address/StreetAutocomplete';
-import { getAppSurface } from '@/lib/routing/surfaces';
 import {
   buildStreetOptionValue,
   formatAddressLine,
@@ -163,7 +162,7 @@ const BookingForm = ({
   const router = useRouter();
   const pathname = usePathname();
   const isHomepageForm = pathname === '/';
-  const isAppSurface = isAppSurfaceProp ?? getAppSurface() === 'app';
+  const isAppSurface = isAppSurfaceProp ?? false;
   const prefersReducedMotion = usePrefersReducedMotion();
   const shouldShowStepOneRouteIntro = showStepOneRouteIntro ?? !isHomepageForm;
   const allowExtendedDropdownSpace = true;
@@ -789,10 +788,6 @@ const BookingForm = ({
     }));
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    // No-op: Do not mark as touched on blur
-  };
-
   const clearStreetSelection = (target: 'street' | 'extraStopStreet', rawValue: string) => {
     const selectedOption = target === 'street' ? resolvedStreetOption : resolvedExtraStopStreetOption;
     const normalizedValue = rawValue.replace(/\s+/g, ' ').trimStart();
@@ -946,8 +941,6 @@ const BookingForm = ({
   };
 
   const handleFlightNumberBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
-    handleBlur(e);
-
     const lookupFlightNumber = extractLookupFlightNumber(e.target.value);
     if (!lookupFlightNumber) return;
 
@@ -1206,7 +1199,7 @@ const BookingForm = ({
     if (getStepValidation(currentStep).isValid) {
       setError(null);
     }
-  }, [formData, currentStep, error]);
+  }, [formData, currentStep, error, touched, streetPasteWarning, resolvedStreetOption]);
 
   const handlePaymentChange = (method: PaymentMethod) => {
     setFormData(prev => ({ ...prev, paymentMethod: method }));
@@ -1294,7 +1287,7 @@ const BookingForm = ({
           }),
         );
 
-        if (getAppSurface() === 'www') {
+        if (!isAppSurface) {
           window.location.assign('/book');
           return;
         }
@@ -1669,10 +1662,7 @@ const BookingForm = ({
                       onChange={(value) => clearStreetSelection('street', value)}
                       onSelect={(option) => applyStreetSelection('street', option)}
                       onPasteText={(text) => handleStreetPaste('street', text)}
-                      onBlur={() => {
-                        validateStreetNumber('street');
-                        handleBlur({} as React.FocusEvent<HTMLInputElement>);
-                      }}
+                      onBlur={() => validateStreetNumber('street')}
                       placeholder={addressInputPlaceholder}
                       className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:text-[18px]"
                     />
@@ -1757,7 +1747,6 @@ const BookingForm = ({
       loading={loading}
       handleBookingForMyselfToggle={handleBookingForMyselfToggle}
       handleChange={handleChange}
-      handleBlur={handleBlur}
       getInputClassName={getInputClassName}
       handlePaymentChange={handlePaymentChange}
       touched={touched}

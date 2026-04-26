@@ -11,7 +11,7 @@ export const BookingSchema = z.object({
   flightNumber: z.string().optional(),
   passengers: z.number().min(1).max(8),
   luggage: z.number().min(0).max(8),
-  vehicleType: z.enum(['Standard', 'Kombi', 'Van']),
+  vehicleType: z.enum(['Limo', 'Kombi', 'Bus']),
   notes: z.string().max(500).optional(),
 });
 

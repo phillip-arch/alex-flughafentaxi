@@ -222,10 +222,11 @@ export default function DatePicker({
       const rect = anchor.getBoundingClientRect();
       const panelWidth = Math.min(760, window.innerWidth - 32);
       const left = Math.min(Math.max(rect.left - 8, 16), window.innerWidth - panelWidth - 16);
+      const top = Math.max(rect.top, 16);
       const nextStyle: React.CSSProperties = {
         left,
         position: 'fixed',
-        top: rect.bottom + 14,
+        top,
         width: panelWidth,
       };
 

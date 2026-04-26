@@ -15,7 +15,6 @@ type BookingStepThreeProps = {
   loading: boolean;
   handleBookingForMyselfToggle: (checked: boolean) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-  handleBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   getInputClassName: (name: any) => string;
   handlePaymentChange: (method: 'cash' | 'card') => void;
   touched: Record<string, boolean>;
@@ -36,7 +35,6 @@ export default function BookingStepThree({
   loading,
   handleBookingForMyselfToggle,
   handleChange,
-  handleBlur,
   getInputClassName,
   handlePaymentChange,
   touched,
@@ -82,7 +80,6 @@ export default function BookingStepThree({
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
-            onBlur={handleBlur}
             placeholder=""
             className={getInputClassName('fullName')}
           />
@@ -97,7 +94,6 @@ export default function BookingStepThree({
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            onBlur={handleBlur}
             placeholder=""
             className={getInputClassName('phone')}
           />
@@ -112,7 +108,6 @@ export default function BookingStepThree({
             name="email"
             value={formData.email}
             onChange={handleChange}
-            onBlur={handleBlur}
             placeholder=""
             className={getInputClassName('email')}
           />

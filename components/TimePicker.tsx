@@ -179,10 +179,11 @@ export default function TimePicker({
       const rect = anchor.getBoundingClientRect();
       const panelWidth = Math.min(rect.width, window.innerWidth - 32);
       const viewportLeft = Math.min(Math.max(rect.left, 16), window.innerWidth - panelWidth - 16);
+      const topAbsolute = Math.max(rect.top + window.scrollY, window.scrollY + 16);
       const nextStyle: React.CSSProperties = {
         left: viewportLeft + window.scrollX,
         position: 'absolute',
-        top: rect.bottom + window.scrollY + 6,
+        top: topAbsolute,
         width: panelWidth,
       };
 
