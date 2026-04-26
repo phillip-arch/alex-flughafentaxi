@@ -379,7 +379,7 @@ export default async function Home({
                       <span className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[#dde9f8] bg-white text-[#1166d4] shadow-[0_8px_20px_rgba(22,121,255,0.1)]">
                         <Icon size={21} strokeWidth={2.1} />
                       </span>
-                      <span aria-hidden="true" className="text-[2.6rem] font-black leading-none tracking-[-0.06em] text-[#c8d8e4] transition-colors group-hover:text-[#b8cfe0]">
+                      <span aria-hidden="true" className="text-[2.6rem] font-black leading-none tracking-[-0.06em] text-[#8fa4b8] transition-colors group-hover:text-[#7a90a8]">
                         {num}
                       </span>
                     </div>
@@ -486,7 +486,7 @@ export default async function Home({
                     key={num}
                     className="flex flex-col gap-5 rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-7 py-7 md:px-8 md:py-8"
                   >
-                    <span aria-hidden="true" className="text-[3.8rem] font-black leading-none tracking-[-0.07em] text-[#c8d8e4]">
+                    <span aria-hidden="true" className="text-[3.8rem] font-black leading-none tracking-[-0.07em] text-[#8fa4b8]">
                       {num}
                     </span>
                     <div>
