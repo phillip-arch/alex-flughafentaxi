@@ -226,8 +226,8 @@ const popularTrips = [
 
 function SectionEyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-2 text-[0.75rem] font-bold uppercase tracking-[0.2em] text-[#1679FF]">
-      <span className="h-1 w-4 rounded-full bg-[#1679FF]" />
+    <span className="inline-flex items-center gap-2 text-[0.75rem] font-bold uppercase tracking-[0.2em] text-[#1166d4]">
+      <span className="h-1 w-4 rounded-full bg-[#1166d4]" />
       {children}
     </span>
   );
@@ -294,7 +294,7 @@ export default async function Home({
                         key={label}
                         className="inline-flex items-center gap-2 text-[0.875rem] font-semibold text-[#b0c8e0]"
                       >
-                        <Icon size={14} className="text-[#1679FF]" strokeWidth={2.4} />
+                        <Icon size={14} className="text-[#1166d4]" strokeWidth={2.4} />
                         {label}
                       </span>
                     ))}
@@ -372,10 +372,10 @@ export default async function Home({
                     className="group flex flex-col gap-6 rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-7 py-7 transition-all duration-200 hover:border-[#bdd4ff] hover:bg-white hover:shadow-[0_20px_50px_rgba(22,121,255,0.07)] md:px-8 md:py-8"
                   >
                     <div className="flex items-start justify-between">
-                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[#dde9f8] bg-white text-[#1679FF] shadow-[0_8px_20px_rgba(22,121,255,0.1)]">
+                      <span className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[#dde9f8] bg-white text-[#1166d4] shadow-[0_8px_20px_rgba(22,121,255,0.1)]">
                         <Icon size={21} strokeWidth={2.1} />
                       </span>
-                      <span className="text-[2.6rem] font-black leading-none tracking-[-0.06em] text-[#eaf0f8] transition-colors group-hover:text-[#dde9ff]">
+                      <span aria-hidden="true" className="text-[2.6rem] font-black leading-none tracking-[-0.06em] text-[#eaf0f8] transition-colors group-hover:text-[#dde9ff]">
                         {num}
                       </span>
                     </div>
@@ -419,7 +419,7 @@ export default async function Home({
                     {/* Description + specs */}
                     <div className="px-6 pb-5 pt-4 lg:px-0 lg:py-0">
                       <h3 className="text-[1.45rem] font-bold tracking-[-0.04em] text-[#0c111e] lg:text-[1.55rem] lg:tracking-[-0.05em]">{v.title}</h3>
-                      <p className="mt-2 text-[0.9rem] leading-[1.6] text-[#6a7d96]">{v.summary}</p>
+                      <p className="mt-2 text-[0.9rem] leading-[1.6] text-[#5e718a]">{v.summary}</p>
                       <div className="mt-3 flex flex-wrap gap-2 lg:mt-5">
                         {[
                           { icon: Users, value: `${v.passengers} passengers` },
@@ -429,7 +429,7 @@ export default async function Home({
                             key={value}
                             className="inline-flex items-center gap-1.5 rounded-full border border-[#dde8f6] bg-[#f2f7ff] px-3 py-1.5 text-[0.78rem] font-semibold text-[#2d4a6e]"
                           >
-                            <Icon size={12} className="text-[#1679FF]" strokeWidth={2.3} />
+                            <Icon size={12} className="text-[#1166d4]" strokeWidth={2.3} />
                             {value}
                           </span>
                         ))}
@@ -438,7 +438,7 @@ export default async function Home({
 
                     {/* Price list */}
                     <div className="mx-4 mb-5 rounded-[1.2rem] border border-[#e0eaf6] bg-[#f5f9ff] px-5 py-4 lg:mx-0 lg:my-0">
-                      <p className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#1679FF]">
+                      <p className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#1166d4]">
                         Fixed prices · Vienna
                       </p>
                       <div className="mt-3 space-y-2.5">
@@ -482,7 +482,7 @@ export default async function Home({
                     key={num}
                     className="flex flex-col gap-5 rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-7 py-7 md:px-8 md:py-8"
                   >
-                    <span className="text-[3.8rem] font-black leading-none tracking-[-0.07em] text-[#e8f0fa]">
+                    <span aria-hidden="true" className="text-[3.8rem] font-black leading-none tracking-[-0.07em] text-[#e8f0fa]">
                       {num}
                     </span>
                     <div>
@@ -515,7 +515,7 @@ export default async function Home({
                     <p className="flex-1 text-[0.97rem] leading-[1.7] text-[#3a5070]">&quot;{review}&quot;</p>
                     <div className="flex items-center justify-between border-t border-[#edf2f8] pt-4">
                       <span className="text-[0.88rem] font-semibold text-[#0c111e]">{name}</span>
-                      <span className="rounded-full border border-[#dde9f8] bg-[#f2f7ff] px-3 py-1 text-[0.72rem] font-semibold text-[#1679FF]">
+                      <span className="rounded-full border border-[#dde9f8] bg-[#f2f7ff] px-3 py-1 text-[0.72rem] font-semibold text-[#1166d4]">
                         Google
                       </span>
                     </div>
@@ -588,12 +588,12 @@ export default async function Home({
                     key={seat.title}
                     className="flex flex-col gap-5 rounded-[1.75rem] border border-[#e0eaf6] bg-white px-6 py-6 md:px-7 md:py-7"
                   >
-                    <span className="inline-flex w-fit rounded-full border border-[#dbe7f8] bg-[#eef5ff] px-3.5 py-1.5 text-[0.77rem] font-bold text-[#1679FF]">
+                    <span className="inline-flex w-fit rounded-full border border-[#dbe7f8] bg-[#eef5ff] px-3.5 py-1.5 text-[0.77rem] font-bold text-[#1166d4]">
                       {seat.weightRange}
                     </span>
                     <div>
                       <h3 className="text-[1.15rem] font-bold tracking-[-0.04em] text-[#0c111e]">{seat.title}</h3>
-                      <p className="mt-0.5 text-[0.8rem] font-medium text-[#7a90a8]">{seat.ageLabel}</p>
+                      <p className="mt-0.5 text-[0.8rem] font-medium text-[#64748b]">{seat.ageLabel}</p>
                     </div>
                     <p className="text-[0.88rem] leading-[1.7] text-[#5e718a]">{seat.description}</p>
                   </div>
@@ -601,7 +601,7 @@ export default async function Home({
               </div>
 
               <div className="mt-5 flex items-start gap-4 rounded-[1.4rem] border border-[#dbe7f8] bg-white px-5 py-5 md:px-6 md:py-6">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#dde9f8] bg-[#eef5ff] text-[#1679FF]">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#dde9f8] bg-[#eef5ff] text-[#1166d4]">
                   <Info size={15} strokeWidth={2.3} />
                 </span>
                 <p className="text-[0.87rem] leading-[1.72] text-[#5e718a]">
@@ -677,7 +677,7 @@ export default async function Home({
                           href={linkHref}
                           target="_blank"
                           rel="noreferrer"
-                          className="mt-3 inline-flex items-center gap-2 text-[0.84rem] font-semibold text-[#1679FF] hover:text-[#0f5fcc]"
+                          className="mt-3 inline-flex items-center gap-2 text-[0.84rem] font-semibold text-[#1166d4] hover:text-[#0f5fcc]"
                         >
                           <MapPin size={13} />
                           {linkLabel}
@@ -746,7 +746,7 @@ export default async function Home({
                     <a
                       key={trip}
                       href="/book"
-                      className="group flex items-center justify-between gap-4 border-b border-[#e6edf7] py-3 text-[#2d3f58] transition-colors hover:text-[#1679FF]"
+                      className="group flex items-center justify-between gap-4 border-b border-[#e6edf7] py-3 text-[#2d3f58] transition-colors hover:text-[#1166d4]"
                     >
                       <span className="text-[0.8rem] leading-[1.3]">{trip}</span>
                       <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#e6edf7] text-[#2d3f58] transition-colors group-hover:bg-[#1679FF] group-hover:text-white">

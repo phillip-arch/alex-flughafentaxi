@@ -1501,7 +1501,7 @@ const BookingForm = ({
             onClick={() => handleDirectionChange(option.value)}
             className={`relative z-[1] flex min-w-0 items-center justify-center gap-2 rounded-[0.95rem] px-3 text-[15px] font-semibold tracking-[-0.02em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:px-4 md:text-[16px] ${
               isActive
-                ? 'bg-[#1679FF] text-white'
+                ? 'bg-[#1166d4] text-white'
                 : 'bg-white text-[#374151]'
             }`}
             aria-pressed={isActive}
@@ -1532,9 +1532,8 @@ const BookingForm = ({
                 <CalendarDays className="h-[18px] w-[18px]" strokeWidth={2.2} />
               </span>
               <span className="min-w-0">
-                <span className="block text-[12px] font-semibold leading-none text-[#7b8798]">Date</span>
-                <span className={`mt-1 block truncate text-[17px] font-semibold leading-none ${formData.date ? 'text-[#111827]' : 'text-[#9aa3ae]'}`}>
-                  {formData.date || 'Select date'}
+                <span className={`block truncate text-[17px] font-semibold leading-none ${formData.date ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
+                  {formData.date || 'Date'}
                 </span>
               </span>
             </span>
@@ -1565,9 +1564,8 @@ const BookingForm = ({
                 <Clock3 className="h-[18px] w-[18px]" strokeWidth={2.2} />
               </span>
               <span className="min-w-0">
-                <span className="block text-[12px] font-semibold leading-none text-[#7b8798]">{timeFieldLabel}</span>
-                <span className={`mt-1 block truncate text-[17px] font-semibold leading-none ${formData.time ? 'text-[#111827]' : 'text-[#9aa3ae]'}`}>
-                  {formData.time || 'Select time'}
+                <span className={`block truncate text-[17px] font-semibold leading-none ${formData.time ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
+                  {formData.time || 'Time'}
                 </span>
               </span>
             </span>
@@ -1583,7 +1581,7 @@ const BookingForm = ({
           />
         </div>
         {leadTimeAdjustmentNotice ? (
-          <p className="mt-2 pl-1 text-[12px] font-medium text-[#1679FF] md:text-[12.5px]">
+          <p className="mt-2 pl-1 text-[12px] font-medium text-[#1166d4] md:text-[12.5px]">
             {leadTimeAdjustmentNotice}
           </p>
         ) : null}
@@ -1614,6 +1612,7 @@ const BookingForm = ({
               onChange={handleChange}
               onBlur={handleFlightNumberBlur}
               placeholder="e.g. OS 123"
+              tabIndex={isFlightDetailsVisible ? undefined : -1}
               className={`${getInputClassName('flightNumber')} !h-[3.35rem] !rounded-[1.05rem] !border-[#e4e6ea] !bg-[#f9fafb] !px-5 !text-[18px] !font-semibold !tracking-[0.02em] !text-[#717982] placeholder:!text-[#717982] md:!h-[3.25rem] md:!rounded-[1rem] md:!px-5 md:!text-[18px]`}
             />
           </div>
@@ -1651,7 +1650,7 @@ const BookingForm = ({
         <div className="min-w-0">
           {DirectionSelector()}
           <div className="mt-7 space-y-6 md:mt-6 md:space-y-5">
-            <div className="space-y-3">
+            <div className="space-y-5">
               <h2 className="text-[2rem] font-semibold leading-[1.02] tracking-[-0.05em] text-[#111827] md:text-[2.15rem]">
                 {addressPlaceholder}
               </h2>
@@ -1691,7 +1690,7 @@ const BookingForm = ({
                 Address could not be recognized clearly. Please choose from the list.
               </div>
             ) : null}
-            <div className="space-y-3">
+            <div className="space-y-5">
               <h3 className="text-[1.4rem] font-bold leading-[1.08] tracking-[-0.04em] text-[#111827] md:text-[1.35rem]">
                 When do you need a ride?
               </h3>

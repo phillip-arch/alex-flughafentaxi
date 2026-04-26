@@ -22,10 +22,10 @@
   --color-border: rgba(17, 17, 17, 0.08);
   --color-border-strong: #d2d2d7;
   --color-border-soft: #d9d4c8;
-  --color-primary: #1679ff;
-  --color-primary-strong: #1679ff;
+  --color-primary: #1166d4;
+  --color-primary-strong: #1166d4;
   --color-primary-soft: rgba(10, 99, 255, 0.12);
-  --color-booking-accent: #1679ff;
+  --color-booking-accent: #1166d4;
   --color-booking-accent-soft: #edf4ff;
   --color-danger: #d70015;
   --color-danger-soft: #fff2f4;
@@ -322,7 +322,7 @@ p {
   }
 
   .ui-contact-fab-phone {
-    background: #1679ff;
+    background: #1166d4;
   }
 
   .ui-contact-fab-phone:hover {
@@ -562,7 +562,7 @@ p {
     justify-content: center;
     gap: 0.5rem;
     border-radius: 14px;
-    background: #1679FF !important;
+    background: #1166d4 !important;
     padding: 1rem 2rem;
     font-size: 18px;
     font-weight: 700;
