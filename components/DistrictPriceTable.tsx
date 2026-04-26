@@ -161,6 +161,18 @@ export default function DistrictPriceTable({
                     </tr>
                   );
                 })}
+                {gi === 0 && (
+                  <tr className="border-t border-[#eef2f7] md:hidden">
+                    <td colSpan={4} className="px-2 py-2 pl-3 text-center">
+                      <div className="text-[0.9rem] font-bold leading-tight tracking-[-0.03em] text-[#9ca3af]">
+                        Swipe left
+                      </div>
+                      <div className="text-[0.62rem] uppercase leading-tight text-[#9ca3af]">
+                        to see more
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           ))}

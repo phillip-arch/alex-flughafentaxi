@@ -166,6 +166,7 @@ const childSeats = [
     ageLabel: 'For newborns & infants',
     description:
       'Rear-facing installation protects the sensitive neck area during braking. Required for all infant airport transfers.',
+    imageSrc: '/alex-flughafentaxi-wien-babyschale-gratis.jpg',
   },
   {
     title: 'Child Seat',
@@ -173,6 +174,7 @@ const childSeats = [
     ageLabel: 'For toddlers',
     description:
       '5-point harness with reinforced side-impact protection provides maximum stability throughout the journey.',
+    imageSrc: '/alex-flughafentaxi-wien-kindersitz-sicherheit.jpg',
   },
   {
     title: 'Booster Seat',
@@ -180,6 +182,7 @@ const childSeats = [
     ageLabel: 'For school-age children (up to ~12 yrs)',
     description:
       'Ergonomic booster positions the seat belt correctly over shoulder and pelvis for proper protection.',
+    imageSrc: '/alex-flughafentaxi-wien-sitzerhoehung-gratis.jpg',
   },
 ];
 
@@ -224,10 +227,11 @@ const popularTrips = [
   'Von Vienna Central Train Station nach Terminal 3 Vienna Airport',
 ];
 
-function SectionEyebrow({ children }: { children: React.ReactNode }) {
+function SectionEyebrow({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
+  const color = onDark ? 'text-[#1679FF] [&>span]:bg-[#1679FF]' : 'text-[#1166d4] [&>span]:bg-[#1166d4]';
   return (
-    <span className="inline-flex items-center gap-2 text-[0.75rem] font-bold uppercase tracking-[0.2em] text-[#1166d4]">
-      <span className="h-1 w-4 rounded-full bg-[#1166d4]" />
+    <span className={`inline-flex items-center gap-2 text-[0.75rem] font-bold uppercase tracking-[0.2em] ${color}`}>
+      <span className="h-1 w-4 rounded-full" />
       {children}
     </span>
   );
@@ -271,7 +275,7 @@ export default async function Home({
 
                 {/* Left: editorial headline */}
                 <div className="flex flex-col gap-8 lg:py-6">
-                  <SectionEyebrow>Vienna, Austria · VIE · Schwechat</SectionEyebrow>
+                  <SectionEyebrow onDark>Vienna, Austria · VIE · Schwechat</SectionEyebrow>
 
                   <h1 className="text-[3.4rem] font-black leading-[0.93] tracking-[-0.055em] !text-white sm:text-[4.2rem] md:text-[5rem] lg:text-[3.8rem] xl:text-[4.6rem]">
                     Vienna<br />
@@ -375,7 +379,7 @@ export default async function Home({
                       <span className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[#dde9f8] bg-white text-[#1166d4] shadow-[0_8px_20px_rgba(22,121,255,0.1)]">
                         <Icon size={21} strokeWidth={2.1} />
                       </span>
-                      <span aria-hidden="true" className="text-[2.6rem] font-black leading-none tracking-[-0.06em] text-[#eaf0f8] transition-colors group-hover:text-[#dde9ff]">
+                      <span aria-hidden="true" className="text-[2.6rem] font-black leading-none tracking-[-0.06em] text-[#c8d8e4] transition-colors group-hover:text-[#b8cfe0]">
                         {num}
                       </span>
                     </div>
@@ -482,7 +486,7 @@ export default async function Home({
                     key={num}
                     className="flex flex-col gap-5 rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-7 py-7 md:px-8 md:py-8"
                   >
-                    <span aria-hidden="true" className="text-[3.8rem] font-black leading-none tracking-[-0.07em] text-[#e8f0fa]">
+                    <span aria-hidden="true" className="text-[3.8rem] font-black leading-none tracking-[-0.07em] text-[#c8d8e4]">
                       {num}
                     </span>
                     <div>
@@ -586,16 +590,27 @@ export default async function Home({
                 {childSeats.map((seat) => (
                   <div
                     key={seat.title}
-                    className="flex flex-col gap-5 rounded-[1.75rem] border border-[#e0eaf6] bg-white px-6 py-6 md:px-7 md:py-7"
+                    className="flex flex-col overflow-hidden rounded-[1.75rem] border border-[#e0eaf6] bg-white"
                   >
-                    <span className="inline-flex w-fit rounded-full border border-[#dbe7f8] bg-[#eef5ff] px-3.5 py-1.5 text-[0.77rem] font-bold text-[#1166d4]">
-                      {seat.weightRange}
-                    </span>
-                    <div>
-                      <h3 className="text-[1.15rem] font-bold tracking-[-0.04em] text-[#0c111e]">{seat.title}</h3>
-                      <p className="mt-0.5 text-[0.8rem] font-medium text-[#64748b]">{seat.ageLabel}</p>
+                    <div className="relative h-[13rem] w-full bg-[#f5f9ff]">
+                      <Image
+                        src={seat.imageSrc}
+                        alt={seat.title}
+                        fill
+                        className="object-contain object-center p-4"
+                        sizes="(min-width: 768px) 33vw, 100vw"
+                      />
                     </div>
-                    <p className="text-[0.88rem] leading-[1.7] text-[#5e718a]">{seat.description}</p>
+                    <div className="flex flex-col gap-4 px-6 py-5">
+                      <span className="inline-flex w-fit rounded-full border border-[#dbe7f8] bg-[#eef5ff] px-3.5 py-1.5 text-[0.77rem] font-bold text-[#1166d4]">
+                        {seat.weightRange}
+                      </span>
+                      <div>
+                        <h3 className="text-[1.15rem] font-bold tracking-[-0.04em] text-[#0c111e]">{seat.title}</h3>
+                        <p className="mt-0.5 text-[0.8rem] font-medium text-[#64748b]">{seat.ageLabel}</p>
+                      </div>
+                      <p className="text-[0.88rem] leading-[1.7] text-[#5e718a]">{seat.description}</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -618,7 +633,7 @@ export default async function Home({
             <div className="mx-auto max-w-[108rem]">
               <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-16">
                 <div>
-                  <SectionEyebrow>Contact</SectionEyebrow>
+                  <SectionEyebrow onDark>Contact</SectionEyebrow>
                   <SectionHeading light>Questions about your booking?</SectionHeading>
                   <p className="mt-4 max-w-[40rem] text-[0.95rem] leading-[1.72] text-[#8da4c0]">
                     Book online in minutes. Or reach us directly by phone and WhatsApp — available 24 / 7.

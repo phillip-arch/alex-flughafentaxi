@@ -151,10 +151,10 @@ export default function DistrictMapPriceExplorer({
   const tooltipY = activeFeature ? getTooltipY(activeFeature, tooltipHeight, mapGeometry.svgHeight) : 0;
 
   return (
-    <div className="flex flex-col items-start gap-8 lg:flex-row lg:items-stretch">
+    <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-stretch lg:gap-8">
       <section ref={mapSectionRef} className={mapSectionClassName}>
         <div
-          className="relative min-h-[17.5rem] w-full overflow-hidden md:min-h-[26rem] lg:h-full lg:min-h-0"
+          className="relative min-h-[14rem] w-full overflow-hidden md:min-h-[26rem] lg:h-full lg:min-h-0"
         >
           {shouldRenderMap && mapGeometry.features.length > 0 ? (
             <svg
