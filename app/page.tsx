@@ -403,31 +403,24 @@ export default async function Home({
                 {vehicles.map((v) => (
                   <div
                     key={v.type}
-                    className="grid gap-6 rounded-[1.75rem] border border-[#e0eaf6] bg-white px-6 py-6 shadow-[0_6px_20px_rgba(17,17,17,0.04)] transition-shadow hover:shadow-[0_10px_30px_rgba(22,121,255,0.07)] md:px-8 md:py-7 lg:grid-cols-[20rem_minmax(0,1fr)_minmax(16rem,0.8fr)] lg:items-center lg:gap-8"
+                    className="grid gap-0 rounded-[1.75rem] border border-[#e0eaf6] bg-white shadow-[0_6px_20px_rgba(17,17,17,0.04)] transition-shadow hover:shadow-[0_10px_30px_rgba(22,121,255,0.07)] lg:grid-cols-[20rem_minmax(0,1fr)_minmax(16rem,0.8fr)] lg:items-center lg:gap-8 lg:px-8 lg:py-7"
                   >
                     {/* Vehicle image */}
-                    <div className="flex items-center gap-4 lg:block">
-                      <div className="relative h-[9rem] w-[14rem] shrink-0 lg:h-[13rem] lg:w-full">
-                        <Image
-                          src={v.imageSrc}
-                          alt={v.title}
-                          fill
-                          className="scale-[1.15] object-contain object-center mix-blend-multiply"
-                          sizes="(min-width: 1024px) 320px, 224px"
-                        />
-                      </div>
-                      {/* Mobile title next to image */}
-                      <div className="lg:hidden">
-                        <h3 className="text-[1.45rem] font-bold tracking-[-0.04em] text-[#0c111e]">{v.title}</h3>
-                        <p className="mt-1 text-[0.84rem] leading-[1.5] text-[#6a7d96]">{v.summary}</p>
-                      </div>
+                    <div className="relative h-[13rem] w-full overflow-hidden rounded-t-[1.75rem] lg:h-[13rem] lg:rounded-none">
+                      <Image
+                        src={v.imageSrc}
+                        alt={v.title}
+                        fill
+                        className="scale-[1.15] object-contain object-center mix-blend-multiply"
+                        sizes="(min-width: 1024px) 320px, 100vw"
+                      />
                     </div>
 
                     {/* Description + specs */}
-                    <div>
-                      <h3 className="hidden text-[1.55rem] font-bold tracking-[-0.05em] text-[#0c111e] lg:block">{v.title}</h3>
-                      <p className="hidden mt-2 text-[0.9rem] leading-[1.6] text-[#6a7d96] lg:block">{v.summary}</p>
-                      <div className="mt-4 flex flex-wrap gap-2 lg:mt-5">
+                    <div className="px-6 pb-5 pt-4 lg:px-0 lg:py-0">
+                      <h3 className="text-[1.45rem] font-bold tracking-[-0.04em] text-[#0c111e] lg:text-[1.55rem] lg:tracking-[-0.05em]">{v.title}</h3>
+                      <p className="mt-2 text-[0.9rem] leading-[1.6] text-[#6a7d96]">{v.summary}</p>
+                      <div className="mt-3 flex flex-wrap gap-2 lg:mt-5">
                         {[
                           { icon: Users, value: `${v.passengers} passengers` },
                           { icon: Briefcase, value: `${v.suitcases} suitcases` },
@@ -444,7 +437,7 @@ export default async function Home({
                     </div>
 
                     {/* Price list */}
-                    <div className="rounded-[1.2rem] border border-[#e0eaf6] bg-[#f5f9ff] px-5 py-4">
+                    <div className="mx-4 mb-5 rounded-[1.2rem] border border-[#e0eaf6] bg-[#f5f9ff] px-5 py-4 lg:mx-0 lg:my-0">
                       <p className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#1679FF]">
                         Fixed prices · Vienna
                       </p>
