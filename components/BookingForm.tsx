@@ -1529,7 +1529,7 @@ const BookingForm = ({
             <span className="flex min-w-0 items-center gap-1.5 md:gap-3">
               <CalendarDays className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
               <span className="min-w-0">
-                <span className={`block truncate text-[17px] font-semibold leading-none ${formData.date ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
+                <span className={`block truncate text-[14px] font-semibold leading-none ${formData.date ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
                   {formData.date || 'Date'}
                 </span>
               </span>
@@ -1559,7 +1559,7 @@ const BookingForm = ({
             <span className="flex min-w-0 items-center gap-1.5 md:gap-3">
               <Clock3 className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
               <span className="min-w-0">
-                <span className={`block truncate text-[17px] font-semibold leading-none ${formData.time ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
+                <span className={`block truncate text-[14px] font-semibold leading-none ${formData.time ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
                   {formData.time || 'Time'}
                 </span>
               </span>
