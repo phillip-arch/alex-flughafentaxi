@@ -329,7 +329,7 @@ export default function TimePicker({
                 disabled={!isAvailable}
                 data-time-option={value}
                 data-time-unavailable={isAvailable ? undefined : 'true'}
-                className={`flex w-full items-center px-4 py-3 text-left text-[1.05rem] font-medium tracking-[-0.03em] transition-colors ${
+                className={`flex w-full items-center px-4 py-3 text-left text-[14px] font-medium tracking-[-0.03em] transition-colors md:text-[1.05rem] ${
                   isSelected
                     ? 'text-[#111827]'
                     : isAvailable
