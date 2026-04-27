@@ -519,7 +519,8 @@ export default function BookingStepTwo({
     ) : null;
 
   const renderScratchStepTwo = () => (
-    <div className="w-full min-w-0 max-w-full overflow-hidden space-y-3 md:hidden">
+    <div className="flex flex-1 min-h-0 flex-col md:hidden">
+      <div className="min-h-0 flex-1 space-y-3">
         {inlineVehicleCard ? (
           <div
             className={`grid min-w-0 grid-cols-[7rem_minmax(0,1fr)] gap-3 rounded-[1.15rem] border bg-white px-3 py-1.5 ${
@@ -561,8 +562,10 @@ export default function BookingStepTwo({
         </div>
 
         {renderOptionalTrigger()}
+      </div>
 
-        <div className="grid w-full min-w-0 grid-cols-[3.5rem_minmax(0,1fr)] gap-3 pt-1">
+      <div className={actionRowClass}>
+        <div className="grid w-full min-w-0 grid-cols-[3.5rem_minmax(0,1fr)] gap-3">
           <button type="button" onClick={prevStep} className={secondaryBackButtonClass}>
             <ChevronLeft size={24} />
           </button>
@@ -571,6 +574,7 @@ export default function BookingStepTwo({
           </button>
         </div>
         {actionTrustLine}
+      </div>
     </div>
   );
 
@@ -874,7 +878,7 @@ export default function BookingStepTwo({
       : null;
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip md:flex md:h-full md:flex-col">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip flex flex-1 min-h-0 flex-col">
       <div className="hidden md:flex md:h-full md:flex-col">
       <div className="md:min-h-0 md:flex-1 md:space-y-4">
       {renderInlineTravelDetails()}

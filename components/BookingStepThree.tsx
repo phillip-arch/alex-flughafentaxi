@@ -51,8 +51,8 @@ export default function BookingStepThree({
   const privacyHref = `/datenschutz?lang=${currentLang}`;
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip md:flex md:h-full md:flex-col">
-      <div className="space-y-3 md:min-h-0 md:flex-1 md:overflow-y-auto md:space-y-3">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip flex flex-1 min-h-0 flex-col">
+      <div className="space-y-3 min-h-0 flex-1 md:overflow-y-auto">
       <BookingPriceSummaryCard formData={formData} totalPrice={totalPrice} vehicleType={vehicleType} />
 
       {isLoggedIn ? (

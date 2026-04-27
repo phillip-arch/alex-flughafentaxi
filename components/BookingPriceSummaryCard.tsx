@@ -23,8 +23,8 @@ export default function BookingPriceSummaryCard({
   const passengerValue = formData.passengers === '' ? '--' : formData.passengers;
   const luggageValue = formData.luggage === '' ? '--' : formData.luggage;
   const cityLabel = formData.city?.trim() || formData.zip?.trim() || 'Pickup';
-  const compactRoute =
-    formData.direction === 'to_airport' ? `${cityLabel} → VIE` : `VIE → ${cityLabel}`;
+  const routeFrom = formData.direction === 'to_airport' ? cityLabel : 'VIE';
+  const routeTo = formData.direction === 'to_airport' ? 'VIE' : cityLabel;
   const vehicleLabel = formatVehicleTypeLabel(vehicleType);
   const paymentLabel =
     formData.paymentMethod === 'cash'
@@ -68,9 +68,11 @@ export default function BookingPriceSummaryCard({
         </div>
       </div>
       <div className="relative z-10 flex min-w-0 flex-col justify-center gap-0.5 px-2 py-1 text-left md:gap-1 md:px-3 md:py-1">
-        <p className="truncate text-[0.72rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[0.8rem]">
-          {compactRoute}
-        </p>
+        <div className="flex min-w-0 items-center gap-0.5 text-[0.72rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[0.8rem]">
+          <span className="truncate">{routeFrom}</span>
+          <span className="shrink-0">→</span>
+          <span className="truncate">{routeTo}</span>
+        </div>
         <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.62rem] font-medium text-[#5f6975] md:gap-x-2 md:text-[0.61rem]">
           <span className="inline-flex items-center gap-0.5" title="Passengers">
             <Users className="h-2.5 w-2.5 text-[#1679FF] md:h-[11px] md:w-[11px]" />

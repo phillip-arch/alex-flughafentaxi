@@ -1621,8 +1621,8 @@ const BookingForm = ({
   const titleHeaderClassName =
     'mb-5 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[8px]';
   const stepOneContent = (
-    <div className={`${stepContentClassName} md:flex md:h-full md:flex-col`}>
-      <div className="space-y-4 md:min-h-0 md:flex-1 md:space-y-3">
+    <div className={`${stepContentClassName} flex flex-1 min-h-0 flex-col`}>
+      <div className="min-h-0 flex-1 space-y-4 md:space-y-3">
         {shouldShowStepOneRouteIntro && (
           <div className="text-center mb-6">
             <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
@@ -1634,7 +1634,7 @@ const BookingForm = ({
             {DirectionSelector()}
             <div className="mt-4 space-y-4 md:mt-4 md:space-y-4">
               <div>
-                <p style={{ marginBottom: '14px' }} className="text-[1.65rem] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
+                <p style={{ marginBottom: '14px' }} className="text-[22px] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
                   {addressPlaceholder}
                 </p>
                 <div className={`rounded-[1.35rem] border bg-white pl-2 pr-5 py-3 transition-shadow md:pl-3 md:pr-5 md:py-3 ${isFieldInvalid('street') || isFieldInvalid('zip') ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
@@ -1733,7 +1733,7 @@ const BookingForm = ({
     <div
       className={`${BOOKING_FORM_CARD_CLASS} relative isolate w-full max-w-[32rem] shrink-0 ${
         fluidDesktopWidth ? 'lg:max-w-none lg:w-full' : 'md:w-[33.6rem] md:max-w-[33.6rem]'
-      } ${showStepIndicator ? 'min-h-[520px]' : ''} ${shouldLockDesktopFormHeight ? 'md:flex md:h-[535px] md:flex-col' : ''} ${
+      } ${shouldLockDesktopFormHeight ? 'flex flex-col h-[640px] md:h-[535px]' : ''} ${
         allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-x-clip overflow-y-hidden'
       }`}
     >
@@ -1753,10 +1753,10 @@ const BookingForm = ({
       ) : null}
       <div
         className={`${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-x-clip'} ${formContentSpacingClassName} ${
-          shouldLockDesktopFormHeight ? 'md:flex md:h-full md:flex-col' : ''
+          shouldLockDesktopFormHeight ? 'flex h-full flex-col' : ''
         } ${allowExtendedDropdownSpace ? '' : 'pb-2 md:pb-3'}`}
       >
-        <form onSubmit={handleSubmit} className={shouldLockDesktopFormHeight ? 'md:flex md:h-full md:flex-col' : undefined}>
+        <form onSubmit={handleSubmit} className={shouldLockDesktopFormHeight ? 'flex h-full flex-col' : undefined}>
           {headerTitle ? (
             <div className={titleHeaderClassName}>
               <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
@@ -1775,7 +1775,7 @@ const BookingForm = ({
               mobileStepDirection === 'prev'
                 ? 'ui-form-mobile-transition-prev'
                 : 'ui-form-mobile-transition-next'
-            } md:h-full`}
+            } min-h-0 flex-1 flex flex-col`}
           >
             {activeStepContent}
           </div>
