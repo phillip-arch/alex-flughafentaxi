@@ -51,7 +51,8 @@ export default function BookingStepThree({
   const privacyHref = `/datenschutz?lang=${currentLang}`;
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-4 md:flex md:h-full md:flex-col md:space-y-3.5">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip md:flex md:h-full md:flex-col">
+      <div className="space-y-3 md:min-h-0 md:flex-1 md:overflow-y-auto md:space-y-3">
       <BookingPriceSummaryCard formData={formData} totalPrice={totalPrice} vehicleType={vehicleType} />
 
       {isLoggedIn ? (
@@ -69,7 +70,7 @@ export default function BookingStepThree({
         </div>
       ) : null}
 
-      <div className="grid gap-x-4 gap-y-4 md:grid-cols-2 md:gap-y-3">
+      <div className="grid gap-x-4 gap-y-3 md:grid-cols-2 md:gap-y-2.5">
         <div className={`relative md:col-span-2 ${BOOKING_FIELD_STACK_CLASS}`}>
           <label htmlFor="fullName" className={BOOKING_FIELD_LABEL_CLASS}>
             Name
@@ -122,7 +123,7 @@ export default function BookingStepThree({
           <button
             type="button"
             onClick={() => handlePaymentChange('cash')}
-            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
+            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-2.5 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
               formData.paymentMethod === 'cash'
                 ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1679FF] ring-2 ring-inset ring-[#7fb3ff]'
                 : touched['paymentMethod'] && !formData.paymentMethod
@@ -135,7 +136,7 @@ export default function BookingStepThree({
           <button
             type="button"
             onClick={() => handlePaymentChange('card')}
-            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-3 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
+            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-2.5 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
               formData.paymentMethod === 'card'
                 ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1679FF] ring-2 ring-inset ring-[#7fb3ff]'
                 : touched['paymentMethod'] && !formData.paymentMethod
@@ -148,14 +149,7 @@ export default function BookingStepThree({
         </div>
       </div>
 
-      {error ? (
-        <div className="mt-4 flex items-center gap-2 rounded-xl border border-[#ffd4d8] bg-[#fff2f4] p-3 text-[14px] font-medium text-[#d70015]">
-          <span className="block h-1.5 w-1.5 rounded-full bg-[#d70015]" />
-          {error}
-        </div>
-      ) : null}
-
-      <p className="mt-3 text-left text-[12px] leading-[1.5] text-[#5f6975] md:text-[13px]">
+      <p className="text-left text-[12px] leading-[1.5] text-[#5f6975] md:text-[13px]">
         By booking, you accept our{' '}
         <Link href={agbHref} className="font-medium !text-[#1678ff] underline underline-offset-2 hover:!text-[#0f5fcc]">
           Terms and Conditions
@@ -169,6 +163,7 @@ export default function BookingStepThree({
         </Link>
         . Your data is used only to carry out the ride.
       </p>
+      </div>
 
       <div className={actionRowClass}>
         <div className={actionButtonGroupClass}>

@@ -24,7 +24,7 @@ export default function BookingPriceSummaryCard({
   const luggageValue = formData.luggage === '' ? '--' : formData.luggage;
   const cityLabel = formData.city?.trim() || formData.zip?.trim() || 'Pickup';
   const compactRoute =
-    formData.direction === 'to_airport' ? `${cityLabel} \u2192 VIE` : `VIE \u2192 ${cityLabel}`;
+    formData.direction === 'to_airport' ? `${cityLabel} → VIE` : `VIE → ${cityLabel}`;
   const vehicleLabel = formatVehicleTypeLabel(vehicleType);
   const paymentLabel =
     formData.paymentMethod === 'cash'
@@ -52,52 +52,52 @@ export default function BookingPriceSummaryCard({
 
   return (
     <div
-      className={`relative mt-1 grid h-[4.6rem] grid-cols-[30%_40%_30%] overflow-hidden rounded-[0.75rem] border bg-[#f8fbff] shadow-[0_8px_18px_rgba(17,17,17,0.04)] md:mt-4 md:h-[6.85rem] md:grid-cols-[30%_42%_28%] md:rounded-[0.9rem] md:shadow-[0_12px_26px_rgba(17,17,17,0.05)] ${
+      className={`relative mt-0 grid h-[3.7rem] grid-cols-[30%_40%_30%] overflow-hidden rounded-[0.6rem] border bg-[#f8fbff] shadow-[0_8px_18px_rgba(17,17,17,0.04)] md:h-[5.5rem] md:grid-cols-[30%_42%_28%] md:rounded-[0.72rem] md:shadow-[0_12px_26px_rgba(17,17,17,0.05)] ${
         invalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
       }`}
     >
       <div className="relative flex items-center justify-center bg-transparent px-1 py-1 md:px-2 md:py-1">
-        <div className="relative h-[4rem] w-[5.6rem] shrink-0 md:h-[6.35rem] md:w-[9.55rem]">
+        <div className="relative h-[3.2rem] w-[4.5rem] shrink-0 md:h-[5.1rem] md:w-[7.65rem]">
           <Image
             src={vehicleImage.src}
             alt={vehicleImage.alt}
             fill
             className="object-contain mix-blend-multiply"
-            sizes="(min-width: 768px) 180px, 90px"
+            sizes="(min-width: 768px) 145px, 72px"
           />
         </div>
       </div>
-      <div className="relative z-10 flex min-w-0 flex-col justify-center gap-1 px-2 py-1 text-left md:gap-1.5 md:px-4 md:py-1">
-        <p className="truncate text-[0.72rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[1rem]">
+      <div className="relative z-10 flex min-w-0 flex-col justify-center gap-0.5 px-2 py-1 text-left md:gap-1 md:px-3 md:py-1">
+        <p className="truncate text-[0.72rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[0.8rem]">
           {compactRoute}
         </p>
-        <p className="text-[0.85rem] font-semibold leading-none tracking-[-0.03em] text-[#1679FF] md:text-[1.18rem]">
-          {vehicleLabel}
-        </p>
-        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.62rem] font-medium text-[#5f6975] md:gap-x-2.5 md:text-[0.76rem]">
-          <span className="inline-flex items-center gap-0.5 md:gap-1" title="Passengers">
-            <Users className="h-2.5 w-2.5 text-[#1679FF] md:h-[14px] md:w-[14px]" />
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.62rem] font-medium text-[#5f6975] md:gap-x-2 md:text-[0.61rem]">
+          <span className="inline-flex items-center gap-0.5" title="Passengers">
+            <Users className="h-2.5 w-2.5 text-[#1679FF] md:h-[11px] md:w-[11px]" />
             {passengerValue}
           </span>
           <span className="text-[#b7bec8]">|</span>
-          <span className="inline-flex items-center gap-0.5 md:gap-1" title="Check-in luggage">
-            <Briefcase className="h-2.5 w-2.5 text-[#1679FF] md:h-[14px] md:w-[14px]" />
+          <span className="inline-flex items-center gap-0.5" title="Check-in luggage">
+            <Briefcase className="h-2.5 w-2.5 text-[#1679FF] md:h-[11px] md:w-[11px]" />
             {luggageValue}
           </span>
         </div>
       </div>
-      <div className={`relative z-10 flex min-w-0 flex-col items-end justify-center gap-1 px-2.5 py-1 text-right md:gap-1.5 md:px-4 md:py-1 ${onEdit ? 'pt-8 md:pt-10' : ''}`}>
-        <p className="text-[1.15rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[1.9rem]">
-          <AnimatedPrice value={totalPrice} />
+      <div className={`relative z-10 flex min-w-0 flex-col items-end justify-center gap-0.5 px-2.5 py-1 text-right md:px-3 md:py-1 ${onEdit ? 'pt-8 md:pt-8' : ''}`}>
+        <p className="truncate text-[0.72rem] font-semibold leading-none tracking-[-0.02em] text-[#1679FF] md:text-[0.68rem]">
+          {vehicleLabel}
         </p>
-        <div className="flex min-h-[0.88rem] items-center justify-end md:min-h-[1.05rem]">
+        <p className="text-[0.92rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[1.52rem]">
+          <AnimatedPrice value={totalPrice} currencyDisplay="symbol" />
+        </p>
+        <div className="flex min-h-[0.7rem] items-center justify-end md:min-h-[0.84rem]">
           <div
-            className={`inline-flex items-center gap-1 text-[0.62rem] font-semibold text-[#1679FF] md:text-[0.76rem] ${
+            className={`inline-flex items-center gap-1 text-[0.62rem] font-semibold text-[#1679FF] md:text-[0.61rem] ${
               paymentLabel ? 'opacity-100' : 'opacity-0'
             }`}
             aria-hidden={!paymentLabel}
           >
-            <PaymentIcon className="h-2.5 w-2.5 md:h-[14px] md:w-[14px]" />
+            <PaymentIcon className="h-2.5 w-2.5 md:h-[11px] md:w-[11px]" />
             <span>{stablePaymentLabel}</span>
           </div>
         </div>

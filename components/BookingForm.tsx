@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
-import { usePrefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion';
 import StreetAutocomplete from '@/components/address/StreetAutocomplete';
 import {
   buildStreetOptionValue,
@@ -57,7 +56,7 @@ type PaymentMethod = 'cash' | 'card' | null;
 
 const PENDING_BOOKING_STORAGE_KEY = 'pending-booking-form';
 const VEHICLE_ORDER: VehicleType[] = ['Limo', 'Kombi', 'Bus'];
-const DESKTOP_BOOKING_VIEWPORT_HEIGHT_PX = 660;
+const DESKTOP_BOOKING_VIEWPORT_HEIGHT_PX = 440;
 
 interface FavoriteAddress {
   id: string;
@@ -163,7 +162,6 @@ const BookingForm = ({
   const pathname = usePathname();
   const isHomepageForm = pathname === '/';
   const isAppSurface = isAppSurfaceProp ?? false;
-  const prefersReducedMotion = usePrefersReducedMotion();
   const shouldShowStepOneRouteIntro = showStepOneRouteIntro ?? !isHomepageForm;
   const allowExtendedDropdownSpace = true;
   const copy = {
@@ -190,10 +188,8 @@ const BookingForm = ({
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const datePickerAnchorRef = useRef<HTMLDivElement | null>(null);
   const timePickerAnchorRef = useRef<HTMLDivElement | null>(null);
-  const stepPanelRefs = useRef<Array<HTMLElement | null>>([]);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [isDesktopWizard, setIsDesktopWizard] = useState(false);
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(
     sortFavoriteAddresses(initialFavorites),
   );
@@ -246,6 +242,19 @@ const BookingForm = ({
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const REQUIRED_FIELDS_ERROR = 'Please fill in all required fields.';
+  const [isErrorToastVisible, setIsErrorToastVisible] = useState(false);
+  const [toastKey, setToastKey] = useState(0);
+  const errorToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const activeToastMessage =
+    error ||
+    flightLookupError ||
+    (streetPasteWarning === 'street' ? 'Address could not be recognized clearly. Please choose from the list.' : null) ||
+    (streetNumberWarning === 'street' ? 'Please add the street number.' : null) ||
+    leadTimeAdjustmentNotice ||
+    null;
+  const activeToastIsError = Boolean(error || flightLookupError || streetPasteWarning || streetNumberWarning);
+  const activeToastAutoHide = activeToastMessage === REQUIRED_FIELDS_ERROR || (!activeToastIsError && Boolean(leadTimeAdjustmentNotice));
 
   useEffect(() => {
     onDirectionChange?.(formData.direction);
@@ -563,28 +572,24 @@ const BookingForm = ({
   }, [currentStep, onStepChange]);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    if (errorToastTimerRef.current) {
+      clearTimeout(errorToastTimerRef.current);
+      errorToastTimerRef.current = null;
+    }
+    if (!activeToastMessage) {
+      setIsErrorToastVisible(false);
       return;
     }
-
-    const mediaQuery = window.matchMedia('(min-width: 768px)');
-    const syncViewportMode = () => setIsDesktopWizard(mediaQuery.matches);
-    syncViewportMode();
-
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', syncViewportMode);
-      return () => mediaQuery.removeEventListener('change', syncViewportMode);
+    setIsErrorToastVisible(true);
+    if (activeToastAutoHide) {
+      errorToastTimerRef.current = setTimeout(() => setIsErrorToastVisible(false), 3500);
     }
+    return () => {
+      if (errorToastTimerRef.current) clearTimeout(errorToastTimerRef.current);
+    };
+  }, [activeToastMessage, toastKey]);
 
-    mediaQuery.addListener(syncViewportMode);
-    return () => mediaQuery.removeListener(syncViewportMode);
-  }, []);
-
-  const shouldUseSlidingWizard = !isHomepageForm && isDesktopWizard;
-  const shouldLockDesktopFormHeight = shouldUseSlidingWizard || lockDesktopHeight;
-  const formViewportStyle = shouldUseSlidingWizard
-    ? { height: `${DESKTOP_BOOKING_VIEWPORT_HEIGHT_PX}px` }
-    : undefined;
+  const shouldLockDesktopFormHeight = true;
   const favoriteMenuItems =
     isAppSurface && isLoggedIn && favoriteAddresses.length > 0
       ? favoriteAddresses.map((favorite, index) => {
@@ -1251,6 +1256,7 @@ const BookingForm = ({
       }
 
       setError(validation.errorMessage || REQUIRED_FIELDS_ERROR);
+      setToastKey((k) => k + 1);
       return false;
     }
 
@@ -1417,9 +1423,9 @@ const BookingForm = ({
   };
 
   const actionRowWithTrustClass =
-    'mt-3 flex flex-col items-center gap-2 md:mt-auto md:flex-row md:items-center md:gap-6 md:pt-4';
+    'mt-2 flex flex-col items-center gap-2 md:mt-0 md:flex-row md:items-center md:gap-6 md:pt-3';
   const actionRowStackedTrustClass =
-    'mt-3 flex flex-col items-center gap-2 md:mt-auto md:pt-4';
+    'mt-2 flex flex-col items-center gap-2 md:mt-0 md:pt-3';
   const actionButtonGroupClass = 'flex w-full items-center justify-center gap-3';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
@@ -1468,7 +1474,7 @@ const BookingForm = ({
         <p className="text-[13px] font-semibold tracking-[-0.02em] text-[#6b7280] md:text-[14px]">
           Step {currentStep} of 3
         </p>
-        <div className="mt-3 h-[6px] overflow-hidden rounded-full bg-[#E8EDF5]">
+        <div className="mt-2 h-[5px] overflow-hidden rounded-full bg-[#E8EDF5]">
           <div
             className="h-full rounded-full bg-[#1679FF] transition-[width] duration-300 ease-out"
             style={{ width: progressWidth }}
@@ -1514,7 +1520,7 @@ const BookingForm = ({
           <button
             type="button"
             onClick={() => setIsDatePickerOpen(true)}
-            className={`ui-field-surface flex h-[4.35rem] w-full items-center justify-between rounded-[1.05rem] border bg-white px-4 text-left outline-none transition-all md:h-[4.2rem] md:rounded-[1rem] ${
+            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-white px-4 text-left outline-none transition-all md:h-[3.6rem] md:rounded-[1rem] ${
               isFieldInvalid('date')
                 ? 'border-[#d70015]'
                 : 'border-[#e4e6ea] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
@@ -1546,7 +1552,7 @@ const BookingForm = ({
           <button
             type="button"
             onClick={() => setIsTimePickerOpen(true)}
-            className={`ui-field-surface flex h-[4.35rem] w-full items-center justify-between rounded-[1.05rem] border bg-white px-4 text-left outline-none transition-all md:h-[4.2rem] md:rounded-[1rem] ${
+            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-white px-4 text-left outline-none transition-all md:h-[3.6rem] md:rounded-[1rem] ${
               isFieldInvalid('time')
                 ? 'border-[#d70015]'
                 : 'border-[#e4e6ea] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
@@ -1573,11 +1579,6 @@ const BookingForm = ({
             anchorRef={timePickerAnchorRef}
           />
         </div>
-        {leadTimeAdjustmentNotice ? (
-          <p className="mt-2 pl-1 text-[12px] font-medium text-[#1166d4] md:text-[12.5px]">
-            {leadTimeAdjustmentNotice}
-          </p>
-        ) : null}
       </div>
     </div>
   );
@@ -1606,18 +1607,10 @@ const BookingForm = ({
               onBlur={handleFlightNumberBlur}
               placeholder="e.g. OS 123"
               tabIndex={isFlightDetailsVisible ? undefined : -1}
-              className={`${getInputClassName('flightNumber')} !h-[3.35rem] !rounded-[1.05rem] !border-[#e4e6ea] !bg-[#f9fafb] !px-5 !text-[18px] !font-semibold !tracking-[0.02em] !text-[#717982] placeholder:!text-[#717982] md:!h-[3.25rem] md:!rounded-[1rem] md:!px-5 md:!text-[18px]`}
+              className={`${getInputClassName('flightNumber')} !h-[3.35rem] !rounded-[1.05rem] ${isFieldInvalid('flightNumber') ? '' : '!border-[#e4e6ea] !bg-[#f9fafb]'} !px-5 !text-[18px] !font-semibold !tracking-[0.02em] !text-[#717982] placeholder:!text-[#717982] md:!h-[3.25rem] md:!rounded-[1rem] md:!px-5 md:!text-[18px]`}
             />
           </div>
         </div>
-        {isLookingUpFlight ? (
-          <p className="mt-2 ml-1 text-[12px] text-[#6d7075]">Loading flight data...</p>
-        ) : null}
-        {flightLookupError ? (
-          <div className="mt-2 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
-            {flightLookupError}
-          </div>
-        ) : null}
         </div>
       </div>
     </div>
@@ -1625,84 +1618,65 @@ const BookingForm = ({
 
   const shouldShowInfoTrigger = isAppSurface && hasMounted;
   const formContentSpacingClassName = showStepIndicator
-    ? 'p-6 md:px-5 md:py-4'
-    : 'p-6 md:px-5 md:py-4';
+    ? 'p-5 md:px-5 md:py-3.5'
+    : 'p-5 md:px-5 md:py-3.5';
   const stepContentClassName = `w-full min-w-0 max-w-full ${allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-x-clip'}`;
-  const stepHeaderClassName = 'mb-7 flex justify-center md:mb-5';
+  const stepHeaderClassName = 'mb-4 flex justify-center md:mb-3';
   const titleHeaderClassName =
     'mb-5 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-left lg:px-[8px]';
   const stepOneContent = (
-    <div className={`${stepContentClassName} space-y-5 md:flex md:h-full md:flex-col md:space-y-3`}>
-      {shouldShowStepOneRouteIntro && (
-        <div className="text-center mb-6">
-          <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
-          <p className="text-[12px] text-[#6d7075]">{copy.routeDescription}</p>
-        </div>
-      )}
-      <div className="rounded-[2.2rem] bg-transparent pt-0 shadow-none">
-        <div className="min-w-0">
-          {DirectionSelector()}
-          <div className="mt-7 space-y-6 md:mt-6 md:space-y-5">
-            <div className="space-y-5">
-              <h2 className="text-[2rem] font-semibold leading-[1.02] tracking-[-0.05em] text-[#111827] md:text-[2.15rem]">
-                {addressPlaceholder}
-              </h2>
-              <div className="rounded-[1.35rem] border border-[#c8d3e0] bg-white px-5 py-4 shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] transition-shadow hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)] md:px-5 md:py-4">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-[#1679FF]">
-                    <MapPin className="h-[18px] w-[18px]" strokeWidth={2.2} />
-                  </span>
-                  <div className="relative min-w-0 flex-1">
-                    <StreetAutocomplete
-                      value={streetInputValue}
-                      selectedOption={selectedStreetOption}
-                      mobileDropdownFullWidth
-                      mobileSelectedStreetOnly
-                      menuItems={favoriteMenuItems}
-                      onChange={(value) => clearStreetSelection('street', value)}
-                      onSelect={(option) => applyStreetSelection('street', option)}
-                      onPasteText={(text) => handleStreetPaste('street', text)}
-                      onBlur={() => validateStreetNumber('street')}
-                      placeholder={addressInputPlaceholder}
-                      className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:text-[18px]"
-                    />
+    <div className={`${stepContentClassName} md:flex md:h-full md:flex-col`}>
+      <div className="space-y-4 md:min-h-0 md:flex-1 md:space-y-3">
+        {shouldShowStepOneRouteIntro && (
+          <div className="text-center mb-6">
+            <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
+            <p className="text-[12px] text-[#6d7075]">{copy.routeDescription}</p>
+          </div>
+        )}
+        <div className="rounded-[2.2rem] bg-transparent pt-0 shadow-none">
+          <div className="min-w-0">
+            {DirectionSelector()}
+            <div className="mt-4 space-y-4 md:mt-4 md:space-y-4">
+              <div className="space-y-[1.1rem]">
+                <h2 className="text-[1.65rem] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
+                  {addressPlaceholder}
+                </h2>
+                <div className={`rounded-[1.35rem] border bg-white px-5 py-3 transition-shadow md:px-5 md:py-3 ${isFieldInvalid('street') || isFieldInvalid('zip') ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-[#1679FF]">
+                      <MapPin className="h-[18px] w-[18px]" strokeWidth={2.2} />
+                    </span>
+                    <div className="relative min-w-0 flex-1">
+                      <StreetAutocomplete
+                        value={streetInputValue}
+                        selectedOption={selectedStreetOption}
+                        mobileDropdownFullWidth
+                        mobileSelectedStreetOnly
+                        menuItems={favoriteMenuItems}
+                        onChange={(value) => clearStreetSelection('street', value)}
+                        onSelect={(option) => applyStreetSelection('street', option)}
+                        onPasteText={(text) => handleStreetPaste('street', text)}
+                        onBlur={() => validateStreetNumber('street')}
+                        placeholder={addressInputPlaceholder}
+                        className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:text-[18px]"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            {streetNumberWarning === 'street' ? (
-              <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
-                Please add the street number.
+              <div className="space-y-[1.1rem]">
+                <h3 className="text-[1.1rem] font-bold leading-[1.1] tracking-[-0.04em] text-[#111827] md:text-[1.1rem]">
+                  When do you need a ride?
+                </h3>
+                {DateTimeFields()}
               </div>
-            ) : null}
-            {streetPasteWarning === 'street' ? (
-              <div className="mt-3 rounded-[var(--radius-field)] border border-[rgba(215,0,21,0.18)] bg-[rgba(215,0,21,0.05)] px-4 py-3 text-[0.95rem] font-medium text-[#d70015] md:py-2 md:text-[0.82rem]">
-                Address could not be recognized clearly. Please choose from the list.
-              </div>
-            ) : null}
-            <div className="space-y-5">
-              <h3 className="text-[1.4rem] font-bold leading-[1.08] tracking-[-0.04em] text-[#111827] md:text-[1.35rem]">
-                When do you need a ride?
-              </h3>
-              {DateTimeFields()}
+              {FlightDetailsFields()}
             </div>
-            {FlightDetailsFields()}
           </div>
         </div>
       </div>
 
-      {error && (
-        <div
-          className={`mt-4 flex items-center gap-2 rounded-xl border border-[#ffd4d8] bg-[#fff2f4] p-3 text-[14px] font-medium text-[#d70015] ${
-            isLeadTimeErrorMessage(error) ? 'ui-error-notice-shake' : ''
-          }`}
-        >
-          <span className="block w-1.5 h-1.5 bg-[#d70015] rounded-full" />
-          {error}
-        </div>
-      )}
-
-      <div className="flex flex-col items-center gap-3 md:mt-auto md:gap-2 md:pt-4">
+      <div className="mt-2 flex flex-col items-center gap-2 md:mt-0 md:pt-3">
         <div className="flex w-full items-center justify-center">
           <button
             type="button"
@@ -1765,7 +1739,7 @@ const BookingForm = ({
     <div
       className={`${BOOKING_FORM_CARD_CLASS} relative isolate w-full max-w-[32rem] shrink-0 ${
         fluidDesktopWidth ? 'lg:max-w-none lg:w-full' : 'md:w-[33.6rem] md:max-w-[33.6rem]'
-      } ${shouldLockDesktopFormHeight ? 'md:flex md:min-h-[660px] md:flex-col' : ''} ${
+      } ${showStepIndicator ? 'min-h-[520px]' : ''} ${shouldLockDesktopFormHeight ? 'md:flex md:h-[535px] md:flex-col' : ''} ${
         allowExtendedDropdownSpace ? 'overflow-visible' : 'overflow-x-clip overflow-y-hidden'
       }`}
     >
@@ -1801,59 +1775,36 @@ const BookingForm = ({
               <StepIndicator />
             </div>
           ) : null}
-          {shouldUseSlidingWizard ? (
-            <div
-              className="ui-form-viewport"
-              style={formViewportStyle}
-            >
-              <div
-                className="ui-form-track"
-                style={
-                  prefersReducedMotion
-                    ? { transform: `translateX(-${(currentStep - 1) * 33.333333}%)`, transition: 'none' }
-                    : { transform: `translateX(-${(currentStep - 1) * 33.333333}%)` }
-                }
-              >
-                {[stepOneContent, stepTwoContent, stepThreeContent].map((content, index) => {
-                  const stepNumber = index + 1;
-                  const isActive = currentStep === stepNumber;
-
-                  return (
-                    <section
-                      key={stepNumber}
-                      ref={(node) => {
-                        stepPanelRefs.current[index] = node;
-                      }}
-                      aria-hidden={!isActive}
-                      inert={!isActive}
-                      className={`ui-form-step ${isActive ? 'ui-form-step-active' : 'ui-form-step-inactive'}`}
-                    >
-                      {content}
-                    </section>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div
-              key={!isHomepageForm ? currentStep : 0}
-              className={
-                !isHomepageForm
-                  ? `ui-form-mobile-transition ${
-                      mobileStepDirection === 'prev'
-                        ? 'ui-form-mobile-transition-prev'
-                        : 'ui-form-mobile-transition-next'
-                    } ${shouldLockDesktopFormHeight ? 'md:h-full' : ''}`
-                  : shouldLockDesktopFormHeight
-                    ? 'md:h-full'
-                  : undefined
-              }
-            >
-              {activeStepContent}
-            </div>
-          )}
+          <div
+            key={currentStep}
+            className={`ui-form-mobile-transition ${
+              mobileStepDirection === 'prev'
+                ? 'ui-form-mobile-transition-prev'
+                : 'ui-form-mobile-transition-next'
+            } md:h-full`}
+          >
+            {activeStepContent}
+          </div>
         </form>
       </div>
+      {hasMounted && isErrorToastVisible && activeToastMessage ? (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="pointer-events-none absolute inset-x-0 bottom-4 z-50 flex justify-center px-4"
+        >
+          <div
+            className={`pointer-events-auto flex max-w-[24rem] items-center gap-2.5 rounded-[0.9rem] border bg-white px-4 py-3 text-[13.5px] font-medium shadow-[0_8px_28px_rgba(17,17,17,0.13)] animate-in fade-in slide-in-from-bottom-3 duration-200 ${
+              activeToastIsError
+                ? `border-[#ffd4d8] text-[#d70015] ${isLeadTimeErrorMessage(activeToastMessage) ? 'ui-error-notice-shake' : ''}`
+                : 'border-[#bdd4ff] text-[#1166d4]'
+            }`}
+          >
+            <span className={`block h-1.5 w-1.5 shrink-0 rounded-full ${activeToastIsError ? 'bg-[#d70015]' : 'bg-[#1166d4]'}`} />
+            <span>{activeToastMessage}</span>
+          </div>
+        </div>
+      ) : null}
       {isInfoPanelOpen ? (
         <div className="fixed inset-0 z-[140] bg-white/96 text-[#111827] backdrop-blur-sm md:bg-transparent md:backdrop-blur-0">
           <div className="flex h-[100dvh] md:min-h-full md:justify-end md:p-0">

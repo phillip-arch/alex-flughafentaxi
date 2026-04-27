@@ -653,7 +653,8 @@ p {
 
 @media (min-width: 768px) {
   .ui-button-booking-primary {
-    font-size: 20px;
+    font-size: 18px;
+    padding: 0.6rem 2rem;
   }
 
   .ui-input {

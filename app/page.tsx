@@ -159,6 +159,156 @@ const faqItems = [
   },
 ];
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': ['TaxiService', 'LocalBusiness'],
+      '@id': 'https://flughafentaxi-wien.at/#business',
+      name: 'Alex Flughafentaxi Wien',
+      alternateName: 'Alex Airport Taxi Vienna',
+      url: 'https://flughafentaxi-wien.at',
+      telephone: '+436764826069',
+      description:
+        'Fixed-price airport taxi transfers to and from Vienna International Airport (VIE). Sedans, station wagons, and minivans available 24/7. No hidden fees, real-time flight tracking.',
+      priceRange: '€€',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Vienna',
+        addressRegion: 'Vienna',
+        addressCountry: 'AT',
+      },
+      areaServed: [
+        {
+          '@type': 'City',
+          name: 'Vienna',
+          sameAs: 'https://www.wikidata.org/wiki/Q1741',
+        },
+        {
+          '@type': 'Airport',
+          name: 'Vienna International Airport',
+          iataCode: 'VIE',
+          sameAs: 'https://www.wikidata.org/wiki/Q153411',
+        },
+      ],
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+          opens: '00:00',
+          closes: '23:59',
+        },
+      ],
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Vienna Airport Transfer — Fixed Prices',
+        itemListElement: [
+          {
+            '@type': 'Offer',
+            name: 'Limousine transfer — 1st to 10th district',
+            description: 'Fixed-price sedan airport transfer between Vienna Airport (VIE) and districts 1–10',
+            price: '42.00',
+            priceCurrency: 'EUR',
+            eligibleQuantity: { '@type': 'QuantitativeValue', maxValue: 2 },
+            seller: { '@id': 'https://flughafentaxi-wien.at/#business' },
+          },
+          {
+            '@type': 'Offer',
+            name: 'Limousine transfer — 11th district',
+            description: 'Fixed-price sedan airport transfer between Vienna Airport (VIE) and the 11th district',
+            price: '39.00',
+            priceCurrency: 'EUR',
+            eligibleQuantity: { '@type': 'QuantitativeValue', maxValue: 2 },
+            seller: { '@id': 'https://flughafentaxi-wien.at/#business' },
+          },
+          {
+            '@type': 'Offer',
+            name: 'Limousine transfer — 12th to 23rd district',
+            description: 'Fixed-price sedan airport transfer between Vienna Airport (VIE) and districts 12–23',
+            price: '45.00',
+            priceCurrency: 'EUR',
+            eligibleQuantity: { '@type': 'QuantitativeValue', maxValue: 2 },
+            seller: { '@id': 'https://flughafentaxi-wien.at/#business' },
+          },
+          {
+            '@type': 'Offer',
+            name: 'Station Wagon transfer — 1st to 10th district',
+            description: 'Fixed-price station wagon airport transfer between Vienna Airport (VIE) and districts 1–10',
+            price: '48.00',
+            priceCurrency: 'EUR',
+            eligibleQuantity: { '@type': 'QuantitativeValue', maxValue: 4 },
+            seller: { '@id': 'https://flughafentaxi-wien.at/#business' },
+          },
+          {
+            '@type': 'Offer',
+            name: 'Station Wagon transfer — 11th district',
+            description: 'Fixed-price station wagon airport transfer between Vienna Airport (VIE) and the 11th district',
+            price: '45.00',
+            priceCurrency: 'EUR',
+            eligibleQuantity: { '@type': 'QuantitativeValue', maxValue: 4 },
+            seller: { '@id': 'https://flughafentaxi-wien.at/#business' },
+          },
+          {
+            '@type': 'Offer',
+            name: 'Station Wagon transfer — 12th to 23rd district',
+            description: 'Fixed-price station wagon airport transfer between Vienna Airport (VIE) and districts 12–23',
+            price: '51.00',
+            priceCurrency: 'EUR',
+            eligibleQuantity: { '@type': 'QuantitativeValue', maxValue: 4 },
+            seller: { '@id': 'https://flughafentaxi-wien.at/#business' },
+          },
+          {
+            '@type': 'Offer',
+            name: 'Minivan transfer — 1st to 10th district',
+            description: 'Fixed-price minivan airport transfer between Vienna Airport (VIE) and districts 1–10',
+            price: '72.00',
+            priceCurrency: 'EUR',
+            eligibleQuantity: { '@type': 'QuantitativeValue', maxValue: 8 },
+            seller: { '@id': 'https://flughafentaxi-wien.at/#business' },
+          },
+          {
+            '@type': 'Offer',
+            name: 'Minivan transfer — 11th district',
+            description: 'Fixed-price minivan airport transfer between Vienna Airport (VIE) and the 11th district',
+            price: '69.00',
+            priceCurrency: 'EUR',
+            eligibleQuantity: { '@type': 'QuantitativeValue', maxValue: 8 },
+            seller: { '@id': 'https://flughafentaxi-wien.at/#business' },
+          },
+          {
+            '@type': 'Offer',
+            name: 'Minivan transfer — 12th to 23rd district',
+            description: 'Fixed-price minivan airport transfer between Vienna Airport (VIE) and districts 12–23',
+            price: '75.00',
+            priceCurrency: 'EUR',
+            eligibleQuantity: { '@type': 'QuantitativeValue', maxValue: 8 },
+            seller: { '@id': 'https://flughafentaxi-wien.at/#business' },
+          },
+        ],
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        ratingCount: '47',
+        bestRating: '5',
+        worstRating: '1',
+      },
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': 'https://flughafentaxi-wien.at/#faq',
+      mainEntity: faqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    },
+  ],
+};
+
 const childSeats = [
   {
     title: 'Baby Seat',
@@ -264,50 +414,54 @@ export default async function Home({
 }) {
   return (
     <div className="min-h-screen bg-[#f3f7fc] text-[#111111]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
       <main>
 
         {/* ── HERO ─────────────────────────────────────────────────────── */}
         <section className="relative bg-[#080e1c] text-white">
           <div className="app-container pb-14 pt-[calc(72px+2.5rem)] md:pb-16 md:pt-[calc(72px+3rem)] lg:pb-20 lg:pt-[calc(72px+3.5rem)]">
-            <div className="mx-auto max-w-[108rem]">
-              <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.88fr)] lg:items-center lg:gap-10 xl:gap-16">
+            <div className="mx-auto grid items-start gap-10 lg:max-w-[1400px] lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-8 xl:gap-10">
 
-                {/* Left: editorial headline */}
-                <div className="flex flex-col gap-8 lg:py-6">
-                  <SectionEyebrow onDark>Vienna, Austria · VIE · Schwechat</SectionEyebrow>
-
-                  <h1 className="text-[3.4rem] font-black leading-[0.93] tracking-[-0.055em] !text-white sm:text-[4.2rem] md:text-[5rem] lg:text-[3.8rem] xl:text-[4.6rem]">
-                    Vienna<br />
-                    Airport<br />
-                    Taxi.
-                  </h1>
-
-                  <p className="max-w-[36rem] text-[1rem] leading-[1.72] text-[#8da4c0] lg:max-w-[28rem]">
-                    Fixed-price transfers to and from Vienna International Airport — tracked in real time, on time, every time.
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                    {[
-                      { icon: Star, label: '4.9 Rating' },
-                      { icon: Check, label: 'Fixed price' },
-                      { icon: Plane, label: '24 / 7 service' },
-                      { icon: ShieldCheck, label: '10 + years' },
-                    ].map(({ icon: Icon, label }) => (
-                      <span
-                        key={label}
-                        className="inline-flex items-center gap-2 text-[0.875rem] font-semibold text-[#b0c8e0]"
-                      >
-                        <Icon size={14} className="text-[#1166d4]" strokeWidth={2.4} />
-                        {label}
-                      </span>
-                    ))}
-                  </div>
+              {/* Form — left 40%, below headline on mobile */}
+              <div className="order-2 self-start lg:order-1 lg:sticky lg:top-24">
+                <div className="mx-auto w-full max-w-[57.5rem] lg:mx-0 lg:max-w-none">
+                  <BookingForm fluidDesktopWidth />
                 </div>
+              </div>
 
-                {/* Right: booking form */}
-                <div>
-                  <BookingForm fluidDesktopWidth lockDesktopHeight />
+              {/* Editorial headline — right 60%, above form on mobile */}
+              <div className="order-1 flex flex-col gap-8 lg:order-2 lg:py-6">
+                <SectionEyebrow onDark>Vienna, Austria · VIE · Schwechat</SectionEyebrow>
+
+                <h1 className="text-[3.4rem] font-black leading-[0.93] tracking-[-0.055em] !text-white sm:text-[4.2rem] md:text-[5rem] lg:text-[3.8rem] xl:text-[4.6rem]">
+                  Vienna<br />
+                  Airport<br />
+                  Taxi.
+                </h1>
+
+                <p className="max-w-[36rem] text-[1rem] leading-[1.72] text-[#8da4c0] lg:max-w-[28rem]">
+                  Fixed-price transfers to and from Vienna International Airport — tracked in real time, on time, every time.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                  {[
+                    { icon: Star, label: '4.9 Rating' },
+                    { icon: Check, label: 'Fixed price' },
+                    { icon: Plane, label: '24 / 7 service' },
+                    { icon: ShieldCheck, label: '10 + years' },
+                  ].map(({ icon: Icon, label }) => (
+                    <span
+                      key={label}
+                      className="inline-flex items-center gap-2 text-[0.875rem] font-semibold text-[#b0c8e0]"
+                    >
+                      <Icon size={14} className="text-[#1166d4]" strokeWidth={2.4} />
+                      {label}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
@@ -590,18 +744,18 @@ export default async function Home({
                 {childSeats.map((seat) => (
                   <div
                     key={seat.title}
-                    className="flex flex-col overflow-hidden rounded-[1.75rem] border border-[#e0eaf6] bg-white"
+                    className="relative flex flex-col overflow-hidden rounded-[1.75rem] border border-[#e0eaf6] bg-white"
                   >
-                    <div className="relative h-[13rem] w-full bg-[#f5f9ff]">
+                    <div className="absolute right-4 top-4 h-[5.5rem] w-[5.5rem]">
                       <Image
                         src={seat.imageSrc}
                         alt={seat.title}
                         fill
-                        className="object-contain object-center p-4"
-                        sizes="(min-width: 768px) 33vw, 100vw"
+                        className="object-contain mix-blend-multiply"
+                        sizes="88px"
                       />
                     </div>
-                    <div className="flex flex-col gap-4 px-6 py-5">
+                    <div className="flex flex-col gap-3 py-5 pl-6 pr-[6.5rem]">
                       <span className="inline-flex w-fit rounded-full border border-[#dbe7f8] bg-[#eef5ff] px-3.5 py-1.5 text-[0.77rem] font-bold text-[#1166d4]">
                         {seat.weightRange}
                       </span>
