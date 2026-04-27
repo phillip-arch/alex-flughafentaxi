@@ -46,7 +46,7 @@ export default function AccountMobileBottomNav({
           {placement === 'inline' ? (
             <Link href="/account?tab=start" aria-label="Alex Flughafentaxi Home" className="shrink-0">
               <Image
-                src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/applogo.jpg"
+                src="/alexlogo.png"
                 alt="Alex Flughafentaxi"
                 width={92}
                 height={92}

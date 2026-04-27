@@ -1007,7 +1007,7 @@ export default function AccountClient({
 
                 <div className="flex justify-center pt-2">
                   <Image
-                    src="https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/applogo.jpg"
+                    src="/alexlogo.png"
                     alt="Alex Flughafentaxi"
                     width={72}
                     height={72}

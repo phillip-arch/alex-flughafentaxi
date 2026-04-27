@@ -164,7 +164,7 @@ export default function NavbarClient({
         <Link href={withLang('/')} className="flex items-center">
           <span className="relative block h-11 w-[120px] overflow-hidden lg:h-12 lg:w-[220px]">
             <Image
-              src="https://web-site.website/images/aflogo.jpg"
+              src="/alexlogo.png"
               alt="Alex Airport Taxi Logo"
               fill
               sizes="(max-width: 1023px) 120px, 220px"
@@ -260,7 +260,7 @@ export default function NavbarClient({
             <Link href={withLang('/')} className="flex items-center" onClick={closeMobileMenu}>
               <span className="relative block h-11 w-[120px] overflow-hidden">
                 <Image
-                  src="https://web-site.website/images/aflogo.jpg"
+                  src="/alexlogo.png"
                   alt="Alex Airport Taxi Logo"
                   fill
                   sizes="120px"
