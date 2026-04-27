@@ -1520,16 +1520,14 @@ const BookingForm = ({
           <button
             type="button"
             onClick={() => setIsDatePickerOpen(true)}
-            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-white px-4 text-left outline-none transition-all md:h-[3.6rem] md:rounded-[1rem] ${
+            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-white pl-3 pr-4 text-left outline-none transition-all md:h-[3.6rem] md:rounded-[1rem] ${
               isFieldInvalid('date')
                 ? 'border-[#d70015]'
                 : 'border-[#e4e6ea] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
             }`}
           >
             <span className="flex min-w-0 items-center gap-3">
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-[#1679FF]">
-                <CalendarDays className="h-[18px] w-[18px]" strokeWidth={2.2} />
-              </span>
+              <CalendarDays className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
               <span className="min-w-0">
                 <span className={`block truncate text-[17px] font-semibold leading-none ${formData.date ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
                   {formData.date || 'Date'}
@@ -1552,16 +1550,14 @@ const BookingForm = ({
           <button
             type="button"
             onClick={() => setIsTimePickerOpen(true)}
-            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-white px-4 text-left outline-none transition-all md:h-[3.6rem] md:rounded-[1rem] ${
+            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-white pl-3 pr-4 text-left outline-none transition-all md:h-[3.6rem] md:rounded-[1rem] ${
               isFieldInvalid('time')
                 ? 'border-[#d70015]'
                 : 'border-[#e4e6ea] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
             }`}
           >
             <span className="flex min-w-0 items-center gap-3">
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-[#1679FF]">
-                <Clock3 className="h-[18px] w-[18px]" strokeWidth={2.2} />
-              </span>
+              <Clock3 className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
               <span className="min-w-0">
                 <span className={`block truncate text-[17px] font-semibold leading-none ${formData.time ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
                   {formData.time || 'Time'}
@@ -1641,11 +1637,9 @@ const BookingForm = ({
                 <p style={{ marginBottom: '14px' }} className="text-[1.65rem] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
                   {addressPlaceholder}
                 </p>
-                <div className={`rounded-[1.35rem] border bg-white px-5 py-3 transition-shadow md:px-5 md:py-3 ${isFieldInvalid('street') || isFieldInvalid('zip') ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
+                <div className={`rounded-[1.35rem] border bg-white pl-3 pr-5 py-3 transition-shadow md:pl-3 md:pr-5 md:py-3 ${isFieldInvalid('street') || isFieldInvalid('zip') ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-[#1679FF]">
-                      <MapPin className="h-[18px] w-[18px]" strokeWidth={2.2} />
-                    </span>
+                    <MapPin className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
                     <div className="relative min-w-0 flex-1">
                       <StreetAutocomplete
                         value={streetInputValue}
