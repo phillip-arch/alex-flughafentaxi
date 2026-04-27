@@ -422,7 +422,7 @@ export default async function Home({
       <main>
 
         {/* ── HERO ─────────────────────────────────────────────────────── */}
-        <section className="relative bg-[#080e1c] text-white">
+        <section id="hero" className="relative bg-[#080e1c] text-white">
           <div className="app-container pb-14 pt-[calc(72px+2.5rem)] md:pb-16 md:pt-[calc(72px+3rem)] lg:pb-20 lg:pt-[calc(72px+3.5rem)]">
             <div className="mx-auto grid items-start gap-10 lg:max-w-[1400px] lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-8 xl:gap-10">
 
@@ -438,9 +438,9 @@ export default async function Home({
                 <SectionEyebrow onDark>Vienna, Austria · VIE · Schwechat</SectionEyebrow>
 
                 <h1 className="text-[3.4rem] font-black leading-[0.93] tracking-[-0.055em] !text-white sm:text-[4.2rem] md:text-[5rem] lg:text-[3.8rem] xl:text-[4.6rem]">
-                  Vienna<br />
-                  Airport<br />
-                  Taxi.
+                  Vienna Airport Taxi:<br />
+                  Fixed Prices,<br />
+                  Zero Stress.
                 </h1>
 
                 <p className="max-w-[36rem] text-[1rem] leading-[1.72] text-[#8da4c0] lg:max-w-[28rem]">
@@ -475,19 +475,19 @@ export default async function Home({
               <div className="grid gap-3 md:grid-cols-3 md:gap-4">
                 {[
                   {
-                    src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/vienna-city.jpg',
+                    src: 'https://images.unsplash.com/photo-1590253198910-1683b35ba5bf?q=80&w=1470&auto=format&fit=crop',
                     alt: 'Vienna city centre',
                     label: 'Vienna city',
                     bg: 'bg-[#1a2236]',
                   },
                   {
-                    src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/vienna-airport.jpg',
+                    src: 'https://images.pexels.com/photos/10302773/pexels-photo-10302773.jpeg',
                     alt: 'Vienna International Airport',
                     label: 'Vienna airport',
                     bg: 'bg-[#151e30]',
                   },
                   {
-                    src: 'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/car-interior.jpg',
+                    src: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1470&auto=format&fit=crop',
                     alt: 'Premium car interior',
                     label: 'Premium interior',
                     bg: 'bg-[#111827]',
@@ -524,7 +524,7 @@ export default async function Home({
               </div>
 
               <div className="grid gap-5 md:grid-cols-2 lg:gap-6">
-                {features.map(({ num, title, description, icon: Icon }) => (
+                {features.map(({ title, description, icon: Icon }) => (
                   <article
                     key={title}
                     className="group flex flex-col gap-6 rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-7 py-7 transition-all duration-200 hover:border-[#bdd4ff] hover:bg-white hover:shadow-[0_20px_50px_rgba(22,121,255,0.07)] md:px-8 md:py-8"
@@ -532,9 +532,6 @@ export default async function Home({
                     <div className="flex items-start justify-between">
                       <span className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[#dde9f8] bg-white text-[#1166d4] shadow-[0_8px_20px_rgba(22,121,255,0.1)]">
                         <Icon size={21} strokeWidth={2.1} />
-                      </span>
-                      <span aria-hidden="true" className="text-[2.6rem] font-black leading-none tracking-[-0.06em] text-[#6b7280] transition-colors group-hover:text-[#4b5563]">
-                        {num}
                       </span>
                     </div>
                     <div>
@@ -654,8 +651,76 @@ export default async function Home({
           </div>
         </section>
 
+        {/* ── ABOUT ALEX ───────────────────────────────────────────────── */}
+        <section className="bg-[#f3f7fc] py-24 md:py-32">
+          <div className="app-container">
+            <div className="mx-auto max-w-[108rem]">
+              <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-20">
+
+                {/* Image */}
+                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[1.75rem]">
+                  <Image
+                    src="https://images.unsplash.com/photo-1740485863389-a8445da2735e?q=80&w=702&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="Alex, founder of Alex Airport Taxi"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 40vw, 100vw"
+                  />
+                </div>
+
+                {/* Text */}
+                <div className="py-4 lg:py-8">
+                  <SectionEyebrow>About Alex</SectionEyebrow>
+                  <SectionHeading>Meet Alex: The Driver<br className="hidden md:block" /> Behind the Standard.</SectionHeading>
+                  <p style={{ marginTop: '0.75rem', marginBottom: '1.25rem' }} className="text-[1.05rem] font-semibold tracking-[-0.02em] text-[#1679FF]">Over 10 years of experience on Vienna&apos;s roads.</p>
+                  <p className="mt-4 text-[0.95rem] leading-[1.75] text-[#5e718a]">
+                    For over a decade, Alex drove the route to Vienna Airport Schwechat. He saw firsthand exactly what frustrated travelers the most: hidden fees, unmaintained cars, and stressed drivers who treated passengers like numbers. He knew that airport transfers needed to bring hospitality back to the industry.
+                  </p>
+                  <p style={{ marginTop: '1.5rem' }} className="text-[0.95rem] leading-[1.75] text-[#5e718a]">
+                    That is why Alex transitioned from a solo driver to a boutique fleet owner.
+                  </p>
+                  <p style={{ marginTop: '1.5rem' }} className="text-[1.05rem] font-bold tracking-[-0.03em] text-[#0c111e]">What is the &ldquo;Alex Standard&rdquo;?</p>
+                  <p style={{ marginTop: '1.5rem' }} className="text-[0.95rem] leading-[1.75] text-[#5e718a]">
+                    Today, Alex Airport Taxi is not a faceless agency. Alex has personally hand-picked and trained a small, dedicated team of professional drivers. Every driver in our fleet is required to deliver the exact same level of care that Alex built his reputation on:
+                  </p>
+                  <ul className="mt-5 space-y-3">
+                    <li className="flex gap-3">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1679FF]">
+                        <Check size={12} strokeWidth={3} className="text-white" />
+                      </span>
+                      <span className="text-[0.95rem] leading-[1.65] text-[#5e718a]">
+                        <span className="font-semibold text-[#0c111e]">Immaculate Vehicles:</span> Spotless, meticulously maintained cars that guarantee a comfortable ride.
+                      </span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1679FF]">
+                        <Check size={12} strokeWidth={3} className="text-white" />
+                      </span>
+                      <span className="text-[0.95rem] leading-[1.65] text-[#5e718a]">
+                        <span className="font-semibold text-[#0c111e]">Absolute Reliability:</span> We track your flight and adjust to your schedule automatically.
+                      </span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1679FF]">
+                        <Check size={12} strokeWidth={3} className="text-white" />
+                      </span>
+                      <span className="text-[0.95rem] leading-[1.65] text-[#5e718a]">
+                        <span className="font-semibold text-[#0c111e]">Honest Hospitality:</span> A friendly face, luggage assistance, and the guarantee that your fixed price is truly fixed.
+                      </span>
+                    </li>
+                  </ul>
+                  <p className="mt-7 text-[0.95rem] leading-[1.75] text-[#5e718a]">
+                    When you book with our team, you get the reliability of a 10-year industry veteran built into every single trip.
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ── REVIEWS ──────────────────────────────────────────────────── */}
-        <section className="bg-[#f3f7fc] py-20 md:py-24">
+        <section className="bg-white py-20 md:py-24">
           <div className="app-container">
             <div className="mx-auto max-w-[108rem]">
               <div className="mb-12">

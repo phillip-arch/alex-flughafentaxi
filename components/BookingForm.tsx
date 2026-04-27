@@ -1637,10 +1637,10 @@ const BookingForm = ({
           <div className="min-w-0">
             {DirectionSelector()}
             <div className="mt-4 space-y-4 md:mt-4 md:space-y-4">
-              <div className="space-y-[1.1rem]">
-                <h2 className="text-[1.65rem] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
+              <div>
+                <p style={{ marginBottom: '14px' }} className="text-[1.65rem] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
                   {addressPlaceholder}
-                </h2>
+                </p>
                 <div className={`rounded-[1.35rem] border bg-white px-5 py-3 transition-shadow md:px-5 md:py-3 ${isFieldInvalid('street') || isFieldInvalid('zip') ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#eef5ff] text-[#1679FF]">
@@ -1664,10 +1664,10 @@ const BookingForm = ({
                   </div>
                 </div>
               </div>
-              <div className="space-y-[1.1rem]">
-                <h3 className="text-[1.1rem] font-bold leading-[1.1] tracking-[-0.04em] text-[#111827] md:text-[1.1rem]">
+              <div>
+                <p style={{ marginBottom: '10px' }} className="text-[1.1rem] font-bold leading-[1.1] tracking-[-0.04em] text-[#111827] md:text-[1.1rem]">
                   When do you need a ride?
-                </h3>
+                </p>
                 {DateTimeFields()}
               </div>
               {FlightDetailsFields()}

@@ -180,8 +180,11 @@ export default function TimePicker({
       const panelWidth = Math.min(rect.width, window.innerWidth - 32);
       const viewportLeft = Math.min(Math.max(rect.left, 16), window.innerWidth - panelWidth - 16);
       const topAbsolute = Math.max(rect.top + window.scrollY, window.scrollY + 16);
+      const maxHeight = window.innerHeight - (topAbsolute - window.scrollY) - 16;
       const nextStyle: React.CSSProperties = {
         left: viewportLeft + window.scrollX,
+        maxHeight,
+        overflowY: 'auto',
         position: 'absolute',
         top: topAbsolute,
         width: panelWidth,
@@ -192,7 +195,8 @@ export default function TimePicker({
           current?.left === nextStyle.left &&
           current?.top === nextStyle.top &&
           current?.width === nextStyle.width &&
-          current?.position === nextStyle.position
+          current?.position === nextStyle.position &&
+          current?.maxHeight === nextStyle.maxHeight
         ) {
           return current;
         }

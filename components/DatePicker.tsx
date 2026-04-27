@@ -86,15 +86,15 @@ function MonthGrid({
         </div>
       ) : null}
 
-      <div className="mb-2 grid grid-cols-7">
+      <div className="mb-1 grid grid-cols-7 md:mb-2">
         {DAY_NAMES.map((day) => (
-          <div key={day} className="py-1 text-center text-[11px] font-semibold tracking-[0.02em] text-[#86868b]">
+          <div key={day} className="py-1 text-center text-[10px] font-semibold tracking-[0.02em] text-[#86868b] md:text-[11px]">
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-y-2">
+      <div className="grid grid-cols-7 gap-y-1 md:gap-y-1">
         {Array.from({ length: startDayIndex }).map((_, index) => (
           <div key={`empty-${month}-${index}`} />
         ))}
@@ -113,7 +113,7 @@ function MonthGrid({
               key={dateStr}
               onClick={() => !disabled && onSelect(date)}
               disabled={disabled}
-              className={`mx-auto flex h-[2.35rem] w-[2.35rem] items-center justify-center rounded-full text-[15px] font-medium transition-all md:h-[2.5rem] md:w-[2.5rem] md:text-[16px] ${
+              className={`mx-auto flex h-[2.35rem] w-[2.35rem] items-center justify-center rounded-full text-[15px] font-medium transition-all md:h-[2rem] md:w-[2rem] md:text-[13px] ${
                 isSelected ? 'bg-[#1679FF] text-white shadow-md' : ''
               } ${
                 !isSelected && !disabled ? 'text-[#1d1d1f] hover:bg-[#f5f5f7]' : ''
@@ -223,8 +223,11 @@ export default function DatePicker({
       const panelWidth = Math.min(760, window.innerWidth - 32);
       const left = Math.min(Math.max(rect.left - 8, 16), window.innerWidth - panelWidth - 16);
       const top = Math.max(rect.top - 100, 16);
+      const maxHeight = window.innerHeight - top - 16;
       const nextStyle: React.CSSProperties = {
         left,
+        maxHeight,
+        overflowY: 'auto',
         position: 'fixed',
         top,
         width: panelWidth,
@@ -235,7 +238,8 @@ export default function DatePicker({
           currentStyle?.left === nextStyle.left &&
           currentStyle?.top === nextStyle.top &&
           currentStyle?.width === nextStyle.width &&
-          currentStyle?.position === nextStyle.position
+          currentStyle?.position === nextStyle.position &&
+          currentStyle?.maxHeight === nextStyle.maxHeight
         ) {
           return currentStyle;
         }
@@ -295,28 +299,28 @@ export default function DatePicker({
         onClick={onClose}
       />
       <div
-        className="relative z-10 w-[min(23rem,calc(100vw-2rem))] rounded-[1.45rem] border border-[#e6e1d7] bg-white p-4 shadow-[0_18px_42px_rgba(17,17,17,0.16)] animate-in fade-in slide-in-from-bottom-4 duration-200 md:w-[min(47.5rem,calc(100vw-2rem))] md:rounded-[1.75rem] md:p-6 md:slide-in-from-top-2"
+        className="relative z-10 w-[min(23rem,calc(100vw-2rem))] rounded-[1.45rem] border border-[#e6e1d7] bg-white p-4 shadow-[0_18px_42px_rgba(17,17,17,0.16)] animate-in fade-in duration-150 md:w-[min(42rem,calc(100vw-2rem))] md:rounded-[1.5rem] md:p-4"
         style={popoverStyle}
         role="dialog"
         aria-modal="true"
         aria-label="Calendar"
       >
-        <div className="mb-4 grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] items-center gap-3 md:mb-5 md:grid-cols-[2.75rem_minmax(0,1fr)_minmax(0,1fr)_2.75rem] md:gap-6">
+        <div className="mb-3 grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] items-center gap-3 md:mb-3 md:grid-cols-[2.25rem_minmax(0,1fr)_minmax(0,1fr)_2.25rem] md:gap-4">
           <button
             type="button"
             onClick={handlePrevMonth}
             disabled={!canGoPrev}
-            className="col-start-1 row-start-1 flex h-10 w-10 items-center justify-center self-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#d2d2d7] disabled:hover:bg-transparent"
+            className="col-start-1 row-start-1 flex h-10 w-10 items-center justify-center self-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#d2d2d7] disabled:hover:bg-transparent md:h-8 md:w-8"
           >
             <ChevronLeft size={22} />
           </button>
           <div className="col-start-2 row-start-1 justify-self-center text-center">
-            <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[#1d1d1f] md:text-[19px]">
+            <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[#1d1d1f] md:text-[15px]">
               {MONTH_FORMATTER.format(primaryMonth)} {primaryMonth.getFullYear()}
             </h2>
           </div>
           <div className="hidden justify-self-center text-center md:block md:col-start-3 md:row-start-1">
-            <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[#1d1d1f] md:text-[19px]">
+            <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[#1d1d1f] md:text-[15px]">
               {MONTH_FORMATTER.format(secondaryMonth)} {secondaryMonth.getFullYear()}
             </h2>
           </div>
@@ -324,13 +328,13 @@ export default function DatePicker({
             type="button"
             onClick={handleNextMonth}
             disabled={!canGoNext}
-            className="col-start-3 row-start-1 flex h-10 w-10 items-center justify-center self-center justify-self-end rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#d2d2d7] disabled:hover:bg-transparent md:col-start-4"
+            className="col-start-3 row-start-1 flex h-10 w-10 items-center justify-center self-center justify-self-end rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#d2d2d7] disabled:hover:bg-transparent md:col-start-4 md:h-8 md:w-8"
           >
             <ChevronRight size={22} />
           </button>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2 md:gap-8">
+        <div className="grid gap-5 md:grid-cols-2 md:gap-4">
           <MonthGrid
             showHeader={false}
             monthDate={primaryMonth}
@@ -351,7 +355,7 @@ export default function DatePicker({
           </div>
         </div>
 
-        <p className="mt-8 text-center text-[12px] font-medium text-[#7b8798] md:mt-10 md:text-[13px]">
+        <p className="mt-4 text-center text-[12px] font-medium text-[#7b8798] md:mt-3 md:text-[11px]">
           Reserve your ride up to 90 days in advance
         </p>
       </div>

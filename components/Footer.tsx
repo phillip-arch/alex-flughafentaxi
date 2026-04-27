@@ -25,132 +25,149 @@ export default function Footer() {
   };
 
   return (
-    <footer id="site-footer" className="mt-auto border-t border-white/8 bg-[#000000] py-14 text-white md:py-16">
-      <div className="app-container">
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:gap-6">
-          <div className="rounded-[2rem] border border-white/10 bg-[#151515] px-6 py-6 shadow-[0_18px_42px_rgba(0,0,0,0.24)] md:px-7 md:py-7">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#1d4f96] bg-[#101d31] px-4 py-2 text-[0.95rem] font-semibold tracking-[-0.02em] text-[#78a9ff]">
-              <ShieldCheck size={16} className="shrink-0" />
-              <span>Fixed price • available 24/7</span>
-            </div>
+    <footer id="site-footer" className="mt-auto bg-[#080e1c] text-white">
+      <div className="app-container py-16 md:py-20">
+        <div className="grid gap-14 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-12">
 
-            <h2 className="mt-6 max-w-[12ch] text-[2.3rem] font-black tracking-[-0.055em] !text-white md:max-w-none md:text-[3.3rem]">
-              Book your airport taxi now
+          {/* Brand / CTA */}
+          <div>
+            <h2 className="text-[2rem] font-black leading-[1.05] tracking-[-0.055em] !text-white md:text-[2.5rem]">
+              Book your airport<br />taxi now
             </h2>
 
-            <p className="mt-5 max-w-[32rem] text-[1.08rem] leading-[1.7] text-white/64">
-              Book in less than 1 minute. On-time pickup, transparent fixed
-              prices, and direct support by phone or WhatsApp.
+            <p className="mt-4 text-[0.95rem] leading-[1.7] text-white/55">
+              Book in less than 1 minute. On-time pickup, transparent fixed prices, and direct support by phone or WhatsApp.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href={withLang('/book')}
-                className="inline-flex items-center justify-center gap-3 rounded-[1.35rem] bg-white px-6 py-4 text-[1.05rem] font-semibold tracking-[-0.02em] text-[#111111] transition-transform hover:-translate-y-[1px]"
+                className="inline-flex items-center gap-2 rounded-[0.9rem] bg-[#1679FF] px-6 py-3.5 text-[0.95rem] font-semibold text-white transition-colors hover:bg-[#1166d4]"
               >
-                <span>Secure your ride now</span>
-                <ChevronRight size={19} />
+                Book now
+                <ChevronRight size={16} />
               </Link>
               <Link
                 href={withLang('/preise')}
-                className="inline-flex items-center justify-center rounded-[1.35rem] border border-white/10 bg-white/[0.04] px-6 py-4 text-[1.05rem] font-semibold tracking-[-0.02em] text-white/92 transition-colors hover:bg-white/[0.08]"
+                className="inline-flex items-center rounded-[0.9rem] border border-white/15 px-6 py-3.5 text-[0.95rem] font-semibold text-white/75 transition-colors hover:border-white/30 hover:text-white"
               >
                 View prices
               </Link>
             </div>
 
-            <div className="mt-8 flex flex-col gap-3 text-[1rem] text-white/68 md:flex-row md:flex-wrap md:gap-x-8 md:gap-y-3">
-              <div className="inline-flex items-center gap-2.5">
-                <Clock3 size={18} className="text-[#1679ff]" />
-                <span>On-time pickup</span>
-              </div>
-              <div className="inline-flex items-center gap-2.5">
-                <ShieldEllipsis size={18} className="text-[#1679ff]" />
-                <span>No hidden costs</span>
-              </div>
-              <div className="inline-flex items-center gap-2.5">
-                <ShieldCheck size={18} className="text-[#1679ff]" />
-                <span>Reliable airport transfer</span>
-              </div>
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-[0.88rem] text-white/50">
+              <span className="inline-flex items-center gap-2">
+                <Clock3 size={15} className="text-[#1679ff]" />
+                On-time pickup
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <ShieldEllipsis size={15} className="text-[#1679ff]" />
+                No hidden costs
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <ShieldCheck size={15} className="text-[#1679ff]" />
+                Reliable airport transfer
+              </span>
             </div>
 
-            <div className="mt-8 flex gap-4">
+            <div className="mt-8 flex gap-3">
               <a
                 href="#"
                 aria-label="TikTok"
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/45 transition-colors hover:border-white/25 hover:text-white"
               >
-                <TikTokIcon className="h-[18px] w-[18px]" />
+                <TikTokIcon className="h-4 w-4" />
               </a>
               <a
                 href="#"
                 aria-label="Instagram"
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/45 transition-colors hover:border-white/25 hover:text-white"
               >
-                <Instagram size={18} />
+                <Instagram size={16} />
               </a>
             </div>
           </div>
 
-          <div className="rounded-[1.55rem] border border-white/10 bg-white/[0.03] px-6 py-6 text-white">
-            <h3 className="text-[1.55rem] font-semibold tracking-[-0.04em] !text-white">
-              Quick Links
-            </h3>
-            <ul className="mt-6 space-y-4">
+          {/* Services */}
+          <div>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/35">Services</p>
+            <ul className="mt-5 space-y-4">
               <li>
-                <Link href={withLang('/preise')} className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
+                <Link href={withLang('/book')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                  Airport Transfer
+                </Link>
+              </li>
+              <li>
+                <Link href={withLang('/#flotte')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                  Group Transfers
+                </Link>
+              </li>
+              <li>
+                <Link href={withLang('/#flotte')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                  Child Seats
+                </Link>
+              </li>
+              <li>
+                <Link href={withLang('/preise')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                  Fixed Pricing
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/35">Quick Links</p>
+            <ul className="mt-5 space-y-4">
+              <li>
+                <Link href={withLang('/preise')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
                   Prices
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/#gebiete')} className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
+                <Link href={withLang('/#gebiete')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
                   Areas
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/#flotte')} className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
+                <Link href={withLang('/#flotte')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
                   Fleet
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/faq')} className="text-[1rem] !text-white/62 transition-colors hover:!text-white">
+                <Link href={withLang('/faq')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
                   FAQ
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div className="rounded-[1.55rem] border border-white/10 bg-white/[0.03] px-6 py-6 text-white">
-            <h3 className="text-[1.55rem] font-semibold tracking-[-0.04em] !text-white">
-              Legal
-            </h3>
-            <ul className="mt-6 space-y-4">
+          {/* Legal */}
+          <div>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/35">Legal</p>
+            <ul className="mt-5 space-y-4">
               <li>
-                <Link
-                  href={`/impressum?lang=${activeLang}`}
-                  className="text-[1rem] !text-white/62 transition-colors hover:!text-white"
-                >
+                <Link href={`/impressum?lang=${activeLang}`} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
                   Imprint
                 </Link>
               </li>
               <li>
-                <Link
-                  href={withLang('/datenschutz')}
-                  className="text-[1rem] !text-white/62 transition-colors hover:!text-white"
-                >
+                <Link href={withLang('/datenschutz')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link
-                  href={withLang('/agb')}
-                  className="text-[1rem] !text-white/62 transition-colors hover:!text-white"
-                >
+                <Link href={withLang('/agb')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
                   Terms and Conditions
                 </Link>
               </li>
             </ul>
           </div>
+
+        </div>
+
+        <div className="mt-14 border-t border-white/8 pt-6 text-[0.82rem] text-white/30">
+          © 2025 Alex Airport Taxi. All rights reserved.
         </div>
       </div>
     </footer>
