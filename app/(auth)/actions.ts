@@ -8,6 +8,7 @@ import { claimGuestBookingsForUser } from '@/lib/bookings/claimGuestBookings';
 import { cookies, headers } from 'next/headers';
 import { isIP } from 'net';
 import { Resend } from 'resend';
+import { requireSameOrigin } from '@/lib/security/origin';
 
 import { z } from 'zod';
 
@@ -124,6 +125,8 @@ async function sendAdminLoginFailureAlert(payload: { email: string; ip: string; 
 }
 
 export async function requestPasswordReset(formData: FormData) {
+  await requireSameOrigin();
+  const startTime = Date.now();
   const supabase = await createClient();
   const rawEmail = formData.get('email');
 
@@ -191,11 +194,18 @@ export async function requestPasswordReset(formData: FormData) {
     console.error('Password reset error:', error);
   }
 
+  // Normalize response time to prevent email-enumeration via timing
+  const elapsed = Date.now() - startTime;
+  if (elapsed < 600) {
+    await new Promise(resolve => setTimeout(resolve, 600 - elapsed));
+  }
+
   // Always return the same success message to prevent email enumeration
   return { success: 'Wenn ein Konto mit dieser E-Mail-Adresse existiert, haben wir Ihnen einen Link zum Zurücksetzen des Passworts gesendet.' };
 }
 
 export async function updatePassword(formData: FormData) {
+  await requireSameOrigin();
   const supabase = await createClient();
 
   const rawData = {
@@ -227,6 +237,7 @@ export async function updatePassword(formData: FormData) {
 }
 
 export async function login(formData: FormData) {
+  await requireSameOrigin();
   const cookieStore = cookies();
   const supabase = await createClient();
 
@@ -319,6 +330,7 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
+  await requireSameOrigin();
   const cookieStore = cookies();
   const supabase = await createClient();
 
@@ -399,6 +411,7 @@ export async function signup(formData: FormData) {
 }
 
 export async function adminLogin(formData: FormData) {
+  await requireSameOrigin();
   const cookieStore = cookies();
   const supabase = await createClient();
 

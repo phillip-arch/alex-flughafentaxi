@@ -6,7 +6,9 @@ import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { isIP } from 'net';
 import { Resend } from 'resend';
+import { requireSameOrigin } from '@/lib/security/origin';
 import { buildPassengerConfirmationEmailHtml } from '@/lib/booking/passengerEmail';
+import { generateSafeReference, normalizeBookingReference } from '@/lib/booking/reference';
 
 import { z } from 'zod';
 import { calculateVehiclePrice, type VehicleType } from '@/lib/pricing';
@@ -14,51 +16,6 @@ import {
   getLeadTimeErrorMessage,
   hasSufficientLeadTime,
 } from '@/lib/booking/leadTime';
-
-// Helper to generate a readable, collision-resistant reference
-// Excludes 0, O, 1, I to avoid confusion
-function generateSafeReference(length = 6) {
-  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
-function normalizeBookingReference(reference?: string | null) {
-  if (!reference) return '';
-  return reference.replace(/^TEST-/i, '');
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function formatDateTimeForEmail(value: string) {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return { date: '-', time: '-' };
-  }
-
-  return {
-    date: new Intl.DateTimeFormat('de-AT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(parsed),
-    time: new Intl.DateTimeFormat('de-AT', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).format(parsed),
-  };
-}
 
 const BookingSchema = z.object({
   full_name: z.string().min(2, 'Name ist zu kurz'),
@@ -79,6 +36,7 @@ const BookingSchema = z.object({
 });
 
 export async function createBooking(payload: any) {
+  await requireSameOrigin();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const isProduction = process.env.NODE_ENV === 'production';
@@ -245,15 +203,7 @@ export async function createBooking(payload: any) {
   const directionIcon = isFromAirport ? '🛬' : isToAirport ? '🛫' : '✈️';
 
   if (!process.env.RESEND_API_KEY) {
-    // Keep existing local dev behavior if email provider is not configured.
-    console.log('==================================================');
-    console.log('[MOCK EMAIL] RESEND_API_KEY missing. Confirmation email not sent.');
-    console.log(`[TO]: ${data.email}`);
-    console.log(
-      `[SUBJECT]: Ihre Buchungsbestaetigung (${directionLabel}) ${normalizeBookingReference(data.booking_reference)}`,
-    );
-    console.log(confirmLink);
-    console.log('==================================================');
+    console.warn('[booking] RESEND_API_KEY not set — confirmation email skipped for booking', normalizeBookingReference(data.booking_reference));
   } else {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const configuredFrom = process.env.RESEND_FROM_EMAIL;

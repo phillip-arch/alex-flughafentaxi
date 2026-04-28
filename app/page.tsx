@@ -321,12 +321,34 @@ const jsonLd = {
           },
         ],
       },
+      founder: { '@id': 'https://flughafentaxi-wien.at/#alex' },
+      provider: { '@id': 'https://flughafentaxi-wien.at/#business' },
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: '4.9',
         ratingCount: '47',
         bestRating: '5',
         worstRating: '1',
+      },
+    },
+    {
+      '@type': 'Person',
+      '@id': 'https://flughafentaxi-wien.at/#alex',
+      name: 'Alex',
+      jobTitle: 'Founder & Head Driver',
+      description:
+        'Founder of Alex Airport Taxi Vienna with over 10 years of professional driving experience on the Vienna–VIE airport route. Personally selects and trains every driver in the fleet.',
+      image: 'https://images.unsplash.com/photo-1740485863389-a8445da2735e?q=80&w=702&auto=format&fit=crop',
+      worksFor: { '@id': 'https://flughafentaxi-wien.at/#business' },
+      hasOccupation: {
+        '@type': 'Occupation',
+        name: 'Professional Airport Transfer Driver',
+        occupationLocation: {
+          '@type': 'City',
+          name: 'Vienna',
+          sameAs: 'https://www.wikidata.org/wiki/Q1741',
+        },
+        experienceRequirements: 'Over 10 years of professional experience',
       },
     },
     {
@@ -648,7 +670,7 @@ export default async function Home() {
               </div>
 
               <div className="mt-10 flex justify-center">
-                <BookingCta className="md:!w-auto md:!flex-none" label="Secure your fixed-price transfer" icon={ShieldCheck} />
+                <BookingCta className="md:!w-auto md:!flex-none" label="Secure fixed-price transfer" icon={ShieldCheck} />
               </div>
             </div>
           </div>

@@ -8,7 +8,7 @@ export async function verifyAdmin() {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    return { authorized: false, error: 'Unauthorized' };
+    return { authorized: false as const, error: 'Unauthorized', user: undefined };
   }
 
   // 2. Check if user has 'admin' role in profiles table
@@ -22,8 +22,8 @@ export async function verifyAdmin() {
     .single();
 
   if (profileError || !profile || profile.role !== 'admin') {
-    return { authorized: false, error: 'Forbidden' };
+    return { authorized: false as const, error: 'Forbidden', user: undefined };
   }
 
-  return { authorized: true, user };
+  return { authorized: true as const, user, error: undefined };
 }

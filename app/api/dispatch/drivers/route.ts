@@ -7,7 +7,7 @@ import { requireSameOrigin } from '@/lib/security/origin';
 export async function POST(req: NextRequest) {
   await requireSameOrigin();
   // 1. Verify Admin (Server-Side Check)
-  const { authorized, error } = await verifyAdmin();
+  const { authorized, error, user } = await verifyAdmin();
   if (!authorized) {
     return NextResponse.json({ error }, { status: 401 });
   }
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     // 4. Audit Log
     await supabaseAdmin.from('audit_logs').insert({
-      actor_user_id: (await verifyAdmin()).user?.id,
+      actor_user_id: user?.id,
       action: 'CREATE_DRIVER',
       entity: 'drivers',
       entity_id: data.id,

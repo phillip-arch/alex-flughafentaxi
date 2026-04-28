@@ -20,10 +20,14 @@ function createNonce() {
 
 function buildContentSecurityPolicy(nonce: string) {
   const isDev = process.env.NODE_ENV !== 'production';
-  const scriptSrc = ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'", "'unsafe-inline'", 'https:', 'http:'];
+  // In production: nonce + strict-dynamic is sufficient for modern browsers.
+  // 'unsafe-inline' is omitted so it cannot be exploited; strict-dynamic causes
+  // compliant browsers to ignore it anyway, but some older UA fallbacks would use it.
+  const scriptSrc = ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'"];
 
   if (isDev) {
-    scriptSrc.push("'unsafe-eval'");
+    // Dev needs unsafe-inline for HMR and unsafe-eval for source maps
+    scriptSrc.push("'unsafe-inline'", "'unsafe-eval'", 'https:', 'http:');
   }
 
   return [

@@ -272,7 +272,7 @@ export default function BookingStepTwo({
     return (
       <div className="flex min-h-[4.9rem] items-center justify-between gap-4 px-4 py-3 md:min-h-[3.8rem] md:px-4 md:py-2">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] bg-[#eef5ff] text-[#1679FF]">
+          <span className="shrink-0 text-[#1679FF]">
             <Icon size={18} />
           </span>
           <p className="truncate text-[1.02rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
@@ -325,7 +325,7 @@ export default function BookingStepTwo({
     return (
       <div className={`grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center justify-between gap-3 px-4 ${isLarger ? 'py-2.5' : 'py-3.5'}`}>
         <div className="flex min-w-0 items-center gap-3">
-          <span className={`flex shrink-0 items-center justify-center rounded-[0.9rem] bg-[#eef5ff] text-[#1679FF] ${isLarger ? 'h-11 w-11' : 'h-10 w-10'}`}>
+          <span className="shrink-0 text-[#1679FF]">
             <Icon size={isLarger ? 20 : 18} />
           </span>
           <div className="min-w-0">
@@ -429,36 +429,65 @@ export default function BookingStepTwo({
   };
 
   const optionalSummary = [
-    formData.meetAndGreet && canUseMeetAndGreet ? 'Meet & Greet +6€' : null,
     childSeatTotal > 0 ? `${childSeatTotal} child seat${childSeatTotal !== 1 ? 's' : ''}` : null,
     hasDriverNote ? 'Note added' : null,
   ].filter(Boolean).join(' · ');
 
-  const renderOptionalTrigger = () => (
-    <button
-      type="button"
-      onClick={() => setIsOptionalSheetOpen(true)}
-      className="flex w-full items-center justify-between gap-4 rounded-[1.15rem] border border-[#dbe7f8] bg-white px-4 py-3 text-left transition-colors hover:border-[#bdd4ff]"
-      aria-haspopup="dialog"
-      aria-expanded={isOptionalSheetOpen}
-    >
-      <div className="min-w-0">
-        <p className="text-[0.78rem] font-bold uppercase tracking-[0.08em] text-[#687384]">Optional</p>
-        <p className={`mt-0.5 truncate text-[0.88rem] font-medium ${optionalSummary ? 'text-[#1679FF]' : 'text-[#9ca3af]'}`}>
-          {optionalSummary || 'Child seats, meet & greet, notes'}
-        </p>
-      </div>
-      <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1679FF]">
-        {optionalSummary ? 'Edit' : '+ Add'}
-      </span>
-    </button>
+  const renderMeetAndGreetAndOptional = () => (
+    <div className="overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white">
+      {canUseMeetAndGreet ? (
+        <>
+          <button
+            type="button"
+            onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
+            className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3.5 text-left transition-colors"
+            aria-pressed={Boolean(formData.meetAndGreet)}
+          >
+            <span>
+              <p className="text-[0.78rem] font-bold uppercase tracking-[0.08em] text-[#687384]">Meet &amp; Greet <span className="text-[1rem] text-[#1679FF]">+6€</span></p>
+              <span className="mt-0.5 block text-[0.88rem] font-medium leading-snug text-[#5f6975]">
+                Driver waits in arrivals<br className="md:hidden" /> with a name sign
+              </span>
+            </span>
+            <span
+              className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors ${
+                formData.meetAndGreet ? 'bg-[#1679FF]' : 'bg-[#e9edf3]'
+              }`}
+            >
+              <span
+                className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white transition-transform ${
+                  formData.meetAndGreet ? 'translate-x-[1.2rem]' : 'translate-x-0'
+                }`}
+              />
+            </span>
+          </button>
+          <div className="border-t border-[#e8eef7]" />
+        </>
+      ) : null}
+      <button
+        type="button"
+        onClick={() => setIsOptionalSheetOpen(true)}
+        className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors"
+        aria-haspopup="dialog"
+        aria-expanded={isOptionalSheetOpen}
+      >
+        <div className="min-w-0">
+          <p className={`mt-0.5 truncate text-[0.88rem] font-medium ${optionalSummary ? 'text-[#1679FF]' : 'text-[#9ca3af]'}`}>
+            {optionalSummary || 'Free child seats, notes'}
+          </p>
+        </div>
+        <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1679FF]">
+          {optionalSummary ? 'Edit' : '+ Add'}
+        </span>
+      </button>
+    </div>
   );
 
   const renderInlineTravelDetails = () => (
-    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-3">
+    <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-2">
       {inlineVehicleCard ? (
         <div
-          className={`relative grid min-h-[6.55rem] min-w-0 w-full max-w-full grid-cols-[9.8rem_auto] grid-rows-[auto_auto] items-start justify-between gap-x-3 gap-y-1.5 overflow-hidden rounded-[1.15rem] border bg-white px-4 py-1.5 md:min-h-[5.2rem] md:grid-cols-[9rem_minmax(0,1fr)_6.5rem] md:grid-rows-none md:items-center md:justify-normal md:gap-3 md:px-4 md:py-1 ${
+          className={`relative grid min-h-[6.55rem] min-w-0 w-full max-w-full grid-cols-[9.8rem_auto] grid-rows-[auto_auto] items-start justify-between gap-x-3 gap-y-1.5 overflow-hidden rounded-[1.15rem] border bg-white px-4 py-1.5 md:min-h-[4.6rem] md:grid-cols-[9rem_minmax(0,1fr)_6.5rem] md:grid-rows-none md:items-center md:justify-normal md:gap-3 md:px-4 md:py-0 ${
             travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
           }`}
         >
@@ -520,7 +549,7 @@ export default function BookingStepTwo({
 
   const renderScratchStepTwo = () => (
     <div className="flex flex-1 min-h-0 flex-col md:hidden">
-      <div className="min-h-0 flex-1 space-y-3">
+      <div className="min-h-0 flex-1 space-y-2">
         {inlineVehicleCard ? (
           <div
             className={`grid min-w-0 grid-cols-[7rem_minmax(0,1fr)] gap-3 rounded-[1.15rem] border bg-white px-3 py-1.5 ${
@@ -561,7 +590,7 @@ export default function BookingStepTwo({
           <div className="border-t border-[#e8eef7]" />
         </div>
 
-        {renderOptionalTrigger()}
+        {renderMeetAndGreetAndOptional()}
       </div>
 
       <div className={actionRowClass}>
@@ -828,25 +857,6 @@ export default function BookingStepTwo({
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
               {renderSheetHeader('Optional extras', 'Add these to your ride before continuing.', closeOptionalSheet)}
               <div className="space-y-5">
-                {canUseMeetAndGreet ? (
-                  <div>
-                    <p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#687384]">Meet &amp; Greet</p>
-                    <button
-                      type="button"
-                      onClick={() => handleMeetAndGreetChange(!formData.meetAndGreet)}
-                      className={`grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[1.1rem] border px-4 py-3.5 text-left transition-colors ${formData.meetAndGreet ? 'border-[#7fb3ff] bg-white' : 'border-[#e4e8ef] bg-[#f8fbff]'}`}
-                      aria-pressed={Boolean(formData.meetAndGreet)}
-                    >
-                      <span>
-                        <span className="block text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">Meet &amp; Greet <span className="text-[#1679FF]">+6€</span></span>
-                        <span className="mt-0.5 block text-[0.84rem] font-medium leading-snug text-[#5f6975]">Driver waits in arrivals with a name sign</span>
-                      </span>
-                      <span className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors ${formData.meetAndGreet ? 'bg-[#1679FF]' : 'bg-[#e9edf3]'}`}>
-                        <span className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white transition-transform ${formData.meetAndGreet ? 'translate-x-[1.2rem]' : 'translate-x-0'}`} />
-                      </span>
-                    </button>
-                  </div>
-                ) : null}
                 <div>
                   <p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#687384]">Child seats — free of charge</p>
                   <div className="overflow-hidden rounded-[1.1rem] border border-[#e4e8ef] bg-[#f8fbff]">
@@ -880,10 +890,10 @@ export default function BookingStepTwo({
   return (
     <div className="w-full min-w-0 max-w-full overflow-x-clip flex flex-1 min-h-0 flex-col">
       <div className="hidden md:flex md:h-full md:flex-col">
-      <div className="md:min-h-0 md:flex-1 md:space-y-4">
+      <div className="md:min-h-0 md:flex-1 md:space-y-2">
       {renderInlineTravelDetails()}
 
-      {renderOptionalTrigger()}
+      {renderMeetAndGreetAndOptional()}
       </div>
 
       <div className={actionRowClass}>

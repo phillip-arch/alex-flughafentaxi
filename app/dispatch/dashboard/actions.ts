@@ -14,44 +14,13 @@ import {
 import { buildDriverCancellationEmailHtml } from '@/lib/booking/driverCancellationEmail';
 import { buildDriverAssignmentEmailHtml } from '@/lib/booking/driverAssignmentEmail';
 import { logAuditEvent } from '@/lib/audit/logAuditEvent';
-
-function normalizeBookingReference(reference?: string | null) {
-  if (!reference) return '-';
-  return reference.replace(/^TEST-/i, '');
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+import { normalizeBookingReference } from '@/lib/booking/reference';
+import { escapeHtml } from '@/lib/email/template';
+import { formatDateTime } from '@/lib/email/formatters';
 
 function safeActionError(publicMessage: string, context: string, error?: unknown) {
   console.error(context, error);
   return { error: publicMessage };
-}
-
-function formatDateTimeForEmail(value: string) {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return { date: '-', time: '-' };
-  }
-
-  return {
-    date: new Intl.DateTimeFormat('de-AT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(parsed),
-    time: new Intl.DateTimeFormat('de-AT', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).format(parsed),
-  };
 }
 
 async function checkAdmin() {
@@ -760,7 +729,7 @@ export async function assignDriver(bookingId: string, driverId: string, sendEmai
         Number(booking.price ?? 0),
       ),
     );
-    const { date: pickupDate, time: pickupTime } = formatDateTimeForEmail(String(booking.pickup_at));
+    const { date: pickupDate, time: pickupTime } = formatDateTime(String(booking.pickup_at));
     const safeDate = escapeHtml(pickupDate);
     const safeTime = escapeHtml(pickupTime);
     const safeDirectionLabel = escapeHtml(directionLabel);

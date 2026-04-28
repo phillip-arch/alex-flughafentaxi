@@ -32,7 +32,6 @@ export async function POST(req: NextRequest) {
     if (updateError) throw updateError;
 
     // 3. Send Email (Mock for now - replace with Resend)
-    console.log(`[EMAIL] Sending confirmation link to driver: /book/confirm?token=${confirmToken}`);
 
     // 4. Audit Log
     await supabaseAdmin.from('audit_logs').insert({

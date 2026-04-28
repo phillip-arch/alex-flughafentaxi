@@ -199,6 +199,7 @@ const BookingForm = ({
   const [resolvedExtraStopStreetOption, setResolvedExtraStopStreetOption] = useState<StreetOption | null>(null);
   const [streetNumberWarning, setStreetNumberWarning] = useState<'street' | 'extraStopStreet' | null>(null);
   const [streetPasteWarning, setStreetPasteWarning] = useState<'street' | 'extraStopStreet' | null>(null);
+  const [unresolvedStreetWarning, setUnresolvedStreetWarning] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
   const [accountDefaults, setAccountDefaults] = useState(initialAccountDefaults);
   const [zipPricing, setZipPricing] = useState<{
@@ -249,12 +250,13 @@ const BookingForm = ({
   const activeToastMessage =
     error ||
     flightLookupError ||
-    (streetPasteWarning === 'street' ? 'Address could not be recognized clearly. Please choose from the list.' : null) ||
-    (streetNumberWarning === 'street' ? 'Please add the street number.' : null) ||
+    (streetPasteWarning === 'street' ? 'Couldn\'t auto-detect the address. Type to search and select from the list.' : null) ||
+    (unresolvedStreetWarning ? 'Select an address from the dropdown to continue.' : null) ||
+    (streetNumberWarning === 'street' ? 'Please add the house number.' : null) ||
     leadTimeAdjustmentNotice ||
     null;
-  const activeToastIsError = Boolean(error || flightLookupError || streetPasteWarning || streetNumberWarning);
-  const activeToastAutoHide = activeToastMessage === REQUIRED_FIELDS_ERROR || (!activeToastIsError && Boolean(leadTimeAdjustmentNotice));
+  const activeToastIsError = Boolean(error || flightLookupError || streetPasteWarning || unresolvedStreetWarning || streetNumberWarning);
+  const activeToastAutoHide = activeToastMessage === REQUIRED_FIELDS_ERROR || Boolean(flightLookupError) || (!activeToastIsError && Boolean(leadTimeAdjustmentNotice));
 
   useEffect(() => {
     onDirectionChange?.(formData.direction);
@@ -619,8 +621,13 @@ const BookingForm = ({
 
     if (!selectedOption) {
       setStreetNumberWarning((prev) => (prev === target ? null : prev));
+      if (target === 'street' && rawValue.trim().length > 0) {
+        setUnresolvedStreetWarning(true);
+      }
       return;
     }
+
+    setUnresolvedStreetWarning(false);
 
     if (hasTypedStreetNumber(rawValue, selectedOption.street)) {
       setStreetNumberWarning((prev) => (prev === target ? null : prev));
@@ -805,6 +812,7 @@ const BookingForm = ({
 
     setStreetNumberWarning((prev) => (prev === target ? null : prev));
     setStreetPasteWarning((prev) => (prev === target ? null : prev));
+    if (target === 'street') setUnresolvedStreetWarning(false);
 
     if (selectedOption && normalizedValue.toLowerCase().startsWith(selectedOption.street.toLowerCase())) {
       setFormData((prev) =>
@@ -837,13 +845,13 @@ const BookingForm = ({
             ...prev,
             street: rawValue,
             zip: '',
-            city: 'Wien',
+            city: '',
           }
         : {
             ...prev,
             extraStopStreet: rawValue,
             extraStopZip: '',
-            extraStopCity: 'Wien',
+            extraStopCity: '',
           },
     );
   };
@@ -858,6 +866,7 @@ const BookingForm = ({
       setResolvedStreetOption(option);
       setStreetNumberWarning('street');
       setStreetPasteWarning(null);
+      setUnresolvedStreetWarning(false);
       setFormData((prev) => ({
         ...prev,
         street: option.street,
@@ -1637,7 +1646,7 @@ const BookingForm = ({
                 <p style={{ marginBottom: '14px' }} className="text-[22px] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
                   {addressPlaceholder}
                 </p>
-                <div className={`rounded-[1.35rem] border bg-white pl-2 pr-5 py-3 transition-shadow md:pl-3 md:pr-5 md:py-3 ${isFieldInvalid('street') || isFieldInvalid('zip') ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
+                <div className={`rounded-[1.35rem] border bg-white pl-2 pr-5 py-3 transition-shadow md:pl-3 md:pr-5 md:py-3 ${isFieldInvalid('street') || isFieldInvalid('zip') || unresolvedStreetWarning ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
                   <div className="flex min-w-0 items-center gap-1.5 md:gap-3">
                     <MapPin className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
                     <div className="relative min-w-0 flex-1">
@@ -1652,11 +1661,21 @@ const BookingForm = ({
                         onPasteText={(text) => handleStreetPaste('street', text)}
                         onBlur={() => validateStreetNumber('street')}
                         placeholder={addressInputPlaceholder}
-                        className="w-full border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:text-[18px]"
+                        className="w-full min-h-[3.15rem] border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:min-h-0 md:text-[18px]"
                       />
                     </div>
                   </div>
                 </div>
+                {unresolvedStreetWarning && (
+                  <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[#d70015]">
+                    Select an address from the list.
+                  </p>
+                )}
+                {!unresolvedStreetWarning && streetNumberWarning === 'street' && (
+                  <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[#d70015]">
+                    Add the house number to continue.
+                  </p>
+                )}
               </div>
               <div>
                 <p style={{ marginBottom: '10px' }} className="text-[1.1rem] font-bold leading-[1.1] tracking-[-0.04em] text-[#111827] md:text-[1.1rem]">

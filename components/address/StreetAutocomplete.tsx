@@ -410,7 +410,7 @@ export default function StreetAutocomplete({
           ) : !results.length ? (
             trimmedValue.length >= 2 ? (
               <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">
-                No matching streets found.
+                Keine Straße gefunden.
               </div>
             ) : null
           ) : (
@@ -418,12 +418,12 @@ export default function StreetAutocomplete({
               const key = `${option.zip}-${option.street}-${option.city}`;
               const isActive = index === activeIndex;
               return (
-                <button
+                <div
                   key={key}
                   id={`${listboxId}-option-${index}`}
-                  type="button"
                   role="option"
                   aria-selected={isActive}
+                  tabIndex={-1}
                   onMouseEnter={() => setActiveIndex(index)}
                   onMouseDown={(event) => {
                     event.preventDefault();
@@ -431,7 +431,7 @@ export default function StreetAutocomplete({
                   onClick={() => {
                     selectOption(option);
                   }}
-                  className={`flex w-full flex-col items-start px-4 py-3 text-left transition-colors ${
+                  className={`flex w-full cursor-pointer flex-col items-start px-4 py-3 text-left transition-colors ${
                     isActive ? 'bg-[#f8fbff]' : 'hover:bg-[#f8fbff]'
                   } ${
                     index > 0 ? 'border-t border-[#edf2f7]' : ''
@@ -440,7 +440,7 @@ export default function StreetAutocomplete({
                   <span className="min-w-0 truncate text-[0.95rem] font-medium text-[#111111]">
                     {buildStreetOptionValue(option.street, option.zip, option.city)}
                   </span>
-                </button>
+                </div>
               );
             })
           )}

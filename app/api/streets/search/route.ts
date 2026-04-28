@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { buildStreetOptionValue } from '@/lib/addresses';
 
+// Stable zip→city lookup cached per server instance (Vienna ZIP data changes rarely).
+let _zipCityCache: Map<string, string> | null = null;
+let _zipCityCacheAt = 0;
+const ZIP_CITY_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+async function getZipCityMap(): Promise<Map<string, string>> {
+  const now = Date.now();
+  if (_zipCityCache && now - _zipCityCacheAt < ZIP_CITY_CACHE_TTL) {
+    return _zipCityCache;
+  }
+  const { data } = await supabaseAdmin.from('zip_prices').select('zip, city');
+  _zipCityCache = new Map(
+    (data || []).map((row) => [String(row.zip || '').trim(), String(row.city || '').trim()]),
+  );
+  _zipCityCacheAt = now;
+  return _zipCityCache;
+}
+
 function normalizeSearchValue(value: string) {
   return value
     .trim()
@@ -183,26 +201,8 @@ export async function GET(request: NextRequest) {
       ...(zipResults || []),
       ...(cityStreetResults.data || []),
     ];
-    const zipList = [...new Set(combined.map((item) => String(item.zip || '').trim()).filter(Boolean))];
 
-    let cityByZip = new Map<string, string>();
-    if (zipList.length > 0) {
-      const { data: zipPriceRows, error: zipPriceError } = await supabaseAdmin
-        .from('zip_prices')
-        .select('zip, city')
-        .in('zip', zipList);
-
-      if (zipPriceError) {
-        return NextResponse.json(
-          { error: zipPriceError.message || 'ZIP price lookup failed.' },
-          { status: 500 },
-        );
-      }
-
-      cityByZip = new Map(
-        (zipPriceRows || []).map((row) => [String(row.zip || '').trim(), String(row.city || '').trim()]),
-      );
-    }
+    const cityByZip = await getZipCityMap();
 
     const seen = new Set<string>();
 

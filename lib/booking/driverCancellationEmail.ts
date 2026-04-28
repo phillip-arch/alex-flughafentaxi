@@ -1,4 +1,5 @@
 import { buildEmailLayout } from '@/lib/email/template';
+import { formatDate, formatTime, formatPrice, formatAddress } from '@/lib/email/formatters';
 
 export type DriverCancellationEmailInput = {
   driverName?: string | null;
@@ -8,40 +9,6 @@ export type DriverCancellationEmailInput = {
   vehicleType?: string | null;
   price?: number | null;
 };
-
-function formatDate(value?: string | null) {
-  const parsed = new Date(String(value || ''));
-  if (Number.isNaN(parsed.getTime())) return '-';
-  return new Intl.DateTimeFormat('de-AT', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(parsed);
-}
-
-function formatTime(value?: string | null) {
-  const parsed = new Date(String(value || ''));
-  if (Number.isNaN(parsed.getTime())) return '-';
-  return new Intl.DateTimeFormat('de-AT', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).format(parsed);
-}
-
-function formatPrice(value?: number | null) {
-  return new Intl.NumberFormat('de-AT', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Number(value ?? 0));
-}
-
-function formatAddress(value?: string | null) {
-  const raw = String(value || '').trim();
-  const match = raw.match(/^(.*?),\s*(\d{4}\s+.+)$/);
-  if (!match) return raw;
-  return `${match[1]}\n${match[2]}`;
-}
 
 export function buildDriverCancellationEmailHtml(input: DriverCancellationEmailInput) {
   const driverName = String(input.driverName || 'Fahrer');

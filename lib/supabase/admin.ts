@@ -1,10 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
-import { createClient as createServerClient } from './server';
 
-// This client uses the SERVICE ROLE key.
-// It bypasses RLS and has full access to the database.
-// NEVER import this in a client-side component ('use client').
-// ONLY use this in Server Actions or Route Handlers.
+// SERVICE ROLE client — bypasses RLS.
+// Never import in 'use client' components.
+// Use verifyAdmin() from @/lib/auth/server for authorization checks.
 
 if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
   throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY');
@@ -24,20 +22,3 @@ export const supabaseAdmin = createClient(
     },
   }
 );
-
-// Helper function to verify if the current user is an admin
-export const verifyAdmin = async () => {
-  const supabase = await createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) return false;
-
-  // Check the profiles table for the admin role
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  return profile?.role === 'admin';
-};

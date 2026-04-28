@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: 'Flugdaten konnten vom Anbieter nicht geladen werden.' },
+        { error: 'Flight data could not be loaded from the provider.' },
         { status: response.status || 502 },
       );
     }
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
     const matchedFlight = findMatchingFlight(flights, flightNumber);
 
     if (!matchedFlight) {
-      return NextResponse.json({ error: 'Kein Flug mit dieser Nummer am gewaehlten Datum gefunden.' }, { status: 404 });
+      return NextResponse.json({ error: 'No flight found with this number on the selected date.' }, { status: 404 });
     }
 
     const origin = pickAirportDisplayName(matchedFlight.departure?.airport);
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
 
     if (!origin || !scheduledArrivalTime) {
       return NextResponse.json(
-        { error: 'Der Flug wurde gefunden, aber Herkunft oder planmaessige Landezeit fehlen.' },
+        { error: 'Flight found but departure or scheduled arrival time is missing.' },
         { status: 404 },
       );
     }
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
     });
   } catch {
     return NextResponse.json(
-      { error: 'Flugdaten konnten gerade nicht geladen werden.' },
+      { error: 'Flight data could not be loaded right now. Please try again.' },
       { status: 502 },
     );
   }

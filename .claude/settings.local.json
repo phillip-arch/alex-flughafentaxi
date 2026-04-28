@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"#[0-9a-fA-F]\\\\{3,6\\\\}\" components/BookingForm.tsx)",
+      "Bash(npx tsc *)"
+    ]
+  }
+}
