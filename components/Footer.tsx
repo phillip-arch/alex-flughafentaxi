@@ -89,7 +89,7 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/35">Services</p>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/60">Services</p>
             <ul className="mt-5 space-y-4">
               <li>
                 <Link href={withLang('/book')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
@@ -116,7 +116,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/35">Quick Links</p>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/60">Quick Links</p>
             <ul className="mt-5 space-y-4">
               <li>
                 <Link href={withLang('/preise')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
@@ -143,7 +143,7 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/35">Legal</p>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/60">Legal</p>
             <ul className="mt-5 space-y-4">
               <li>
                 <Link href={`/impressum?lang=${activeLang}`} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
@@ -165,7 +165,7 @@ export default function Footer() {
 
         </div>
 
-        <div className="mt-14 border-t border-white/8 pt-6 text-[0.82rem] text-white/30">
+        <div className="mt-14 border-t border-white/8 pt-6 text-[0.82rem] text-white/50">
           © 2025 Alex Airport Taxi. All rights reserved.
         </div>
       </div>

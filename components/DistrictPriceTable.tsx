@@ -69,7 +69,7 @@ export default function DistrictPriceTable({
   return (
     <div className="mt-4 flex flex-col overflow-hidden rounded-[0.9rem] border border-[#e7edf5] bg-white shadow-[0_10px_24px_rgba(17,17,17,0.035)] md:mt-0 lg:flex-1">
       {/* Header — fixed, always visible */}
-      <table className="w-full shrink-0 table-fixed border-collapse text-left">
+      <table aria-hidden="true" className="w-full shrink-0 table-fixed border-collapse text-left">
         <colgroup>
           <col style={{ width: '34%' }} />
           <col style={{ width: '22%' }} />
@@ -129,6 +129,14 @@ export default function DistrictPriceTable({
                 <col style={{ width: '22%' }} />
                 <col style={{ width: '22%' }} />
               </colgroup>
+              <thead className="sr-only">
+                <tr>
+                  <th scope="col">District / ZIP</th>
+                  {vehicleColumns.map((column) => (
+                    <th key={column.key} scope="col">{column.label}</th>
+                  ))}
+                </tr>
+              </thead>
               <tbody>
                 {group.rows.map((district) => {
                   const isActive = district.id === activeId;

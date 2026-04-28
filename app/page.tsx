@@ -538,7 +538,7 @@ export default async function Home() {
                     bg: 'bg-[#111827]',
                   },
                   {
-                    src: 'https://images.unsplash.com/photo-1590253198910-1683b35ba5bf?q=80&w=1470&auto=format&fit=crop',
+                    src: 'https://images.unsplash.com/photo-1590253198910-1683b35ba5bf?q=60&w=800&auto=format&fit=crop&fm=webp',
                     alt: 'Vienna city centre — served by Alex Airport Taxi with fixed-price transfers to Vienna Airport (VIE)',
                     badge: 'Always on time',
                     bg: 'bg-[#1a2236]',
@@ -729,7 +729,7 @@ export default async function Home() {
                 <div className="py-4 lg:py-8">
                   <SectionEyebrow>About Alex</SectionEyebrow>
                   <SectionHeading>Meet Alex: The Driver<br className="hidden md:block" /> Behind the Standard.</SectionHeading>
-                  <p style={{ marginTop: '0.75rem', marginBottom: '1.25rem' }} className="text-[1.05rem] font-semibold tracking-[-0.02em] text-[#1679FF]">Over 10 years of experience on Vienna&apos;s roads.</p>
+                  <p style={{ marginTop: '0.75rem', marginBottom: '1.25rem' }} className="text-[1.05rem] font-semibold tracking-[-0.02em] text-[#1055c4]">Over 10 years of experience on Vienna&apos;s roads.</p>
                   <p className="mt-4 text-[0.95rem] leading-[1.75] text-[#5e718a]">
                     For over a decade, Alex drove the route to Vienna Airport Schwechat. He saw firsthand exactly what frustrated travelers the most: hidden fees, unmaintained cars, and stressed drivers who treated passengers like numbers. He knew that airport transfers needed to bring hospitality back to the industry.
                   </p>
