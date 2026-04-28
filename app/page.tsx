@@ -399,10 +399,11 @@ function SectionHeading({ children, light = false }: { children: React.ReactNode
   );
 }
 
-function BookingCta({ className = '' }: { className?: string }) {
+function BookingCta({ className = '', label = 'Book Now', icon: Icon }: { className?: string; label?: string; icon?: LucideIcon }) {
   return (
     <Link href="/book" className={`ui-button-booking-primary ${className}`}>
-      Book Now
+      {Icon && <Icon size={17} strokeWidth={2.2} />}
+      {label}
     </Link>
   );
 }
@@ -475,25 +476,25 @@ export default async function Home({
               <div className="grid gap-3 md:grid-cols-3 md:gap-4">
                 {[
                   {
+                    src: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1470&auto=format&fit=crop',
+                    alt: 'Premium car interior',
+                    badge: 'Fixed Price',
+                    bg: 'bg-[#111827]',
+                  },
+                  {
                     src: 'https://images.unsplash.com/photo-1590253198910-1683b35ba5bf?q=80&w=1470&auto=format&fit=crop',
                     alt: 'Vienna city centre',
-                    label: 'Vienna city',
+                    badge: 'Always on time',
                     bg: 'bg-[#1a2236]',
                   },
                   {
                     src: 'https://images.pexels.com/photos/10302773/pexels-photo-10302773.jpeg',
                     alt: 'Vienna International Airport',
-                    label: 'Vienna airport',
+                    badge: 'Flight Monitoring',
                     bg: 'bg-[#151e30]',
                   },
-                  {
-                    src: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1470&auto=format&fit=crop',
-                    alt: 'Premium car interior',
-                    label: 'Premium interior',
-                    bg: 'bg-[#111827]',
-                  },
-                ].map(({ src, alt, label, bg }) => (
-                  <div key={label} className={`relative overflow-hidden rounded-[1.5rem] md:rounded-[1.75rem] ${bg}`}>
+                ].map(({ src, alt, badge, bg }) => (
+                  <div key={alt} className={`relative overflow-hidden rounded-[1.5rem] md:rounded-[1.75rem] ${bg}`}>
                     <div className="relative h-[13rem] w-full md:h-[16rem]">
                       <Image
                         src={src}
@@ -503,8 +504,8 @@ export default async function Home({
                         sizes="(min-width: 768px) 33vw, 100vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <span className="absolute bottom-4 left-5 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/80">
-                        {label}
+                      <span className="absolute bottom-4 left-4 inline-flex items-center rounded-full bg-[#1679FF] px-3 py-1 text-[0.75rem] font-semibold text-white shadow-[0_4px_12px_rgba(22,121,255,0.4)]">
+                        {badge}
                       </span>
                     </div>
                   </div>
@@ -613,7 +614,7 @@ export default async function Home({
               </div>
 
               <div className="mt-10 flex justify-center">
-                <BookingCta />
+                <BookingCta className="md:!w-auto md:!flex-none" label="Secure your fixed-price transfer" icon={ShieldCheck} />
               </div>
             </div>
           </div>
@@ -955,7 +956,7 @@ export default async function Home({
                   </p>
                 </div>
                 <div className="mt-8">
-                  <BookingCta />
+                  <BookingCta className="md:!w-auto md:!flex-none" />
                 </div>
               </div>
             </div>

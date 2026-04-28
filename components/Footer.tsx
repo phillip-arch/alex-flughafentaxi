@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { ChevronRight, Clock3, Instagram, ShieldCheck, ShieldEllipsis } from 'lucide-react';
+import { Clock3, Instagram, ShieldCheck, ShieldEllipsis } from 'lucide-react';
 
 function TikTokIcon({ className = '' }: { className?: string }) {
   return (
@@ -42,10 +42,9 @@ export default function Footer() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href={withLang('/book')}
-                className="inline-flex items-center gap-2 rounded-[0.9rem] bg-[#1679FF] px-6 py-3.5 text-[0.95rem] font-semibold text-white transition-colors hover:bg-[#1166d4]"
+                className="ui-button-booking-primary !w-auto !flex-none"
               >
                 Book now
-                <ChevronRight size={16} />
               </Link>
               <Link
                 href={withLang('/preise')}
