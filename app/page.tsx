@@ -538,7 +538,7 @@ export default async function Home() {
                     bg: 'bg-[#111827]',
                   },
                   {
-                    src: 'https://images.unsplash.com/photo-1590253198910-1683b35ba5bf?q=60&w=800&auto=format&fit=crop&fm=webp',
+                    src: 'https://images.unsplash.com/photo-1590253198910-1683b35ba5bf?q=40&w=800&auto=format&fit=crop&fm=webp',
                     alt: 'Vienna city centre — served by Alex Airport Taxi with fixed-price transfers to Vienna Airport (VIE)',
                     badge: 'Always on time',
                     bg: 'bg-[#1a2236]',

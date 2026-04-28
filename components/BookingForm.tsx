@@ -1638,7 +1638,7 @@ const BookingForm = ({
             <p className="text-[12px] text-[#6d7075]">{copy.routeDescription}</p>
           </div>
         )}
-        <div className="rounded-[2.2rem] bg-transparent pt-0 shadow-none">
+        <div className="rounded-[2.2rem] bg-white pt-0 shadow-none">
           <div className="min-w-0">
             {DirectionSelector()}
             <div className="mt-4 space-y-4 md:mt-4 md:space-y-4">
@@ -1689,7 +1689,7 @@ const BookingForm = ({
         </div>
       </div>
 
-      <div className="mt-2 flex flex-col items-center gap-2 md:mt-0 md:pt-3">
+      <div className="mt-2 flex shrink-0 flex-col items-center gap-2 bg-white md:mt-0 md:pt-3">
         <div className="flex w-full items-center justify-center">
           <button
             type="button"
