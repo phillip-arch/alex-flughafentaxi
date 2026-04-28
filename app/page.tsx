@@ -67,6 +67,7 @@ const vehicles = [
   {
     type: 'SEDAN',
     title: 'Limousine',
+    altText: 'Vienna airport taxi — sedan limousine for up to 2 passengers and 2 suitcases',
     imageSrc: '/limo.jpg',
     summary: 'Compact, always available, ideal for solo travelers or couples with standard luggage.',
     passengers: '1 – 2',
@@ -80,6 +81,7 @@ const vehicles = [
   {
     type: 'WAGON',
     title: 'Station Wagon',
+    altText: 'Vienna airport taxi — station wagon with extra luggage space for up to 4 passengers',
     imageSrc: '/kombi.jpg',
     summary: 'More space for luggage, strollers, or extra passengers — no comfort lost.',
     passengers: '1 – 4',
@@ -93,6 +95,7 @@ const vehicles = [
   {
     type: 'MINIVAN',
     title: 'Minivan',
+    altText: 'Vienna airport taxi — minivan for groups of up to 8 passengers with 8 suitcases',
     imageSrc: '/bus.jpg',
     summary: 'The right choice for larger groups arriving together, with plenty of room for all bags.',
     passengers: '1 – 8',
@@ -163,20 +166,52 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
+      '@type': 'WebSite',
+      '@id': 'https://flughafentaxi-wien.at/#website',
+      url: 'https://flughafentaxi-wien.at',
+      name: 'Alex Airport Taxi Vienna',
+      description: 'Fixed-price airport taxi transfers to and from Vienna International Airport (VIE), available 24/7.',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: 'https://flughafentaxi-wien.at/book',
+        },
+      },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': 'https://flughafentaxi-wien.at/#webpage',
+      url: 'https://flughafentaxi-wien.at',
+      name: 'Vienna Airport Taxi — Fixed Price Transfers | Alex Flughafentaxi',
+      isPartOf: { '@id': 'https://flughafentaxi-wien.at/#website' },
+      about: { '@id': 'https://flughafentaxi-wien.at/#business' },
+      speakable: {
+        '@type': 'SpeakableSpecification',
+        cssSelector: ['h1', 'h2'],
+      },
+    },
+    {
       '@type': ['TaxiService', 'LocalBusiness'],
       '@id': 'https://flughafentaxi-wien.at/#business',
       name: 'Alex Flughafentaxi Wien',
       alternateName: 'Alex Airport Taxi Vienna',
       url: 'https://flughafentaxi-wien.at',
       telephone: '+436764826069',
+      image: 'https://flughafentaxi-wien.at/alexlogo.png',
       description:
-        'Fixed-price airport taxi transfers to and from Vienna International Airport (VIE). Sedans, station wagons, and minivans available 24/7. No hidden fees, real-time flight tracking.',
+        'Fixed-price airport taxi transfers to and from Vienna International Airport (VIE). Taxi to Vienna Airport and taxi from Vienna Airport — sedans, station wagons, and minivans available 24/7. No hidden fees, real-time flight tracking.',
       priceRange: '€€',
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Vienna',
         addressRegion: 'Vienna',
         addressCountry: 'AT',
+      },
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: 48.1102778,
+        longitude: 16.5697222,
       },
       areaServed: [
         {
@@ -312,6 +347,7 @@ const jsonLd = {
 const childSeats = [
   {
     title: 'Baby Seat',
+    altText: 'Infant baby seat — provided free of charge in every Vienna airport taxi with advance notice',
     weightRange: '0 – 13 kg',
     ageLabel: 'For newborns & infants',
     description:
@@ -320,6 +356,7 @@ const childSeats = [
   },
   {
     title: 'Child Seat',
+    altText: 'Child seat with 5-point harness — free of charge for Vienna airport taxi transfers',
     weightRange: '9 – 18 kg',
     ageLabel: 'For toddlers',
     description:
@@ -328,6 +365,7 @@ const childSeats = [
   },
   {
     title: 'Booster Seat',
+    altText: 'Booster seat for school-age children — included at no extra cost in Vienna airport taxis',
     weightRange: '15 – 36 kg',
     ageLabel: 'For school-age children (up to ~12 yrs)',
     description:
@@ -408,11 +446,7 @@ function BookingCta({ className = '', label = 'Book Now', icon: Icon }: { classN
   );
 }
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ lang?: string }>;
-}) {
+export default async function Home() {
   return (
     <div className="min-h-screen bg-[#f3f7fc] text-[#111111]">
       <script
@@ -477,19 +511,19 @@ export default async function Home({
                 {[
                   {
                     src: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1470&auto=format&fit=crop',
-                    alt: 'Premium car interior',
+                    alt: 'Premium interior of an Alex Airport Taxi Vienna — clean, modern vehicle for every transfer',
                     badge: 'Fixed Price',
                     bg: 'bg-[#111827]',
                   },
                   {
                     src: 'https://images.unsplash.com/photo-1590253198910-1683b35ba5bf?q=80&w=1470&auto=format&fit=crop',
-                    alt: 'Vienna city centre',
+                    alt: 'Vienna city centre — served by Alex Airport Taxi with fixed-price transfers to Vienna Airport (VIE)',
                     badge: 'Always on time',
                     bg: 'bg-[#1a2236]',
                   },
                   {
                     src: 'https://images.pexels.com/photos/10302773/pexels-photo-10302773.jpeg',
-                    alt: 'Vienna International Airport',
+                    alt: 'Vienna International Airport (VIE) — taxi pickup and drop-off point for Alex Flughafentaxi',
                     badge: 'Flight Monitoring',
                     bg: 'bg-[#151e30]',
                   },
@@ -552,7 +586,7 @@ export default async function Home({
             <div className="mx-auto max-w-[108rem]">
               <div className="mb-12 lg:mb-14">
                 <SectionEyebrow>Vehicle categories</SectionEyebrow>
-                <SectionHeading>Choose your vehicle.</SectionHeading>
+                <SectionHeading>Choose your vehicle for the airport transfer.</SectionHeading>
               </div>
 
               <div className="space-y-4">
@@ -565,7 +599,7 @@ export default async function Home({
                     <div className="relative h-[13rem] w-full overflow-hidden rounded-t-[1.75rem] lg:h-[13rem] lg:rounded-none">
                       <Image
                         src={v.imageSrc}
-                        alt={v.title}
+                        alt={v.altText}
                         fill
                         className="scale-[1.15] object-contain object-center mix-blend-multiply"
                         sizes="(min-width: 1024px) 320px, 100vw"
@@ -815,7 +849,7 @@ export default async function Home({
                     <div className="absolute right-4 top-4 h-[5.5rem] w-[5.5rem]">
                       <Image
                         src={seat.imageSrc}
-                        alt={seat.title}
+                        alt={seat.altText}
                         fill
                         className="object-contain mix-blend-multiply"
                         sizes="88px"
@@ -970,7 +1004,7 @@ export default async function Home({
               <div className="rounded-[1.75rem] border border-[#e6edf7] bg-[#f8fbff] px-7 py-8 md:px-10 md:py-10">
                 <SectionEyebrow>Routes</SectionEyebrow>
                 <h2 className="mt-3 text-[2rem] font-black leading-[1.02] tracking-[-0.05em] text-[#0c111e] md:text-[2.3rem]">
-                  Popular routes.
+                  Popular Vienna airport taxi routes.
                 </h2>
                 <p className="mt-2 text-[0.88rem] text-[#5e718a]">
                   Most-booked transfers from and to Vienna Airport.

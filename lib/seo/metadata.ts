@@ -11,14 +11,14 @@ type LocalizedMetadataEntry = {
 const localizedMetadata: Record<MetadataKey, Record<SiteLocale, LocalizedMetadataEntry>> = {
   home: {
     de: {
-      title: 'Alex Flughafentaxi Wien | Ihr Transfer zum Flughafen Wien',
+      title: 'Flughafentaxi Wien | Fixpreis Transfer zum Flughafen Wien (VIE)',
       description:
-        'Buchen Sie Ihr Alex Flughafentaxi Wien zum garantierten Fixpreis. Sicherer Transfer, moderne Fahrzeuge und kostenlose Kindersitze. Jetzt einfach online oder telefonisch bestellen!',
+        'Flughafentaxi Wien zum garantierten Fixpreis — zuverlässiger Transfer zum und vom Flughafen Wien (VIE), 24/7. Keine versteckten Gebühren, Flugüberwachung inklusive. Jetzt online buchen!',
     },
     en: {
-      title: 'Alex Airport Taxi Vienna | Your transfer to Vienna Airport',
+      title: 'Vienna Airport Taxi | Fixed Price Taxi to & from Vienna Airport (VIE)',
       description:
-        'Book your Alex Airport Taxi Vienna at a guaranteed fixed price. Safe transfer, modern vehicles, and free child seats. Order online or by phone in just a few steps.',
+        'Book a Vienna airport taxi at a guaranteed fixed price. Reliable taxi to Vienna Airport and from Vienna Airport (VIE), available 24/7. Flight tracking included, no hidden fees — sedan, station wagon and minivan available.',
     },
   },
   agb: {

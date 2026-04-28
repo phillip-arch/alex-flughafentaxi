@@ -25,12 +25,12 @@ const archivo = Archivo({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Alex Flughafentaxi',
-    default: 'Ihr professioneller Flughafen Taxi Service',
+    template: '%s | Alex Flughafentaxi Wien',
+    default: 'Flughafentaxi Wien — Fixpreis Transfer zum Flughafen Wien (VIE)',
   },
   manifest: '/manifest.webmanifest',
   description:
-    'Buchen Sie Ihren Flughafentransfer in Wien. Fixpreise, zuverlaessiger Service und komfortable Fahrten zum und vom Flughafen Wien.',
+    'Flughafentaxi Wien zum garantierten Fixpreis. Zuverlässiger Transfer zum und vom Flughafen Wien (VIE), 24/7. Flugüberwachung inklusive, keine versteckten Gebühren.',
   metadataBase: new URL('https://flughafentaxi-wien.at'),
   applicationName: 'Alex Flughafentaxi',
   appleWebApp: {
