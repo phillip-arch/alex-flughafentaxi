@@ -101,7 +101,7 @@ export default function StreetAutocomplete({
       hasLockedHouseNumberSuffix);
   const showMobileSelectedSummary = showMobileSelectedStreetOnly && !isFocused;
   const mobileSelectedInputClasses = showMobileSelectedStreetOnly
-    ? '!h-[3.15rem] !px-[0.6rem] !py-[0.6rem] text-[1rem] leading-tight md:!h-auto md:!px-[0.6rem] md:!py-[0.6rem] md:text-inherit md:leading-normal'
+    ? '!h-[2.6rem] !px-[0.6rem] !py-[0.6rem] text-[1rem] leading-tight md:!h-auto md:!px-[0.6rem] md:!py-[0.6rem] md:text-inherit md:leading-normal'
     : '';
   const mobileDisplayValue = showMobileSelectedSummary
     ? normalizedInputValue || selectedOption.street

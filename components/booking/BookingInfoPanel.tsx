@@ -290,28 +290,9 @@ function getStepSections(
   meetAndGreet: boolean,
 ): InfoSection[] {
   if (currentStep === 2) {
-    const sections: InfoSection[] = [
-      {
-        id: 'child-seats',
-        title: 'Child seats',
-        body: 'Travel details that matter for planning',
-        items: [
-          'Child seats are available on request and should be selected here so the driver arrives prepared.',
-        ],
-      },
-    ];
+    const sections: InfoSection[] = [];
 
     if (direction === 'from_airport') {
-      sections.push({
-        id: 'check-in-luggage',
-        title: 'Check-in luggage',
-        body: 'Why this information matters',
-        items: [
-          'Check-in luggage means the bags you hand over at the airline counter. A standard suitcase is checked luggage with a total size of up to 158 cm (length + width + height).',
-          'Please enter the luggage count correctly. It affects vehicle planning and, for airport pickups, how much time passengers need from aircraft to driver.',
-        ],
-      });
-
       sections.push({
         id: 'airport-pickup',
         title: 'Airport pickup',
@@ -325,7 +306,26 @@ function getStepSections(
               'Pickup is outside the airport at the agreed pickup point.',
             ],
       });
+
+      sections.push({
+        id: 'check-in-luggage',
+        title: 'Check-in luggage',
+        body: 'Why this information matters',
+        items: [
+          'Check-in luggage means the bags you hand over at the airline counter. A standard suitcase is checked luggage with a total size of up to 158 cm (length + width + height).',
+          'Please enter the luggage count correctly. It affects vehicle planning and, for airport pickups, how much time passengers need from aircraft to driver.',
+        ],
+      });
     }
+
+    sections.push({
+      id: 'child-seats',
+      title: 'Child seats',
+      body: 'Travel details that matter for planning',
+      items: [
+        'Child seats are available on request and should be selected here so the driver arrives prepared.',
+      ],
+    });
 
     return sections;
   }

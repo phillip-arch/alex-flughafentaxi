@@ -1661,7 +1661,7 @@ const BookingForm = ({
                         onPasteText={(text) => handleStreetPaste('street', text)}
                         onBlur={() => validateStreetNumber('street')}
                         placeholder={addressInputPlaceholder}
-                        className="w-full min-h-[3.15rem] border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:min-h-0 md:text-[18px]"
+                        className="w-full min-h-[2.6rem] border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:min-h-0 md:text-[18px]"
                       />
                     </div>
                   </div>

@@ -57,13 +57,13 @@ export default function BookingPriceSummaryCard({
       }`}
     >
       <div className="relative flex items-center justify-center bg-transparent px-1 py-1 md:px-2 md:py-1">
-        <div className="relative h-[4.15rem] w-[5.85rem] shrink-0 md:h-[5.1rem] md:w-[7.65rem]">
+        <div className="relative h-[5.4rem] w-[7.6rem] shrink-0 md:h-[5.1rem] md:w-[7.65rem]">
           <Image
             src={vehicleImage.src}
             alt={vehicleImage.alt}
             fill
             className="object-contain mix-blend-multiply"
-            sizes="(min-width: 768px) 145px, 94px"
+            sizes="(min-width: 768px) 145px, 122px"
           />
         </div>
       </div>

@@ -494,8 +494,8 @@ export default async function Home() {
               <div className="order-1 flex flex-col gap-8 lg:order-2 lg:py-6">
                 <SectionEyebrow onDark>Vienna, Austria · VIE · Schwechat</SectionEyebrow>
 
-                <h1 className="text-[3.4rem] font-black leading-[0.93] tracking-[-0.055em] !text-white sm:text-[4.2rem] md:text-[5rem] lg:text-[3.8rem] xl:text-[4.6rem]">
-                  Vienna Airport Taxi:<br />
+                <h1 className="text-[3.4rem] font-black leading-[0.93] tracking-[-0.055em] !text-white sm:text-[4.2rem] md:text-[5rem] lg:[font-size:clamp(2.8rem,4vw,4.6rem)]">
+                  Vienna<br className="sm:hidden" />{' '}Airport Taxi:<br />
                   Fixed Prices,<br />
                   Zero Stress.
                 </h1>
@@ -878,7 +878,7 @@ export default async function Home() {
                       />
                     </div>
                     <div className="flex flex-col gap-3 py-5 pl-6 pr-[6.5rem]">
-                      <span className="inline-flex w-fit rounded-full border border-[#dbe7f8] bg-[#eef5ff] px-3.5 py-1.5 text-[0.77rem] font-bold text-[#1166d4]">
+                      <span className="inline-flex w-fit min-w-[6.25rem] justify-center rounded-full border border-[#dbe7f8] bg-[#eef5ff] px-3.5 py-1.5 text-[0.77rem] font-bold text-[#1166d4]">
                         {seat.weightRange}
                       </span>
                       <div>
@@ -998,14 +998,14 @@ export default async function Home() {
               <div className="rounded-[1.75rem] border border-[#e0eaf6] bg-white px-7 py-8 md:px-10 md:py-10">
                 <SectionEyebrow>Vienna Airport</SectionEyebrow>
                 <h2 className="mt-3 text-[1.85rem] font-black leading-[1.04] tracking-[-0.05em] text-[#0c111e] md:text-[2.1rem]">
-                  Vienna airport taxi — stress-free to Vienna Airport (VIE)
+                  Vienna airport taxi, stress-free to Vienna Airport (VIE)
                 </h2>
                 <div className="mt-5 space-y-3">
                   <p className="text-[0.9rem] font-semibold text-[#0c111e]">
                     Vienna International Airport (VIE) · 1300 Schwechat, Austria
                   </p>
                   <p className="text-[0.93rem] leading-[1.72] text-[#5e718a]">
-                    With a Vienna airport taxi, you can reach the airport quickly and comfortably. Book your ride in just a few steps — immediately or in advance.
+                    With a Vienna airport taxi, you can reach the airport quickly and comfortably. Book your ride in just a few steps immediately or in advance.
                   </p>
                   <p className="text-[0.93rem] leading-[1.72] text-[#5e718a]">
                     On-time pickup, a fixed price, and reliable transfer service for the perfect start to your journey.

@@ -428,10 +428,7 @@ export default function BookingStepTwo({
     setIsOptionalSheetOpen(false);
   };
 
-  const optionalSummary = [
-    childSeatTotal > 0 ? `${childSeatTotal} child seat${childSeatTotal !== 1 ? 's' : ''}` : null,
-    hasDriverNote ? 'Note added' : null,
-  ].filter(Boolean).join(' · ');
+  const childSeatSummary = childSeatTotal > 0 ? `${childSeatTotal} child seat${childSeatTotal !== 1 ? 's' : ''}` : null;
 
   const renderMeetAndGreetAndOptional = () => (
     <div className="overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white">
@@ -464,22 +461,40 @@ export default function BookingStepTwo({
           <div className="border-t border-[#e8eef7]" />
         </>
       ) : null}
-      <button
-        type="button"
-        onClick={() => setIsOptionalSheetOpen(true)}
-        className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors"
-        aria-haspopup="dialog"
-        aria-expanded={isOptionalSheetOpen}
-      >
-        <div className="min-w-0">
-          <p className={`mt-0.5 truncate text-[0.88rem] font-medium ${optionalSummary ? 'text-[#1679FF]' : 'text-[#9ca3af]'}`}>
-            {optionalSummary || 'Free child seats, notes'}
-          </p>
+      <div className="grid grid-cols-1 divide-y divide-[#e8eef7] md:grid-cols-2 md:divide-x md:divide-y-0">
+        <div className="flex w-full items-center justify-between gap-4 px-4 py-3">
+          <div className="min-w-0">
+            <p className={`mt-0.5 truncate text-[0.88rem] font-medium ${hasDriverNote ? 'text-[#1679FF]' : 'text-[#9ca3af]'}`}>
+              {hasDriverNote ? 'Note added' : 'Note for driver'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsNoteSheetOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={isNoteSheetOpen}
+            className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.45rem] bg-[#eef5ff] px-3 text-[0.8rem] font-semibold text-[#1679FF] transition-colors hover:bg-[#ddeeff]"
+          >
+            {hasDriverNote ? 'Edit' : '+ Add'}
+          </button>
         </div>
-        <span className="inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--radius-field)] bg-[#eef5ff] px-4 text-[0.92rem] font-semibold text-[#1679FF]">
-          {optionalSummary ? 'Edit' : '+ Add'}
-        </span>
-      </button>
+        <div className="flex w-full items-center justify-between gap-4 px-4 py-3">
+          <div className="min-w-0">
+            <p className={`mt-0.5 truncate text-[0.88rem] font-medium ${childSeatSummary ? 'text-[#1679FF]' : 'text-[#9ca3af]'}`}>
+              {childSeatSummary || 'Free child seats'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsOptionalSheetOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={isOptionalSheetOpen}
+            className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.45rem] bg-[#eef5ff] px-3 text-[0.8rem] font-semibold text-[#1679FF] transition-colors hover:bg-[#ddeeff]"
+          >
+            {childSeatSummary ? 'Edit' : '+ Add'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 
@@ -855,28 +870,11 @@ export default function BookingStepTwo({
             <button type="button" aria-label="Close optional extras" className="absolute inset-0 h-full w-full cursor-default" onClick={closeOptionalSheet} />
             <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
-              {renderSheetHeader('Optional extras', 'Add these to your ride before continuing.', closeOptionalSheet)}
-              <div className="space-y-5">
-                <div>
-                  <p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#687384]">Child seats — free of charge</p>
-                  <div className="overflow-hidden rounded-[1.1rem] border border-[#e4e8ef] bg-[#f8fbff]">
-                    {renderSheetStepper('babySeats', 'Baby seat', formData.babySeats, 0, 3, Baby)}
-                    <div className="border-t border-[#e8eef7]" />
-                    {renderSheetStepper('childSeats', 'Child seat', formData.childSeats, 0, 3, Armchair)}
-                    <div className="border-t border-[#e8eef7]" />
-                    {renderSheetStepper('boosterSeats', 'Booster seat', formData.boosterSeats, 0, 3, ShieldCheck)}
-                  </div>
-                </div>
-                <div>
-                  <p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-[#687384]">Note for driver</p>
-                  <textarea
-                    value={draftNotes}
-                    onChange={(e) => setDraftNotes(e.target.value)}
-                    rows={3}
-                    placeholder="Pickup details, luggage notes, anything the driver should know"
-                    className="ui-field-surface w-full resize-none rounded-[var(--radius-field)] border border-[#d2d2d7] p-3 text-[16px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none transition-all focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]"
-                  />
-                </div>
+              {renderSheetHeader('Free child seats', 'Choose the seats you need for the ride.', closeOptionalSheet)}
+              <div className="space-y-3">
+                {renderSheetStepper('babySeats', 'Baby seat', formData.babySeats, 0, 3, Baby)}
+                {renderSheetStepper('childSeats', 'Child seat', formData.childSeats, 0, 3, Armchair)}
+                {renderSheetStepper('boosterSeats', 'Booster seat', formData.boosterSeats, 0, 3, ShieldCheck)}
               </div>
               <button type="button" onClick={closeOptionalSheet} className="mt-5 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[#1679FF] text-[1rem] font-semibold text-white transition-colors hover:bg-[#0f6ae8]">
                 Done
@@ -912,6 +910,7 @@ export default function BookingStepTwo({
 
       {renderScratchStepTwo()}
       {optionalSheet}
+      {noteSheet}
     </div>
   );
 }
