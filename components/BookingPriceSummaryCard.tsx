@@ -52,28 +52,28 @@ export default function BookingPriceSummaryCard({
 
   return (
     <div
-      className={`relative mt-0 grid h-[3.7rem] grid-cols-[30%_40%_30%] overflow-hidden rounded-[0.6rem] border bg-[#f8fbff] shadow-[0_8px_18px_rgba(17,17,17,0.04)] md:h-[5.5rem] md:grid-cols-[30%_42%_28%] md:rounded-[0.72rem] md:shadow-[0_12px_26px_rgba(17,17,17,0.05)] ${
+      className={`relative mt-0 grid h-[4.15rem] grid-cols-[31%_39%_30%] overflow-hidden rounded-[0.6rem] border bg-[#f8fbff] shadow-[0_8px_18px_rgba(17,17,17,0.04)] md:h-[5.5rem] md:grid-cols-[30%_42%_28%] md:rounded-[0.72rem] md:shadow-[0_12px_26px_rgba(17,17,17,0.05)] ${
         invalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
       }`}
     >
       <div className="relative flex items-center justify-center bg-transparent px-1 py-1 md:px-2 md:py-1">
-        <div className="relative h-[5.4rem] w-[7.6rem] shrink-0 md:h-[5.1rem] md:w-[7.65rem]">
+        <div className="relative h-[3.45rem] w-[5.8rem] shrink-0 md:h-[5.1rem] md:w-[7.65rem]">
           <Image
             src={vehicleImage.src}
             alt={vehicleImage.alt}
             fill
-            className="object-contain mix-blend-multiply"
+            className="object-contain object-center mix-blend-multiply"
             sizes="(min-width: 768px) 145px, 122px"
           />
         </div>
       </div>
-      <div className="relative z-10 flex min-w-0 flex-col justify-center gap-0.5 px-2 py-1 text-left md:gap-1 md:px-3 md:py-1">
-        <div className="flex min-w-0 items-center gap-0.5 text-[0.72rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:text-[0.8rem]">
+      <div className="relative z-10 flex min-w-0 flex-col items-center justify-center gap-0.5 px-1 py-1 text-center md:items-start md:gap-1 md:px-3 md:py-1 md:text-left">
+        <div className="flex min-w-0 max-w-full items-center justify-center gap-0.5 text-[0.72rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:justify-start md:text-[0.8rem]">
           <span className="truncate">{routeFrom}</span>
           <span className="shrink-0">→</span>
           <span className="truncate">{routeTo}</span>
         </div>
-        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.62rem] font-medium text-[#5f6975] md:gap-x-2 md:text-[0.61rem]">
+        <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-[0.62rem] font-medium text-[#5f6975] md:justify-start md:gap-x-2 md:text-[0.61rem]">
           <span className="inline-flex items-center gap-0.5" title="Passengers">
             <Users className="h-2.5 w-2.5 text-[#1679FF] md:h-[11px] md:w-[11px]" />
             {passengerValue}
