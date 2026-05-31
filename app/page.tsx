@@ -425,16 +425,19 @@ const airportTips = [
 ];
 
 const popularTrips = [
-  'From Terminal 1 Vienna Airport to Vienna Central Train Station',
-  'From Stephansplatz to Terminal 3 Vienna Airport',
-  'From Terminal 1 Vienna Airport to Schoenbrunn Palace',
-  'From Vienna Westbahnhof to Terminal 3 Vienna Airport',
-  'From Praterstern to Terminal 3 Vienna Airport',
-  'From Terminal 1 Vienna Airport to Stephansplatz',
-  'From Schwedenplatz to Terminal 3 Vienna Airport',
-  'From Terminal 1 Vienna Airport to Vienna Westbahnhof',
-  'From Ernst-Happel-Stadion to Terminal 3 Vienna Airport',
-  'From Vienna Central Train Station to Terminal 3 Vienna Airport',
+  {
+    label: 'From Terminal 1 Vienna Airport to Vienna Central Train Station',
+    href: '/routes/terminal-1-vienna-airport-to-vienna-hbf',
+  },
+  { label: 'From Stephansplatz to Terminal 3 Vienna Airport', href: '/book' },
+  { label: 'From Terminal 1 Vienna Airport to Schoenbrunn Palace', href: '/book' },
+  { label: 'From Vienna Westbahnhof to Terminal 3 Vienna Airport', href: '/book' },
+  { label: 'From Praterstern to Terminal 3 Vienna Airport', href: '/book' },
+  { label: 'From Terminal 1 Vienna Airport to Stephansplatz', href: '/book' },
+  { label: 'From Schwedenplatz to Terminal 3 Vienna Airport', href: '/book' },
+  { label: 'From Terminal 1 Vienna Airport to Vienna Westbahnhof', href: '/book' },
+  { label: 'From Ernst-Happel-Stadion to Terminal 3 Vienna Airport', href: '/book' },
+  { label: 'From Vienna Central Train Station to Terminal 3 Vienna Airport', href: '/book' },
 ];
 
 function SectionEyebrow({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
@@ -1035,11 +1038,11 @@ export default async function Home() {
                 <div className="mt-8 grid gap-x-10 lg:grid-cols-2">
                   {popularTrips.map((trip) => (
                     <a
-                      key={trip}
-                      href="/book"
+                      key={trip.label}
+                      href={trip.href}
                       className="group flex items-center justify-between gap-4 border-b border-[#e6edf7] py-3 text-[#2d3f58] transition-colors hover:text-[#1166d4]"
                     >
-                      <span className="text-[0.8rem] leading-[1.3]">{trip}</span>
+                      <span className="text-[0.8rem] leading-[1.3]">{trip.label}</span>
                       <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#e6edf7] text-[#2d3f58] transition-colors group-hover:bg-[#1679FF] group-hover:text-white">
                         <ChevronRight size={11} />
                       </span>
