@@ -4,13 +4,14 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
-import StreetAutocomplete from '@/components/address/StreetAutocomplete';
+import GoogleAddressAutocomplete from '@/components/address/GoogleAddressAutocomplete';
 import {
   buildStreetOptionValue,
   formatAddressLine,
   sortFavoriteAddresses,
   type StreetOption,
 } from '@/lib/addresses';
+import { normalizeCity, normalizeZip, type ParsedGoogleAddress } from '@/lib/googleAddress';
 import {
   MapPin, 
   House,
@@ -75,6 +76,12 @@ interface ExtendedBookingInput {
   extraStopCity: string;
   extraStopZip: string;
   extraStopStreet: string;
+  formattedAddress: string;
+  houseNumber: string;
+  country: string;
+  lat: number | null;
+  lng: number | null;
+  placeId: string;
   flightNumber: string;
   pickupAt: string; // ISO date string
   date: string;
@@ -197,6 +204,7 @@ const BookingForm = ({
   const [extraStopStreetInputValue, setExtraStopStreetInputValue] = useState('');
   const [resolvedStreetOption, setResolvedStreetOption] = useState<StreetOption | null>(null);
   const [resolvedExtraStopStreetOption, setResolvedExtraStopStreetOption] = useState<StreetOption | null>(null);
+  const [selectedGoogleAddress, setSelectedGoogleAddress] = useState<ParsedGoogleAddress | null>(null);
   const [streetNumberWarning, setStreetNumberWarning] = useState<'street' | 'extraStopStreet' | null>(null);
   const [streetPasteWarning, setStreetPasteWarning] = useState<'street' | 'extraStopStreet' | null>(null);
   const [unresolvedStreetWarning, setUnresolvedStreetWarning] = useState(false);
@@ -219,6 +227,12 @@ const BookingForm = ({
     extraStopCity: 'Wien',
     extraStopZip: '',
     extraStopStreet: '',
+    formattedAddress: '',
+    houseNumber: '',
+    country: '',
+    lat: null,
+    lng: null,
+    placeId: '',
     flightNumber: '',
     pickupAt: '',
     date: '',
@@ -304,6 +318,7 @@ const BookingForm = ({
         formData?: Partial<ExtendedBookingInput>;
         currentStep?: number;
         selectedStreetOption?: StreetOption | null;
+        selectedGoogleAddress?: ParsedGoogleAddress | null;
       };
 
       if (parsed.formData) {
@@ -330,6 +345,9 @@ const BookingForm = ({
             zip: restoredZip,
             city: restoredCity || 'Wien',
           });
+          if (parsed.selectedGoogleAddress?.placeId) {
+            setSelectedGoogleAddress(parsed.selectedGoogleAddress);
+          }
         }
       }
 
@@ -357,6 +375,7 @@ const BookingForm = ({
   const applyFavoriteAddress = (favorite: FavoriteAddress) => {
     const city = favorite.city.toLowerCase().includes('schwechat') ? 'Schwechat' : 'Wien';
     setStreetInputValue(`${favorite.street} `);
+    setSelectedGoogleAddress(null);
     setResolvedStreetOption({
       street: favorite.street,
       zip: favorite.zip,
@@ -480,9 +499,10 @@ const BookingForm = ({
   ]);
 
   useEffect(() => {
-    const normalizedZip = String(formData.zip || '').trim();
+    const normalizedZip = normalizeZip(String(formData.zip || ''));
+    const normalizedCity = normalizeCity(String(formData.city || ''));
 
-    if (!/^\d{4}$/.test(normalizedZip)) {
+    if (!/^\d{3,6}$/.test(normalizedZip) || !normalizedCity) {
       setZipPricing(null);
       return;
     }
@@ -494,6 +514,7 @@ const BookingForm = ({
         .from('zip_prices')
         .select('city, base_price, limo_price, kombi_price, bus_price')
         .eq('zip', normalizedZip)
+        .ilike('city', normalizedCity)
         .maybeSingle();
 
       if (!isActive) return;
@@ -517,7 +538,7 @@ const BookingForm = ({
     return () => {
       isActive = false;
     };
-  }, [formData.zip, supabase]);
+  }, [formData.city, formData.zip, supabase]);
 
   const dbPrices = zipPricing
     ? {
@@ -526,6 +547,7 @@ const BookingForm = ({
         bus: zipPricing.bus,
       }
     : undefined;
+  const hasFixedPrice = Boolean(zipPricing);
   const basePrice = zipPricing?.basePrice ?? DEFAULT_BASE_PRICE;
   const meetAndGreetPrice = formData.direction === 'from_airport' && formData.meetAndGreet ? 6 : 0;
   
@@ -543,10 +565,10 @@ const BookingForm = ({
   
   // Calculate price with ZIP-based surcharge when available
   const vehiclePrice = calculateVehiclePrice(basePrice, vehicleType, dbPrices);
-  const totalPrice = vehiclePrice + meetAndGreetPrice;
+  const totalPrice = hasFixedPrice ? vehiclePrice + meetAndGreetPrice : null;
   const vehiclePriceOptions = (['Limo', 'Kombi', 'Bus'] as VehicleType[]).map((optionVehicleType) => ({
     vehicleType: optionVehicleType,
-    totalPrice: calculateVehiclePrice(basePrice, optionVehicleType, dbPrices) + meetAndGreetPrice,
+    totalPrice: hasFixedPrice ? calculateVehiclePrice(basePrice, optionVehicleType, dbPrices) + meetAndGreetPrice : null,
   }));
   const selectedStreetOption = resolvedStreetOption;
   const currentPickupDisplayValue =
@@ -616,8 +638,14 @@ const BookingForm = ({
   };
 
   const validateStreetNumber = (target: 'street' | 'extraStopStreet') => {
-    const selectedOption = target === 'street' ? resolvedStreetOption : resolvedExtraStopStreetOption;
-    const rawValue = target === 'street' ? formData.street : formData.extraStopStreet;
+    if (target === 'street' && isResolvedStreetComplete('street')) {
+      setStreetNumberWarning((prev) => (prev === target ? null : prev));
+      setUnresolvedStreetWarning(false);
+      return;
+    }
+
+    const selectedOption = resolvedExtraStopStreetOption;
+    const rawValue = formData.extraStopStreet;
 
     if (!selectedOption) {
       setStreetNumberWarning((prev) => (prev === target ? null : prev));
@@ -638,8 +666,19 @@ const BookingForm = ({
   };
 
   const isResolvedStreetComplete = (target: 'street' | 'extraStopStreet') => {
-    const selectedOption = target === 'street' ? resolvedStreetOption : resolvedExtraStopStreetOption;
-    const rawValue = target === 'street' ? formData.street : formData.extraStopStreet;
+    if (target === 'street') {
+      return Boolean(
+        selectedGoogleAddress?.placeId &&
+          selectedGoogleAddress.formattedAddress &&
+          selectedGoogleAddress.zip &&
+          selectedGoogleAddress.city &&
+          selectedGoogleAddress.street &&
+          selectedGoogleAddress.houseNumber,
+      );
+    }
+
+    const selectedOption = resolvedExtraStopStreetOption;
+    const rawValue = formData.extraStopStreet;
     return Boolean(selectedOption && hasTypedStreetNumber(rawValue, selectedOption.street));
   };
 
@@ -806,6 +845,7 @@ const BookingForm = ({
 
     if (target === 'street') {
       setStreetInputValue(rawValue);
+      setSelectedGoogleAddress(null);
     } else {
       setExtraStopStreetInputValue(rawValue);
     }
@@ -822,6 +862,12 @@ const BookingForm = ({
               street: rawValue,
               zip: selectedOption.zip,
               city: selectedOption.city,
+              formattedAddress: '',
+              houseNumber: '',
+              country: '',
+              lat: null,
+              lng: null,
+              placeId: '',
             }
           : {
               ...prev,
@@ -846,6 +892,12 @@ const BookingForm = ({
             street: rawValue,
             zip: '',
             city: '',
+            formattedAddress: '',
+            houseNumber: '',
+            country: '',
+            lat: null,
+            lng: null,
+            placeId: '',
           }
         : {
             ...prev,
@@ -863,6 +915,7 @@ const BookingForm = ({
     const nextValue = `${option.street} `;
     if (target === 'street') {
       setStreetInputValue(nextValue);
+      setSelectedGoogleAddress(null);
       setResolvedStreetOption(option);
       setStreetNumberWarning('street');
       setStreetPasteWarning(null);
@@ -872,6 +925,12 @@ const BookingForm = ({
         street: option.street,
         zip: option.zip,
         city: option.city,
+        formattedAddress: '',
+        houseNumber: '',
+        country: '',
+        lat: null,
+        lng: null,
+        placeId: '',
       }));
       return;
     }
@@ -885,6 +944,39 @@ const BookingForm = ({
       extraStopStreet: option.street,
       extraStopZip: option.zip,
       extraStopCity: option.city,
+    }));
+  };
+
+  const applyGoogleAddressSelection = (address: ParsedGoogleAddress) => {
+    const streetLine = [address.street, address.houseNumber].filter(Boolean).join(' ').trim();
+    const displayValue = address.formattedAddress || formatAddressLine(streetLine, address.zip, address.city);
+
+    setSelectedGoogleAddress(address);
+    setStreetInputValue(displayValue);
+    setResolvedStreetOption({
+      street: streetLine || address.street,
+      zip: address.zip,
+      city: address.city,
+    });
+    setStreetNumberWarning(address.houseNumber ? null : 'street');
+    setStreetPasteWarning(null);
+    setUnresolvedStreetWarning(false);
+    setFormData((prev) => ({
+      ...prev,
+      city: address.city,
+      zip: address.zip,
+      street: streetLine || address.street,
+      formattedAddress: address.formattedAddress,
+      houseNumber: address.houseNumber,
+      country: address.country,
+      lat: address.lat,
+      lng: address.lng,
+      placeId: address.placeId,
+    }));
+    setTouched((prev) => ({
+      ...prev,
+      street: false,
+      zip: false,
     }));
   };
 
@@ -1184,7 +1276,7 @@ const BookingForm = ({
         return {
           isValid: false,
           missingFields: ['street'] as (keyof ExtendedBookingInput)[],
-          errorMessage: 'Please choose a valid address from the list and add the street number.',
+          errorMessage: 'Please select a full address from Google suggestions.',
         };
       }
     }
@@ -1213,7 +1305,7 @@ const BookingForm = ({
     if (getStepValidation(currentStep).isValid) {
       setError(null);
     }
-  }, [formData, currentStep, error, touched, streetPasteWarning, resolvedStreetOption]);
+  }, [formData, currentStep, error, touched, streetPasteWarning, resolvedStreetOption, selectedGoogleAddress]);
 
   const handlePaymentChange = (method: PaymentMethod) => {
     setFormData(prev => ({ ...prev, paymentMethod: method }));
@@ -1294,11 +1386,18 @@ const BookingForm = ({
               extraStopCity: 'Wien',
               extraStopZip: '',
               extraStopStreet: '',
+              formattedAddress: formData.formattedAddress,
+              houseNumber: formData.houseNumber,
+              country: formData.country,
+              lat: formData.lat,
+              lng: formData.lng,
+              placeId: formData.placeId,
               date: formData.date,
               time: formData.time,
               meetAndGreet: formData.meetAndGreet,
             },
             selectedStreetOption: resolvedStreetOption,
+            selectedGoogleAddress,
           }),
         );
 
@@ -1354,7 +1453,7 @@ const BookingForm = ({
 
     try {
       // Construct the pickup/destination strings based on direction
-      const addressString = formatAddressLine(
+      const addressString = formData.formattedAddress || formatAddressLine(
         formData.street,
         formData.zip,
         formData.city,
@@ -1397,6 +1496,21 @@ const BookingForm = ({
                    })`
                  : ''),
         _zip: formData.zip,
+        _city: formData.city,
+        pickup_formatted_address: formData.direction === 'to_airport' ? formData.formattedAddress : '',
+        pickup_zip: formData.direction === 'to_airport' ? formData.zip : '',
+        pickup_city: formData.direction === 'to_airport' ? formData.city : '',
+        pickup_country: formData.direction === 'to_airport' ? formData.country : '',
+        pickup_lat: formData.direction === 'to_airport' ? formData.lat : null,
+        pickup_lng: formData.direction === 'to_airport' ? formData.lng : null,
+        pickup_place_id: formData.direction === 'to_airport' ? formData.placeId : '',
+        dropoff_formatted_address: formData.direction === 'from_airport' ? formData.formattedAddress : '',
+        dropoff_zip: formData.direction === 'from_airport' ? formData.zip : '',
+        dropoff_city: formData.direction === 'from_airport' ? formData.city : '',
+        dropoff_country: formData.direction === 'from_airport' ? formData.country : '',
+        dropoff_lat: formData.direction === 'from_airport' ? formData.lat : null,
+        dropoff_lng: formData.direction === 'from_airport' ? formData.lng : null,
+        dropoff_place_id: formData.direction === 'from_airport' ? formData.placeId : '',
         _extraStop: false,
         _meetAndGreet: formData.direction === 'from_airport' && formData.meetAndGreet,
       };
@@ -1650,15 +1764,10 @@ const BookingForm = ({
                   <div className="flex min-w-0 items-center gap-1.5 md:gap-3">
                     <MapPin className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
                     <div className="relative min-w-0 flex-1">
-                      <StreetAutocomplete
+                      <GoogleAddressAutocomplete
                         value={streetInputValue}
-                        selectedOption={selectedStreetOption}
-                        mobileDropdownFullWidth
-                        mobileSelectedStreetOnly
-                        menuItems={favoriteMenuItems}
                         onChange={(value) => clearStreetSelection('street', value)}
-                        onSelect={(option) => applyStreetSelection('street', option)}
-                        onPasteText={(text) => handleStreetPaste('street', text)}
+                        onSelect={applyGoogleAddressSelection}
                         onBlur={() => validateStreetNumber('street')}
                         placeholder={addressInputPlaceholder}
                         className="w-full min-h-[2.6rem] border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:min-h-0 md:text-[18px]"
@@ -1668,12 +1777,12 @@ const BookingForm = ({
                 </div>
                 {unresolvedStreetWarning && (
                   <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[#d70015]">
-                    Select an address from the list.
+                    Select an address from Google suggestions.
                   </p>
                 )}
                 {!unresolvedStreetWarning && streetNumberWarning === 'street' && (
                   <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[#d70015]">
-                    Add the house number to continue.
+                    Select a full street address with house number.
                   </p>
                 )}
               </div>

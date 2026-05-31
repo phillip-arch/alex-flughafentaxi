@@ -12,7 +12,7 @@ import { BOOKING_OVERLAY_BACKDROP_CLASS } from './bookingOverlayStyles';
 
 type VehiclePriceOption = {
   vehicleType: VehicleType;
-  totalPrice: number;
+  totalPrice: number | null;
 };
 
 // Keep the upgrade card styling in place for a later upsell return.
@@ -385,7 +385,14 @@ export default function BookingStepTwo({
   );
 
   const getVehicleOptionPrice = (optionVehicleType: VehicleType) =>
-    vehiclePriceOptions.find((option) => option.vehicleType === optionVehicleType)?.totalPrice ?? 0;
+    vehiclePriceOptions.find((option) => option.vehicleType === optionVehicleType)?.totalPrice ?? null;
+
+  const renderPrice = (price: number | null, className = '') =>
+    price === null ? (
+      <span className={className}>On request</span>
+    ) : (
+      <AnimatedPrice value={price} currencyDisplay="symbol" className={className} />
+    );
 
   const getNextVehicleType = (optionVehicleType: VehicleType) => {
     const currentIndex = vehicleOrder.indexOf(optionVehicleType);
@@ -398,7 +405,10 @@ export default function BookingStepTwo({
   const inlineVehiclePrice = getVehicleOptionPrice(vehicleType);
   const nextVehicleType = currentVehicleCard ? getNextVehicleType(currentVehicleCard.vehicleType) : undefined;
   const nextVehiclePrice = nextVehicleType ? getVehicleOptionPrice(nextVehicleType) : 0;
-  const upgradePrice = Math.max(0, nextVehiclePrice - currentVehiclePrice);
+  const upgradePrice =
+    nextVehiclePrice === null || currentVehiclePrice === null
+      ? null
+      : Math.max(0, nextVehiclePrice - currentVehiclePrice);
   const passengerValue = formData.passengers === '' ? 0 : formData.passengers;
   const suitcaseValue = formData.luggage === '' ? 0 : formData.luggage;
   const canUseMeetAndGreet = formData.direction === 'from_airport';
@@ -531,7 +541,7 @@ export default function BookingStepTwo({
               {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
             </p>
             <p className="mt-1.5 whitespace-nowrap text-right text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2rem]">
-              <AnimatedPrice value={inlineVehiclePrice} currencyDisplay="symbol" />
+              {renderPrice(inlineVehiclePrice)}
             </p>
           </div>
           <div className="absolute bottom-3 right-4 md:hidden">
@@ -585,7 +595,7 @@ export default function BookingStepTwo({
                 {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
               </p>
               <p className="text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
-                <AnimatedPrice value={inlineVehiclePrice} currencyDisplay="symbol" />
+                {renderPrice(inlineVehiclePrice)}
               </p>
               <span className="inline-flex items-center gap-2 whitespace-nowrap text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
                 <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[#5f6975]">Max.</span>
@@ -695,7 +705,7 @@ export default function BookingStepTwo({
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
                     <p className="text-right text-[1.35rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
-                      <AnimatedPrice value={price} />
+                      {renderPrice(price)}
                     </p>
                   </div>
                 </div>
@@ -736,7 +746,7 @@ export default function BookingStepTwo({
                       {formatVehicleTypeLabel(currentVehicleCard.vehicleType)}
                     </p>
                     <p className="mt-1 text-[1.25rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
-                      <AnimatedPrice value={currentVehiclePrice} />
+                      {renderPrice(currentVehiclePrice)}
                     </p>
                   </div>
                 </div>
@@ -753,7 +763,7 @@ export default function BookingStepTwo({
                     onClick={() => handleTravelUpgrade(nextVehicleType)}
                     className="shrink-0 rounded-[0.75rem] bg-[#119b45] px-4 py-2.5 text-[0.9rem] font-bold text-white transition-colors hover:bg-[#0c873b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7bd895] focus-visible:ring-offset-2"
                   >
-                    {upgradePrice > 0 ? `Upgrade +${upgradePrice}€` : 'Upgrade'}
+                    {upgradePrice && upgradePrice > 0 ? `Upgrade +${upgradePrice}€` : 'Upgrade'}
                   </button>
                 </div>
               ) : null}
@@ -773,7 +783,7 @@ export default function BookingStepTwo({
                     onClick={() => handleTravelUpgrade(nextVehicleType)}
                     className="shrink-0 rounded-[0.75rem] bg-[#119b45] px-4 py-2.5 text-[0.9rem] font-bold text-white transition-colors hover:bg-[#0c873b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7bd895] focus-visible:ring-offset-2"
                   >
-                    {upgradePrice > 0 ? `Upgrade +${upgradePrice}€` : 'Upgrade'}
+                    {upgradePrice && upgradePrice > 0 ? `Upgrade +${upgradePrice}€` : 'Upgrade'}
                   </button>
                 </div>
               ) : null}

@@ -1,6 +1,6 @@
 create table if not exists public.zip_prices (
   id uuid primary key default gen_random_uuid(),
-  zip text not null unique,
+  zip text not null,
   city text not null,
   base_price numeric not null,
   limo_price numeric not null,
@@ -10,6 +10,7 @@ create table if not exists public.zip_prices (
 );
 
 create index if not exists zip_prices_zip_idx on public.zip_prices (zip);
+create unique index if not exists zip_prices_zip_city_unique_idx on public.zip_prices (zip, city);
 
 alter table public.zip_prices enable row level security;
 

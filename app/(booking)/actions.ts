@@ -12,6 +12,7 @@ import { generateSafeReference, normalizeBookingReference } from '@/lib/booking/
 
 import { z } from 'zod';
 import { calculateVehiclePrice, type VehicleType } from '@/lib/pricing';
+import { normalizeCity, normalizeZip } from '@/lib/googleAddress';
 import {
   getLeadTimeErrorMessage,
   hasSufficientLeadTime,
@@ -31,6 +32,21 @@ const BookingSchema = z.object({
   vehicle_type: z.enum(['Limo', 'Kombi', 'Bus']),
   notes: z.string().optional(),
   _zip: z.string().optional(),
+  _city: z.string().optional(),
+  pickup_formatted_address: z.string().optional(),
+  pickup_zip: z.string().optional(),
+  pickup_city: z.string().optional(),
+  pickup_country: z.string().optional(),
+  pickup_lat: z.number().nullable().optional(),
+  pickup_lng: z.number().nullable().optional(),
+  pickup_place_id: z.string().optional(),
+  dropoff_formatted_address: z.string().optional(),
+  dropoff_zip: z.string().optional(),
+  dropoff_city: z.string().optional(),
+  dropoff_country: z.string().optional(),
+  dropoff_lat: z.number().nullable().optional(),
+  dropoff_lng: z.number().nullable().optional(),
+  dropoff_place_id: z.string().optional(),
   _extraStop: z.boolean().optional(),
   _meetAndGreet: z.boolean().optional(),
 });
@@ -50,7 +66,27 @@ export async function createBooking(payload: any) {
     return { error: validated.error.issues[0]?.message || 'Ungültige Eingabe' };
   }
   
-  const { _zip, _extraStop, _meetAndGreet, ...bookingData } = validated.data;
+  const {
+    _zip,
+    _city,
+    _extraStop,
+    _meetAndGreet,
+    pickup_formatted_address,
+    pickup_zip,
+    pickup_city,
+    pickup_country,
+    pickup_lat,
+    pickup_lng,
+    pickup_place_id,
+    dropoff_formatted_address,
+    dropoff_zip,
+    dropoff_city,
+    dropoff_country,
+    dropoff_lat,
+    dropoff_lng,
+    dropoff_place_id,
+    ...bookingData
+  } = validated.data;
 
   const pickupAtDate = new Date(bookingData.pickup_at);
   if (!hasSufficientLeadTime(pickupAtDate)) {
@@ -108,20 +144,28 @@ export async function createBooking(payload: any) {
   }
 
   // 3. Server-Side Price Calculation & ZIP Validation
-  let basePrice = 38; // default base price
+  let basePrice = 0;
   let dbPrices = undefined;
+  let hasFixedPrice = false;
 
-  const normalizedZip = typeof _zip === 'string' ? _zip.trim() : '';
+  const selectedPlaceId = pickup_place_id || dropoff_place_id || '';
+  const normalizedZip = normalizeZip(typeof _zip === 'string' ? _zip : '');
+  const normalizedCity = normalizeCity(typeof _city === 'string' ? _city : '');
+
+  if (!selectedPlaceId || !normalizedZip || !normalizedCity) {
+    return { error: 'Please select a valid address from Google suggestions.' };
+  }
 
   if (normalizedZip !== '') {
-    if (!/^\d{1,4}$/.test(normalizedZip)) {
-      return { error: 'Bitte geben Sie eine gueltige Postleitzahl mit maximal 4 Ziffern ein.' };
+    if (!/^\d{3,6}$/.test(normalizedZip) || !normalizedCity) {
+      return { error: 'Please select a valid address from Google suggestions.' };
     }
 
     const { data: zipData, error: zipLookupError } = await supabaseAdmin
       .from('zip_prices')
       .select('*')
       .eq('zip', normalizedZip)
+      .ilike('city', normalizedCity)
       .maybeSingle();
 
     if (zipLookupError) {
@@ -131,6 +175,7 @@ export async function createBooking(payload: any) {
 
     if (zipData) {
       basePrice = zipData.base_price;
+      hasFixedPrice = true;
       dbPrices = {
         limo: zipData.limo_price,
         kombi: zipData.kombi_price,
@@ -139,10 +184,12 @@ export async function createBooking(payload: any) {
     }
   }
 
-  const vehiclePrice = calculateVehiclePrice(basePrice, bookingData.vehicle_type as VehicleType, dbPrices);
+  const vehiclePrice = hasFixedPrice
+    ? calculateVehiclePrice(basePrice, bookingData.vehicle_type as VehicleType, dbPrices)
+    : null;
   const extraStopPrice = _extraStop ? 10 : 0;
   const meetAndGreetPrice = _meetAndGreet && /flughafen/i.test(bookingData.pickup) ? 6 : 0;
-  const finalPrice = vehiclePrice + extraStopPrice + meetAndGreetPrice;
+  const finalPrice = vehiclePrice === null ? null : vehiclePrice + extraStopPrice + meetAndGreetPrice;
 
   // Generate unique tokens and references
   const confirm_token = crypto.randomUUID();
@@ -162,6 +209,20 @@ export async function createBooking(payload: any) {
       .insert({
         ...bookingData,
         price: finalPrice, // Server-calculated price
+        pickup_formatted_address: pickup_formatted_address || null,
+        pickup_zip: pickup_zip || null,
+        pickup_city: pickup_city || null,
+        pickup_country: pickup_country || null,
+        pickup_lat: pickup_lat ?? null,
+        pickup_lng: pickup_lng ?? null,
+        pickup_place_id: pickup_place_id || null,
+        dropoff_formatted_address: dropoff_formatted_address || null,
+        dropoff_zip: dropoff_zip || null,
+        dropoff_city: dropoff_city || null,
+        dropoff_country: dropoff_country || null,
+        dropoff_lat: dropoff_lat ?? null,
+        dropoff_lng: dropoff_lng ?? null,
+        dropoff_place_id: dropoff_place_id || null,
         status: 'pending', // Server-enforced status
         ip_address: ip, // Store IP for rate limiting
         user_id: user?.id || null,
@@ -349,6 +410,4 @@ export async function confirmBooking(token: string, driverId?: string) {
 
   return { error: 'Ungültiger oder abgelaufener Bestätigungslink.' };
 }
-
-
 

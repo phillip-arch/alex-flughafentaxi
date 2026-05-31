@@ -63,6 +63,7 @@ function buildPassengerCancellationInfoRows(input: PassengerCancellationEmailInp
   const formattedDate = formatDate(input.pickupAt);
   const formattedTime = formatTime(input.pickupAt);
   const formattedPrice = formatPrice(input.price);
+  const formattedPriceWithCurrency = input.price === null || input.price === undefined ? formattedPrice : `${formattedPrice} EUR`;
 
   return [
     ...(bookingReference ? [{ label: 'Buchungsnummer', value: bookingReference }] : []),
@@ -71,7 +72,7 @@ function buildPassengerCancellationInfoRows(input: PassengerCancellationEmailInp
     { label: 'Datum', value: formattedDate },
     { label: 'Uhrzeit', value: formattedTime },
     { label: 'Fahrzeug', value: vehicle },
-    { label: 'Preis', value: `${formattedPrice} EUR` },
+    { label: 'Preis', value: formattedPriceWithCurrency },
   ];
 }
 
@@ -108,6 +109,7 @@ function buildPassengerConfirmationContent(
   const intermediateStopInfo = String(input.intermediateStopInfo || '').trim();
   const notes = String(input.notes || '').trim();
   const formattedPrice = formatPrice(input.price);
+  const formattedPriceWithCurrency = input.price === null || input.price === undefined ? formattedPrice : `${formattedPrice} EUR`;
   const isFromAirport = /flughafen/i.test(pickup);
   const directionLabel = isFromAirport ? 'Vom Flughafen' : 'Zum Flughafen';
 
@@ -177,7 +179,7 @@ function buildPassengerConfirmationContent(
           </td>
           <td style="width:50%;padding:18px 10px 18px 10px;text-align:center;vertical-align:top;">
             <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8b95a7;font-weight:700;margin-bottom:8px;">Gesamtpreis</div>
-            <div style="font-size:26px;line-height:1;color:#111827;font-weight:700;letter-spacing:-0.03em;">${escapeHtml(formattedPrice)} EUR</div>
+            <div style="font-size:26px;line-height:1;color:#111827;font-weight:700;letter-spacing:-0.03em;">${escapeHtml(formattedPriceWithCurrency)}</div>
             ${paymentLabel ? `<div style="margin-top:10px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1c2d52;">${escapeHtml(paymentLabel)}</div>` : ''}
           </td>
         </tr>

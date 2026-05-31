@@ -19,10 +19,12 @@ export function formatTime(value?: string | null): string {
 }
 
 export function formatPrice(value?: number | null): string {
+  if (value === null || value === undefined) return 'Price on request';
+
   return new Intl.NumberFormat('de-AT', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(Number(value ?? 0));
+  }).format(Number(value));
 }
 
 export function formatAddress(value?: string | null): string {

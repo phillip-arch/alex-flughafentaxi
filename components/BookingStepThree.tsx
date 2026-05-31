@@ -8,7 +8,7 @@ import { BOOKING_FIELD_LABEL_CLASS, BOOKING_FIELD_STACK_CLASS } from '@/lib/ui/b
 
 type BookingStepThreeProps = {
   formData: any;
-  totalPrice: number;
+  totalPrice: number | null;
   vehicleType: string;
   isLoggedIn: boolean;
   error: string | null;

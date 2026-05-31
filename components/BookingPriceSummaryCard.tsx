@@ -7,7 +7,7 @@ import AnimatedPrice from './AnimatedPrice';
 
 type BookingPriceSummaryCardProps = {
   formData: any;
-  totalPrice: number;
+  totalPrice: number | null;
   vehicleType: string;
   invalid?: boolean;
   onEdit?: () => void;
@@ -90,7 +90,11 @@ export default function BookingPriceSummaryCard({
           {vehicleLabel}
         </p>
         <p className="text-[0.92rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[1.52rem]">
-          <AnimatedPrice value={totalPrice} currencyDisplay="symbol" />
+          {totalPrice === null ? (
+            <span className="text-[0.72rem] tracking-[-0.02em] md:text-[1rem]">On request</span>
+          ) : (
+            <AnimatedPrice value={totalPrice} currencyDisplay="symbol" />
+          )}
         </p>
         <div className="flex min-h-[0.7rem] items-center justify-end md:min-h-[0.84rem]">
           <div

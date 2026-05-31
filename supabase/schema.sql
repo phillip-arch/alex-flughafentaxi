@@ -47,6 +47,20 @@ create table public.bookings (
   vehicle_type text, -- Added vehicle type
   passengers int,
   luggage int,
+  pickup_formatted_address text,
+  pickup_zip text,
+  pickup_city text,
+  pickup_country text,
+  pickup_lat double precision,
+  pickup_lng double precision,
+  pickup_place_id text,
+  dropoff_formatted_address text,
+  dropoff_zip text,
+  dropoff_city text,
+  dropoff_country text,
+  dropoff_lat double precision,
+  dropoff_lng double precision,
+  dropoff_place_id text,
   created_at timestamptz default now()
 );
 
@@ -77,7 +91,7 @@ create index streets_street_idx on public.streets (street);
 -- ZIP PRICES
 create table public.zip_prices (
   id uuid primary key default gen_random_uuid(),
-  zip text not null unique,
+  zip text not null,
   city text not null,
   base_price numeric not null,
   limo_price numeric not null,
@@ -87,6 +101,7 @@ create table public.zip_prices (
 );
 
 create index zip_prices_zip_idx on public.zip_prices (zip);
+create unique index zip_prices_zip_city_unique_idx on public.zip_prices (zip, city);
 
 -- SAVED ADDRESSES
 create table public.saved_addresses (
