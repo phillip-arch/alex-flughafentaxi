@@ -27,6 +27,8 @@ type PlacePrediction = {
   text?: { text?: string; toString?: () => string };
   mainText?: { text?: string; toString?: () => string };
   secondaryText?: { text?: string; toString?: () => string };
+  zip?: string;
+  city?: string;
 };
 
 const GOOGLE_PLACES_COUNTRIES = ['at', 'sk', 'hu', 'si'];
@@ -166,6 +168,32 @@ async function fetchRestPlaceDetails(apiKey: string, prediction: PlacePrediction
   return response.json();
 }
 
+async function addAddressDetailsToPredictions(
+  apiKey: string,
+  predictions: PlacePrediction[],
+  sessionToken: string | null,
+) {
+  const visiblePredictions = predictions.slice(0, 5);
+
+  const enrichedPredictions = await Promise.all(
+    visiblePredictions.map(async (prediction) => {
+      try {
+        const placeJson = await fetchRestPlaceDetails(apiKey, prediction, sessionToken);
+        const parsedAddress = parseGoogleAddress(placeJson);
+        return {
+          ...prediction,
+          zip: parsedAddress.zip,
+          city: parsedAddress.city,
+        };
+      } catch {
+        return prediction;
+      }
+    }),
+  );
+
+  return [...enrichedPredictions, ...predictions.slice(visiblePredictions.length)];
+}
+
 export default function GoogleAddressAutocomplete({
   value,
   placeholder,
@@ -235,6 +263,10 @@ export default function GoogleAddressAutocomplete({
         if (nextPredictions.length === 0) {
           nextPredictions = await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, sessionToken, false);
         }
+
+        if (!isActive) return;
+
+        nextPredictions = await addAddressDetailsToPredictions(apiKey, nextPredictions, sessionToken);
 
         if (!isActive) return;
 
@@ -481,7 +513,11 @@ export default function GoogleAddressAutocomplete({
           ) : (
             predictions.map((prediction, index) => {
               const label = getPredictionText(prediction.text);
-              const secondary = getPredictionText(prediction.secondaryText);
+              const cityLine = [prediction.zip, prediction.city ? formatDisplayCity(prediction.city) : '']
+                .filter(Boolean)
+                .join(' ')
+                .trim();
+              const secondary = cityLine || getPredictionText(prediction.secondaryText);
               const isActive = index === activeIndex;
               return (
                 <button
