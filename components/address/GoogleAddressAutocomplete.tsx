@@ -443,7 +443,7 @@ export default function GoogleAddressAutocomplete({
         aria-autocomplete="list"
         aria-expanded={isOpen}
         aria-controls={isOpen ? listboxId : undefined}
-        className={`${className} ${showMobileAddressDisplay ? 'text-transparent caret-[#111111] md:text-[#111111]' : ''} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''}`}
+        className={`${className} ${showMobileAddressDisplay ? 'text-transparent caret-transparent md:text-[#111111] md:caret-[#111111]' : ''} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''}`}
       />
       {showMobileAddressDisplay ? (
         <div className={`pointer-events-none absolute inset-y-0 left-0 right-0 flex flex-col justify-center pr-2 md:hidden ${hasLeadingIcon ? 'pl-10' : 'pl-0'}`}>
