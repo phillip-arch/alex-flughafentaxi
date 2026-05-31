@@ -32,11 +32,11 @@ function buildContentSecurityPolicy(nonce: string) {
 
   return [
     "default-src 'self'",
-    `script-src ${scriptSrc.join(' ')}`,
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://web-site.website https://images.pexels.com https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com",
-    "font-src 'self' data:",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://prod.api.market https://www.google-analytics.com https://region1.google-analytics.com",
+    `script-src ${scriptSrc.join(' ')} https://maps.googleapis.com https://maps.gstatic.com`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https://web-site.website https://images.pexels.com https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com https://maps.googleapis.com https://maps.gstatic.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://prod.api.market https://www.google-analytics.com https://region1.google-analytics.com https://maps.googleapis.com https://maps.gstatic.com https://places.googleapis.com",
     "frame-src 'self' https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",
