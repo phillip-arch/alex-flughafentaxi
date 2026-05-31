@@ -233,6 +233,12 @@ export default function GoogleAddressAutocomplete({
   }, [onSelect]);
 
   useEffect(() => {
+    if (isStructuredAddressValue(value)) {
+      selectedValueRef.current = value;
+    }
+  }, [value]);
+
+  useEffect(() => {
     if (!apiKey) {
       debugError('Missing NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in browser bundle.');
       setLoadError('Google address search is not configured.');

@@ -348,7 +348,7 @@ const BookingForm = ({
         const restoredZip = String(parsed.formData.zip || '').trim();
         const restoredCity = String(parsed.formData.city || '').trim();
         if (restoredStreet && restoredZip) {
-          setStreetInputValue(restoredStreet);
+          setStreetInputValue(formatAddressLine(restoredStreet, restoredZip, formatDisplayCity(restoredCity || 'Wien')));
           setResolvedStreetOption({
             street: parsed.selectedStreetOption?.street || splitStreetAndHouseSuffix(restoredStreet).streetQuery,
             zip: restoredZip,
