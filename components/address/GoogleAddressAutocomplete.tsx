@@ -446,7 +446,7 @@ export default function GoogleAddressAutocomplete({
         className={`${className} ${showMobileAddressDisplay ? 'text-transparent caret-[#111111] md:text-[#111111]' : ''} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''}`}
       />
       {showMobileAddressDisplay ? (
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex flex-col justify-center pl-10 pr-2 md:hidden">
+        <div className={`pointer-events-none absolute inset-y-0 left-0 right-0 flex flex-col justify-center pr-2 md:hidden ${hasLeadingIcon ? 'pl-10' : 'pl-0'}`}>
           <span className="w-full truncate text-left text-[17px] font-medium leading-[1.12] tracking-[-0.02em] text-[#111111]">
             {displayLines[0]}
           </span>
