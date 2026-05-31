@@ -13,29 +13,45 @@ export type ParsedGoogleAddress = {
 type GoogleAddressComponent = {
   long_name?: string;
   short_name?: string;
+  longText?: string;
+  shortText?: string;
   types?: string[];
 };
 
 type GooglePlaceLike = {
   address_components?: GoogleAddressComponent[];
+  addressComponents?: GoogleAddressComponent[];
   formatted_address?: string;
+  formattedAddress?: string;
   geometry?: {
     location?: {
       lat?: () => number;
       lng?: () => number;
     };
   };
+  location?: {
+    lat?: number | (() => number);
+    lng?: number | (() => number);
+  };
   place_id?: string;
+  id?: string;
 };
 
 function getComponent(place: GooglePlaceLike, type: string) {
-  const component = place.address_components?.find((item) => item.types?.includes(type));
-  return component?.long_name || '';
+  const components = place.address_components || place.addressComponents || [];
+  const component = components.find((item) => item.types?.includes(type));
+  return component?.long_name || component?.longText || '';
 }
 
 function getShortComponent(place: GooglePlaceLike, type: string) {
-  const component = place.address_components?.find((item) => item.types?.includes(type));
-  return component?.short_name || '';
+  const components = place.address_components || place.addressComponents || [];
+  const component = components.find((item) => item.types?.includes(type));
+  return component?.short_name || component?.shortText || '';
+}
+
+function readCoordinate(value?: number | (() => number)) {
+  if (typeof value === 'function') return value();
+  return typeof value === 'number' ? value : null;
 }
 
 export function normalizeZip(zip: string) {
@@ -66,18 +82,18 @@ export function parseGoogleAddress(place: GooglePlaceLike): ParsedGoogleAddress 
     getComponent(place, 'administrative_area_level_2') ||
     getComponent(place, 'administrative_area_level_1');
   const countryCode = getShortComponent(place, 'country');
-  const location = place.geometry?.location;
+  const location = place.geometry?.location || place.location;
 
   return {
-    formattedAddress: place.formatted_address || '',
+    formattedAddress: place.formatted_address || place.formattedAddress || '',
     street: route,
     houseNumber: streetNumber,
     zip: normalizeZip(postalCode),
     city: normalizeCity(city),
     country: countryCode,
-    lat: typeof location?.lat === 'function' ? location.lat() : null,
-    lng: typeof location?.lng === 'function' ? location.lng() : null,
-    placeId: place.place_id || '',
+    lat: readCoordinate(location?.lat),
+    lng: readCoordinate(location?.lng),
+    placeId: place.place_id || place.id || '',
   };
 }
 
