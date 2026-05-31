@@ -58,6 +58,22 @@ function formatDisplayCity(city: string) {
     .join('');
 }
 
+function normalizeComparableAddress(value: string) {
+  return value.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function isStructuredAddressValue(value: string) {
+  return /,\s*\d{4,5}\s+\S+/u.test(value.trim());
+}
+
+function formatControlValue(value: string) {
+  return value.replace(/,\s*(\d{4,5}\s+\S.*)$/u, '\n$1');
+}
+
+function parseControlValue(value: string) {
+  return value.replace(/\n\s*(\d{4,5}\s+\S.*)$/u, ', $1');
+}
+
 function getAddressInputValue(address: ParsedGoogleAddress) {
   if (address.street && !address.houseNumber) return address.street;
 
@@ -179,6 +195,11 @@ export default function GoogleAddressAutocomplete({
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
   const hasLeadingIcon = Boolean(leadingIcon);
   const trimmedValue = value.trim();
+  const displayedValue = formatControlValue(value);
+  const isCompletedSelectedValue =
+    isStructuredAddressValue(value) ||
+    (selectedValueRef.current &&
+      normalizeComparableAddress(value) === normalizeComparableAddress(selectedValueRef.current));
   const hasSavedLocations = savedLocations.length > 0;
 
   useEffect(() => {
@@ -197,9 +218,9 @@ export default function GoogleAddressAutocomplete({
   }, [apiKey]);
 
   useEffect(() => {
-    if (!isConfigured || trimmedValue.length < 3 || trimmedValue === selectedValueRef.current) {
+    if (!isConfigured || trimmedValue.length < 3 || isCompletedSelectedValue) {
       setPredictions([]);
-      setIsOpen(hasSavedLocations && Boolean(document.activeElement?.id === inputId));
+      setIsOpen(false);
       setLoading(false);
       setActiveIndex(-1);
       return;
@@ -238,7 +259,7 @@ export default function GoogleAddressAutocomplete({
       isActive = false;
       window.clearTimeout(timeout);
     };
-  }, [apiKey, isConfigured, sessionToken, trimmedValue]);
+  }, [apiKey, isCompletedSelectedValue, isConfigured, sessionToken, trimmedValue]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -352,19 +373,21 @@ export default function GoogleAddressAutocomplete({
           {leadingIcon}
         </label>
       ) : null}
-      <input
+      <textarea
         id={inputId}
-        type="text"
-        value={value}
+        rows={displayedValue.includes('\n') ? 2 : 1}
+        value={displayedValue}
         onChange={(event) => {
-          onChange(event.target.value);
+          onChange(parseControlValue(event.target.value));
           setPendingHouseNumberAddress(null);
           setHouseNumberValue('');
-          setIsOpen(event.target.value.trim().length >= 3);
+          setIsOpen(parseControlValue(event.target.value).trim().length >= 3);
         }}
         onBlur={onBlur}
         onFocus={() => {
-          if (trimmedValue.length >= 3 || hasSavedLocations || pendingHouseNumberAddress) setIsOpen(true);
+          if (!isCompletedSelectedValue && (trimmedValue.length >= 3 || hasSavedLocations || pendingHouseNumberAddress)) {
+            setIsOpen(true);
+          }
           onFocus?.();
         }}
         onKeyDown={(event) => {
@@ -390,7 +413,7 @@ export default function GoogleAddressAutocomplete({
         aria-autocomplete="list"
         aria-expanded={isOpen}
         aria-controls={isOpen ? listboxId : undefined}
-        className={`${className} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''}`}
+        className={`${className} resize-none overflow-hidden leading-[1.15] md:leading-normal ${displayedValue.includes('\n') ? 'text-[15px] md:text-[18px]' : ''} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''}`}
       />
       {loadError ? (
         <p className="mt-1.5 text-[0.78rem] font-medium text-[#d70015]">{loadError}</p>
