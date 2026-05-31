@@ -31,6 +31,20 @@ type PlacePrediction = {
 
 const GOOGLE_PLACES_COUNTRIES = ['at', 'sk', 'hu', 'si'];
 const GOOGLE_ADDRESS_TYPES = ['street_address', 'premise', 'subpremise'];
+const DEBUG_PREFIX = '[GoogleAddressAutocomplete]';
+
+function debugLog(message: string, data?: unknown) {
+  if (data === undefined) {
+    console.info(DEBUG_PREFIX, message);
+    return;
+  }
+
+  console.info(DEBUG_PREFIX, message, data);
+}
+
+function debugError(message: string, error?: unknown) {
+  console.error(DEBUG_PREFIX, message, error);
+}
 
 function getPredictionText(value?: { text?: string; toString?: () => string }) {
   if (!value) return '';
@@ -39,12 +53,19 @@ function getPredictionText(value?: { text?: string; toString?: () => string }) {
 
 function loadGooglePlaces(apiKey: string) {
   if (typeof window === 'undefined') return Promise.resolve();
-  if (window.google?.maps?.importLibrary) return Promise.resolve();
-  if (window.__googleMapsPlacesPromise) return window.__googleMapsPlacesPromise;
+  if (window.google?.maps?.importLibrary) {
+    debugLog('Google Maps script already loaded; importLibrary is available.');
+    return Promise.resolve();
+  }
+  if (window.__googleMapsPlacesPromise) {
+    debugLog('Reusing existing Google Maps script load promise.');
+    return window.__googleMapsPlacesPromise;
+  }
 
   window.__googleMapsPlacesPromise = new Promise<void>((resolve, reject) => {
     const existingScript = document.querySelector<HTMLScriptElement>('script[data-google-maps-places="true"]');
     if (existingScript) {
+      debugLog('Found existing Google Maps script tag.', { src: existingScript.src });
       existingScript.addEventListener('load', () => resolve(), { once: true });
       existingScript.addEventListener('error', () => reject(new Error('Google Maps script failed to load.')), {
         once: true,
@@ -59,11 +80,18 @@ function loadGooglePlaces(apiKey: string) {
       v: 'weekly',
     });
     script.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
+    debugLog('Injecting Google Maps script.', { src: script.src.replace(apiKey, '[redacted]') });
     script.async = true;
     script.defer = true;
     script.dataset.googleMapsPlaces = 'true';
-    script.addEventListener('load', () => resolve(), { once: true });
-    script.addEventListener('error', () => reject(new Error('Google Maps script failed to load.')), { once: true });
+    script.addEventListener('load', () => {
+      debugLog('Google Maps script loaded.');
+      resolve();
+    }, { once: true });
+    script.addEventListener('error', (error) => {
+      debugError('Google Maps script failed to load.', error);
+      reject(new Error('Google Maps script failed to load.'));
+    }, { once: true });
     document.head.appendChild(script);
   });
 
@@ -101,19 +129,39 @@ export default function GoogleAddressAutocomplete({
 
   useEffect(() => {
     if (!apiKey) {
+      debugError('Missing NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in browser bundle.');
       setLoadError('Google address search is not configured.');
       return;
     }
 
+    debugLog('Starting Google Places initialization.', {
+      hasApiKey: Boolean(apiKey),
+      keyPrefix: `${apiKey.slice(0, 6)}...`,
+      origin: typeof window !== 'undefined' ? window.location.origin : '',
+    });
+
     let isActive = true;
     void loadGooglePlaces(apiKey)
       .then(async () => {
+        debugLog('Importing Google Places library.');
         const lib = await window.google?.maps?.importLibrary?.('places');
-        if (!isActive || !lib?.AutocompleteSuggestion) return;
+        debugLog('Google Places import result.', {
+          active: isActive,
+          hasLib: Boolean(lib),
+          hasAutocompleteSuggestion: Boolean(lib?.AutocompleteSuggestion),
+          hasSessionToken: Boolean(lib?.AutocompleteSessionToken),
+        });
+        if (!isActive || !lib?.AutocompleteSuggestion) {
+          if (isActive) {
+            debugError('Places library missing AutocompleteSuggestion. Check Places API (New), billing, API restrictions, or script version.');
+          }
+          return;
+        }
         setPlacesLib(lib);
         setSessionToken(new lib.AutocompleteSessionToken());
       })
-      .catch(() => {
+      .catch((error) => {
+        debugError('Google Places initialization failed.', error);
         if (isActive) {
           setLoadError('Google address search could not be loaded.');
         }
@@ -135,6 +183,12 @@ export default function GoogleAddressAutocomplete({
 
     let isActive = true;
     const timeout = window.setTimeout(async () => {
+      debugLog('Fetching autocomplete suggestions.', {
+        input: trimmedValue,
+        countries: GOOGLE_PLACES_COUNTRIES,
+        primaryTypes: GOOGLE_ADDRESS_TYPES,
+        hasSessionToken: Boolean(sessionToken),
+      });
       setLoading(true);
       try {
         const { suggestions } = await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
@@ -151,10 +205,15 @@ export default function GoogleAddressAutocomplete({
         const nextPredictions = (suggestions || [])
           .map((suggestion: any) => suggestion.placePrediction)
           .filter(Boolean);
+        debugLog('Autocomplete suggestions received.', {
+          count: nextPredictions.length,
+          labels: nextPredictions.slice(0, 5).map((prediction: PlacePrediction) => getPredictionText(prediction.text)),
+        });
         setPredictions(nextPredictions);
         setIsOpen(true);
         setActiveIndex(nextPredictions.length > 0 ? 0 : -1);
       } catch (error) {
+        debugError('Autocomplete suggestions request failed.', error);
         if (isActive) {
           setPredictions([]);
           setIsOpen(true);
@@ -187,19 +246,29 @@ export default function GoogleAddressAutocomplete({
   }, []);
 
   const selectPrediction = async (prediction: PlacePrediction) => {
+    debugLog('Selecting prediction.', {
+      placeId: prediction.placeId,
+      label: getPredictionText(prediction.text),
+    });
     setLoading(true);
     try {
       const place = prediction.toPlace();
+      debugLog('Fetching selected place fields.');
       await place.fetchFields({
         fields: ['addressComponents', 'formattedAddress', 'location', 'id'],
       });
 
-      const parsedAddress = parseGoogleAddress(place.toJSON?.() || place);
+      const placeJson = place.toJSON?.() || place;
+      debugLog('Place details received.', placeJson);
+      const parsedAddress = parseGoogleAddress(placeJson);
+      debugLog('Parsed Google address.', parsedAddress);
       onSelectRef.current(parsedAddress);
       setPredictions([]);
       setIsOpen(false);
       setActiveIndex(-1);
       setSessionToken(placesLib ? new placesLib.AutocompleteSessionToken() : null);
+    } catch (error) {
+      debugError('Place details fetch failed.', error);
     } finally {
       setLoading(false);
     }
