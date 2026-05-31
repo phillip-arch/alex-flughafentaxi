@@ -135,6 +135,15 @@ type StepperFieldName =
   | 'boosterSeats';
 
 const EMPTY_FAVORITES: FavoriteAddress[] = [];
+
+function formatDisplayCity(city: string) {
+  return city
+    .trim()
+    .split(/(\s+|-)/u)
+    .map((part) => (/^\s+$|^-$/u.test(part) || !part ? part : `${part.charAt(0).toUpperCase()}${part.slice(1)}`))
+    .join('');
+}
+
 const EMPTY_ACCOUNT_DEFAULTS = {
   fullName: '',
   phone: '',
@@ -956,7 +965,10 @@ const BookingForm = ({
 
   const applyGoogleAddressSelection = (address: ParsedGoogleAddress) => {
     const streetLine = [address.street, address.houseNumber].filter(Boolean).join(' ').trim();
-    const displayValue = formatAddressLine(streetLine || address.street, address.zip, address.city);
+    const displayValue =
+      address.street && !address.houseNumber
+        ? `${address.street} `
+        : formatAddressLine(streetLine || address.street, address.zip, formatDisplayCity(address.city));
 
     setSelectedGoogleAddress(address);
     setStreetInputValue(displayValue);

@@ -50,9 +50,19 @@ function stripCountryFromAddress(value: string) {
     .trim();
 }
 
+function formatDisplayCity(city: string) {
+  return city
+    .trim()
+    .split(/(\s+|-)/u)
+    .map((part) => (/^\s+$|^-$/u.test(part) || !part ? part : `${part.charAt(0).toUpperCase()}${part.slice(1)}`))
+    .join('');
+}
+
 function getAddressInputValue(address: ParsedGoogleAddress) {
+  if (address.street && !address.houseNumber) return address.street;
+
   const streetLine = [address.street, address.houseNumber].filter(Boolean).join(' ').trim();
-  const cityLine = [address.zip, address.city].filter(Boolean).join(' ').trim();
+  const cityLine = [address.zip, formatDisplayCity(address.city)].filter(Boolean).join(' ').trim();
   const structuredValue = [streetLine, cityLine].filter(Boolean).join(', ');
 
   return structuredValue || stripCountryFromAddress(address.formattedAddress);
@@ -251,7 +261,7 @@ export default function GoogleAddressAutocomplete({
       selectedValueRef.current = getAddressInputValue(parsedAddress);
       onSelectRef.current(parsedAddress);
       setPredictions([]);
-      setPendingHouseNumberAddress(parsedAddress.houseNumber ? null : parsedAddress);
+      setPendingHouseNumberAddress(parsedAddress.street && !parsedAddress.houseNumber ? parsedAddress : null);
       setHouseNumberValue('');
       setIsOpen(!parsedAddress.houseNumber && Boolean(parsedAddress.street));
       setActiveIndex(-1);
@@ -300,7 +310,7 @@ export default function GoogleAddressAutocomplete({
             parsedAddress.formattedAddress ||
             [
               [baseAddress.street, houseNumber].filter(Boolean).join(' '),
-              [baseAddress.zip, baseAddress.city].filter(Boolean).join(' '),
+              [baseAddress.zip, formatDisplayCity(baseAddress.city)].filter(Boolean).join(' '),
             ]
               .filter(Boolean)
               .join(', '),
@@ -313,7 +323,7 @@ export default function GoogleAddressAutocomplete({
           houseNumber,
           formattedAddress: [
             [baseAddress.street, houseNumber].filter(Boolean).join(' '),
-            [baseAddress.zip, baseAddress.city].filter(Boolean).join(' '),
+            [baseAddress.zip, formatDisplayCity(baseAddress.city)].filter(Boolean).join(' '),
           ]
             .filter(Boolean)
             .join(', '),
