@@ -24,6 +24,15 @@ type PlacePrediction = {
 
 const GOOGLE_PLACES_COUNTRIES = ['at', 'sk', 'hu', 'si'];
 const GOOGLE_ADDRESS_TYPES = ['street_address', 'premise', 'subpremise'];
+const VIENNA_LOCATION_BIAS = {
+  circle: {
+    center: {
+      latitude: 48.2082,
+      longitude: 16.3738,
+    },
+    radius: 85000,
+  },
+};
 const DEBUG_PREFIX = '[GoogleAddressAutocomplete]';
 const PLACES_AUTOCOMPLETE_ENDPOINT = 'https://places.googleapis.com/v1/places:autocomplete';
 
@@ -65,6 +74,7 @@ async function fetchRestAutocompleteSuggestions(
     input,
     includedRegionCodes: GOOGLE_PLACES_COUNTRIES,
     languageCode: 'en',
+    locationBias: VIENNA_LOCATION_BIAS,
     regionCode: 'AT',
     sessionToken,
   };
@@ -172,11 +182,11 @@ export default function GoogleAddressAutocomplete({
     const timeout = window.setTimeout(async () => {
       setLoading(true);
       try {
-        let nextPredictions = await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, sessionToken, true);
-
-        if (nextPredictions.length === 0) {
-          nextPredictions = await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, sessionToken, false);
-        }
+        const broadPredictions = await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, sessionToken, false);
+        const addressPredictions = await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, sessionToken, true);
+        const nextPredictions = [...addressPredictions, ...broadPredictions].filter(
+          (prediction, index, list) => list.findIndex((item) => item.placeId === prediction.placeId) === index,
+        );
 
         if (!isActive) return;
 
