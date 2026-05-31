@@ -124,6 +124,13 @@ type BookingFormProps = {
     phone: string;
     email: string;
   };
+  routePreset?: {
+    direction: Exclude<Direction, null>;
+    routeLabel: string;
+    pickupLabel: string;
+    dropoffLabel: string;
+    notes: string;
+  };
 };
 
 type StepperFieldName =
@@ -173,6 +180,7 @@ const BookingForm = ({
   onMeetAndGreetChange,
   onStepChange,
   initialAccountDefaults = EMPTY_ACCOUNT_DEFAULTS,
+  routePreset,
 }: BookingFormProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -182,8 +190,10 @@ const BookingForm = ({
   const allowExtendedDropdownSpace = true;
   const copy = {
     stepLabel: (step: number) => `STEP ${step} OF 3`,
-    routeTitle: 'Route',
-    routeDescription: 'Enter pickup and destination',
+    routeTitle: routePreset ? 'Route selected' : 'Route',
+    routeDescription: routePreset
+      ? `${routePreset.pickupLabel} to ${routePreset.dropoffLabel}`
+      : 'Enter pickup and destination',
     pickupLabel: 'Pickup',
     destinationLabel: 'Destination',
     airportLabel: 'Vienna Airport (VIE)',
@@ -228,7 +238,7 @@ const BookingForm = ({
   } | null>(null);
 
   const [formData, setFormData] = useState<ExtendedBookingInput>({
-    direction: 'to_airport',
+    direction: routePreset?.direction ?? 'to_airport',
     city: 'Wien',
     zip: '',
     street: '',
@@ -258,7 +268,7 @@ const BookingForm = ({
     fullName: '',
     email: '',
     phone: '',
-    notes: '',
+    notes: routePreset?.notes ?? '',
     paymentMethod: null,
     bookingForMyself: true,
     saveProfile: false,
@@ -291,6 +301,24 @@ const BookingForm = ({
       prev.meetAndGreet === meetAndGreetSelected ? prev : { ...prev, meetAndGreet: meetAndGreetSelected },
     );
   }, [meetAndGreetSelected]);
+
+  useEffect(() => {
+    if (!routePreset) return;
+
+    setFormData((prev) => {
+      if (prev.notes.includes(routePreset.routeLabel) && prev.direction === routePreset.direction) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        direction: routePreset.direction,
+        notes: prev.notes.trim()
+          ? `${prev.notes.trim()}\n${routePreset.notes}`
+          : routePreset.notes,
+      };
+    });
+  }, [routePreset]);
 
   useEffect(() => {
     if (formData.direction === 'from_airport' || !formData.meetAndGreet) return;
@@ -1774,6 +1802,16 @@ const BookingForm = ({
         <div className="rounded-[2.2rem] bg-white pt-0 shadow-none">
           <div className="min-w-0">
             {DirectionSelector()}
+            {routePreset ? (
+              <div className="mt-4 rounded-[1.05rem] border border-[#cfe0f5] bg-[#f4f8ff] px-4 py-3 text-left">
+                <p className="text-[0.78rem] font-bold uppercase tracking-[0.14em] text-[#1166d4]">
+                  {routePreset.routeLabel}
+                </p>
+                <p className="mt-1 text-[0.86rem] leading-[1.45] text-[#4b5f78]">
+                  We added this route to your booking notes. Enter the exact pickup or drop-off address below.
+                </p>
+              </div>
+            ) : null}
             <div className="mt-4 space-y-4 md:mt-4 md:space-y-4">
               <div>
                 <p style={{ marginBottom: '14px' }} className="text-[22px] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">

@@ -25,12 +25,20 @@ export default function BookingPageClient({
   initialEmail = '',
   initialFavorites = EMPTY_FAVORITES,
   initialIsLoggedIn = false,
+  routePreset = null,
 }: {
   initialName?: string;
   initialPhone?: string;
   initialEmail?: string;
   initialFavorites?: FavoriteAddress[];
   initialIsLoggedIn?: boolean;
+  routePreset?: {
+    direction: 'to_airport' | 'from_airport';
+    routeLabel: string;
+    pickupLabel: string;
+    dropoffLabel: string;
+    notes: string;
+  } | null;
 }) {
   const [direction, setDirection] = useState<BookingDirection>('to_airport');
   const [meetAndGreet, setMeetAndGreet] = useState(false);
@@ -48,6 +56,7 @@ export default function BookingPageClient({
     }),
     [initialName, initialPhone, initialEmail],
   );
+  const bookingRoutePreset = useMemo(() => routePreset ?? undefined, [routePreset]);
 
   return (
     <>
@@ -67,6 +76,7 @@ export default function BookingPageClient({
                   initialFavorites={initialFavorites}
                   initialIsLoggedIn={initialIsLoggedIn}
                   initialAccountDefaults={initialAccountDefaults}
+                  routePreset={bookingRoutePreset}
                 />
               </div>
             </section>
