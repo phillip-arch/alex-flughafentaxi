@@ -447,10 +447,10 @@ export default function GoogleAddressAutocomplete({
       />
       {showMobileAddressDisplay ? (
         <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex flex-col justify-center pl-10 pr-2 md:hidden">
-          <span className="truncate text-[17px] font-medium leading-[1.12] tracking-[-0.02em] text-[#111111]">
+          <span className="w-full truncate text-left text-[17px] font-medium leading-[1.12] tracking-[-0.02em] text-[#111111]">
             {displayLines[0]}
           </span>
-          <span className="mt-0.5 truncate text-[13px] font-medium leading-[1.05] tracking-[-0.01em] text-[#4b5563]">
+          <span className="mt-0.5 w-full truncate text-left text-[13px] font-medium leading-[1.05] tracking-[-0.01em] text-[#4b5563]">
             {displayLines[1]}
           </span>
         </div>
