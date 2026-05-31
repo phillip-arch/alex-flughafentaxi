@@ -1779,7 +1779,7 @@ const BookingForm = ({
                 <p style={{ marginBottom: '14px' }} className="text-[22px] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
                   {addressPlaceholder}
                 </p>
-                <div className={`rounded-[1.35rem] border bg-white pl-2 pr-5 py-3 transition-shadow md:pl-3 md:pr-5 md:py-3 ${isFieldInvalid('street') || isFieldInvalid('zip') || unresolvedStreetWarning ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
+                <div className={`rounded-[1.35rem] border bg-white pl-2 pr-5 py-2 transition-shadow md:pl-3 md:pr-5 md:py-2.5 ${isFieldInvalid('street') || isFieldInvalid('zip') || unresolvedStreetWarning ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
                   <div className="flex min-w-0 items-center gap-1.5 md:gap-3">
                     <MapPin className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
                     <div className="relative min-w-0 flex-1">
