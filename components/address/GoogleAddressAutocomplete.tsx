@@ -72,7 +72,24 @@ function mapRestPrediction(suggestion: any): PlacePrediction | null {
   };
 }
 
-async function fetchRestAutocompleteSuggestions(apiKey: string, input: string, sessionToken: string | null) {
+async function fetchRestAutocompleteSuggestions(
+  apiKey: string,
+  input: string,
+  sessionToken: string | null,
+  useAddressTypeFilter = true,
+) {
+  const requestBody: Record<string, unknown> = {
+    input,
+    includedRegionCodes: GOOGLE_PLACES_COUNTRIES,
+    languageCode: 'en',
+    regionCode: 'AT',
+    sessionToken,
+  };
+
+  if (useAddressTypeFilter) {
+    requestBody.includedPrimaryTypes = GOOGLE_ADDRESS_TYPES;
+  }
+
   const response = await fetch(PLACES_AUTOCOMPLETE_ENDPOINT, {
     method: 'POST',
     headers: {
@@ -85,14 +102,7 @@ async function fetchRestAutocompleteSuggestions(apiKey: string, input: string, s
         'suggestions.placePrediction.structuredFormat',
       ].join(','),
     },
-    body: JSON.stringify({
-      input,
-      includedRegionCodes: GOOGLE_PLACES_COUNTRIES,
-      includedPrimaryTypes: GOOGLE_ADDRESS_TYPES,
-      languageCode: 'en',
-      regionCode: 'AT',
-      sessionToken,
-    }),
+    body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {
@@ -102,6 +112,26 @@ async function fetchRestAutocompleteSuggestions(apiKey: string, input: string, s
 
   const data = await response.json();
   return (data.suggestions || []).map(mapRestPrediction).filter(Boolean);
+}
+
+async function fetchJsAutocompleteSuggestions(placesLib: any, input: string, sessionToken: any, useAddressTypeFilter = true) {
+  const request: Record<string, unknown> = {
+    input,
+    includedRegionCodes: GOOGLE_PLACES_COUNTRIES,
+    language: 'en',
+    region: 'at',
+    sessionToken,
+  };
+
+  if (useAddressTypeFilter) {
+    request.includedPrimaryTypes = GOOGLE_ADDRESS_TYPES;
+  }
+
+  const { suggestions } = await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+
+  return (suggestions || [])
+    .map((suggestion: any) => suggestion.placePrediction)
+    .filter(Boolean);
 }
 
 async function fetchRestPlaceDetails(apiKey: string, prediction: PlacePrediction, sessionToken: string | null) {
@@ -274,21 +304,21 @@ export default function GoogleAddressAutocomplete({
       });
       setLoading(true);
       try {
-        const nextPredictions =
+        let nextPredictions =
           autocompleteProvider === 'js'
-            ? (
-                await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-                  input: trimmedValue,
-                  includedRegionCodes: GOOGLE_PLACES_COUNTRIES,
-                  includedPrimaryTypes: GOOGLE_ADDRESS_TYPES,
-                  language: 'en',
-                  region: 'at',
-                  sessionToken,
-                })
-              ).suggestions
-                ?.map((suggestion: any) => suggestion.placePrediction)
-                .filter(Boolean) || []
-            : await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, typeof sessionToken === 'string' ? sessionToken : null);
+            ? await fetchJsAutocompleteSuggestions(placesLib, trimmedValue, sessionToken, true)
+            : await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, typeof sessionToken === 'string' ? sessionToken : null, true);
+
+        if (nextPredictions.length === 0) {
+          debugLog('No suggestions with address type filter; retrying without primary type filter.', {
+            input: trimmedValue,
+            provider: autocompleteProvider,
+          });
+          nextPredictions =
+            autocompleteProvider === 'js'
+              ? await fetchJsAutocompleteSuggestions(placesLib, trimmedValue, sessionToken, false)
+              : await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, typeof sessionToken === 'string' ? sessionToken : null, false);
+        }
 
         if (!isActive) return;
 
