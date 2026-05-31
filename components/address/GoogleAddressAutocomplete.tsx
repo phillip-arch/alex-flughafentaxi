@@ -69,11 +69,7 @@ function isStructuredAddressValue(value: string) {
 }
 
 function formatControlValue(value: string) {
-  return value.replace(/,\s*(\d{4,5}\s+\S.*)$/u, '\n$1');
-}
-
-function parseControlValue(value: string) {
-  return value.replace(/\n\s*(\d{4,5}\s+\S.*)$/u, ', $1');
+  return value;
 }
 
 function getAddressInputValue(address: ParsedGoogleAddress) {
@@ -224,8 +220,7 @@ export default function GoogleAddressAutocomplete({
   const hasLeadingIcon = Boolean(leadingIcon);
   const trimmedValue = value.trim();
   const displayedValue = formatControlValue(value);
-  const displayLines = displayedValue.split('\n');
-  const isSingleLineValue = !displayedValue.includes('\n');
+  const displayLines = displayedValue.replace(/,\s*(\d{4,5}\s+\S.*)$/u, '\n$1').split('\n');
   const isCompletedSelectedValue =
     isStructuredAddressValue(value) ||
     (selectedValueRef.current &&
@@ -408,15 +403,15 @@ export default function GoogleAddressAutocomplete({
           {leadingIcon}
         </label>
       ) : null}
-      <textarea
+      <input
         id={inputId}
-        rows={displayedValue.includes('\n') ? 2 : 1}
+        type="text"
         value={displayedValue}
         onChange={(event) => {
-          onChange(parseControlValue(event.target.value));
+          onChange(event.target.value);
           setPendingHouseNumberAddress(null);
           setHouseNumberValue('');
-          setIsOpen(parseControlValue(event.target.value).trim().length >= 3);
+          setIsOpen(event.target.value.trim().length >= 3);
         }}
         onBlur={onBlur}
         onFocus={() => {
@@ -448,7 +443,7 @@ export default function GoogleAddressAutocomplete({
         aria-autocomplete="list"
         aria-expanded={isOpen}
         aria-controls={isOpen ? listboxId : undefined}
-        className={`${className} resize-none overflow-hidden ${isSingleLineValue ? '!leading-[2.55rem] md:!leading-normal' : 'leading-[1.08] md:leading-normal'} ${displayedValue.includes('\n') ? '!min-h-[2.55rem] text-[15px] md:text-[18px]' : ''} ${showMobileAddressDisplay ? 'text-transparent caret-[#111111] md:text-[#111111]' : ''} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''}`}
+        className={`${className} ${showMobileAddressDisplay ? 'text-transparent caret-[#111111] md:text-[#111111]' : ''} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''}`}
       />
       {showMobileAddressDisplay ? (
         <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex flex-col justify-center pl-10 pr-2 md:hidden">
