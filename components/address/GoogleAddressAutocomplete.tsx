@@ -225,6 +225,7 @@ export default function GoogleAddressAutocomplete({
   const trimmedValue = value.trim();
   const displayedValue = formatControlValue(value);
   const displayLines = displayedValue.split('\n');
+  const isSingleLineValue = !displayedValue.includes('\n');
   const isCompletedSelectedValue =
     isStructuredAddressValue(value) ||
     (selectedValueRef.current &&
@@ -447,7 +448,7 @@ export default function GoogleAddressAutocomplete({
         aria-autocomplete="list"
         aria-expanded={isOpen}
         aria-controls={isOpen ? listboxId : undefined}
-        className={`${className} resize-none overflow-hidden leading-[1.08] md:leading-normal ${displayedValue.includes('\n') ? '!min-h-[2.55rem] text-[15px] md:text-[18px]' : ''} ${showMobileAddressDisplay ? 'text-transparent caret-[#111111] md:text-[#111111]' : ''} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''}`}
+        className={`${className} resize-none overflow-hidden ${isSingleLineValue ? '!leading-[2.55rem] md:!leading-normal' : 'leading-[1.08] md:leading-normal'} ${displayedValue.includes('\n') ? '!min-h-[2.55rem] text-[15px] md:text-[18px]' : ''} ${showMobileAddressDisplay ? 'text-transparent caret-[#111111] md:text-[#111111]' : ''} ${hasLeadingIcon ? 'ui-input-with-leading-icon' : ''}`}
       />
       {showMobileAddressDisplay ? (
         <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex flex-col justify-center pl-10 pr-2 md:hidden">
