@@ -51,11 +51,11 @@ function stripCountryFromAddress(value: string) {
 }
 
 function getAddressInputValue(address: ParsedGoogleAddress) {
-  if (address.formattedAddress) return stripCountryFromAddress(address.formattedAddress);
-
   const streetLine = [address.street, address.houseNumber].filter(Boolean).join(' ').trim();
   const cityLine = [address.zip, address.city].filter(Boolean).join(' ').trim();
-  return [streetLine, cityLine].filter(Boolean).join(', ');
+  const structuredValue = [streetLine, cityLine].filter(Boolean).join(', ');
+
+  return structuredValue || stripCountryFromAddress(address.formattedAddress);
 }
 
 function createRestSessionToken() {
@@ -296,7 +296,14 @@ export default function GoogleAddressAutocomplete({
           city: parsedAddress.city || baseAddress.city,
           zip: parsedAddress.zip || baseAddress.zip,
           country: parsedAddress.country || baseAddress.country,
-          formattedAddress: parsedAddress.formattedAddress || [baseAddress.street, houseNumber, baseAddress.city].filter(Boolean).join(' '),
+          formattedAddress:
+            parsedAddress.formattedAddress ||
+            [
+              [baseAddress.street, houseNumber].filter(Boolean).join(' '),
+              [baseAddress.zip, baseAddress.city].filter(Boolean).join(' '),
+            ]
+              .filter(Boolean)
+              .join(', '),
         };
         selectedValueRef.current = getAddressInputValue(completedAddress);
         onSelectRef.current(completedAddress);
@@ -304,7 +311,12 @@ export default function GoogleAddressAutocomplete({
         const completedAddress = {
           ...baseAddress,
           houseNumber,
-          formattedAddress: [baseAddress.street, houseNumber, baseAddress.zip, baseAddress.city].filter(Boolean).join(', '),
+          formattedAddress: [
+            [baseAddress.street, houseNumber].filter(Boolean).join(' '),
+            [baseAddress.zip, baseAddress.city].filter(Boolean).join(' '),
+          ]
+            .filter(Boolean)
+            .join(', '),
         };
         selectedValueRef.current = getAddressInputValue(completedAddress);
         onSelectRef.current(completedAddress);
@@ -400,7 +412,7 @@ export default function GoogleAddressAutocomplete({
           ) : null}
           {pendingHouseNumberAddress ? (
             <div className="border-b border-[#edf2f7] px-4 py-3">
-              <div className="text-[0.84rem] font-semibold text-[#111111]">Add house number</div>
+              <div className="text-[0.84rem] font-semibold text-[#111111]">Enter house number</div>
               <div className="mt-1 text-[0.78rem] text-[#6a7d96]">{pendingHouseNumberAddress.street}</div>
               <div className="mt-2 flex gap-2">
                 <input

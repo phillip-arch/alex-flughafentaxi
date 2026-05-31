@@ -135,13 +135,6 @@ type StepperFieldName =
   | 'boosterSeats';
 
 const EMPTY_FAVORITES: FavoriteAddress[] = [];
-
-function stripCountryFromAddress(value: string) {
-  return value
-    .replace(/,\s*(Austria|Slovakia|Hungary|Slovenia)$/iu, '')
-    .replace(/,\s*(\u00d6sterreich|Slowakei|Ungarn|Slowenien)$/iu, '')
-    .trim();
-}
 const EMPTY_ACCOUNT_DEFAULTS = {
   fullName: '',
   phone: '',
@@ -963,9 +956,7 @@ const BookingForm = ({
 
   const applyGoogleAddressSelection = (address: ParsedGoogleAddress) => {
     const streetLine = [address.street, address.houseNumber].filter(Boolean).join(' ').trim();
-    const displayValue = address.formattedAddress
-      ? stripCountryFromAddress(address.formattedAddress)
-      : formatAddressLine(streetLine, address.zip, address.city);
+    const displayValue = formatAddressLine(streetLine || address.street, address.zip, address.city);
 
     setSelectedGoogleAddress(address);
     setStreetInputValue(displayValue);
