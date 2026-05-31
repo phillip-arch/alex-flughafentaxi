@@ -23,15 +23,17 @@ type GoogleAddressAutocompleteProps = {
 
 type PlacePrediction = {
   placeId: string;
+  placeResourceName?: string;
   text?: { text?: string; toString?: () => string };
   mainText?: { text?: string; toString?: () => string };
   secondaryText?: { text?: string; toString?: () => string };
-  toPlace: () => any;
+  toPlace?: () => any;
 };
 
 const GOOGLE_PLACES_COUNTRIES = ['at', 'sk', 'hu', 'si'];
 const GOOGLE_ADDRESS_TYPES = ['street_address', 'premise', 'subpremise'];
 const DEBUG_PREFIX = '[GoogleAddressAutocomplete]';
+const PLACES_AUTOCOMPLETE_ENDPOINT = 'https://places.googleapis.com/v1/places:autocomplete';
 
 function debugLog(message: string, data?: unknown) {
   if (data === undefined) {
@@ -49,6 +51,78 @@ function debugError(message: string, error?: unknown) {
 function getPredictionText(value?: { text?: string; toString?: () => string }) {
   if (!value) return '';
   return value.text || value.toString?.() || '';
+}
+
+function createRestSessionToken() {
+  return typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function mapRestPrediction(suggestion: any): PlacePrediction | null {
+  const prediction = suggestion?.placePrediction;
+  if (!prediction?.placeId) return null;
+
+  return {
+    placeId: prediction.placeId,
+    placeResourceName: prediction.place || `places/${prediction.placeId}`,
+    text: prediction.text,
+    mainText: prediction.structuredFormat?.mainText,
+    secondaryText: prediction.structuredFormat?.secondaryText,
+  };
+}
+
+async function fetchRestAutocompleteSuggestions(apiKey: string, input: string, sessionToken: string | null) {
+  const response = await fetch(PLACES_AUTOCOMPLETE_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': apiKey,
+      'X-Goog-FieldMask': [
+        'suggestions.placePrediction.placeId',
+        'suggestions.placePrediction.place',
+        'suggestions.placePrediction.text',
+        'suggestions.placePrediction.structuredFormat',
+      ].join(','),
+    },
+    body: JSON.stringify({
+      input,
+      includedRegionCodes: GOOGLE_PLACES_COUNTRIES,
+      includedPrimaryTypes: GOOGLE_ADDRESS_TYPES,
+      languageCode: 'en',
+      regionCode: 'AT',
+      sessionToken,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Places REST autocomplete failed (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json();
+  return (data.suggestions || []).map(mapRestPrediction).filter(Boolean);
+}
+
+async function fetchRestPlaceDetails(apiKey: string, prediction: PlacePrediction, sessionToken: string | null) {
+  const resourceName = prediction.placeResourceName || `places/${prediction.placeId}`;
+  const url = new URL(`https://places.googleapis.com/v1/${resourceName}`);
+  url.searchParams.set('languageCode', 'en');
+  if (sessionToken) url.searchParams.set('sessionToken', sessionToken);
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      'X-Goog-Api-Key': apiKey,
+      'X-Goog-FieldMask': 'id,formattedAddress,addressComponents,location',
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Places REST details failed (${response.status}): ${errorText}`);
+  }
+
+  return response.json();
 }
 
 function loadGooglePlaces(apiKey: string) {
@@ -77,6 +151,7 @@ function loadGooglePlaces(apiKey: string) {
     const params = new URLSearchParams({
       key: apiKey,
       loading: 'async',
+      libraries: 'places',
       v: 'weekly',
     });
     script.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
@@ -114,6 +189,7 @@ export default function GoogleAddressAutocomplete({
   const onSelectRef = useRef(onSelect);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [placesLib, setPlacesLib] = useState<any>(null);
+  const [autocompleteProvider, setAutocompleteProvider] = useState<'js' | 'rest' | null>(null);
   const [sessionToken, setSessionToken] = useState<any>(null);
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -154,16 +230,22 @@ export default function GoogleAddressAutocomplete({
         if (!isActive || !lib?.AutocompleteSuggestion) {
           if (isActive) {
             debugError('Places library missing AutocompleteSuggestion. Check Places API (New), billing, API restrictions, or script version.');
+            debugLog('Falling back to Places API New REST autocomplete.');
+            setAutocompleteProvider('rest');
+            setSessionToken(createRestSessionToken());
           }
           return;
         }
         setPlacesLib(lib);
+        setAutocompleteProvider('js');
         setSessionToken(new lib.AutocompleteSessionToken());
       })
       .catch((error) => {
         debugError('Google Places initialization failed.', error);
         if (isActive) {
-          setLoadError('Google address search could not be loaded.');
+          debugLog('Falling back to Places API New REST autocomplete after JS initialization failure.');
+          setAutocompleteProvider('rest');
+          setSessionToken(createRestSessionToken());
         }
       });
 
@@ -173,7 +255,7 @@ export default function GoogleAddressAutocomplete({
   }, [apiKey]);
 
   useEffect(() => {
-    if (!placesLib || trimmedValue.length < 3) {
+    if (!autocompleteProvider || trimmedValue.length < 3) {
       setPredictions([]);
       setIsOpen(false);
       setLoading(false);
@@ -187,24 +269,29 @@ export default function GoogleAddressAutocomplete({
         input: trimmedValue,
         countries: GOOGLE_PLACES_COUNTRIES,
         primaryTypes: GOOGLE_ADDRESS_TYPES,
+        provider: autocompleteProvider,
         hasSessionToken: Boolean(sessionToken),
       });
       setLoading(true);
       try {
-        const { suggestions } = await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-          input: trimmedValue,
-          includedRegionCodes: GOOGLE_PLACES_COUNTRIES,
-          includedPrimaryTypes: GOOGLE_ADDRESS_TYPES,
-          language: 'en',
-          region: 'at',
-          sessionToken,
-        });
+        const nextPredictions =
+          autocompleteProvider === 'js'
+            ? (
+                await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+                  input: trimmedValue,
+                  includedRegionCodes: GOOGLE_PLACES_COUNTRIES,
+                  includedPrimaryTypes: GOOGLE_ADDRESS_TYPES,
+                  language: 'en',
+                  region: 'at',
+                  sessionToken,
+                })
+              ).suggestions
+                ?.map((suggestion: any) => suggestion.placePrediction)
+                .filter(Boolean) || []
+            : await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, typeof sessionToken === 'string' ? sessionToken : null);
 
         if (!isActive) return;
 
-        const nextPredictions = (suggestions || [])
-          .map((suggestion: any) => suggestion.placePrediction)
-          .filter(Boolean);
         debugLog('Autocomplete suggestions received.', {
           count: nextPredictions.length,
           labels: nextPredictions.slice(0, 5).map((prediction: PlacePrediction) => getPredictionText(prediction.text)),
@@ -230,7 +317,7 @@ export default function GoogleAddressAutocomplete({
       isActive = false;
       window.clearTimeout(timeout);
     };
-  }, [placesLib, sessionToken, trimmedValue]);
+  }, [apiKey, autocompleteProvider, placesLib, sessionToken, trimmedValue]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -252,13 +339,18 @@ export default function GoogleAddressAutocomplete({
     });
     setLoading(true);
     try {
-      const place = prediction.toPlace();
-      debugLog('Fetching selected place fields.');
-      await place.fetchFields({
-        fields: ['addressComponents', 'formattedAddress', 'location', 'id'],
-      });
-
-      const placeJson = place.toJSON?.() || place;
+      let placeJson: any;
+      if (prediction.toPlace) {
+        const place = prediction.toPlace();
+        debugLog('Fetching selected place fields through Maps JS.');
+        await place.fetchFields({
+          fields: ['addressComponents', 'formattedAddress', 'location', 'id'],
+        });
+        placeJson = place.toJSON?.() || place;
+      } else {
+        debugLog('Fetching selected place fields through Places REST.');
+        placeJson = await fetchRestPlaceDetails(apiKey, prediction, typeof sessionToken === 'string' ? sessionToken : null);
+      }
       debugLog('Place details received.', placeJson);
       const parsedAddress = parseGoogleAddress(placeJson);
       debugLog('Parsed Google address.', parsedAddress);
@@ -266,7 +358,7 @@ export default function GoogleAddressAutocomplete({
       setPredictions([]);
       setIsOpen(false);
       setActiveIndex(-1);
-      setSessionToken(placesLib ? new placesLib.AutocompleteSessionToken() : null);
+      setSessionToken(autocompleteProvider === 'js' && placesLib ? new placesLib.AutocompleteSessionToken() : createRestSessionToken());
     } catch (error) {
       debugError('Place details fetch failed.', error);
     } finally {
