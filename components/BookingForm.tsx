@@ -135,6 +135,13 @@ type StepperFieldName =
   | 'boosterSeats';
 
 const EMPTY_FAVORITES: FavoriteAddress[] = [];
+
+function stripCountryFromAddress(value: string) {
+  return value
+    .replace(/,\s*(Austria|Slovakia|Hungary|Slovenia)$/iu, '')
+    .replace(/,\s*(\u00d6sterreich|Slowakei|Ungarn|Slowenien)$/iu, '')
+    .trim();
+}
 const EMPTY_ACCOUNT_DEFAULTS = {
   fullName: '',
   phone: '',
@@ -626,6 +633,13 @@ const BookingForm = ({
           };
         })
       : [];
+  const savedAddressLocations =
+    isAppSurface && isLoggedIn && favoriteAddresses.length > 0
+      ? favoriteAddresses.map((favorite) => ({
+          id: favorite.id,
+          label: formatAddressLine(favorite.street, favorite.zip, favorite.city),
+        }))
+      : [];
   const hasTypedStreetNumber = (rawValue: string, baseStreet: string) => {
     const normalizedRaw = rawValue.trim().replace(/\s+/g, ' ');
     const normalizedBase = baseStreet.trim().replace(/\s+/g, ' ');
@@ -949,7 +963,9 @@ const BookingForm = ({
 
   const applyGoogleAddressSelection = (address: ParsedGoogleAddress) => {
     const streetLine = [address.street, address.houseNumber].filter(Boolean).join(' ').trim();
-    const displayValue = address.formattedAddress || formatAddressLine(streetLine, address.zip, address.city);
+    const displayValue = address.formattedAddress
+      ? stripCountryFromAddress(address.formattedAddress)
+      : formatAddressLine(streetLine, address.zip, address.city);
 
     setSelectedGoogleAddress(address);
     setStreetInputValue(displayValue);
@@ -1766,8 +1782,13 @@ const BookingForm = ({
                     <div className="relative min-w-0 flex-1">
                       <GoogleAddressAutocomplete
                         value={streetInputValue}
+                        savedLocations={savedAddressLocations}
                         onChange={(value) => clearStreetSelection('street', value)}
                         onSelect={applyGoogleAddressSelection}
+                        onSavedLocationSelect={(location) => {
+                          const favorite = favoriteAddresses.find((item) => item.id === location.id);
+                          if (favorite) applyFavoriteAddress(favorite);
+                        }}
                         onBlur={() => validateStreetNumber('street')}
                         placeholder={addressInputPlaceholder}
                         className="w-full min-h-[2.6rem] border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:min-h-0 md:text-[18px]"
@@ -1782,7 +1803,7 @@ const BookingForm = ({
                 )}
                 {!unresolvedStreetWarning && streetNumberWarning === 'street' && (
                   <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[#d70015]">
-                    Select a full street address with house number.
+                    Add a house number to complete this address.
                   </p>
                 )}
               </div>

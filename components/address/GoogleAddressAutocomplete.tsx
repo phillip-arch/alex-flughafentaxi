@@ -8,10 +8,17 @@ type GoogleAddressAutocompleteProps = {
   placeholder: string;
   className: string;
   leadingIcon?: ReactNode;
+  savedLocations?: SavedLocation[];
   onChange: (value: string) => void;
   onSelect: (address: ParsedGoogleAddress) => void;
+  onSavedLocationSelect?: (location: SavedLocation) => void;
   onBlur?: () => void;
   onFocus?: () => void;
+};
+
+export type SavedLocation = {
+  id: string;
+  label: string;
 };
 
 type PlacePrediction = {
@@ -34,6 +41,21 @@ function debugError(message: string, error?: unknown) {
 function getPredictionText(value?: { text?: string; toString?: () => string }) {
   if (!value) return '';
   return value.text || value.toString?.() || '';
+}
+
+function stripCountryFromAddress(value: string) {
+  return value
+    .replace(/,\s*(Austria|Slovakia|Hungary|Slovenia)$/iu, '')
+    .replace(/,\s*(\u00d6sterreich|Slowakei|Ungarn|Slowenien)$/iu, '')
+    .trim();
+}
+
+function getAddressInputValue(address: ParsedGoogleAddress) {
+  if (address.formattedAddress) return stripCountryFromAddress(address.formattedAddress);
+
+  const streetLine = [address.street, address.houseNumber].filter(Boolean).join(' ').trim();
+  const cityLine = [address.zip, address.city].filter(Boolean).join(' ').trim();
+  return [streetLine, cityLine].filter(Boolean).join(', ');
 }
 
 function createRestSessionToken() {
@@ -123,8 +145,10 @@ export default function GoogleAddressAutocomplete({
   placeholder,
   className,
   leadingIcon,
+  savedLocations = [],
   onChange,
   onSelect,
+  onSavedLocationSelect,
   onBlur,
   onFocus,
 }: GoogleAddressAutocompleteProps) {
@@ -137,12 +161,15 @@ export default function GoogleAddressAutocomplete({
   const [isConfigured, setIsConfigured] = useState(false);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
+  const [pendingHouseNumberAddress, setPendingHouseNumberAddress] = useState<ParsedGoogleAddress | null>(null);
+  const [houseNumberValue, setHouseNumberValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
   const hasLeadingIcon = Boolean(leadingIcon);
   const trimmedValue = value.trim();
+  const hasSavedLocations = savedLocations.length > 0;
 
   useEffect(() => {
     onSelectRef.current = onSelect;
@@ -162,7 +189,7 @@ export default function GoogleAddressAutocomplete({
   useEffect(() => {
     if (!isConfigured || trimmedValue.length < 3 || trimmedValue === selectedValueRef.current) {
       setPredictions([]);
-      setIsOpen(false);
+      setIsOpen(hasSavedLocations && Boolean(document.activeElement?.id === inputId));
       setLoading(false);
       setActiveIndex(-1);
       return;
@@ -221,14 +248,76 @@ export default function GoogleAddressAutocomplete({
     try {
       const placeJson = await fetchRestPlaceDetails(apiKey, prediction, sessionToken);
       const parsedAddress = parseGoogleAddress(placeJson);
-      selectedValueRef.current = parsedAddress.formattedAddress;
+      selectedValueRef.current = getAddressInputValue(parsedAddress);
       onSelectRef.current(parsedAddress);
+      setPredictions([]);
+      setPendingHouseNumberAddress(parsedAddress.houseNumber ? null : parsedAddress);
+      setHouseNumberValue('');
+      setIsOpen(!parsedAddress.houseNumber && Boolean(parsedAddress.street));
+      setActiveIndex(-1);
+      setSessionToken(createRestSessionToken());
+    } catch (error) {
+      debugError('Place details fetch failed.', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const selectSavedLocation = (location: SavedLocation) => {
+    selectedValueRef.current = location.label;
+    setPendingHouseNumberAddress(null);
+    setHouseNumberValue('');
+    setPredictions([]);
+    setIsOpen(false);
+    setActiveIndex(-1);
+    onSavedLocationSelect?.(location);
+  };
+
+  const submitHouseNumber = async () => {
+    const baseAddress = pendingHouseNumberAddress;
+    const houseNumber = houseNumberValue.trim();
+    if (!baseAddress || !houseNumber) return;
+
+    const query = [baseAddress.street, houseNumber, baseAddress.zip, baseAddress.city]
+      .filter(Boolean)
+      .join(' ');
+
+    setLoading(true);
+    try {
+      const matches = await fetchRestAutocompleteSuggestions(apiKey, query, sessionToken, true);
+      const prediction = matches[0];
+      if (prediction) {
+        const placeJson = await fetchRestPlaceDetails(apiKey, prediction, sessionToken);
+        const parsedAddress = parseGoogleAddress(placeJson);
+        const completedAddress = {
+          ...parsedAddress,
+          houseNumber: parsedAddress.houseNumber || houseNumber,
+          street: parsedAddress.street || baseAddress.street,
+          city: parsedAddress.city || baseAddress.city,
+          zip: parsedAddress.zip || baseAddress.zip,
+          country: parsedAddress.country || baseAddress.country,
+          formattedAddress: parsedAddress.formattedAddress || [baseAddress.street, houseNumber, baseAddress.city].filter(Boolean).join(' '),
+        };
+        selectedValueRef.current = getAddressInputValue(completedAddress);
+        onSelectRef.current(completedAddress);
+      } else {
+        const completedAddress = {
+          ...baseAddress,
+          houseNumber,
+          formattedAddress: [baseAddress.street, houseNumber, baseAddress.zip, baseAddress.city].filter(Boolean).join(', '),
+        };
+        selectedValueRef.current = getAddressInputValue(completedAddress);
+        onSelectRef.current(completedAddress);
+      }
+
+      setPendingHouseNumberAddress(null);
+      setHouseNumberValue('');
       setPredictions([]);
       setIsOpen(false);
       setActiveIndex(-1);
       setSessionToken(createRestSessionToken());
     } catch (error) {
-      debugError('Place details fetch failed.', error);
+      debugError('House number address lookup failed.', error);
     } finally {
       setLoading(false);
     }
@@ -247,11 +336,13 @@ export default function GoogleAddressAutocomplete({
         value={value}
         onChange={(event) => {
           onChange(event.target.value);
+          setPendingHouseNumberAddress(null);
+          setHouseNumberValue('');
           setIsOpen(event.target.value.trim().length >= 3);
         }}
         onBlur={onBlur}
         onFocus={() => {
-          if (trimmedValue.length >= 3) setIsOpen(true);
+          if (trimmedValue.length >= 3 || hasSavedLocations || pendingHouseNumberAddress) setIsOpen(true);
           onFocus?.();
         }}
         onKeyDown={(event) => {
@@ -288,10 +379,58 @@ export default function GoogleAddressAutocomplete({
           role="listbox"
           className="absolute left-0 right-0 top-[calc(100%+0.55rem)] z-30 max-h-[18rem] overflow-y-auto overscroll-contain rounded-[18px] border border-[#dbe7f8] bg-white shadow-[0_18px_40px_rgba(17,17,17,0.12)]"
         >
+          {hasSavedLocations ? (
+            <div className="border-b border-[#edf2f7] py-1.5">
+              <div className="px-4 pb-1 pt-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#6a7d96]">
+                Saved locations
+              </div>
+              {savedLocations.map((location) => (
+                <button
+                  key={location.id}
+                  type="button"
+                  role="option"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => selectSavedLocation(location)}
+                  className="flex w-full flex-col items-start px-4 py-2.5 text-left transition-colors hover:bg-[#f8fbff]"
+                >
+                  <span className="min-w-0 truncate text-[0.95rem] font-semibold text-[#111111]">{location.label}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {pendingHouseNumberAddress ? (
+            <div className="border-b border-[#edf2f7] px-4 py-3">
+              <div className="text-[0.84rem] font-semibold text-[#111111]">Add house number</div>
+              <div className="mt-1 text-[0.78rem] text-[#6a7d96]">{pendingHouseNumberAddress.street}</div>
+              <div className="mt-2 flex gap-2">
+                <input
+                  type="text"
+                  value={houseNumberValue}
+                  onChange={(event) => setHouseNumberValue(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      void submitHouseNumber();
+                    }
+                  }}
+                  placeholder="House number"
+                  className="min-w-0 flex-1 rounded-[12px] border border-[#c8d3e0] px-3 py-2 text-[0.92rem] font-medium text-[#111111] outline-none focus:border-[#1679FF]"
+                />
+                <button
+                  type="button"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => void submitHouseNumber()}
+                  className="rounded-[12px] bg-[#1679FF] px-3 py-2 text-[0.84rem] font-semibold text-white"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          ) : null}
           {loading ? (
             <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">Searching...</div>
           ) : predictions.length === 0 ? (
-            trimmedValue.length >= 3 ? (
+            trimmedValue.length >= 3 && !pendingHouseNumberAddress && !hasSavedLocations ? (
               <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">No address found.</div>
             ) : null
           ) : (
