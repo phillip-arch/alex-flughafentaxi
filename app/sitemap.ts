@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { locationRoutes } from '@/lib/location-pages';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://flughafentaxi-wien.at';
@@ -17,5 +18,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: route === '' ? 1 : 0.8,
   }));
 
-  return routes;
+  const routePages = locationRoutes.map((route) => ({
+    url: `${baseUrl}/routes/${route.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.75,
+  }));
+
+  return [...routes, ...routePages];
 }

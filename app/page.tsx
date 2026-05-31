@@ -425,16 +425,16 @@ const airportTips = [
 ];
 
 const popularTrips = [
-  'Von Terminal 1 Vienna Airport nach Wien Hauptbahnhof',
-  'Von Stephansplatz nach Terminal 3 Vienna Airport',
-  'Von Terminal 1 Vienna Airport nach Schoenbrunn Palace',
-  'Von Wien Westbahnhof nach Terminal 3 Vienna Airport',
-  'Von Praterstern nach Terminal 3 Vienna Airport',
-  'Von Terminal 1 Vienna Airport nach Stephansplatz',
-  'Von Schwedenplatz nach Terminal 3 Vienna Airport',
-  'Von Terminal 1 Vienna Airport nach Wien Westbahnhof',
-  'Von Ernst-Happel-Stadion nach Terminal 3 Vienna Airport',
-  'Von Vienna Central Train Station nach Terminal 3 Vienna Airport',
+  'From Terminal 1 Vienna Airport to Vienna Central Train Station',
+  'From Stephansplatz to Terminal 3 Vienna Airport',
+  'From Terminal 1 Vienna Airport to Schoenbrunn Palace',
+  'From Vienna Westbahnhof to Terminal 3 Vienna Airport',
+  'From Praterstern to Terminal 3 Vienna Airport',
+  'From Terminal 1 Vienna Airport to Stephansplatz',
+  'From Schwedenplatz to Terminal 3 Vienna Airport',
+  'From Terminal 1 Vienna Airport to Vienna Westbahnhof',
+  'From Ernst-Happel-Stadion to Terminal 3 Vienna Airport',
+  'From Vienna Central Train Station to Terminal 3 Vienna Airport',
 ];
 
 function SectionEyebrow({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
