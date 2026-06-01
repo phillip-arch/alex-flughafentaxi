@@ -296,6 +296,7 @@ export default function GoogleAddressAutocomplete({
   const inputId = useId();
   const listboxId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const onSelectRef = useRef(onSelect);
   const selectedValueRef = useRef('');
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -320,6 +321,12 @@ export default function GoogleAddressAutocomplete({
   const displayedValue = formatControlValue(isFocused ? editStreetLineValue : value);
   const showMobileAddressDisplay = !isFocused && isCompletedSelectedValue && displayLines.length === 2;
   const hasSavedLocations = savedLocations.length > 0;
+  const mustSelectSuggestion =
+    isOpen &&
+    trimmedValue.length >= 3 &&
+    !isCompletedSelectedValue &&
+    !pendingHouseNumberAddress &&
+    suggestions.length > 0;
 
   useEffect(() => {
     onSelectRef.current = onSelect;
@@ -400,6 +407,15 @@ export default function GoogleAddressAutocomplete({
     const handlePointerDown = (event: MouseEvent) => {
       const target = event.target as Node | null;
       if (rootRef.current && target && !rootRef.current.contains(target)) {
+        if (mustSelectSuggestion) {
+          event.preventDefault();
+          event.stopPropagation();
+          setIsOpen(true);
+          setActiveIndex((prev) => (prev >= 0 ? prev : 0));
+          window.requestAnimationFrame(() => inputRef.current?.focus());
+          return;
+        }
+
         setIsOpen(false);
         setActiveIndex(-1);
       }
@@ -407,21 +423,30 @@ export default function GoogleAddressAutocomplete({
 
     document.addEventListener('mousedown', handlePointerDown);
     return () => document.removeEventListener('mousedown', handlePointerDown);
-  }, []);
+  }, [mustSelectSuggestion]);
+
+  const showCompletedAddressValue = () => {
+    setIsFocused(false);
+    window.requestAnimationFrame(() => inputRef.current?.blur());
+  };
 
   const selectPrediction = async (prediction: PlacePrediction) => {
     setLoading(true);
     try {
       const placeJson = await fetchRestPlaceDetails(apiKey, prediction, sessionToken);
       const parsedAddress = parseGoogleAddress(placeJson);
+      const needsHouseNumber = parsedAddress.street && !parsedAddress.houseNumber;
       selectedValueRef.current = getAddressInputValue(parsedAddress);
       onSelectRef.current(parsedAddress);
       setSuggestions([]);
-      setPendingHouseNumberAddress(parsedAddress.street && !parsedAddress.houseNumber ? parsedAddress : null);
+      setPendingHouseNumberAddress(needsHouseNumber ? parsedAddress : null);
       setHouseNumberValue('');
-      setIsOpen(!parsedAddress.houseNumber && Boolean(parsedAddress.street));
+      setIsOpen(Boolean(needsHouseNumber));
       setActiveIndex(-1);
       setSessionToken(createRestSessionToken());
+      if (!needsHouseNumber) {
+        showCompletedAddressValue();
+      }
     } catch (error) {
       debugError('Place details fetch failed.', error);
     } finally {
@@ -514,6 +539,7 @@ export default function GoogleAddressAutocomplete({
       setIsOpen(false);
       setActiveIndex(-1);
       setSessionToken(createRestSessionToken());
+      showCompletedAddressValue();
     } catch (error) {
       debugError('House number address lookup failed.', error);
     } finally {
@@ -529,6 +555,7 @@ export default function GoogleAddressAutocomplete({
         </label>
       ) : null}
       <input
+        ref={inputRef}
         id={inputId}
         type="text"
         value={displayedValue}
@@ -538,7 +565,10 @@ export default function GoogleAddressAutocomplete({
           setHouseNumberValue('');
           setIsOpen(event.target.value.trim().length >= 3);
         }}
-        onBlur={onBlur}
+        onBlur={() => {
+          if (mustSelectSuggestion) return;
+          onBlur?.();
+        }}
         onFocus={() => {
           setIsFocused(true);
           if (!isCompletedSelectedValue && (trimmedValue.length >= 3 || hasSavedLocations || pendingHouseNumberAddress)) {
@@ -546,7 +576,16 @@ export default function GoogleAddressAutocomplete({
           }
           onFocus?.();
         }}
-        onBlurCapture={() => {
+        onBlurCapture={(event) => {
+          if (mustSelectSuggestion) {
+            event.preventDefault();
+            setIsFocused(true);
+            setIsOpen(true);
+            setActiveIndex((prev) => (prev >= 0 ? prev : 0));
+            window.requestAnimationFrame(() => inputRef.current?.focus());
+            return;
+          }
+
           setIsFocused(false);
         }}
         onKeyDown={(event) => {
