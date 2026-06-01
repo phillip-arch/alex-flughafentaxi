@@ -1817,25 +1817,21 @@ const BookingForm = ({
                 <p style={{ marginBottom: '14px' }} className="text-[22px] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
                   {addressPlaceholder}
                 </p>
-                <div className={`rounded-[1.05rem] border bg-white pl-2 pr-4 py-0 transition-shadow md:pl-3 md:pr-4 ${isFieldInvalid('street') || isFieldInvalid('zip') || unresolvedStreetWarning ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
-                  <div className="flex min-w-0 items-center gap-1.5 md:gap-3">
-                    <MapPin className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
-                    <div className="relative min-w-0 flex-1">
-                      <GoogleAddressAutocomplete
-                        value={streetInputValue}
-                        savedLocations={savedAddressLocations}
-                        onChange={(value) => clearStreetSelection('street', value)}
-                        onSelect={applyGoogleAddressSelection}
-                        onSavedLocationSelect={(location) => {
-                          const favorite = favoriteAddresses.find((item) => item.id === location.id);
-                          if (favorite) applyFavoriteAddress(favorite);
-                        }}
-                        onBlur={() => validateStreetNumber('street')}
-                        placeholder={addressInputPlaceholder}
-                        className="w-full h-[3.8rem] border-0 bg-transparent p-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:h-[3.6rem] md:text-[18px]"
-                      />
-                    </div>
-                  </div>
+                <div className={`rounded-[1.05rem] border bg-white transition-shadow ${isFieldInvalid('street') || isFieldInvalid('zip') || unresolvedStreetWarning ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
+                  <GoogleAddressAutocomplete
+                    value={streetInputValue}
+                    leadingIcon={<MapPin className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />}
+                    savedLocations={savedAddressLocations}
+                    onChange={(value) => clearStreetSelection('street', value)}
+                    onSelect={applyGoogleAddressSelection}
+                    onSavedLocationSelect={(location) => {
+                      const favorite = favoriteAddresses.find((item) => item.id === location.id);
+                      if (favorite) applyFavoriteAddress(favorite);
+                    }}
+                    onBlur={() => validateStreetNumber('street')}
+                    placeholder={addressInputPlaceholder}
+                    className="h-[3.8rem] w-full border-0 bg-transparent px-4 py-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:h-[3.6rem] md:text-[18px]"
+                  />
                 </div>
                 {unresolvedStreetWarning && (
                   <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[#d70015]">

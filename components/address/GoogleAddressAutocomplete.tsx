@@ -123,7 +123,7 @@ async function fetchRestAutocompleteSuggestions(
   const requestBody: Record<string, unknown> = {
     input,
     includedRegionCodes: GOOGLE_PLACES_COUNTRIES,
-    languageCode: 'en',
+    languageCode: 'de',
     regionCode: 'AT',
     sessionToken,
   };
@@ -159,7 +159,7 @@ async function fetchRestAutocompleteSuggestions(
 async function fetchRestPlaceDetails(apiKey: string, prediction: PlacePrediction, sessionToken: string | null) {
   const resourceName = prediction.placeResourceName || `places/${prediction.placeId}`;
   const url = new URL(`https://places.googleapis.com/v1/${resourceName}`);
-  url.searchParams.set('languageCode', 'en');
+  url.searchParams.set('languageCode', 'de');
   if (sessionToken) url.searchParams.set('sessionToken', sessionToken);
 
   const response = await fetch(url.toString(), {
@@ -237,7 +237,7 @@ function buildOrderedSuggestions(streetResults: StreetOption[], placePredictions
   const seenStreetKeys = new Set<string>();
   const seenPlaceIds = new Set<string>();
 
-  streetResults.forEach((option) => {
+  prioritizeViennaStreets(streetResults).forEach((option) => {
     const key = `${option.zip || ''}::${option.city || ''}::${option.street || ''}`.toLocaleLowerCase('de-AT');
     if (seenStreetKeys.has(key)) return;
     seenStreetKeys.add(key);
@@ -259,6 +259,26 @@ function buildOrderedSuggestions(streetResults: StreetOption[], placePredictions
   });
 
   return suggestions;
+}
+
+function hasHouseNumberQuery(value: string) {
+  return /[^\d\s,]+\s+\d+[A-Za-z]?(?:[/-]\d+[A-Za-z]?)?\b/u.test(value.trim());
+}
+
+function prioritizeViennaStreets(streetResults: StreetOption[]) {
+  return [...streetResults].sort((left, right) => {
+    const leftVienna = left.city.trim().toLocaleLowerCase('de-AT') === 'wien' ? 0 : 1;
+    const rightVienna = right.city.trim().toLocaleLowerCase('de-AT') === 'wien' ? 0 : 1;
+
+    if (leftVienna !== rightVienna) {
+      return leftVienna - rightVienna;
+    }
+
+    return buildStreetOptionValue(left.street, left.zip, left.city).localeCompare(
+      buildStreetOptionValue(right.street, right.zip, right.city),
+      'de-AT',
+    );
+  });
 }
 
 export default function GoogleAddressAutocomplete({
@@ -285,18 +305,20 @@ export default function GoogleAddressAutocomplete({
   const [pendingHouseNumberAddress, setPendingHouseNumberAddress] = useState<ParsedGoogleAddress | null>(null);
   const [houseNumberValue, setHouseNumberValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
   const hasLeadingIcon = Boolean(leadingIcon);
   const trimmedValue = value.trim();
-  const displayedValue = formatControlValue(value);
-  const displayLines = displayedValue.replace(/,\s*(\d{4,5}\s+\S.*)$/u, '\n$1').split('\n');
+  const displayLines = formatControlValue(value).replace(/,\s*(\d{4,5}\s+\S.*)$/u, '\n$1').split('\n');
   const isCompletedSelectedValue =
     isStructuredAddressValue(value) ||
     (selectedValueRef.current &&
       normalizeComparableAddress(value) === normalizeComparableAddress(selectedValueRef.current));
-  const showMobileAddressDisplay = isCompletedSelectedValue && displayLines.length === 2;
+  const editStreetLineValue = isCompletedSelectedValue && displayLines.length > 1 ? displayLines[0] : value;
+  const displayedValue = formatControlValue(isFocused ? editStreetLineValue : value);
+  const showMobileAddressDisplay = !isFocused && isCompletedSelectedValue && displayLines.length === 2;
   const hasSavedLocations = savedLocations.length > 0;
 
   useEffect(() => {
@@ -340,7 +362,8 @@ export default function GoogleAddressAutocomplete({
 
         if (!isActive) return;
 
-        const streetResults = streetResult.status === 'fulfilled' ? streetResult.value : [];
+        const streetResults =
+          streetResult.status === 'fulfilled' && !hasHouseNumberQuery(trimmedValue) ? streetResult.value : [];
         const placePredictions =
           placeResult.status === 'fulfilled'
             ? await addAddressDetailsToPredictions(apiKey, placeResult.value, sessionToken)
@@ -517,10 +540,14 @@ export default function GoogleAddressAutocomplete({
         }}
         onBlur={onBlur}
         onFocus={() => {
+          setIsFocused(true);
           if (!isCompletedSelectedValue && (trimmedValue.length >= 3 || hasSavedLocations || pendingHouseNumberAddress)) {
             setIsOpen(true);
           }
           onFocus?.();
+        }}
+        onBlurCapture={() => {
+          setIsFocused(false);
         }}
         onKeyDown={(event) => {
           if (!isOpen || !suggestions.length) return;
