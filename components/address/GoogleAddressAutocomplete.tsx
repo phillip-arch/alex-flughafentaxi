@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { buildStreetOptionValue, type StreetOption } from '@/lib/addresses';
 import { parseGoogleAddress, type ParsedGoogleAddress } from '@/lib/googleAddress';
 
 type GoogleAddressAutocompleteProps = {
@@ -30,6 +31,18 @@ type PlacePrediction = {
   zip?: string;
   city?: string;
 };
+
+type AddressSuggestion =
+  | {
+      kind: 'street';
+      key: string;
+      option: StreetOption;
+    }
+  | {
+      kind: 'place';
+      key: string;
+      prediction: PlacePrediction;
+    };
 
 const GOOGLE_PLACES_COUNTRIES = ['at', 'sk', 'hu', 'si'];
 const GOOGLE_ADDRESS_TYPES = ['street_address', 'premise', 'subpremise'];
@@ -190,6 +203,64 @@ async function addAddressDetailsToPredictions(
   return [...enrichedPredictions, ...predictions.slice(visiblePredictions.length)];
 }
 
+async function fetchStreetSuggestions(input: string) {
+  const params = new URLSearchParams({
+    q: input,
+    limit: '8',
+  });
+  const response = await fetch(`/api/streets/search?${params.toString()}`);
+  const payload = (await response.json()) as { results?: StreetOption[] };
+
+  if (!response.ok) {
+    throw new Error('Street search request failed.');
+  }
+
+  return payload.results || [];
+}
+
+function mapStreetToAddress(option: StreetOption): ParsedGoogleAddress {
+  return {
+    formattedAddress: buildStreetOptionValue(option.street, option.zip, formatDisplayCity(option.city)),
+    street: option.street,
+    houseNumber: '',
+    zip: option.zip,
+    city: option.city,
+    country: 'AT',
+    lat: null,
+    lng: null,
+    placeId: option.id || '',
+  };
+}
+
+function buildOrderedSuggestions(streetResults: StreetOption[], placePredictions: PlacePrediction[]) {
+  const suggestions: AddressSuggestion[] = [];
+  const seenStreetKeys = new Set<string>();
+  const seenPlaceIds = new Set<string>();
+
+  streetResults.forEach((option) => {
+    const key = `${option.zip || ''}::${option.city || ''}::${option.street || ''}`.toLocaleLowerCase('de-AT');
+    if (seenStreetKeys.has(key)) return;
+    seenStreetKeys.add(key);
+    suggestions.push({
+      kind: 'street',
+      key: `street-${key}`,
+      option,
+    });
+  });
+
+  placePredictions.forEach((prediction) => {
+    if (!prediction.placeId || seenPlaceIds.has(prediction.placeId)) return;
+    seenPlaceIds.add(prediction.placeId);
+    suggestions.push({
+      kind: 'place',
+      key: `place-${prediction.placeId}`,
+      prediction,
+    });
+  });
+
+  return suggestions;
+}
+
 export default function GoogleAddressAutocomplete({
   value,
   placeholder,
@@ -210,7 +281,7 @@ export default function GoogleAddressAutocomplete({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isConfigured, setIsConfigured] = useState(false);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
-  const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [pendingHouseNumberAddress, setPendingHouseNumberAddress] = useState<ParsedGoogleAddress | null>(null);
   const [houseNumberValue, setHouseNumberValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -251,7 +322,7 @@ export default function GoogleAddressAutocomplete({
 
   useEffect(() => {
     if (!isConfigured || trimmedValue.length < 3 || isCompletedSelectedValue) {
-      setPredictions([]);
+      setSuggestions([]);
       setIsOpen(false);
       setLoading(false);
       setActiveIndex(-1);
@@ -262,25 +333,30 @@ export default function GoogleAddressAutocomplete({
     const timeout = window.setTimeout(async () => {
       setLoading(true);
       try {
-        let nextPredictions = await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, sessionToken, true);
-
-        if (nextPredictions.length === 0) {
-          nextPredictions = await fetchRestAutocompleteSuggestions(apiKey, trimmedValue, sessionToken, false);
-        }
-
-        if (!isActive) return;
-
-        nextPredictions = await addAddressDetailsToPredictions(apiKey, nextPredictions, sessionToken);
+        const [streetResult, placeResult] = await Promise.allSettled([
+          fetchStreetSuggestions(trimmedValue),
+          fetchRestAutocompleteSuggestions(apiKey, trimmedValue, sessionToken, false),
+        ]);
 
         if (!isActive) return;
 
-        setPredictions(nextPredictions);
+        const streetResults = streetResult.status === 'fulfilled' ? streetResult.value : [];
+        const placePredictions =
+          placeResult.status === 'fulfilled'
+            ? await addAddressDetailsToPredictions(apiKey, placeResult.value, sessionToken)
+            : [];
+
+        if (!isActive) return;
+
+        const nextSuggestions = buildOrderedSuggestions(streetResults, placePredictions);
+
+        setSuggestions(nextSuggestions);
         setIsOpen(true);
-        setActiveIndex(nextPredictions.length > 0 ? 0 : -1);
+        setActiveIndex(nextSuggestions.length > 0 ? 0 : -1);
       } catch (error) {
         debugError('Autocomplete suggestions request failed.', error);
         if (isActive) {
-          setPredictions([]);
+          setSuggestions([]);
           setIsOpen(true);
           setActiveIndex(-1);
         }
@@ -317,7 +393,7 @@ export default function GoogleAddressAutocomplete({
       const parsedAddress = parseGoogleAddress(placeJson);
       selectedValueRef.current = getAddressInputValue(parsedAddress);
       onSelectRef.current(parsedAddress);
-      setPredictions([]);
+      setSuggestions([]);
       setPendingHouseNumberAddress(parsedAddress.street && !parsedAddress.houseNumber ? parsedAddress : null);
       setHouseNumberValue('');
       setIsOpen(!parsedAddress.houseNumber && Boolean(parsedAddress.street));
@@ -330,11 +406,31 @@ export default function GoogleAddressAutocomplete({
     }
   };
 
+  const selectStreetSuggestion = (option: StreetOption) => {
+    const parsedAddress = mapStreetToAddress(option);
+    selectedValueRef.current = getAddressInputValue(parsedAddress);
+    onSelectRef.current(parsedAddress);
+    setSuggestions([]);
+    setPendingHouseNumberAddress(parsedAddress);
+    setHouseNumberValue('');
+    setIsOpen(true);
+    setActiveIndex(-1);
+  };
+
+  const selectSuggestion = (suggestion: AddressSuggestion) => {
+    if (suggestion.kind === 'street') {
+      selectStreetSuggestion(suggestion.option);
+      return;
+    }
+
+    void selectPrediction(suggestion.prediction);
+  };
+
   const selectSavedLocation = (location: SavedLocation) => {
     selectedValueRef.current = location.label;
     setPendingHouseNumberAddress(null);
     setHouseNumberValue('');
-    setPredictions([]);
+    setSuggestions([]);
     setIsOpen(false);
     setActiveIndex(-1);
     onSavedLocationSelect?.(location);
@@ -391,7 +487,7 @@ export default function GoogleAddressAutocomplete({
 
       setPendingHouseNumberAddress(null);
       setHouseNumberValue('');
-      setPredictions([]);
+      setSuggestions([]);
       setIsOpen(false);
       setActiveIndex(-1);
       setSessionToken(createRestSessionToken());
@@ -427,16 +523,16 @@ export default function GoogleAddressAutocomplete({
           onFocus?.();
         }}
         onKeyDown={(event) => {
-          if (!isOpen || !predictions.length) return;
+          if (!isOpen || !suggestions.length) return;
           if (event.key === 'ArrowDown') {
-            setActiveIndex((prev) => (prev + 1) % predictions.length);
+            setActiveIndex((prev) => (prev + 1) % suggestions.length);
             event.preventDefault();
           } else if (event.key === 'ArrowUp') {
-            setActiveIndex((prev) => (prev <= 0 ? predictions.length - 1 : prev - 1));
+            setActiveIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
             event.preventDefault();
           } else if (event.key === 'Enter' && activeIndex >= 0) {
             event.preventDefault();
-            void selectPrediction(predictions[activeIndex]);
+            selectSuggestion(suggestions[activeIndex]);
           } else if (event.key === 'Escape') {
             setIsOpen(false);
             setActiveIndex(-1);
@@ -470,25 +566,6 @@ export default function GoogleAddressAutocomplete({
           role="listbox"
           className="absolute left-0 right-0 top-[calc(100%+0.55rem)] z-30 max-h-[18rem] overflow-y-auto overscroll-contain rounded-[18px] border border-[#dbe7f8] bg-white shadow-[0_18px_40px_rgba(17,17,17,0.12)]"
         >
-          {hasSavedLocations ? (
-            <div className="border-b border-[#edf2f7] py-1.5">
-              <div className="px-4 pb-1 pt-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#6a7d96]">
-                Saved locations
-              </div>
-              {savedLocations.map((location) => (
-                <button
-                  key={location.id}
-                  type="button"
-                  role="option"
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => selectSavedLocation(location)}
-                  className="flex w-full flex-col items-start px-4 py-2.5 text-left transition-colors hover:bg-[#f8fbff]"
-                >
-                  <span className="min-w-0 truncate text-[0.95rem] font-semibold text-[#111111]">{location.label}</span>
-                </button>
-              ))}
-            </div>
-          ) : null}
           {pendingHouseNumberAddress ? (
             <div className="border-b border-[#edf2f7] px-4 py-3">
               <div className="text-[0.84rem] font-semibold text-[#111111]">Enter house number</div>
@@ -520,28 +597,37 @@ export default function GoogleAddressAutocomplete({
           ) : null}
           {loading ? (
             <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">Searching...</div>
-          ) : predictions.length === 0 ? (
+          ) : suggestions.length === 0 ? (
             trimmedValue.length >= 3 && !pendingHouseNumberAddress && !hasSavedLocations ? (
               <div className="px-4 py-3 text-[0.92rem] text-[#6a7d96]">No address found.</div>
             ) : null
           ) : (
-            predictions.map((prediction, index) => {
-              const label = getPredictionText(prediction.text);
-              const cityLine = [prediction.zip, prediction.city ? formatDisplayCity(prediction.city) : '']
-                .filter(Boolean)
-                .join(' ')
-                .trim();
-              const secondary = cityLine || getPredictionText(prediction.secondaryText);
+            suggestions.map((suggestion, index) => {
               const isActive = index === activeIndex;
+              const isStreet = suggestion.kind === 'street';
+              const label = isStreet
+                ? buildStreetOptionValue(
+                    suggestion.option.street,
+                    suggestion.option.zip,
+                    formatDisplayCity(suggestion.option.city),
+                  )
+                : getPredictionText(suggestion.prediction.text);
+              const cityLine = !isStreet
+                ? [suggestion.prediction.zip, suggestion.prediction.city ? formatDisplayCity(suggestion.prediction.city) : '']
+                    .filter(Boolean)
+                    .join(' ')
+                    .trim()
+                : '';
+              const secondary = isStreet ? 'Street' : cityLine || getPredictionText(suggestion.prediction.secondaryText) || 'Place';
               return (
                 <button
-                  key={prediction.placeId}
+                  key={suggestion.key}
                   type="button"
                   role="option"
                   aria-selected={isActive}
                   onMouseEnter={() => setActiveIndex(index)}
                   onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => void selectPrediction(prediction)}
+                  onClick={() => selectSuggestion(suggestion)}
                   className={`flex w-full flex-col items-start px-4 py-3 text-left transition-colors ${
                     isActive ? 'bg-[#f8fbff]' : 'hover:bg-[#f8fbff]'
                   } ${index > 0 ? 'border-t border-[#edf2f7]' : ''}`}
@@ -554,6 +640,25 @@ export default function GoogleAddressAutocomplete({
               );
             })
           )}
+          {hasSavedLocations ? (
+            <div className="border-t border-[#edf2f7] py-1.5">
+              <div className="px-4 pb-1 pt-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[#6a7d96]">
+                Saved locations
+              </div>
+              {savedLocations.map((location) => (
+                <button
+                  key={location.id}
+                  type="button"
+                  role="option"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => selectSavedLocation(location)}
+                  className="flex w-full flex-col items-start px-4 py-2.5 text-left transition-colors hover:bg-[#f8fbff]"
+                >
+                  <span className="min-w-0 truncate text-[0.95rem] font-semibold text-[#111111]">{location.label}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
