@@ -511,7 +511,6 @@ export default async function Home() {
                   {[
                     { icon: Star, label: '4.9 Rating' },
                     { icon: Check, label: 'Fixed price' },
-                    { icon: Plane, label: '24 / 7 service' },
                     { icon: ShieldCheck, label: '10 + years' },
                   ].map(({ icon: Icon, label }) => (
                     <span
