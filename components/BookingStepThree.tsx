@@ -49,10 +49,11 @@ export default function BookingStepThree({
   const currentLang = searchParams.get('lang')?.toLowerCase() === 'de' ? 'de' : 'en';
   const agbHref = `/agb?lang=${currentLang}`;
   const privacyHref = `/datenschutz?lang=${currentLang}`;
+  const contactInputClass = '!min-h-[2.43rem] !py-[0.5rem] md:!min-h-[1.94rem] md:!py-[0.4rem]';
 
   return (
     <div className="w-full min-w-0 max-w-full overflow-x-clip flex flex-1 min-h-0 flex-col">
-      <div className="space-y-3 min-h-0 flex-1 md:overflow-y-auto">
+      <div className="space-y-2.5 min-h-0 flex-1 md:overflow-y-auto">
       <BookingPriceSummaryCard formData={formData} totalPrice={totalPrice} vehicleType={vehicleType} />
 
       {isLoggedIn ? (
@@ -65,7 +66,7 @@ export default function BookingStepThree({
               onChange={(e) => handleBookingForMyselfToggle(e.target.checked)}
               className="peer sr-only"
             />
-            <div className="h-[31px] w-[51px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[#1679FF] peer-focus:outline-none peer-checked:after:translate-x-[20px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[27px] after:w-[27px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
+            <div className="h-[22px] w-[36px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[#1679FF] peer-focus:outline-none peer-checked:after:translate-x-[14px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[18px] after:w-[18px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
           </label>
         </div>
       ) : null}
@@ -82,7 +83,7 @@ export default function BookingStepThree({
             value={formData.fullName}
             onChange={handleChange}
             placeholder=""
-            className={getInputClassName('fullName')}
+            className={`${getInputClassName('fullName')} ${contactInputClass}`}
           />
         </div>
         <div className={`relative ${BOOKING_FIELD_STACK_CLASS}`}>
@@ -96,7 +97,7 @@ export default function BookingStepThree({
             value={formData.phone}
             onChange={handleChange}
             placeholder=""
-            className={getInputClassName('phone')}
+            className={`${getInputClassName('phone')} ${contactInputClass}`}
           />
         </div>
         <div className={`relative ${BOOKING_FIELD_STACK_CLASS}`}>
@@ -110,7 +111,7 @@ export default function BookingStepThree({
             value={formData.email}
             onChange={handleChange}
             placeholder=""
-            className={getInputClassName('email')}
+            className={`${getInputClassName('email')} ${contactInputClass}`}
           />
         </div>
       </div>
@@ -123,7 +124,7 @@ export default function BookingStepThree({
           <button
             type="button"
             onClick={() => handlePaymentChange('cash')}
-            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-2.5 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
+            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-[0.59rem] transition-all duration-200 md:gap-[0.35rem] md:py-[0.52rem] ${
               formData.paymentMethod === 'cash'
                 ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1679FF] ring-2 ring-inset ring-[#7fb3ff]'
                 : touched['paymentMethod'] && !formData.paymentMethod
@@ -136,7 +137,7 @@ export default function BookingStepThree({
           <button
             type="button"
             onClick={() => handlePaymentChange('card')}
-            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-2.5 transition-all duration-200 md:gap-[0.35rem] md:py-[0.55rem] ${
+            className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-[0.59rem] transition-all duration-200 md:gap-[0.35rem] md:py-[0.52rem] ${
               formData.paymentMethod === 'card'
                 ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1679FF] ring-2 ring-inset ring-[#7fb3ff]'
                 : touched['paymentMethod'] && !formData.paymentMethod

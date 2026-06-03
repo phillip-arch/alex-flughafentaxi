@@ -70,6 +70,11 @@ const DASHBOARD_BOOKING_SELECT = `
   booking_reference
 `;
 
+function normalizePricingNumber(value: unknown, fallback = 0) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+}
+
 export async function fetchBookings(date: string) {
   const admin = await checkAdmin();
   if (admin.error) return [];
@@ -131,6 +136,183 @@ export async function fetchDrivers() {
     return [];
   }
   return data;
+}
+
+export async function fetchPricingAdminData() {
+  const admin = await checkAdmin();
+  if (admin.error) {
+    return {
+      settings: null,
+      zipPrices: [],
+    };
+  }
+
+  const [settingsResult, pricesResult] = await Promise.all([
+    supabaseAdmin
+      .from('distance_pricing_settings')
+      .select('*')
+      .eq('id', 'default')
+      .maybeSingle(),
+    supabaseAdmin
+      .from('zip_prices')
+      .select('zip, city, base_price, limo_price, kombi_price, bus_price, created_at')
+      .order('zip', { ascending: true })
+      .order('city', { ascending: true }),
+  ]);
+
+  if (settingsResult.error) {
+    console.error('Error fetching distance pricing settings:', settingsResult.error);
+  }
+
+  if (pricesResult.error) {
+    console.error('Error fetching zip prices:', pricesResult.error);
+  }
+
+  return {
+    settings: settingsResult.data || null,
+    zipPrices: pricesResult.data || [],
+  };
+}
+
+export async function updateDistancePricingSettings(payload: any) {
+  await requireSameOrigin();
+  const admin = await checkAdmin();
+  if (admin.error || !admin.user) return { error: admin.error || 'Unauthorized' };
+
+  const nextSettings = {
+    id: 'default',
+    enabled: payload?.enabled !== false,
+    airport_lat: normalizePricingNumber(payload?.airport_lat, 48.110278),
+    airport_lng: normalizePricingNumber(payload?.airport_lng, 16.569722),
+    base_fee: normalizePricingNumber(payload?.base_fee, 18),
+    limo_per_km: normalizePricingNumber(payload?.limo_per_km, 1.7),
+    kombi_per_km: normalizePricingNumber(payload?.kombi_per_km, 1.9),
+    bus_per_km: normalizePricingNumber(payload?.bus_per_km, 2.4),
+    minimum_limo_price: normalizePricingNumber(payload?.minimum_limo_price, 45),
+    minimum_kombi_price: normalizePricingNumber(payload?.minimum_kombi_price, 50),
+    minimum_bus_price: normalizePricingNumber(payload?.minimum_bus_price, 65),
+    round_to: Math.max(0.01, normalizePricingNumber(payload?.round_to, 1)),
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error } = await supabaseAdmin
+    .from('distance_pricing_settings')
+    .upsert(nextSettings, { onConflict: 'id' });
+
+  if (error) {
+    return safeActionError('Distance pricing settings could not be saved.', 'Distance pricing settings update error:', error);
+  }
+
+  await logAuditEvent({
+    actor: { id: admin.user.id, email: admin.user.email },
+    action: 'UPDATE_DISTANCE_PRICING',
+    entity: 'distance_pricing_settings',
+    entityId: 'default',
+    meta: { settings: nextSettings },
+  });
+
+  revalidatePath('/dispatch/dashboard');
+  return { success: true };
+}
+
+export async function upsertZipPrice(payload: any) {
+  await requireSameOrigin();
+  const admin = await checkAdmin();
+  if (admin.error || !admin.user) return { error: admin.error || 'Unauthorized' };
+
+  const zip = String(payload?.zip || '').replace(/\D/g, '').trim();
+  const city = String(payload?.city || '').trim();
+  const originalZip = String(payload?.original_zip || '').replace(/\D/g, '').trim();
+  const originalCity = String(payload?.original_city || '').trim();
+  const limoPrice = normalizePricingNumber(payload?.limo_price, NaN);
+  const kombiPrice = normalizePricingNumber(payload?.kombi_price, NaN);
+  const busPrice = normalizePricingNumber(payload?.bus_price, NaN);
+
+  if (!/^\d{3,6}$/.test(zip) || !city) {
+    return { error: 'ZIP and city are required.' };
+  }
+
+  if (![limoPrice, kombiPrice, busPrice].every((value) => Number.isFinite(value) && value >= 0)) {
+    return { error: 'Valid Limo, Kombi and Bus prices are required.' };
+  }
+
+  const row = {
+    zip,
+    city,
+    base_price: limoPrice,
+    limo_price: limoPrice,
+    kombi_price: kombiPrice,
+    bus_price: busPrice,
+  };
+
+  const { error } = await supabaseAdmin
+    .from('zip_prices')
+    .upsert(row, { onConflict: 'zip,city' });
+
+  if (error) {
+    return safeActionError('ZIP price could not be saved.', 'ZIP price upsert error:', error);
+  }
+
+  if (originalZip && originalCity && (originalZip !== zip || originalCity !== city)) {
+    const { error: deleteOldError } = await supabaseAdmin
+      .from('zip_prices')
+      .delete()
+      .eq('zip', originalZip)
+      .eq('city', originalCity);
+
+    if (deleteOldError) {
+      return safeActionError('Old ZIP price could not be replaced.', 'ZIP price replacement cleanup error:', deleteOldError);
+    }
+  }
+
+  await logAuditEvent({
+    actor: { id: admin.user.id, email: admin.user.email },
+    action: originalZip && originalCity ? 'UPDATE_ZIP_PRICE' : 'CREATE_ZIP_PRICE',
+    entity: 'zip_prices',
+    entityId: `${zip}-${city}`,
+    meta: { originalZip, originalCity, zip, city, limo_price: limoPrice, kombi_price: kombiPrice, bus_price: busPrice },
+  });
+
+  revalidatePath('/dispatch/dashboard');
+  return { success: true };
+}
+
+export async function deleteZipPrice(input: { zip?: string; city?: string }) {
+  await requireSameOrigin();
+  const admin = await checkAdmin();
+  if (admin.error || !admin.user) return { error: admin.error || 'Unauthorized' };
+
+  const zip = String(input?.zip || '').replace(/\D/g, '').trim();
+  const city = String(input?.city || '').trim();
+  if (!zip || !city) return { error: 'ZIP and city are required.' };
+
+  const { data: existing } = await supabaseAdmin
+    .from('zip_prices')
+    .select('zip, city')
+    .eq('zip', zip)
+    .eq('city', city)
+    .maybeSingle();
+
+  const { error } = await supabaseAdmin
+    .from('zip_prices')
+    .delete()
+    .eq('zip', zip)
+    .eq('city', city);
+
+  if (error) {
+    return safeActionError('ZIP price could not be deleted.', 'ZIP price delete error:', error);
+  }
+
+  await logAuditEvent({
+    actor: { id: admin.user.id, email: admin.user.email },
+    action: 'DELETE_ZIP_PRICE',
+    entity: 'zip_prices',
+    entityId: `${zip}-${city}`,
+    meta: existing || { zip, city },
+  });
+
+  revalidatePath('/dispatch/dashboard');
+  return { success: true };
 }
 
 export async function fetchAuditLogs(
@@ -958,4 +1140,3 @@ export async function fetchPassengerCountsBatch(emails: string[]) {
 
   return counts;
 }
-

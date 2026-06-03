@@ -648,7 +648,7 @@ export default function AccountClient({
                     />
                   </div>
                 </section>
-                <aside className="hidden min-w-0 self-start md:block">
+                <aside className="hidden min-w-0 self-start md:block md:max-h-[calc(100vh-3rem)] md:overflow-y-auto md:overscroll-contain md:pr-1">
                   <BookingInfoPanel
                     direction={bookingDirection}
                     meetAndGreet={meetAndGreet}

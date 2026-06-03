@@ -13,6 +13,7 @@ import { generateSafeReference, normalizeBookingReference } from '@/lib/booking/
 import { z } from 'zod';
 import { calculateVehiclePrice, type VehicleType } from '@/lib/pricing';
 import { normalizeCity, normalizeZip } from '@/lib/googleAddress';
+import { calculateDistancePriceEstimate, getDistancePriceForVehicle } from '@/lib/pricing/distancePricing';
 import {
   getLeadTimeErrorMessage,
   hasSufficientLeadTime,
@@ -147,10 +148,20 @@ export async function createBooking(payload: any) {
   let basePrice = 0;
   let dbPrices = undefined;
   let hasFixedPrice = false;
+  let distancePriceKm: number | null = null;
+  let distanceDurationMinutes: number | null = null;
+  let pricingSource: 'fixed' | 'distance' | null = null;
 
   const selectedPlaceId = pickup_place_id || dropoff_place_id || '';
   const normalizedZip = normalizeZip(typeof _zip === 'string' ? _zip : '');
   const normalizedCity = normalizeCity(typeof _city === 'string' ? _city : '');
+  const selectedStreetAddress = pickup_place_id ? bookingData.pickup : bookingData.destination;
+  const selectedAddress =
+    pickup_formatted_address ||
+    dropoff_formatted_address ||
+    [selectedStreetAddress, normalizedZip && normalizedCity ? `${normalizedZip} ${normalizedCity}` : '']
+      .filter(Boolean)
+      .join(', ');
 
   if (!selectedPlaceId || !normalizedZip || !normalizedCity) {
     return { error: 'Please select a valid address from Google suggestions.' };
@@ -176,6 +187,7 @@ export async function createBooking(payload: any) {
     if (zipData) {
       basePrice = zipData.base_price;
       hasFixedPrice = true;
+      pricingSource = 'fixed';
       dbPrices = {
         limo: zipData.limo_price,
         kombi: zipData.kombi_price,
@@ -184,12 +196,37 @@ export async function createBooking(payload: any) {
     }
   }
 
-  const vehiclePrice = hasFixedPrice
+  let vehiclePrice = hasFixedPrice
     ? calculateVehiclePrice(basePrice, bookingData.vehicle_type as VehicleType, dbPrices)
     : null;
+
+  if (vehiclePrice === null) {
+    try {
+      const distanceEstimate = await calculateDistancePriceEstimate({
+        lat: pickup_lat ?? dropoff_lat ?? null,
+        lng: pickup_lng ?? dropoff_lng ?? null,
+        address: selectedAddress,
+      });
+
+      if (distanceEstimate) {
+        vehiclePrice = getDistancePriceForVehicle(distanceEstimate, bookingData.vehicle_type as VehicleType);
+        distancePriceKm = distanceEstimate.distanceKm;
+        distanceDurationMinutes = distanceEstimate.durationMinutes;
+        pricingSource = 'distance';
+      }
+    } catch (distanceError) {
+      console.error('Distance fallback pricing error:', distanceError);
+      return { error: 'No fixed price found and distance pricing could not be calculated.' };
+    }
+  }
+
   const extraStopPrice = _extraStop ? 10 : 0;
   const meetAndGreetPrice = _meetAndGreet && /flughafen/i.test(bookingData.pickup) ? 6 : 0;
   const finalPrice = vehiclePrice === null ? null : vehiclePrice + extraStopPrice + meetAndGreetPrice;
+
+  if (finalPrice === null) {
+    return { error: 'No price is available for this address.' };
+  }
 
   // Generate unique tokens and references
   const confirm_token = crypto.randomUUID();
@@ -209,6 +246,9 @@ export async function createBooking(payload: any) {
       .insert({
         ...bookingData,
         price: finalPrice, // Server-calculated price
+        pricing_source: pricingSource,
+        pricing_distance_km: distancePriceKm,
+        pricing_duration_minutes: distanceDurationMinutes,
         pickup_formatted_address: pickup_formatted_address || null,
         pickup_zip: pickup_zip || null,
         pickup_city: pickup_city || null,
@@ -410,4 +450,3 @@ export async function confirmBooking(token: string, driverId?: string) {
 
   return { error: 'Ungültiger oder abgelaufener Bestätigungslink.' };
 }
-

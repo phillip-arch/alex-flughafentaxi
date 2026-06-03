@@ -228,7 +228,7 @@ function mapStreetToAddress(option: StreetOption): ParsedGoogleAddress {
     country: 'AT',
     lat: null,
     lng: null,
-    placeId: option.id || '',
+    placeId: '',
   };
 }
 
@@ -313,10 +313,10 @@ export default function GoogleAddressAutocomplete({
   const hasLeadingIcon = Boolean(leadingIcon);
   const trimmedValue = value.trim();
   const displayLines = formatControlValue(value).replace(/,\s*(\d{4,5}\s+\S.*)$/u, '\n$1').split('\n');
-  const isCompletedSelectedValue =
-    isStructuredAddressValue(value) ||
-    (selectedValueRef.current &&
-      normalizeComparableAddress(value) === normalizeComparableAddress(selectedValueRef.current));
+  const isCompletedSelectedValue = Boolean(
+    selectedValueRef.current &&
+      normalizeComparableAddress(value) === normalizeComparableAddress(selectedValueRef.current),
+  );
   const editStreetLineValue = isCompletedSelectedValue && displayLines.length > 1 ? displayLines[0] : value;
   const displayedValue = formatControlValue(isFocused ? editStreetLineValue : value);
   const showMobileAddressDisplay = !isFocused && isCompletedSelectedValue && displayLines.length === 2;
@@ -333,10 +333,10 @@ export default function GoogleAddressAutocomplete({
   }, [onSelect]);
 
   useEffect(() => {
-    if (isStructuredAddressValue(value)) {
+    if (!selectedValueRef.current && isStructuredAddressValue(value)) {
       selectedValueRef.current = value;
     }
-  }, [value]);
+  }, []);
 
   useEffect(() => {
     if (!apiKey) {
@@ -496,7 +496,11 @@ export default function GoogleAddressAutocomplete({
     setLoading(true);
     try {
       const matches = await fetchRestAutocompleteSuggestions(apiKey, query, sessionToken, true);
-      const prediction = matches[0];
+      let prediction = matches[0];
+      if (!prediction) {
+        const broadMatches = await fetchRestAutocompleteSuggestions(apiKey, `${query}, Austria`, sessionToken, false);
+        prediction = broadMatches[0];
+      }
       if (prediction) {
         const placeJson = await fetchRestPlaceDetails(apiKey, prediction, sessionToken);
         const parsedAddress = parseGoogleAddress(placeJson);
@@ -519,18 +523,8 @@ export default function GoogleAddressAutocomplete({
         selectedValueRef.current = getAddressInputValue(completedAddress);
         onSelectRef.current(completedAddress);
       } else {
-        const completedAddress = {
-          ...baseAddress,
-          houseNumber,
-          formattedAddress: [
-            [baseAddress.street, houseNumber].filter(Boolean).join(' '),
-            [baseAddress.zip, formatDisplayCity(baseAddress.city)].filter(Boolean).join(' '),
-          ]
-            .filter(Boolean)
-            .join(', '),
-        };
-        selectedValueRef.current = getAddressInputValue(completedAddress);
-        onSelectRef.current(completedAddress);
+        setLoadError('Please select a full Google address so we can calculate the distance price.');
+        return;
       }
 
       setPendingHouseNumberAddress(null);

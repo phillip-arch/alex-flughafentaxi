@@ -62,9 +62,9 @@ export default function BookingPageClient({
     <>
       {!isAppSurface ? <NavbarClient /> : null}
       <section className="bg-[var(--color-page-bg)]">
-        <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-0' : 'pt-[80px] md:pt-28 [@media(min-width:768px)_and_(max-height:850px)]:pt-[88px]'}`}>
+        <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-5' : 'pt-[100px] md:pt-[8rem] [@media(min-width:768px)_and_(max-height:850px)]:pt-[108px]'}`}>
           <div className="mx-auto grid items-start gap-10 lg:max-w-[1400px] lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-8 xl:gap-10">
-            <section className="order-1 self-start lg:sticky lg:top-24">
+            <section className="order-1 self-start">
               <div className="mx-auto w-full max-w-[57.5rem] lg:mx-0 lg:max-w-none">
                 <BookingForm
                   onDirectionChange={setDirection}
@@ -73,6 +73,7 @@ export default function BookingPageClient({
                   onMeetAndGreetChange={setMeetAndGreet}
                   showStepOneRouteIntro={isAppSurface}
                   fluidDesktopWidth
+                  preserveScrollOnStepChange
                   initialFavorites={initialFavorites}
                   initialIsLoggedIn={initialIsLoggedIn}
                   initialAccountDefaults={initialAccountDefaults}
@@ -81,7 +82,7 @@ export default function BookingPageClient({
               </div>
             </section>
 
-            <aside className="order-3 hidden self-start lg:order-2 lg:sticky lg:top-24 lg:block">
+            <aside className="order-3 hidden self-start lg:order-2 lg:block">
               <div className="w-full max-w-none">
                 <BookingInfoPanel
                   direction={direction}

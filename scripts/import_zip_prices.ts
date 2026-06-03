@@ -173,7 +173,7 @@ async function main() {
       continue;
     }
 
-    payload.set(zip, {
+    payload.set(`${zip}::${city.toLowerCase()}`, {
       zip,
       city,
       base_price: limoPrice,
@@ -202,7 +202,7 @@ async function main() {
   for (let index = 0; index < rowsToImport.length; index += chunkSize) {
     const chunk = rowsToImport.slice(index, index + chunkSize);
     const { error } = await supabase.from('zip_prices').upsert(chunk, {
-      onConflict: 'zip',
+      onConflict: 'zip,city',
       ignoreDuplicates: false,
     });
 

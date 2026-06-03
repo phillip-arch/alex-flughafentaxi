@@ -284,6 +284,21 @@ function InfoSectionCards({
   );
 }
 
+function BookInfoSectionCards({ sections }: { sections: InfoSection[] }) {
+  return (
+    <div className="space-y-7">
+      {sections.map((section) => (
+        <StaticInfoSectionCard
+          key={section.id}
+          section={section}
+          isBookVariant
+          marginClassName="mt-0"
+        />
+      ))}
+    </div>
+  );
+}
+
 function getStepSections(
   currentStep: number,
   direction: BookingDirection,
@@ -388,6 +403,15 @@ export function BookingInfoPanel({
     [currentStep, direction, meetAndGreet],
   );
   const isBookVariant = variant === 'book';
+
+  if (isBookVariant) {
+    return (
+      <section className="px-0 py-0">
+        <BookInfoSectionCards sections={sections} />
+      </section>
+    );
+  }
+
   const prefersReducedMotion = usePrefersReducedMotion();
   const sectionsStructureSignature = useMemo(
     () => JSON.stringify(sections.map((section) => section.id)),

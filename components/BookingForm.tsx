@@ -119,6 +119,7 @@ type BookingFormProps = {
   meetAndGreetSelected?: boolean;
   onMeetAndGreetChange?: (checked: boolean) => void;
   onStepChange?: (step: number) => void;
+  preserveScrollOnStepChange?: boolean;
   initialAccountDefaults?: {
     fullName: string;
     phone: string;
@@ -179,6 +180,7 @@ const BookingForm = ({
   meetAndGreetSelected,
   onMeetAndGreetChange,
   onStepChange,
+  preserveScrollOnStepChange = false,
   initialAccountDefaults = EMPTY_ACCOUNT_DEFAULTS,
   routePreset,
 }: BookingFormProps) => {
@@ -235,6 +237,16 @@ const BookingForm = ({
     limo: number;
     kombi: number;
     bus: number;
+  } | null>(null);
+  const [zipPricingStatus, setZipPricingStatus] = useState<'idle' | 'loading' | 'fixed' | 'missing'>('idle');
+  const [distancePricing, setDistancePricing] = useState<{
+    city: string;
+    basePrice: number;
+    limo: number;
+    kombi: number;
+    bus: number;
+    distanceKm: number;
+    durationMinutes: number | null;
   } | null>(null);
 
   const [formData, setFormData] = useState<ExtendedBookingInput>({
@@ -541,10 +553,14 @@ const BookingForm = ({
 
     if (!/^\d{3,6}$/.test(normalizedZip) || !normalizedCity) {
       setZipPricing(null);
+      setZipPricingStatus('idle');
+      setDistancePricing(null);
       return;
     }
 
     let isActive = true;
+    setZipPricingStatus('loading');
+    setDistancePricing(null);
 
     const loadZipPricing = async () => {
       const { data, error } = await supabase
@@ -558,6 +574,7 @@ const BookingForm = ({
 
       if (error || !data) {
         setZipPricing(null);
+        setZipPricingStatus('missing');
         return;
       }
 
@@ -568,6 +585,8 @@ const BookingForm = ({
         kombi: Number(data.kombi_price ?? 0),
         bus: Number(data.bus_price ?? 0),
       });
+      setZipPricingStatus('fixed');
+      setDistancePricing(null);
     };
 
     void loadZipPricing();
@@ -577,15 +596,80 @@ const BookingForm = ({
     };
   }, [formData.city, formData.zip, supabase]);
 
-  const dbPrices = zipPricing
+  useEffect(() => {
+    const lat = typeof formData.lat === 'number' ? formData.lat : NaN;
+    const lng = typeof formData.lng === 'number' ? formData.lng : NaN;
+    const hasCoordinates = Number.isFinite(lat) && Number.isFinite(lng);
+    const fallbackAddress = (
+      formData.formattedAddress || formatAddressLine(formData.street, formData.zip, formData.city)
+    ).trim();
+
+    if (zipPricingStatus !== 'missing' || !hasCoordinates) {
+      if (zipPricingStatus !== 'missing') setDistancePricing(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    let isActive = true;
+
+    const loadDistancePricing = async () => {
+      try {
+        const response = await fetch('/api/pricing/estimate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lat: hasCoordinates ? lat : null,
+            lng: hasCoordinates ? lng : null,
+            address: fallbackAddress,
+          }),
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          if (isActive) setDistancePricing(null);
+          return;
+        }
+
+        const data = await response.json();
+        if (!isActive) return;
+
+        setDistancePricing({
+          city: formData.city,
+          basePrice: Number(data?.basePrice ?? data?.prices?.limo ?? DEFAULT_BASE_PRICE),
+          limo: Number(data?.prices?.limo ?? DEFAULT_BASE_PRICE),
+          kombi: Number(data?.prices?.kombi ?? 0),
+          bus: Number(data?.prices?.bus ?? 0),
+          distanceKm: Number(data?.distanceKm ?? 0),
+          durationMinutes:
+            data?.durationMinutes === null || data?.durationMinutes === undefined
+              ? null
+              : Number(data.durationMinutes),
+        });
+      } catch (error) {
+        if (!controller.signal.aborted && isActive) {
+          setDistancePricing(null);
+        }
+      }
+    };
+
+    void loadDistancePricing();
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [formData.city, formData.formattedAddress, formData.lat, formData.lng, formData.street, formData.zip, zipPricingStatus]);
+
+  const activePricing = zipPricing || distancePricing;
+  const dbPrices = activePricing
     ? {
-        limo: zipPricing.limo,
-        kombi: zipPricing.kombi,
-        bus: zipPricing.bus,
+        limo: activePricing.limo,
+        kombi: activePricing.kombi,
+        bus: activePricing.bus,
       }
     : undefined;
-  const hasFixedPrice = Boolean(zipPricing);
-  const basePrice = zipPricing?.basePrice ?? DEFAULT_BASE_PRICE;
+  const hasFixedPrice = Boolean(activePricing);
+  const basePrice = activePricing?.basePrice ?? DEFAULT_BASE_PRICE;
   const meetAndGreetPrice = formData.direction === 'from_airport' && formData.meetAndGreet ? 6 : 0;
   
   // Determine vehicle type
@@ -712,12 +796,12 @@ const BookingForm = ({
   const isResolvedStreetComplete = (target: 'street' | 'extraStopStreet') => {
     if (target === 'street') {
       return Boolean(
-        selectedGoogleAddress?.placeId &&
-          selectedGoogleAddress.formattedAddress &&
-          selectedGoogleAddress.zip &&
-          selectedGoogleAddress.city &&
-          selectedGoogleAddress.street &&
-          selectedGoogleAddress.houseNumber,
+        (selectedGoogleAddress?.placeId || formData.placeId) &&
+          (selectedGoogleAddress?.formattedAddress || formData.formattedAddress) &&
+          (selectedGoogleAddress?.zip || formData.zip) &&
+          (selectedGoogleAddress?.city || formData.city) &&
+          typeof (selectedGoogleAddress?.lat ?? formData.lat) === 'number' &&
+          typeof (selectedGoogleAddress?.lng ?? formData.lng) === 'number',
       );
     }
 
@@ -1005,7 +1089,9 @@ const BookingForm = ({
       zip: address.zip,
       city: address.city,
     });
-    setStreetNumberWarning(address.houseNumber ? null : 'street');
+    setStreetNumberWarning(
+      address.placeId && typeof address.lat === 'number' && typeof address.lng === 'number' ? null : 'street',
+    );
     setStreetPasteWarning(null);
     setUnresolvedStreetWarning(false);
     setFormData((prev) => ({
@@ -1152,6 +1238,7 @@ const BookingForm = ({
   };
 
   const scrollToPageTop = () => {
+    if (preserveScrollOnStepChange) return;
     if (typeof window === 'undefined') return;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

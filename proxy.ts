@@ -60,6 +60,13 @@ export async function proxy(request: NextRequest) {
   requestHeaders.set('x-nonce', nonce);
   requestHeaders.set('Content-Security-Policy', contentSecurityPolicy);
 
+  const redirectIfChanged = (targetUrl: URL) => {
+    if (targetUrl.href === request.nextUrl.href) {
+      return null;
+    }
+    return NextResponse.redirect(targetUrl);
+  };
+
   const applyRouteHeaders = (nextResponse: NextResponse) => {
     nextResponse.headers.set('Content-Security-Policy', contentSecurityPolicy);
     nextResponse.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
@@ -92,13 +99,15 @@ export async function proxy(request: NextRequest) {
 
   if (surface === 'www') {
     if (isDispatchPath(path)) {
-      return NextResponse.redirect(buildSurfaceUrl('dispatch', pathnameWithSearch));
+      const redirectResponse = redirectIfChanged(buildSurfaceUrl('dispatch', pathnameWithSearch));
+      if (redirectResponse) return redirectResponse;
     }
 
     const shouldStayOnWeb = path === '/book' || path.startsWith('/book/');
 
     if (isCustomerAppPath(path) && !shouldStayOnWeb) {
-      return NextResponse.redirect(buildSurfaceUrl('app', pathnameWithSearch));
+      const redirectResponse = redirectIfChanged(buildSurfaceUrl('app', pathnameWithSearch));
+      if (redirectResponse) return redirectResponse;
     }
   }
 
@@ -108,11 +117,13 @@ export async function proxy(request: NextRequest) {
     }
 
     if (isDispatchPath(path)) {
-      return NextResponse.redirect(buildSurfaceUrl('dispatch', pathnameWithSearch));
+      const redirectResponse = redirectIfChanged(buildSurfaceUrl('dispatch', pathnameWithSearch));
+      if (redirectResponse) return redirectResponse;
     }
 
     if (!isCustomerAppPath(path)) {
-      return NextResponse.redirect(buildSurfaceUrl('www', pathnameWithSearch));
+      const redirectResponse = redirectIfChanged(buildSurfaceUrl('www', pathnameWithSearch));
+      if (redirectResponse) return redirectResponse;
     }
   }
 
@@ -123,10 +134,12 @@ export async function proxy(request: NextRequest) {
 
     if (!isDispatchPath(path) && path !== '/auth/logout') {
       if (isCustomerAppPath(path)) {
-        return NextResponse.redirect(buildSurfaceUrl('app', pathnameWithSearch));
+        const redirectResponse = redirectIfChanged(buildSurfaceUrl('app', pathnameWithSearch));
+        if (redirectResponse) return redirectResponse;
       }
 
-      return NextResponse.redirect(buildSurfaceUrl('www', pathnameWithSearch));
+      const redirectResponse = redirectIfChanged(buildSurfaceUrl('www', pathnameWithSearch));
+      if (redirectResponse) return redirectResponse;
     }
   }
 

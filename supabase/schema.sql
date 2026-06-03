@@ -44,6 +44,9 @@ create table public.bookings (
   ip_address text,
   notes text,
   price numeric, -- Added price field
+  pricing_source text,
+  pricing_distance_km numeric,
+  pricing_duration_minutes integer,
   vehicle_type text, -- Added vehicle type
   passengers int,
   luggage int,
@@ -102,6 +105,23 @@ create table public.zip_prices (
 
 create index zip_prices_zip_idx on public.zip_prices (zip);
 create unique index zip_prices_zip_city_unique_idx on public.zip_prices (zip, city);
+
+-- DISTANCE PRICING SETTINGS
+create table public.distance_pricing_settings (
+  id text primary key default 'default',
+  enabled boolean not null default true,
+  airport_lat double precision not null default 48.110278,
+  airport_lng double precision not null default 16.569722,
+  base_fee numeric not null default 18,
+  limo_per_km numeric not null default 1.70,
+  kombi_per_km numeric not null default 1.90,
+  bus_per_km numeric not null default 2.40,
+  minimum_limo_price numeric not null default 45,
+  minimum_kombi_price numeric not null default 50,
+  minimum_bus_price numeric not null default 65,
+  round_to numeric not null default 1,
+  updated_at timestamptz default now()
+);
 
 -- SAVED ADDRESSES
 create table public.saved_addresses (
@@ -201,6 +221,7 @@ alter table public.drivers enable row level security;
 alter table public.reviews enable row level security;
 alter table public.streets enable row level security;
 alter table public.zip_prices enable row level security;
+alter table public.distance_pricing_settings enable row level security;
 alter table public.saved_addresses enable row level security;
 alter table public.audit_logs enable row level security;
 alter table public.auth_rate_limits enable row level security;
@@ -243,6 +264,11 @@ using (true);
 
 create policy "public read zip prices"
 on public.zip_prices for select
+to anon, authenticated
+using (true);
+
+create policy "public read distance pricing settings"
+on public.distance_pricing_settings for select
 to anon, authenticated
 using (true);
 

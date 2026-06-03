@@ -18,21 +18,22 @@ type GoogleAddressComponent = {
   types?: string[];
 };
 
+type GoogleLocation = {
+  lat?: number | (() => number);
+  lng?: number | (() => number);
+  latitude?: number;
+  longitude?: number;
+};
+
 type GooglePlaceLike = {
   address_components?: GoogleAddressComponent[];
   addressComponents?: GoogleAddressComponent[];
   formatted_address?: string;
   formattedAddress?: string;
   geometry?: {
-    location?: {
-      lat?: () => number;
-      lng?: () => number;
-    };
+    location?: GoogleLocation;
   };
-  location?: {
-    lat?: number | (() => number);
-    lng?: number | (() => number);
-  };
+  location?: GoogleLocation;
   place_id?: string;
   id?: string;
 };
@@ -52,6 +53,14 @@ function getShortComponent(place: GooglePlaceLike, type: string) {
 function readCoordinate(value?: number | (() => number)) {
   if (typeof value === 'function') return value();
   return typeof value === 'number' ? value : null;
+}
+
+function readLocationCoordinate(
+  location: GoogleLocation | undefined,
+  shortKey: 'lat' | 'lng',
+  longKey: 'latitude' | 'longitude',
+) {
+  return readCoordinate(location?.[shortKey]) ?? readCoordinate(location?.[longKey]);
 }
 
 export function normalizeZip(zip: string) {
@@ -91,8 +100,8 @@ export function parseGoogleAddress(place: GooglePlaceLike): ParsedGoogleAddress 
     zip: normalizeZip(postalCode),
     city: normalizeCity(city),
     country: countryCode,
-    lat: readCoordinate(location?.lat),
-    lng: readCoordinate(location?.lng),
+    lat: readLocationCoordinate(location, 'lat', 'latitude'),
+    lng: readLocationCoordinate(location, 'lng', 'longitude'),
     placeId: place.place_id || place.id || '',
   };
 }

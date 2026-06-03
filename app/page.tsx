@@ -483,7 +483,7 @@ export default async function Home() {
 
         {/* ── HERO ─────────────────────────────────────────────────────── */}
         <section id="hero" className="relative bg-[#080e1c] text-white">
-          <div className="app-container pb-14 pt-[calc(72px+2.5rem)] md:pb-16 md:pt-[calc(72px+3rem)] lg:pb-20 lg:pt-[calc(72px+3.5rem)]">
+          <div className="app-container pb-14 pt-[calc(72px+1.25rem)] md:pb-16 md:pt-[calc(72px+1.75rem)] lg:pb-20 lg:pt-[calc(72px+2.25rem)]">
             <div className="mx-auto grid items-start gap-10 lg:max-w-[1400px] lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-8 xl:gap-10">
 
               {/* Form — left 40%, below headline on mobile */}

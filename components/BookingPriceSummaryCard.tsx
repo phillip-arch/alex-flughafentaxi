@@ -52,12 +52,16 @@ export default function BookingPriceSummaryCard({
 
   return (
     <div
-      className={`relative mt-0 grid h-[4.15rem] grid-cols-[31%_39%_30%] overflow-hidden rounded-[0.6rem] border bg-[#f8fbff] shadow-[0_8px_18px_rgba(17,17,17,0.04)] md:h-[5.5rem] md:grid-cols-[30%_42%_28%] md:rounded-[0.72rem] md:shadow-[0_12px_26px_rgba(17,17,17,0.05)] ${
-        invalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
-      }`}
+      className="relative mt-0 grid h-[3.75rem] grid-cols-[31%_39%_30%] overflow-visible md:h-[4.95rem] md:grid-cols-[30%_42%_28%]"
     >
-      <div className="relative flex items-center justify-center bg-transparent px-1 py-1 md:px-2 md:py-1">
-        <div className="relative h-[3.45rem] w-[5.8rem] shrink-0 md:h-[5.1rem] md:w-[7.65rem]">
+      <div
+        className={`pointer-events-none absolute inset-x-0 bottom-[0.27rem] top-[0.27rem] rounded-[0.54rem] border bg-white md:bottom-[0.38rem] md:top-[0.38rem] md:rounded-[0.65rem] ${
+          invalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
+        }`}
+        aria-hidden="true"
+      />
+      <div className="relative z-10 flex items-center justify-center bg-transparent px-1 py-1 md:px-2 md:py-1">
+        <div className="relative h-[2.8rem] w-[4.7rem] shrink-0 md:h-[4.14rem] md:w-[6.2rem]">
           <Image
             src={vehicleImage.src}
             alt={vehicleImage.alt}
@@ -67,43 +71,43 @@ export default function BookingPriceSummaryCard({
           />
         </div>
       </div>
-      <div className="relative z-10 flex min-w-0 flex-col items-center justify-center gap-0.5 px-1 py-1 text-center md:items-start md:gap-1 md:px-3 md:py-1 md:text-left">
-        <div className="flex min-w-0 max-w-full items-center justify-center gap-0.5 text-[0.72rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:justify-start md:text-[0.8rem]">
+      <div className="relative z-10 flex min-w-0 flex-col items-center justify-center gap-0.5 px-1 py-1 text-center md:items-start md:gap-1 md:px-2.5 md:py-1 md:text-left">
+        <div className="flex min-w-0 max-w-full items-center justify-center gap-0.5 text-[0.65rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827] md:justify-start md:text-[0.72rem]">
           <span className="truncate">{routeFrom}</span>
           <span className="shrink-0">→</span>
           <span className="truncate">{routeTo}</span>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-[0.62rem] font-medium text-[#5f6975] md:justify-start md:gap-x-2 md:text-[0.61rem]">
+        <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-[0.56rem] font-medium text-[#5f6975] md:justify-start md:gap-x-2 md:text-[0.55rem]">
           <span className="inline-flex items-center gap-0.5" title="Passengers">
-            <Users className="h-2.5 w-2.5 text-[#1679FF] md:h-[11px] md:w-[11px]" />
+            <Users className="h-[9px] w-[9px] text-[#1679FF] md:h-[10px] md:w-[10px]" />
             {passengerValue}
           </span>
           <span className="text-[#b7bec8]">|</span>
           <span className="inline-flex items-center gap-0.5" title="Check-in luggage">
-            <Briefcase className="h-2.5 w-2.5 text-[#1679FF] md:h-[11px] md:w-[11px]" />
+            <Briefcase className="h-[9px] w-[9px] text-[#1679FF] md:h-[10px] md:w-[10px]" />
             {luggageValue}
           </span>
         </div>
       </div>
-      <div className={`relative z-10 flex min-w-0 flex-col items-end justify-center gap-0.5 px-2.5 py-1 text-right md:px-3 md:py-1 ${onEdit ? 'pt-8 md:pt-8' : ''}`}>
-        <p className="truncate text-[0.72rem] font-semibold leading-none tracking-[-0.02em] text-[#1679FF] md:text-[0.68rem]">
+      <div className={`relative z-10 flex min-w-0 flex-col items-end justify-center gap-0.5 px-2 py-1 text-right md:px-2.5 md:py-1 ${onEdit ? 'pt-7 md:pt-7' : ''}`}>
+        <p className="truncate text-[0.65rem] font-semibold leading-none tracking-[-0.02em] text-[#1679FF] md:text-[0.61rem]">
           {vehicleLabel}
         </p>
-        <p className="text-[0.92rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[1.52rem]">
+        <p className="text-[0.83rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[1.37rem]">
           {totalPrice === null ? (
-            <span className="text-[0.72rem] tracking-[-0.02em] md:text-[1rem]">On request</span>
+            <span className="text-[0.65rem] tracking-[-0.02em] md:text-[0.9rem]">On request</span>
           ) : (
             <AnimatedPrice value={totalPrice} currencyDisplay="symbol" />
           )}
         </p>
-        <div className="flex min-h-[0.7rem] items-center justify-end md:min-h-[0.84rem]">
+        <div className="flex min-h-[0.63rem] items-center justify-end md:min-h-[0.76rem]">
           <div
-            className={`inline-flex items-center gap-1 text-[0.62rem] font-semibold text-[#1679FF] md:text-[0.61rem] ${
+            className={`inline-flex items-center gap-1 text-[0.56rem] font-semibold text-[#1679FF] md:text-[0.55rem] ${
               paymentLabel ? 'opacity-100' : 'opacity-0'
             }`}
             aria-hidden={!paymentLabel}
           >
-            <PaymentIcon className="h-2.5 w-2.5 md:h-[11px] md:w-[11px]" />
+            <PaymentIcon className="h-[9px] w-[9px] md:h-[10px] md:w-[10px]" />
             <span>{stablePaymentLabel}</span>
           </div>
         </div>

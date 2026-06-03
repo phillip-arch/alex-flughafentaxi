@@ -7,11 +7,12 @@ import {
   Car, Users, BarChart3, Calendar,
   ChevronLeft, ChevronRight,
   Menu, LogOut,
-  LayoutGrid, Rows3, History, Search
+  LayoutGrid, Rows3, History, Search, Calculator
 } from 'lucide-react';
 import { 
   fetchBookings, fetchDrivers, addDriver, deleteDriver, 
-  updateBookingStatus, updateBookingDetails, assignDriver, unassignDriver, fetchStats, fetchPassengerCountsBatch, fetchAuditLogs, searchBookings
+  updateBookingStatus, updateBookingDetails, assignDriver, unassignDriver, fetchStats, fetchPassengerCountsBatch, fetchAuditLogs, searchBookings,
+  fetchPricingAdminData, updateDistancePricingSettings, upsertZipPrice, deleteZipPrice
 } from './actions';
 import {
   buildStreetOptionValue,
@@ -25,6 +26,7 @@ import AdminDriversPanel from './AdminDriversPanel';
 import AdminRidesPanel from './AdminRidesPanel';
 import AdminBookingEditModal from './AdminBookingEditModal';
 import AdminAuditLogPanel from './AdminAuditLogPanel';
+import AdminPricingPanel from './AdminPricingPanel';
 
 const AdminStatsPanel = dynamic(() => import('./AdminStatsPanel'), {
   loading: () => (
@@ -69,7 +71,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     'w-full appearance-none bg-transparent text-center text-[1.5rem] font-semibold text-[#111827] outline-none';
   const adminIconCloseButtonClass =
     'inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#eef2f7] bg-white text-[#8a96a3] transition-colors hover:border-[#f3d8dd] hover:bg-[#fff4f6] hover:text-[#d70015]';
-  const [currentTab, setCurrentTab] = useState<'rides' | 'drivers' | 'stats' | 'logs'>('rides');
+  const [currentTab, setCurrentTab] = useState<'rides' | 'drivers' | 'stats' | 'pricing' | 'logs'>('rides');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
 
   const [date, setDate] = useState(getDefaultDispatchDate);
@@ -86,6 +88,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [auditLogRange, setAuditLogRange] = useState<'today' | '7' | '30' | 'all'>('today');
   const [auditLogsCache, setAuditLogsCache] = useState<Record<string, any[]>>({});
+  const [pricingSettings, setPricingSettings] = useState<any | null>(null);
+  const [zipPrices, setZipPrices] = useState<any[]>([]);
+  const [pricingLoaded, setPricingLoaded] = useState(false);
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const [editDirection, setEditDirection] = useState<'to_airport' | 'from_airport' | null>(null);
   const [editStreetInput, setEditStreetInput] = useState('');
@@ -272,7 +277,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
     const view = params.get('view');
-    setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'logs' ? tab : 'rides');
+    setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'pricing' || tab === 'logs' ? tab : 'rides');
     setViewMode(view === 'grid' ? 'grid' : 'table');
   }, []);
 
@@ -300,7 +305,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       const params = new URLSearchParams(window.location.search);
       const tab = params.get('tab');
       const view = params.get('view');
-      setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'logs' ? tab : 'rides');
+      setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'pricing' || tab === 'logs' ? tab : 'rides');
       setViewMode(view === 'grid' ? 'grid' : 'table');
     };
     window.addEventListener('popstate', onPopState);
@@ -411,6 +416,14 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
           setStatsData(nextStats);
           setStatsCache((prev) => ({ ...prev, [statsRange]: nextStats }));
         }
+      } else if (currentTab === 'pricing') {
+        if (!pricingLoaded) {
+          setLoading(true);
+          const data = await fetchPricingAdminData();
+          setPricingSettings(data.settings);
+          setZipPrices(data.zipPrices || []);
+          setPricingLoaded(true);
+        }
       } else if (currentTab === 'logs') {
         setLoading(true);
         await refreshAuditLogs(auditLogRange);
@@ -423,8 +436,50 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   }
 
   const handleTabChange = (tab: string) => {
-    setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'logs' ? tab : 'rides');
+    setCurrentTab(tab === 'drivers' || tab === 'stats' || tab === 'pricing' || tab === 'logs' ? tab : 'rides');
     setMobileTabsOpen(false);
+  };
+
+  const refreshPricingData = async () => {
+    const data = await fetchPricingAdminData();
+    setPricingSettings(data.settings);
+    setZipPrices(data.zipPrices || []);
+    setPricingLoaded(true);
+  };
+
+  const handleSaveDistancePricingSettings = async (payload: any) => {
+    const result = await updateDistancePricingSettings(payload);
+    if ((result as any)?.error) {
+      alert((result as any).error);
+      return;
+    }
+    await refreshPricingData();
+    setAuditLogsCache({});
+  };
+
+  const handleSaveZipPrice = async (payload: any) => {
+    const result = await upsertZipPrice(payload);
+    if ((result as any)?.error) {
+      alert((result as any).error);
+      return;
+    }
+    await refreshPricingData();
+    setRidesCache({});
+    setStatsCache({});
+    setAuditLogsCache({});
+  };
+
+  const handleDeleteZipPrice = async (input: { zip: string; city: string }) => {
+    if (!window.confirm('Delete this fixed price?')) return;
+    const result = await deleteZipPrice(input);
+    if ((result as any)?.error) {
+      alert((result as any).error);
+      return;
+    }
+    await refreshPricingData();
+    setRidesCache({});
+    setStatsCache({});
+    setAuditLogsCache({});
   };
 
   const handleAssignDriver = async (bookingId: string, driverId: string, sendEmail = false) => {
@@ -863,6 +918,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
         { id: 'rides', label: '', icon: <Car size={18} /> },
         { id: 'drivers', label: '', icon: <Users size={18} /> },
         { id: 'stats', label: '', icon: <BarChart3 size={18} /> },
+        { id: 'pricing', label: '', icon: <Calculator size={18} /> },
         { id: 'logs', label: '', icon: <History size={18} /> },
       ]}
       activeTab={currentTab}
@@ -1023,6 +1079,19 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
                     </button>
                     <button
                       type="button"
+                      onClick={() => handleTabChange('pricing')}
+                      className={`inline-flex h-12 w-full items-center gap-3 rounded-[0.95rem] px-3 transition-colors ${
+                        currentTab === 'pricing'
+                          ? 'bg-[#eef5ff] text-[#1679ff]'
+                          : 'text-[#1d1d1f] hover:bg-[#f8fbff]'
+                      }`}
+                      aria-label="Preise"
+                    >
+                      <Calculator size={16} className="shrink-0" />
+                      <span className="text-[0.95rem] font-medium">Preise</span>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleTabChange('logs')}
                       className={`inline-flex h-12 w-full items-center gap-3 rounded-[0.95rem] px-3 transition-colors ${
                         currentTab === 'logs'
@@ -1125,6 +1194,16 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               setStatsRange={setStatsRange}
               setStatsPaymentFilter={setStatsPaymentFilter}
               setStatsDriverFilter={setStatsDriverFilter}
+            />
+          )}
+          {currentTab === 'pricing' && (
+            <AdminPricingPanel
+              loading={loading}
+              settings={pricingSettings}
+              zipPrices={zipPrices}
+              onSaveSettings={handleSaveDistancePricingSettings}
+              onSaveZipPrice={handleSaveZipPrice}
+              onDeleteZipPrice={handleDeleteZipPrice}
             />
           )}
           {currentTab === 'logs' && (
