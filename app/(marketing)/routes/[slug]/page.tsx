@@ -8,17 +8,13 @@ import {
   ChevronDown,
   ChevronRight,
   Clock3,
-  CreditCard,
   Luggage,
   MapPin,
-  MessageCircle,
   Plane,
-  Phone,
   Route,
   ShieldCheck,
   Users,
 } from 'lucide-react';
-import BookingForm from '@/components/BookingForm';
 import JsonLd from '@/components/JsonLd';
 import Navbar from '@/components/Navbar';
 import { getLocationRoute, locationRoutes, type LocationRoutePage } from '@/lib/location-pages';
@@ -108,16 +104,6 @@ function buildRoutePairBookingHref(route: { from: string; to: string }) {
   return `/book?${params.toString()}`;
 }
 
-function buildRoutePreset(route: LocationRoutePage) {
-  return {
-    direction: 'from_airport' as const,
-    routeLabel: `${route.from} to ${route.to}`,
-    pickupLabel: route.from,
-    dropoffLabel: route.to,
-    notes: `Route request: ${route.from} to ${route.to}`,
-  };
-}
-
 function BookingCta({
   href = '/book',
   label = 'Book this route',
@@ -128,60 +114,97 @@ function BookingCta({
   className?: string;
 }) {
   return (
-    <Link href={href} className={`ui-button-booking-primary route-pressable ${className}`}>
+    <Link href={href} className={`ui-button-booking-primary ${className}`}>
       {label}
-      <ChevronRight size={17} strokeWidth={2.2} />
     </Link>
   );
 }
 
-function StatCard({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Clock3 }) {
-  return (
-    <div className="route-stat-card rounded-[1.2rem] border border-white/10 bg-white/[0.07] px-4 py-4">
-      <div className="flex items-center gap-2 text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-white/45">
-        <Icon size={15} className="text-[#1679FF]" />
-        {label}
-      </div>
-      <p className="mt-2 text-[1.55rem] font-black leading-none tracking-[-0.04em] text-white">{value}</p>
-    </div>
-  );
-}
-
 function RouteChip({ label, value }: { label: string; value: string }) {
+  const displayLabel = label === 'Price' ? 'FIXED PRICE' : label;
+  const displayValue =
+    label === 'Price' && value.startsWith('Fixed price starting from ')
+      ? value.replace('Fixed price starting', 'Starting')
+      : value;
+
   return (
     <div className="rounded-[1.1rem] border border-[#dfe9f7] bg-white px-4 py-3">
-      <p className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[#8a9bb0]">{label}</p>
-      <p className="mt-1 text-[0.95rem] font-bold tracking-[-0.03em] text-[#0c111e]">{value}</p>
+      <p className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[#8a9bb0]">{displayLabel}</p>
+      <p className="mt-1 text-[0.95rem] font-bold tracking-[-0.03em] text-[#0c111e]">{displayValue}</p>
     </div>
   );
 }
 
-function VehicleCard({ vehicle, bookingHref }: { vehicle: LocationRoutePage['vehicles'][number]; bookingHref: string }) {
+function RouteEndpointPanel({ route, bookingHref }: { route: LocationRoutePage; bookingHref: string }) {
   return (
-    <article className="route-vehicle-card overflow-hidden rounded-[1.75rem] border border-[#e0eaf6] bg-white shadow-[0_16px_38px_rgba(17,17,17,0.05)]">
-      <div className="relative h-[12rem] border-b border-[#edf2f8] bg-[#f8fbff]">
-        <Image src={vehicle.imageSrc} alt={vehicle.imageAlt} fill className="object-contain p-5" sizes="(min-width: 768px) 33vw, 100vw" />
+    <div className="route-search-panel rounded-[1.65rem] border border-[#dfe9f7] bg-white p-4 shadow-[0_18px_45px_rgba(17,17,17,0.055)] md:p-5">
+      <div className="grid gap-3">
+        <div className="rounded-[1.05rem] border border-[#e6edf7] bg-[#f8fbff] px-4 py-3">
+          <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[#7d8da3]">From</p>
+          <p className="mt-1 text-[1rem] font-bold tracking-[-0.03em] text-[#0c111e]">{route.from}</p>
+        </div>
+        <div className="rounded-[1.05rem] border border-[#e6edf7] bg-[#f8fbff] px-4 py-3">
+          <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[#7d8da3]">To</p>
+          <p className="mt-1 text-[1rem] font-bold tracking-[-0.03em] text-[#0c111e]">{route.to}</p>
+        </div>
+        <BookingCta href={bookingHref} label="Book ride" className="!min-h-[3.4rem] !py-3" />
+      </div>
+      <p className="mt-4 text-[0.9rem] leading-[1.65] text-[#5e718a]">
+        Fixed price, direct pickup, and the right vehicle size confirmed before you book.
+      </p>
+    </div>
+  );
+}
+
+function VehicleCard({
+  vehicle,
+  route,
+  bookingHref,
+}: {
+  vehicle: LocationRoutePage['vehicles'][number];
+  route: LocationRoutePage;
+  bookingHref: string;
+}) {
+  return (
+    <article className="route-vehicle-card overflow-hidden rounded-[1.5rem] border border-[#e0eaf6] bg-white shadow-[0_14px_34px_rgba(17,17,17,0.045)]">
+      <div className="grid gap-0 md:grid-cols-[14rem_minmax(0,1fr)]">
+      <div className="relative h-[10rem] border-b border-[#edf2f8] bg-[#f8fbff] md:h-auto md:min-h-[14rem] md:border-b-0 md:border-r">
+        <Image src={vehicle.imageSrc} alt={vehicle.imageAlt} fill className="object-contain p-5 mix-blend-multiply" sizes="(min-width: 768px) 224px, 100vw" />
       </div>
       <div className="px-5 py-5">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h3 className="text-[1.35rem] font-black tracking-[-0.05em] text-[#0c111e]">{vehicle.name}</h3>
             <p className="mt-2 text-[0.88rem] leading-[1.6] text-[#5e718a]">{vehicle.description}</p>
           </div>
-          <span className="shrink-0 rounded-full bg-[#eef5ff] px-3 py-1.5 text-[0.76rem] font-bold text-[#1166d4]">
+          <span className="w-fit shrink-0 rounded-full bg-[#eef5ff] px-3 py-1.5 text-[0.8rem] font-bold text-[#1166d4]">
             {vehicle.price}
           </span>
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-2">
+        <div className="mt-5 grid grid-cols-2 gap-2 lg:grid-cols-4">
           <div className="rounded-[1rem] border border-[#e6edf7] bg-[#f8fbff] px-3 py-3">
-            <div className="flex items-center gap-2 text-[0.75rem] font-bold uppercase tracking-[0.14em] text-[#7d8da3]">
+            <div className="flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#7d8da3]">
+              <Clock3 size={14} className="text-[#1166d4]" />
+              Time
+            </div>
+            <p className="mt-1 text-[0.95rem] font-semibold text-[#0c111e]">{route.duration}</p>
+          </div>
+          <div className="rounded-[1rem] border border-[#e6edf7] bg-[#f8fbff] px-3 py-3">
+            <div className="flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#7d8da3]">
+              <Route size={14} className="text-[#1166d4]" />
+              Distance
+            </div>
+            <p className="mt-1 text-[0.95rem] font-semibold text-[#0c111e]">{route.distance}</p>
+          </div>
+          <div className="rounded-[1rem] border border-[#e6edf7] bg-[#f8fbff] px-3 py-3">
+            <div className="flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#7d8da3]">
               <Users size={14} className="text-[#1166d4]" />
               Passengers
             </div>
             <p className="mt-1 text-[0.95rem] font-semibold text-[#0c111e]">{vehicle.passengers}</p>
           </div>
           <div className="rounded-[1rem] border border-[#e6edf7] bg-[#f8fbff] px-3 py-3">
-            <div className="flex items-center gap-2 text-[0.75rem] font-bold uppercase tracking-[0.14em] text-[#7d8da3]">
+            <div className="flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#7d8da3]">
               <Luggage size={14} className="text-[#1166d4]" />
               Luggage
             </div>
@@ -190,62 +213,8 @@ function VehicleCard({ vehicle, bookingHref }: { vehicle: LocationRoutePage['veh
         </div>
         <BookingCta href={`${bookingHref}&vehicle=${encodeURIComponent(vehicle.name)}`} label={`Book ${vehicle.name}`} className="mt-5 !min-h-0 !py-3 !text-[0.95rem]" />
       </div>
+      </div>
     </article>
-  );
-}
-
-function RouteBookingPanel({ route, bookingHref }: { route: LocationRoutePage; bookingHref: string }) {
-  const cheapestVehicle = route.vehicles[0];
-
-  return (
-    <aside className="route-reveal route-reveal-2 route-summary-panel rounded-[1.9rem] border border-white/10 bg-white/[0.06] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.25)] backdrop-blur">
-      <div className="relative h-[11rem] overflow-hidden rounded-[1.4rem] bg-white md:h-[13rem]">
-        <Image src={route.heroImage.src} alt={route.heroImage.alt} fill priority className="object-contain p-5" sizes="(min-width: 1024px) 33vw, 100vw" />
-      </div>
-
-      <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-[#0d1729] px-4 py-4">
-        <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-[#7eaefe]">Selected route</p>
-        <div className="mt-3 space-y-3">
-          <div className="flex gap-3">
-            <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1679FF] text-white">
-              <Plane size={13} />
-            </span>
-            <div>
-              <p className="text-[0.78rem] font-semibold text-white/45">Pickup</p>
-              <p className="text-[0.96rem] font-bold leading-tight text-white">{route.from}</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[#7eaefe]">
-              <MapPin size={13} />
-            </span>
-            <div>
-              <p className="text-[0.78rem] font-semibold text-white/45">Drop-off</p>
-              <p className="text-[0.96rem] font-bold leading-tight text-white">{route.shortTo}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <RouteChip label="Time" value={route.duration} />
-        <RouteChip label="Distance" value={route.distance} />
-        <RouteChip label="Price" value={cheapestVehicle?.price ?? 'Fixed'} />
-      </div>
-
-      <BookingCta href={bookingHref} label="Book this transfer" className="mt-4 !min-h-0 !py-3 !text-[0.95rem]" />
-
-      <div className="mt-4 grid gap-2 text-[0.82rem] font-semibold text-white/62">
-        <span className="inline-flex items-center gap-2">
-          <Check size={14} className="text-[#37d67a]" strokeWidth={2.8} />
-          Flight tracking and free child seats
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <MessageCircle size={14} className="text-[#37d67a]" strokeWidth={2.4} />
-          Phone and WhatsApp support
-        </span>
-      </div>
-    </aside>
   );
 }
 
@@ -340,81 +309,56 @@ export default async function LocationRoutePage({ params }: RoutePageProps) {
   if (!route) notFound();
 
   const bookingHref = buildBookingHref(route);
-  const routePreset = buildRoutePreset(route);
 
   return (
     <div className="min-h-screen bg-[#f3f7fc] text-[#111111]">
       <JsonLd data={buildJsonLd(route)} />
       <Navbar />
       <main>
-        <section className="relative overflow-hidden bg-[#080e1c] text-white">
-          <div className="app-container pb-14 pt-[calc(72px+2.5rem)] md:pb-16 md:pt-[calc(72px+3rem)] lg:pb-20 lg:pt-[calc(72px+3.5rem)]">
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,0.94fr)_minmax(21rem,0.56fr)] lg:items-start lg:gap-12">
+        <section className="relative overflow-hidden bg-[#f3f7fc]">
+          <div className="app-container pb-12 pt-[calc(72px+2.5rem)] md:pb-14 md:pt-[calc(72px+3rem)] lg:pb-16 lg:pt-[calc(72px+3.5rem)]">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(20rem,0.52fr)] lg:items-start lg:gap-10">
               <div className="route-reveal route-reveal-1">
-                <SectionEyebrow onDark>
+                <SectionEyebrow>
                   {route.city}, {route.country} - {route.airportCode}
                 </SectionEyebrow>
-                <h1 className="mt-5 max-w-[58rem] text-[3.15rem] font-black leading-[0.93] tracking-[-0.055em] !text-white sm:text-[4rem] md:text-[4.8rem] lg:text-[5.2rem]">
-                  From {route.from} to {route.to}
+                <h1 className="mt-5 max-w-[58rem] text-[2.85rem] font-black leading-[0.95] tracking-[-0.055em] text-[#0c111e] sm:text-[3.6rem] md:text-[4.35rem] lg:text-[4.85rem]">
+                  How to get from {route.from} to {route.to}
                 </h1>
-                <p className="mt-6 max-w-[45rem] text-[1rem] leading-[1.75] text-[#9fb2ca] md:text-[1.05rem]">
+                <p className="mt-6 max-w-[45rem] text-[1rem] leading-[1.75] text-[#5e718a] md:text-[1.05rem]">
                   {route.intro}
                 </p>
 
                 <div className="route-reveal route-reveal-3 mt-8 grid gap-3 sm:grid-cols-3">
-                  <StatCard label="Travel time" value={route.duration} icon={Clock3} />
-                  <StatCard label="Distance" value={route.distance} icon={Route} />
-                  <StatCard label="Price" value={route.vehicles[0]?.price ?? 'Fixed'} icon={CreditCard} />
-                </div>
-
-                <div className="route-reveal route-reveal-4 mt-8 flex flex-col gap-3 sm:flex-row">
-                  <BookingCta href={bookingHref} label="Book this transfer" className="sm:!w-auto sm:!flex-none" />
-                  <a
-                    href="tel:+436764826069"
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[14px] border border-white/15 px-6 py-3 text-[0.95rem] font-semibold text-white/75 transition-colors hover:border-white/30 hover:text-white"
-                  >
-                    <Phone size={16} strokeWidth={2.2} />
-                    Call for this transfer
-                  </a>
+                  <RouteChip label="Travel time" value={route.duration} />
+                  <RouteChip label="Distance" value={route.distance} />
+                  <RouteChip label="Price" value={route.vehicles[0]?.price ?? 'Fixed'} />
                 </div>
               </div>
 
-              <RouteBookingPanel route={route} bookingHref={bookingHref} />
+              <div className="route-reveal route-reveal-2">
+                <RouteEndpointPanel route={route} bookingHref={bookingHref} />
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="bg-[#f3f7fc] py-14 md:py-16">
+        <section className="bg-white py-14 md:py-16">
           <div className="app-container">
-            <div className="mx-auto grid max-w-[108rem] gap-4 md:grid-cols-4">
-              {route.highlights.slice(0, 4).map((highlight) => (
-                <div key={highlight} className="route-trust-card flex items-start gap-3 rounded-[1.25rem] border border-[#dfe9f7] bg-white px-4 py-4 shadow-[0_8px_22px_rgba(17,17,17,0.035)]">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1679FF]">
-                    <Check size={12} strokeWidth={3} className="text-white" />
-                  </span>
-                  <p className="text-[0.88rem] font-semibold leading-[1.45] text-[#31445f]">{highlight}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-white py-16 md:py-20">
-          <div className="app-container">
-            <div className="mx-auto max-w-[108rem]">
+            <div className="mx-auto max-w-[86rem]">
               <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <SectionEyebrow>Choose your vehicle</SectionEyebrow>
-                  <SectionHeading>Fixed-price transfers for every group size.</SectionHeading>
+                  <SectionEyebrow>Ride options</SectionEyebrow>
+                  <SectionHeading>Choose your airport taxi.</SectionHeading>
                 </div>
                 <p className="max-w-[28rem] text-[0.93rem] leading-[1.7] text-[#5e718a]">
                   Select a sedan, station wagon, or minivan depending on passengers and luggage. Final prices are confirmed before booking.
                 </p>
               </div>
 
-              <div className="grid gap-5 lg:grid-cols-3">
+              <div className="grid gap-5">
                 {route.vehicles.map((vehicle) => (
-                  <VehicleCard key={vehicle.name} vehicle={vehicle} bookingHref={bookingHref} />
+                  <VehicleCard key={vehicle.name} vehicle={vehicle} route={route} bookingHref={bookingHref} />
                 ))}
               </div>
             </div>
@@ -475,27 +419,36 @@ export default async function LocationRoutePage({ params }: RoutePageProps) {
               <div>
                 <SectionEyebrow onDark>Book online</SectionEyebrow>
                 <SectionHeading light>Reserve your airport transfer.</SectionHeading>
-                <p className="mt-4 max-w-[34rem] text-[0.95rem] leading-[1.72] text-[#8da4c0]">
-                  Use the booking form to confirm the exact pickup time, passengers, luggage, child seats, and payment method. This route is already added to your booking notes.
+                <p className="mt-4 max-w-[34rem] text-[0.95rem] leading-[1.72] text-white">
+                  Open the booking page with this route already selected. Choose the exact pickup time, passengers, luggage, child seats, and payment method there.
                 </p>
+                <div className="mt-7 max-w-[20rem]">
+                  <BookingCta href={bookingHref} label="Book this transfer" className="!min-h-0 !py-3 !text-[0.95rem]" />
+                </div>
                 <div className="mt-7 grid gap-3 sm:grid-cols-3">
                   <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.06] px-4 py-4">
-                    <Plane size={18} className="text-[#1679FF]" />
+                    <Plane size={36} className="text-[#1679FF]" />
                     <p className="mt-3 text-[0.85rem] font-semibold text-white">Flight tracking</p>
                   </div>
                   <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.06] px-4 py-4">
-                    <Baby size={18} className="text-[#1679FF]" />
+                    <Baby size={36} className="text-[#1679FF]" />
                     <p className="mt-3 text-[0.85rem] font-semibold text-white">Child seats</p>
                   </div>
                   <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.06] px-4 py-4">
-                    <ShieldCheck size={18} className="text-[#1679FF]" />
+                    <ShieldCheck size={36} className="text-[#1679FF]" />
                     <p className="mt-3 text-[0.85rem] font-semibold text-white">Fixed price</p>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-[1.9rem] border border-white/10 bg-white/[0.06] p-3 md:p-4">
-                <BookingForm headerTitle="Book your transfer" showInfoTrigger={false} showStepOneRouteIntro fluidDesktopWidth routePreset={routePreset} />
+              <div className="relative aspect-video w-full overflow-hidden rounded-[1.75rem] shadow-[0_24px_70px_rgba(0,0,0,0.25)]">
+                <Image
+                  src="https://images.pexels.com/photos/9641136/pexels-photo-9641136.jpeg"
+                  alt="Wien Hauptbahnhof station entrance for Vienna airport transfers"
+                  fill
+                  className="scale-[1.015] object-cover object-center"
+                  sizes="(min-width: 1024px) 520px, 100vw"
+                />
               </div>
             </div>
           </div>

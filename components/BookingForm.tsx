@@ -130,6 +130,17 @@ type BookingFormProps = {
     routeLabel: string;
     pickupLabel: string;
     dropoffLabel: string;
+    address?: {
+      street: string;
+      zip: string;
+      city: string;
+      formattedAddress: string;
+      houseNumber: string;
+      country: string;
+      lat: number;
+      lng: number;
+      placeId: string;
+    };
     notes: string;
   };
 };
@@ -221,11 +232,37 @@ const BookingForm = ({
   const [favoriteAddresses, setFavoriteAddresses] = useState<FavoriteAddress[]>(
     sortFavoriteAddresses(initialFavorites),
   );
-  const [streetInputValue, setStreetInputValue] = useState('');
+  const [streetInputValue, setStreetInputValue] = useState(
+    routePreset?.address
+      ? formatAddressLine(routePreset.address.street, routePreset.address.zip, formatDisplayCity(routePreset.address.city))
+      : '',
+  );
   const [extraStopStreetInputValue, setExtraStopStreetInputValue] = useState('');
-  const [resolvedStreetOption, setResolvedStreetOption] = useState<StreetOption | null>(null);
+  const [resolvedStreetOption, setResolvedStreetOption] = useState<StreetOption | null>(
+    routePreset?.address
+      ? {
+          street: routePreset.address.street,
+          zip: routePreset.address.zip,
+          city: routePreset.address.city,
+        }
+      : null,
+  );
   const [resolvedExtraStopStreetOption, setResolvedExtraStopStreetOption] = useState<StreetOption | null>(null);
-  const [selectedGoogleAddress, setSelectedGoogleAddress] = useState<ParsedGoogleAddress | null>(null);
+  const [selectedGoogleAddress, setSelectedGoogleAddress] = useState<ParsedGoogleAddress | null>(
+    routePreset?.address
+      ? {
+          street: routePreset.address.street,
+          zip: routePreset.address.zip,
+          city: routePreset.address.city,
+          formattedAddress: routePreset.address.formattedAddress,
+          houseNumber: routePreset.address.houseNumber,
+          country: routePreset.address.country,
+          lat: routePreset.address.lat,
+          lng: routePreset.address.lng,
+          placeId: routePreset.address.placeId,
+        }
+      : null,
+  );
   const [streetNumberWarning, setStreetNumberWarning] = useState<'street' | 'extraStopStreet' | null>(null);
   const [streetPasteWarning, setStreetPasteWarning] = useState<'street' | 'extraStopStreet' | null>(null);
   const [unresolvedStreetWarning, setUnresolvedStreetWarning] = useState(false);
@@ -251,19 +288,19 @@ const BookingForm = ({
 
   const [formData, setFormData] = useState<ExtendedBookingInput>({
     direction: routePreset?.direction ?? 'to_airport',
-    city: 'Wien',
-    zip: '',
-    street: '',
+    city: routePreset?.address?.city ?? 'Wien',
+    zip: routePreset?.address?.zip ?? '',
+    street: routePreset?.address?.street ?? '',
     extraStop: false,
     extraStopCity: 'Wien',
     extraStopZip: '',
     extraStopStreet: '',
-    formattedAddress: '',
-    houseNumber: '',
-    country: '',
-    lat: null,
-    lng: null,
-    placeId: '',
+    formattedAddress: routePreset?.address?.formattedAddress ?? '',
+    houseNumber: routePreset?.address?.houseNumber ?? '',
+    country: routePreset?.address?.country ?? '',
+    lat: routePreset?.address?.lat ?? null,
+    lng: routePreset?.address?.lng ?? null,
+    placeId: routePreset?.address?.placeId ?? '',
     flightNumber: '',
     pickupAt: '',
     date: '',
@@ -325,11 +362,49 @@ const BookingForm = ({
       return {
         ...prev,
         direction: routePreset.direction,
+        ...(routePreset.address
+          ? {
+              city: routePreset.address.city,
+              zip: routePreset.address.zip,
+              street: routePreset.address.street,
+              formattedAddress: routePreset.address.formattedAddress,
+              houseNumber: routePreset.address.houseNumber,
+              country: routePreset.address.country,
+              lat: routePreset.address.lat,
+              lng: routePreset.address.lng,
+              placeId: routePreset.address.placeId,
+            }
+          : {}),
         notes: prev.notes.trim()
           ? `${prev.notes.trim()}\n${routePreset.notes}`
           : routePreset.notes,
       };
     });
+
+    if (routePreset.address) {
+      setStreetInputValue(
+        formatAddressLine(routePreset.address.street, routePreset.address.zip, formatDisplayCity(routePreset.address.city)),
+      );
+      setResolvedStreetOption({
+        street: routePreset.address.street,
+        zip: routePreset.address.zip,
+        city: routePreset.address.city,
+      });
+      setSelectedGoogleAddress({
+        street: routePreset.address.street,
+        zip: routePreset.address.zip,
+        city: routePreset.address.city,
+        formattedAddress: routePreset.address.formattedAddress,
+        houseNumber: routePreset.address.houseNumber,
+        country: routePreset.address.country,
+        lat: routePreset.address.lat,
+        lng: routePreset.address.lng,
+        placeId: routePreset.address.placeId,
+      });
+      setStreetNumberWarning(null);
+      setStreetPasteWarning(null);
+      setUnresolvedStreetWarning(false);
+    }
   }, [routePreset]);
 
   useEffect(() => {
@@ -358,6 +433,7 @@ const BookingForm = ({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (pathname !== '/book' && pathname !== '/account') return;
+    if (routePreset) return;
 
     const raw = window.sessionStorage.getItem(PENDING_BOOKING_STORAGE_KEY);
     if (!raw) return;
@@ -1860,7 +1936,7 @@ const BookingForm = ({
               onBlur={handleFlightNumberBlur}
               placeholder="e.g. OS 123"
               tabIndex={isFlightDetailsVisible ? undefined : -1}
-              className={`${getInputClassName('flightNumber')} !h-[3.35rem] !rounded-[1.05rem] ${isFieldInvalid('flightNumber') ? '' : '!border-[#e4e6ea] !bg-[#f9fafb]'} !px-5 !text-[18px] !font-semibold !tracking-[0.02em] !text-[#717982] placeholder:!text-[#717982] md:!h-[3.25rem] md:!rounded-[1rem] md:!px-5 md:!text-[18px]`}
+              className={`${getInputClassName('flightNumber')} !h-[3.35rem] !rounded-[1.05rem] ${isFieldInvalid('flightNumber') ? '' : '!border-[#e4e6ea] !bg-[#f9fafb]'} !px-5 !text-[14px] !font-semibold !tracking-normal !text-[#111827] placeholder:!text-[14px] placeholder:!text-[#6b7280] md:!h-[3.25rem] md:!rounded-[1rem] md:!px-5 md:!text-[14px]`}
             />
           </div>
         </div>

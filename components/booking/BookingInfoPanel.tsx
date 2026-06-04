@@ -32,6 +32,18 @@ const paymentMethodBadges: PaymentMethodBadge[] = [
   { label: 'Apple Pay', kind: 'applepay' },
 ];
 
+const getInfoCardClassName = (isBookVariant: boolean, marginClassName: string) =>
+  `${marginClassName} ${isBookVariant ? 'rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`;
+
+const getInfoTitleClassName = (isBookVariant: boolean) =>
+  `${isBookVariant ? 'text-[1rem] tracking-[0.04em]' : 'text-[12px] tracking-[0.18em] md:text-[13px]'} font-semibold uppercase text-[#1679FF]`;
+
+const getInfoBodyClassName = (isBookVariant: boolean) =>
+  `${isBookVariant ? 'mt-3 text-[1rem] md:text-[1.08rem]' : 'mt-2 text-sm'} font-medium text-[var(--color-text)]`;
+
+const getInfoItemsClassName = (isBookVariant: boolean) =>
+  `${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-2 text-sm leading-6'} text-[#64748b]`;
+
 function PaymentBadgeIcon({ kind }: { kind: PaymentMethodBadge['kind'] }) {
   if (kind === 'cash') {
     return (
@@ -112,22 +124,16 @@ function StaticInfoSectionCard({
   marginClassName: string;
 }) {
   return (
-    <div
-      className={`${marginClassName} ${isBookVariant ? 'rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`}
-    >
-      <p
-        className={`${isBookVariant ? 'text-[1rem] tracking-[0.04em]' : 'text-[12px] tracking-[0.18em] md:text-[13px]'} font-semibold uppercase text-[#1679FF]`}
-      >
+    <div className={getInfoCardClassName(isBookVariant, marginClassName)}>
+      <p className={getInfoTitleClassName(isBookVariant)}>
         {section.title}
       </p>
       {section.body ? (
-        <p className={`${isBookVariant ? 'mt-3 text-[1rem] md:text-[1.08rem]' : 'mt-2 text-sm'} font-medium text-[var(--color-text)]`}>
+        <p className={getInfoBodyClassName(isBookVariant)}>
           {section.body}
         </p>
       ) : null}
-      <div
-        className={`${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-2 text-sm leading-6'} text-[#64748b]`}
-      >
+      <div className={getInfoItemsClassName(isBookVariant)}>
         {section.items.map((item) => (
           <p key={item}>{item}</p>
         ))}
@@ -228,23 +234,19 @@ function AnimatedInfoSectionCard({
 
   return (
     <div
-      className={`${marginClassName} ${isBookVariant ? 'rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`}
+      className={getInfoCardClassName(isBookVariant, marginClassName)}
       style={lockedHeight ? { minHeight: `${lockedHeight}px` } : undefined}
     >
       <div ref={cardRef} className={`ui-info-card-transition ${phaseClassName}`}>
-        <p
-          className={`${isBookVariant ? 'text-[1rem] tracking-[0.04em]' : 'text-[12px] tracking-[0.18em] md:text-[13px]'} font-semibold uppercase text-[#1679FF]`}
-        >
+        <p className={getInfoTitleClassName(isBookVariant)}>
           {visibleSection.title}
         </p>
         {visibleSection.body ? (
-          <p className={`${isBookVariant ? 'mt-3 text-[1rem] md:text-[1.08rem]' : 'mt-2 text-sm'} font-medium text-[var(--color-text)]`}>
+          <p className={getInfoBodyClassName(isBookVariant)}>
             {visibleSection.body}
           </p>
         ) : null}
-        <div
-          className={`${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-2 text-sm leading-6'} text-[#64748b]`}
-        >
+        <div className={getInfoItemsClassName(isBookVariant)}>
           {visibleSection.items.map((item) => (
             <p key={item}>{item}</p>
           ))}

@@ -31,6 +31,17 @@ export type LocationRoutePage = {
     src: string;
     alt: string;
   };
+  bookingAddress?: {
+    street: string;
+    zip: string;
+    city: string;
+    formattedAddress: string;
+    houseNumber: string;
+    country: string;
+    lat: number;
+    lng: number;
+    placeId: string;
+  };
   vehicles: RouteVehicleOption[];
   highlights: string[];
   steps: {
@@ -65,6 +76,17 @@ export const locationRoutes: LocationRoutePage[] = [
       src: '/limo.jpg',
       alt: 'Vienna airport taxi sedan for a transfer from Terminal 1 Vienna Airport to Vienna HBF',
     },
+    bookingAddress: {
+      street: 'Am Hauptbahnhof 1',
+      zip: '1100',
+      city: 'Wien',
+      formattedAddress: 'Am Hauptbahnhof 1, 1100 Wien, Austria',
+      houseNumber: '1',
+      country: 'Austria',
+      lat: 48.185057,
+      lng: 16.376333,
+      placeId: 'route-preset-vienna-hbf',
+    },
     vehicles: [
       {
         name: 'Sedan',
@@ -73,7 +95,7 @@ export const locationRoutes: LocationRoutePage[] = [
         imageAlt: 'Sedan airport taxi from Vienna Airport Terminal 1 to Vienna HBF',
         passengers: '1-2',
         luggage: '2 suitcases',
-        price: 'from EUR 42',
+        price: 'Fixed price starting from EUR 42',
       },
       {
         name: 'Station Wagon',
@@ -82,7 +104,7 @@ export const locationRoutes: LocationRoutePage[] = [
         imageAlt: 'Station wagon airport taxi from Vienna Airport Terminal 1 to Vienna HBF',
         passengers: '1-4',
         luggage: '4 suitcases',
-        price: 'from EUR 48',
+        price: 'Fixed price starting from EUR 48',
       },
       {
         name: 'Minivan',
@@ -91,7 +113,7 @@ export const locationRoutes: LocationRoutePage[] = [
         imageAlt: 'Minivan airport taxi from Vienna Airport Terminal 1 to Vienna HBF',
         passengers: '1-8',
         luggage: '8 suitcases',
-        price: 'from EUR 72',
+        price: 'Fixed price starting from EUR 72',
       },
     ],
     highlights: [
@@ -123,7 +145,7 @@ export const locationRoutes: LocationRoutePage[] = [
       {
         question: 'What is the cheapest taxi option from Terminal 1 Vienna Airport to Vienna HBF?',
         answer:
-          'The sedan is usually the cheapest option for this route and starts from EUR 42 for up to 2 passengers with standard luggage.',
+          'The sedan is usually the cheapest option for this route and has a fixed price of EUR 42 for up to 2 passengers with standard luggage.',
       },
       {
         question: 'How far is Vienna HBF from Terminal 1 Vienna Airport?',

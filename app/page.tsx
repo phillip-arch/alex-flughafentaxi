@@ -407,7 +407,7 @@ const terminalPickupInfo = [
     description:
       'After baggage claim, turn right toward Burger King. Exit the terminal, cross the street, and proceed toward the parking area.',
     linkLabel: 'View exact pickup location on Google Maps',
-    linkHref: 'https://maps.app.goo.gl/Yzv6rhxJBWNjLLMP7',
+    linkHref: 'https://maps.app.goo.gl/JkuDu7qEX6tgxK4D6',
   },
 ];
 

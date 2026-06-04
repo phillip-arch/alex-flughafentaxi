@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { Armchair, Baby, Briefcase, ChevronLeft, Minus, NotebookPen, Plus, ShieldCheck, Users, X } from 'lucide-react';
@@ -18,6 +18,42 @@ type VehiclePriceOption = {
 // Keep the upgrade card styling in place for a later upsell return.
 const ENABLE_TRAVEL_UPSELL = false;
 const ROLLING_DIGITS = Array.from({ length: 10 }, (_, index) => index);
+const BOOKING_SHEET_OVERLAY_CLASS = `${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-end px-0 md:items-center md:justify-center md:px-4`;
+const BOOKING_NOTE_SHEET_OVERLAY_CLASS = `${BOOKING_OVERLAY_BACKDROP_CLASS} z-[10000] flex items-end px-0 md:items-center md:justify-center md:px-4`;
+const BOOKING_SHEET_CLOSE_BUTTON_CLASS = 'absolute inset-0 h-full w-full cursor-default';
+const BOOKING_SHEET_PANEL_CLASS =
+  'relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]';
+const BOOKING_NOTE_SHEET_PANEL_CLASS =
+  'relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[32rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]';
+const BOOKING_SHEET_HANDLE_CLASS = 'mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden';
+const BOOKING_SHEET_ACTION_BUTTON_CLASS =
+  'mt-5 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[#1679FF] text-[1rem] font-semibold text-white transition-colors hover:bg-[#0f6ae8]';
+
+function BookingBottomSheet({
+  ariaLabel,
+  closeLabel,
+  onClose,
+  children,
+  overlayClassName = BOOKING_SHEET_OVERLAY_CLASS,
+  panelClassName = BOOKING_SHEET_PANEL_CLASS,
+}: {
+  ariaLabel: string;
+  closeLabel: string;
+  onClose: () => void;
+  children: ReactNode;
+  overlayClassName?: string;
+  panelClassName?: string;
+}) {
+  return (
+    <div className={overlayClassName} role="dialog" aria-modal="true" aria-label={ariaLabel}>
+      <button type="button" aria-label={closeLabel} className={BOOKING_SHEET_CLOSE_BUTTON_CLASS} onClick={onClose} />
+      <div className={panelClassName}>
+        <div className={BOOKING_SHEET_HANDLE_CLASS} />
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function RollingCounter({
   value,
@@ -720,15 +756,11 @@ export default function BookingStepTwo({
   const travelSheet =
     isTravelSheetOpen && isMounted
       ? createPortal(
-          <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-end px-0 md:items-center md:justify-center md:px-4`} role="dialog" aria-modal="true" aria-label="Passengers and luggage">
-            <button
-              type="button"
-              aria-label="Close passengers and luggage"
-              className="absolute inset-0 h-full w-full cursor-default"
-              onClick={() => setIsTravelSheetOpen(false)}
-            />
-            <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
-              <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
+          <BookingBottomSheet
+            ariaLabel="Passengers and luggage"
+            closeLabel="Close passengers and luggage"
+            onClose={() => setIsTravelSheetOpen(false)}
+          >
               {renderSheetHeader('Passengers and luggage', 'Adjust each item before continuing.', () => setIsTravelSheetOpen(false))}
               {currentVehicleCard ? (
                 <div className="mb-4 flex items-center justify-between gap-3 rounded-[1rem] border border-[#dbe7f8] bg-[#f8fbff] px-4 py-2.5">
@@ -790,12 +822,11 @@ export default function BookingStepTwo({
               <button
                 type="button"
                 onClick={confirmTravelSheet}
-                className="mt-5 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[#1679FF] text-[1rem] font-semibold text-white transition-colors hover:bg-[#0f6ae8]"
+                className={BOOKING_SHEET_ACTION_BUTTON_CLASS}
               >
                 Confirm selection
               </button>
-            </div>
-          </div>,
+          </BookingBottomSheet>,
           document.body
         )
       : null;
@@ -803,15 +834,11 @@ export default function BookingStepTwo({
   const childSeatSheet =
     isChildSeatSheetOpen && isMounted
       ? createPortal(
-          <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-end px-0 md:items-center md:justify-center md:px-4`} role="dialog" aria-modal="true" aria-label="Child seats">
-            <button
-              type="button"
-              aria-label="Close child seats"
-              className="absolute inset-0 h-full w-full cursor-default"
-              onClick={() => setIsChildSeatSheetOpen(false)}
-            />
-            <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
-              <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
+          <BookingBottomSheet
+            ariaLabel="Child seats"
+            closeLabel="Close child seats"
+            onClose={() => setIsChildSeatSheetOpen(false)}
+          >
               {renderSheetHeader('Child seats', 'Choose the seats you need for the ride.', () => setIsChildSeatSheetOpen(false))}
               <div className="space-y-3">
                 {renderSheetStepper('babySeats', 'Baby seat', formData.babySeats, 0, 3, Baby)}
@@ -821,12 +848,11 @@ export default function BookingStepTwo({
               <button
                 type="button"
                 onClick={() => setIsChildSeatSheetOpen(false)}
-                className="mt-5 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[#1679FF] text-[1rem] font-semibold text-white transition-colors hover:bg-[#0f6ae8]"
+                className={BOOKING_SHEET_ACTION_BUTTON_CLASS}
               >
                 Done
               </button>
-            </div>
-          </div>,
+          </BookingBottomSheet>,
           document.body
         )
       : null;
@@ -834,20 +860,13 @@ export default function BookingStepTwo({
   const noteSheet =
     isNoteSheetOpen && isMounted
       ? createPortal(
-          <div
-            className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[10000] flex items-end px-0 md:items-center md:justify-center md:px-4`}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Driver note"
+          <BookingBottomSheet
+            ariaLabel="Driver note"
+            closeLabel="Close driver note"
+            onClose={() => setIsNoteSheetOpen(false)}
+            overlayClassName={BOOKING_NOTE_SHEET_OVERLAY_CLASS}
+            panelClassName={BOOKING_NOTE_SHEET_PANEL_CLASS}
           >
-            <button
-              type="button"
-              aria-label="Close driver note"
-              className="absolute inset-0 h-full w-full cursor-default"
-              onClick={() => setIsNoteSheetOpen(false)}
-            />
-            <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[32rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
-              <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
               {renderSheetHeader(
                 'Note for the driver',
                 'Add pickup details, luggage notes, or anything the driver should know.',
@@ -867,8 +886,7 @@ export default function BookingStepTwo({
               >
                 Save
               </button>
-            </div>
-          </div>,
+          </BookingBottomSheet>,
           document.body,
         )
       : null;
@@ -876,21 +894,17 @@ export default function BookingStepTwo({
   const optionalSheet =
     isOptionalSheetOpen && isMounted
       ? createPortal(
-          <div className={`${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] flex items-end px-0 md:items-center md:justify-center md:px-4`} role="dialog" aria-modal="true" aria-label="Optional extras">
-            <button type="button" aria-label="Close optional extras" className="absolute inset-0 h-full w-full cursor-default" onClick={closeOptionalSheet} />
-            <div className="relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]">
-              <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden" />
+          <BookingBottomSheet ariaLabel="Optional extras" closeLabel="Close optional extras" onClose={closeOptionalSheet}>
               {renderSheetHeader('Free child seats', 'Choose the seats you need for the ride.', closeOptionalSheet)}
               <div className="space-y-3">
                 {renderSheetStepper('babySeats', 'Baby seat', formData.babySeats, 0, 3, Baby)}
                 {renderSheetStepper('childSeats', 'Child seat', formData.childSeats, 0, 3, Armchair)}
                 {renderSheetStepper('boosterSeats', 'Booster seat', formData.boosterSeats, 0, 3, ShieldCheck)}
               </div>
-              <button type="button" onClick={closeOptionalSheet} className="mt-5 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[#1679FF] text-[1rem] font-semibold text-white transition-colors hover:bg-[#0f6ae8]">
+              <button type="button" onClick={closeOptionalSheet} className={BOOKING_SHEET_ACTION_BUTTON_CLASS}>
                 Done
               </button>
-            </div>
-          </div>,
+          </BookingBottomSheet>,
           document.body,
         )
       : null;

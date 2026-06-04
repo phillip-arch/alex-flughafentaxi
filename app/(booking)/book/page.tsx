@@ -43,6 +43,7 @@ function buildRoutePreset(searchParams: Awaited<NonNullable<BookingPageProps['se
     routeLabel,
     pickupLabel: from,
     dropoffLabel: to,
+    address: route?.bookingAddress,
     notes: notes.join('\n'),
   };
 }

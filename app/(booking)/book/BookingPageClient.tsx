@@ -37,6 +37,17 @@ export default function BookingPageClient({
     routeLabel: string;
     pickupLabel: string;
     dropoffLabel: string;
+    address?: {
+      street: string;
+      zip: string;
+      city: string;
+      formattedAddress: string;
+      houseNumber: string;
+      country: string;
+      lat: number;
+      lng: number;
+      placeId: string;
+    };
     notes: string;
   } | null;
 }) {

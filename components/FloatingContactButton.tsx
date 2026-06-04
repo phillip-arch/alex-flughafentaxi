@@ -8,7 +8,7 @@ const PHONE_NUMBER = '+436764826069';
 const WHATSAPP_NUMBER = '436764826069';
 
 export default function FloatingContactButton() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -18,7 +18,7 @@ export default function FloatingContactButton() {
     const syncVisibility = () => {
       const hero = document.getElementById('hero');
       const footer = document.getElementById('site-footer');
-      const isPastHero = hero ? hero.getBoundingClientRect().bottom <= 0 : false;
+      const isPastHero = hero ? hero.getBoundingClientRect().bottom <= 0 : true;
       const isAtFooter = footer ? footer.getBoundingClientRect().top <= window.innerHeight : false;
 
       setIsVisible(isPastHero && !isAtFooter);
