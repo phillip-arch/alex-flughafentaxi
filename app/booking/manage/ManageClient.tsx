@@ -16,6 +16,7 @@ function formatPickup(pickupAt: string) {
   const d = new Date(pickupAt);
   if (Number.isNaN(d.getTime())) return pickupAt;
   return d.toLocaleString('de-AT', {
+    timeZone: 'Europe/Vienna',
     weekday: 'short',
     day: '2-digit',
     month: '2-digit',
