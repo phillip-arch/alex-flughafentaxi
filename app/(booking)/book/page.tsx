@@ -16,7 +16,22 @@ type BookingPageProps = {
     from?: string;
     to?: string;
     vehicle?: string;
+    flight?: string;
+    when?: string;
+    name?: string;
+    phone?: string;
+    notes?: string;
   }>;
+};
+
+const VEHICLE_PARAM_MAP: Record<string, 'Limo' | 'Kombi' | 'Bus'> = {
+  limo: 'Limo',
+  limousine: 'Limo',
+  sedan: 'Limo',
+  kombi: 'Kombi',
+  wagon: 'Kombi',
+  bus: 'Bus',
+  van: 'Bus',
 };
 
 function buildRoutePreset(searchParams: Awaited<NonNullable<BookingPageProps['searchParams']>>) {
@@ -31,12 +46,22 @@ function buildRoutePreset(searchParams: Awaited<NonNullable<BookingPageProps['se
   const toAirport = /airport|flughafen|vie|terminal/i.test(to);
   const direction: 'to_airport' | 'from_airport' = fromAirport && !toAirport ? 'from_airport' : 'to_airport';
   const routeLabel = route ? `${route.from} to ${route.to}` : `${from} to ${to}`;
-  const vehicle = String(searchParams.vehicle || '').trim();
+  const vehicleParam = String(searchParams.vehicle || '').trim().toLowerCase();
+  const vehicle = VEHICLE_PARAM_MAP[vehicleParam] ?? null;
+  const flightNumber = String(searchParams.flight || '').trim().slice(0, 12);
+  const when = String(searchParams.when || '').trim().slice(0, 32);
+  const name = String(searchParams.name || '').trim().slice(0, 80);
+  const phone = String(searchParams.phone || '').trim().slice(0, 32);
+  const extraNotes = String(searchParams.notes || '').trim().slice(0, 500);
   const notes = [`Route request: ${routeLabel}`];
 
-  if (vehicle) {
-    notes.push(`Preferred vehicle: ${vehicle}`);
+  if (vehicleParam && !vehicle) {
+    notes.push(`Preferred vehicle: ${vehicleParam}`);
   }
+  if (when) notes.push(`Requested pickup: ${when}`);
+  if (name) notes.push(`Name: ${name}`);
+  if (phone) notes.push(`Phone: ${phone}`);
+  if (extraNotes) notes.push(extraNotes);
 
   return {
     direction,
@@ -44,6 +69,8 @@ function buildRoutePreset(searchParams: Awaited<NonNullable<BookingPageProps['se
     pickupLabel: from,
     dropoffLabel: to,
     address: route?.bookingAddress,
+    vehicle,
+    flightNumber,
     notes: notes.join('\n'),
   };
 }

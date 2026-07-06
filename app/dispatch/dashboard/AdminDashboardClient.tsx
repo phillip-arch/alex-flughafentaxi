@@ -9,8 +9,9 @@ import {
   Menu, LogOut,
   LayoutGrid, Rows3, History, Search, Calculator
 } from 'lucide-react';
-import { 
-  fetchBookings, fetchDrivers, addDriver, deleteDriver, 
+import {
+  fetchBookings, fetchDrivers, addDriver, deleteDriver,
+  fetchNotificationSettings, updateCancellationAlertEmail, toggleDriverCancellationNotice,
   updateBookingStatus, updateBookingDetails, assignDriver, unassignDriver, fetchStats, fetchPassengerCountsBatch, fetchAuditLogs, searchBookings,
   fetchPricingAdminData, updateDistancePricingSettings, upsertZipPrice, deleteZipPrice
 } from './actions';
@@ -84,6 +85,9 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
   const [ridesCache, setRidesCache] = useState<Record<string, { bookings: any[]; passengerCounts: Record<string, number> }>>({});
   const [driverSelection, setDriverSelection] = useState<Record<string, string>>({});
   const [driversLoaded, setDriversLoaded] = useState(false);
+  const [alertEmail, setAlertEmail] = useState('');
+  const [alertEmailFallback, setAlertEmailFallback] = useState('');
+  const [notifSettingsLoaded, setNotifSettingsLoaded] = useState(false);
   const [statsCache, setStatsCache] = useState<Record<string, any[]>>({});
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [auditLogRange, setAuditLogRange] = useState<'today' | '7' | '30' | 'all'>('today');
@@ -370,6 +374,7 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
             const driversData = await fetchDrivers();
             setDrivers(driversData || []);
             setDriversLoaded(true);
+            void loadNotificationSettings();
           }
         } else {
           setLoading(bookings.length === 0);
@@ -545,6 +550,45 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
       if (success) {
         alert('Buchung wurde erfolgreich an den Fahrer gesendet.');
       }
+    }
+  };
+
+  const loadNotificationSettings = async () => {
+    if (notifSettingsLoaded) return;
+    try {
+      const settings = await fetchNotificationSettings();
+      setAlertEmail(settings.alertEmail || '');
+      setAlertEmailFallback(settings.envFallback || '');
+      setNotifSettingsLoaded(true);
+    } catch (error) {
+      console.error('loadNotificationSettings failed:', error);
+    }
+  };
+
+  const handleSaveAlertEmail = async (email: string) => {
+    try {
+      const res = await updateCancellationAlertEmail(email);
+      if (res && 'error' in res && res.error) {
+        alert(res.error);
+        return;
+      }
+      setAlertEmail(String(email || '').trim());
+      alert('Gespeichert.');
+    } catch (error) {
+      console.error('handleSaveAlertEmail failed:', error);
+    }
+  };
+
+  const handleToggleDriverNotice = async (driverId: string, enabled: boolean) => {
+    try {
+      const res = await toggleDriverCancellationNotice(driverId, enabled);
+      if (res && 'error' in res && res.error) {
+        alert(res.error);
+        return;
+      }
+      setDrivers((prev) => prev.map((d) => (d.id === driverId ? { ...d, notify_on_cancellation: enabled } : d)));
+    } catch (error) {
+      console.error('handleToggleDriverNotice failed:', error);
     }
   };
 
@@ -1182,6 +1226,10 @@ export default function AdminDashboardClient({ userEmail }: { userEmail: string 
               drivers={drivers}
               handleDeleteDriver={handleDeleteDriver}
               handleAddDriver={handleAddDriver}
+              handleToggleDriverNotice={handleToggleDriverNotice}
+              alertEmail={alertEmail}
+              alertEmailFallback={alertEmailFallback}
+              handleSaveAlertEmail={handleSaveAlertEmail}
               adminPrimaryButtonClass={adminPrimaryButtonClass}
             />
           )}

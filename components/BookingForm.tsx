@@ -141,6 +141,8 @@ type BookingFormProps = {
       lng: number;
       placeId: string;
     };
+    vehicle?: VehicleType | null;
+    flightNumber?: string;
     notes: string;
   };
 };
@@ -301,14 +303,14 @@ const BookingForm = ({
     lat: routePreset?.address?.lat ?? null,
     lng: routePreset?.address?.lng ?? null,
     placeId: routePreset?.address?.placeId ?? '',
-    flightNumber: '',
+    flightNumber: routePreset?.flightNumber ?? '',
     pickupAt: '',
     date: '',
     time: '',
     passengers: 1,
     luggage: 0,
     travelDetailsSelected: false,
-    vehicleOverride: null,
+    vehicleOverride: routePreset?.vehicle ?? null,
     childSeat: false,
     babySeats: 0,
     childSeats: 0,

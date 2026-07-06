@@ -16,6 +16,7 @@ type PassengerBaseEmailInput = {
 export type PassengerCancellationEmailInput = PassengerBaseEmailInput;
 
 export type PassengerConfirmationEmailInput = PassengerBaseEmailInput & {
+  manageUrl?: string | null;
   passengers?: number | null;
   luggage?: number | null;
   handLuggage?: string | null;
@@ -217,6 +218,12 @@ export function buildPassengerConfirmationEmailHtml(input: PassengerConfirmation
         <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#1679ff;font-weight:700;text-align:center;padding-bottom:14px;">
           Aenderungen &amp; Stornierungen
         </div>
+        ${input.manageUrl ? `
+        <div style="text-align:center;padding-bottom:18px;">
+          <a href="${escapeHtml(String(input.manageUrl))}" style="display:inline-block;background:#ffffff;border:1.5px solid #1679ff;color:#1679ff;text-decoration:none;font-size:14px;font-weight:700;padding:12px 24px;border-radius:14px;">
+            Buchung online ansehen oder stornieren
+          </a>
+        </div>` : ''}
         <p style="margin:0 0 12px 0;font-size:14px;line-height:1.75;color:#111827;">
           Fuer Fahrten bis 22:00 Uhr:<br/>
           Aenderungen oder Stornierungen sind bis spaetestens 3 Stunden vor Abholzeit moeglich.

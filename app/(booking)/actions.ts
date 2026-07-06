@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { isIP } from 'net';
 import { Resend } from 'resend';
+import { buildBookingIcs } from '@/lib/booking/ics';
 import { requireSameOrigin } from '@/lib/security/origin';
 import { buildPassengerConfirmationEmailHtml } from '@/lib/booking/passengerEmail';
 import { generateSafeReference, normalizeBookingReference } from '@/lib/booking/reference';
@@ -230,7 +231,8 @@ export async function createBooking(payload: any) {
 
   // Generate unique tokens and references
   const confirm_token = crypto.randomUUID();
-  
+  const manage_token = crypto.randomUUID();
+
   let booking_reference = '';
   let data, error;
   let retries = 0;
@@ -267,6 +269,7 @@ export async function createBooking(payload: any) {
         ip_address: ip, // Store IP for rate limiting
         user_id: user?.id || null,
         confirm_token,
+        manage_token,
         booking_reference
       })
       .select('id, email, full_name, booking_reference')
@@ -296,6 +299,8 @@ export async function createBooking(payload: any) {
   // Prefer server-only APP_URL to avoid preview deployment leaks.
   const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const confirmLink = `${appUrl}/book/confirm?token=${confirm_token}`;
+  const webUrl = (process.env.PUBLIC_WEB_URL || appUrl).replace(/\/+$/, '');
+  const manageLink = `${webUrl}/booking/manage?token=${manage_token}`;
   const pickupRaw = String(bookingData.pickup || '').toLowerCase();
   const destinationRaw = String(bookingData.destination || '').toLowerCase();
   const isFromAirport = pickupRaw.includes('flughafen');
@@ -347,13 +352,34 @@ export async function createBooking(payload: any) {
             ? 'Gratis'
             : '-';
 
+    let icsAttachment: { filename: string; content: string } | null = null;
+    try {
+      icsAttachment = {
+        filename: `Flughafentaxi-${normalizeBookingReference(data.booking_reference)}.ics`,
+        content: Buffer.from(
+          buildBookingIcs({
+            bookingReference: normalizeBookingReference(data.booking_reference),
+            pickup: bookingData.pickup,
+            destination: bookingData.destination,
+            pickupAt: bookingData.pickup_at,
+            price: finalPrice,
+            durationMinutes: distanceDurationMinutes ?? null,
+          })
+        ).toString('base64'),
+      };
+    } catch (icsError) {
+      console.error('[booking] ICS generation failed:', icsError);
+    }
+
     let emailError: any = null;
     for (const from of fromCandidates) {
       const { error } = await resend.emails.send({
+        ...(icsAttachment ? { attachments: [icsAttachment] } : {}),
         from,
         to: data.email,
         subject: `Ihre Buchungsbestaetigung (${directionLabel}) ${normalizeBookingReference(data.booking_reference)}`.trim(),
         html: buildPassengerConfirmationEmailHtml({
+          manageUrl: manageLink,
           fullName: data.full_name,
           email: bookingData.email,
           phone: bookingData.phone,

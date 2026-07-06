@@ -48,6 +48,8 @@ export default function BookingPageClient({
       lng: number;
       placeId: string;
     };
+    vehicle?: 'Limo' | 'Kombi' | 'Bus' | null;
+    flightNumber?: string;
     notes: string;
   } | null;
 }) {

@@ -13,6 +13,7 @@ import {
 } from '@/lib/booking/passengerEmail';
 import { buildDriverCancellationEmailHtml } from '@/lib/booking/driverCancellationEmail';
 import { buildDriverAssignmentEmailHtml } from '@/lib/booking/driverAssignmentEmail';
+import { getAppSettingValue, setAppSettingValue } from '@/lib/settings/appSettings';
 import { logAuditEvent } from '@/lib/audit/logAuditEvent';
 import { normalizeBookingReference } from '@/lib/booking/reference';
 import { escapeHtml } from '@/lib/email/template';
@@ -1139,4 +1140,64 @@ export async function fetchPassengerCountsBatch(emails: string[]) {
   }
 
   return counts;
+}
+
+export async function fetchNotificationSettings() {
+  const admin = await checkAdmin();
+  if (admin.error) return { alertEmail: '', envFallback: '' };
+
+  const setting = await getAppSettingValue<{ email?: string }>('cancellation_alert_email');
+  return {
+    alertEmail: String(setting?.email || '').trim(),
+    envFallback: String(process.env.BOOKING_ALERT_EMAIL || process.env.ADMIN_LOGIN_ALERT_EMAIL || '').trim(),
+  };
+}
+
+export async function updateCancellationAlertEmail(email: string) {
+  const admin = await checkAdmin();
+  if (admin.error) return { error: admin.error };
+
+  const trimmed = String(email || '').trim().slice(0, 120);
+  if (trimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+    return { error: 'Bitte eine gueltige E-Mail-Adresse eingeben.' };
+  }
+
+  const { error } = await setAppSettingValue('cancellation_alert_email', { email: trimmed });
+  if (error) {
+    return safeActionError('Einstellung konnte nicht gespeichert werden.', 'updateCancellationAlertEmail failed', error);
+  }
+
+  await supabaseAdmin.from('audit_logs').insert({
+    actor_user_id: admin.user?.id,
+    action: 'UPDATE_SETTING',
+    entity: 'app_settings',
+    entity_id: 'cancellation_alert_email',
+    meta: { email: trimmed },
+  });
+
+  return { success: true, alertEmail: trimmed };
+}
+
+export async function toggleDriverCancellationNotice(driverId: string, enabled: boolean) {
+  const admin = await checkAdmin();
+  if (admin.error) return { error: admin.error };
+
+  const { error } = await supabaseAdmin
+    .from('drivers')
+    .update({ notify_on_cancellation: !!enabled, updated_at: new Date() })
+    .eq('id', driverId);
+
+  if (error) {
+    return safeActionError('Fahrer-Einstellung konnte nicht gespeichert werden.', 'toggleDriverCancellationNotice failed', error);
+  }
+
+  await supabaseAdmin.from('audit_logs').insert({
+    actor_user_id: admin.user?.id,
+    action: 'UPDATE_DRIVER_NOTIFY',
+    entity: 'drivers',
+    entity_id: driverId,
+    meta: { notify_on_cancellation: !!enabled },
+  });
+
+  return { success: true };
 }
