@@ -79,14 +79,42 @@ export async function GET(request: Request) {
       manageUrl: appUrl && booking.manage_token ? `${appUrl}/booking/manage?token=${booking.manage_token}` : null,
     });
 
+    const { data: currentBooking, error: currentBookingError } = await supabaseAdmin
+      .from('bookings')
+      .select('status, reminder_sent_at')
+      .eq('id', booking.id)
+      .maybeSingle();
+
+    if (currentBookingError) {
+      console.error(
+        `[cron/reminders] final status check failed for ${reference}:`,
+        currentBookingError
+      );
+      failures.push(reference);
+      continue;
+    }
+
+    if (
+      !currentBooking ||
+      !REMINDER_STATUSES.includes(currentBooking.status) ||
+      currentBooking.reminder_sent_at
+    ) {
+      continue;
+    }
+
     let emailError: unknown = null;
     for (const from of fromCandidates) {
-      const { error: sendError } = await resend.emails.send({
-        from,
-        to: booking.email,
-        subject: `Erinnerung: Ihre Fahrt morgen (${reference})`,
-        html,
-      });
+      const { error: sendError } = await resend.emails.send(
+        {
+          from,
+          to: booking.email,
+          subject: `Erinnerung: Ihre Fahrt morgen (${reference})`,
+          html,
+        },
+        {
+          idempotencyKey: `booking-reminder-${booking.id}-${from}`,
+        }
+      );
       if (!sendError) {
         emailError = null;
         break;

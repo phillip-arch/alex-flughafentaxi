@@ -7,7 +7,20 @@ export const NIGHT_LEAD_TIME_ERROR =
   'Night bookings require 8 hours notice. Please call Alex for urgent requests.';
 
 export function isNightLeadTimeWindow(selectedDate: Date) {
-  const selectedHour = selectedDate.getHours();
+  const hourPart = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Vienna',
+    hour: '2-digit',
+    hourCycle: 'h23',
+  })
+    .formatToParts(selectedDate)
+    .find((part) => part.type === 'hour');
+
+  const selectedHour = Number(hourPart?.value);
+
+  if (!Number.isInteger(selectedHour)) {
+    throw new Error('Could not determine pickup hour in Europe/Vienna.');
+  }
+
   return selectedHour >= 22 || selectedHour < 7;
 }
 
