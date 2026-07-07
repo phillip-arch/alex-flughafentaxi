@@ -173,9 +173,9 @@ export default function DistrictMapPriceExplorer({
                   <g key={feature.beznr}>
                     <path
                       d={feature.path}
-                      fill={isActive ? '#1679ff' : '#d8dee8'}
+                      fill={isActive ? 'var(--amber)' : 'rgba(244,241,232,.32)'}
                       fillOpacity={isActive ? 0.9 : 1}
-                      stroke={isActive ? '#0f5fca' : '#ffffff'}
+                      stroke={isActive ? 'var(--amber-deep)' : 'rgba(244,241,232,.16)'}
                       strokeWidth={isActive ? ACTIVE_DISTRICT_STROKE_WIDTH : DISTRICT_STROKE_WIDTH}
                       vectorEffect="non-scaling-stroke"
                       className="cursor-pointer transition-all duration-200 focus:outline-none"
@@ -198,9 +198,9 @@ export default function DistrictMapPriceExplorer({
                       y={feature.center.y + labelOffset.y}
                       textAnchor="middle"
                       dominantBaseline="central"
-                      className="pointer-events-none select-none fill-[#111111] text-[20px] font-bold transition-all duration-200"
+                      className="pointer-events-none select-none fill-[var(--paper)] text-[20px] font-bold transition-all duration-200"
                       style={{
-                        fill: isActive ? '#ffffff' : '#111111',
+                        fill: isActive ? 'var(--night)' : 'var(--paper)',
                         fontSize: isActive ? '26px' : '20px',
                       }}
                     >
@@ -213,7 +213,7 @@ export default function DistrictMapPriceExplorer({
                 <path
                   d={activeFeature.path}
                   fill="none"
-                  stroke="#0f5fca"
+                  stroke="var(--amber-deep)"
                   strokeWidth={ACTIVE_DISTRICT_STROKE_WIDTH}
                   vectorEffect="non-scaling-stroke"
                   className="pointer-events-none"
@@ -227,16 +227,16 @@ export default function DistrictMapPriceExplorer({
                   height={tooltipHeight}
                   className="pointer-events-none overflow-visible"
                 >
-                  <div className="rounded-[1rem] border border-[#dbe7f8] bg-white/95 px-4 py-3 text-left shadow-[0_18px_45px_rgba(17,24,39,0.18)] backdrop-blur-sm">
-                    <p className="text-[35.15px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:text-[20px]">
+                  <div className="rounded-[1rem] border border-[var(--line)] bg-[rgba(16,26,44,.96)] px-4 py-3 text-left shadow-[0_18px_45px_rgba(0,0,0,0.32)] backdrop-blur-sm">
+                    <p className="text-[35.15px] font-black leading-tight tracking-[-0.03em] text-[var(--paper)] md:text-[20px]">
                       📍 {activeDistrict.id} {activeDistrict.name}
                     </p>
-                    <p className="mt-2 text-[35.15px] font-semibold leading-tight text-[#5f6975] md:mt-1.5 md:text-[20px]">
+                    <p className="mt-2 text-[35.15px] font-semibold leading-tight text-[var(--muted)] md:mt-1.5 md:text-[20px]">
                       ⏱️ {DISTRICT_DRIVE_TIMES[activeDistrict.id] ?? '~30 min'}
                     </p>
-                    <p className="mt-4 whitespace-nowrap text-[35.15px] font-black leading-tight tracking-[-0.03em] text-[#111827] md:mt-2 md:text-[20px]">
-                      {getDistrictPrice(activeDistrict.group, 'limo')}€ <span className="text-[#9ca3af]">|</span>{' '}
-                      {getDistrictPrice(activeDistrict.group, 'kombi')}€ <span className="text-[#9ca3af]">|</span>{' '}
+                    <p className="mt-4 whitespace-nowrap text-[35.15px] font-black leading-tight tracking-[-0.03em] text-[var(--paper)] md:mt-2 md:text-[20px]">
+                      {getDistrictPrice(activeDistrict.group, 'limo')}€ <span className="text-[var(--muted)]">|</span>{' '}
+                      {getDistrictPrice(activeDistrict.group, 'kombi')}€ <span className="text-[var(--muted)]">|</span>{' '}
                       {getDistrictPrice(activeDistrict.group, 'van')}€
                     </p>
                   </div>
@@ -244,12 +244,12 @@ export default function DistrictMapPriceExplorer({
               ) : null}
             </svg>
           ) : shouldRenderMap ? (
-            <div className="absolute inset-0 flex items-center justify-center px-4 py-10 text-center text-sm text-[#6b7280]">
+            <div className="absolute inset-0 flex items-center justify-center px-4 py-10 text-center text-sm text-[var(--muted)]">
               Die Bezirkskarte konnte nicht geladen werden.
             </div>
           ) : (
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,#f4f7fb_0%,#eef3f9_100%)]">
-              <div className="absolute inset-x-[8%] top-[12%] h-[76%] rounded-[1.2rem] border border-[#dbe4f0] bg-white/60" />
+            <div className="absolute inset-0 bg-[var(--panel-2)]">
+              <div className="absolute inset-x-[8%] top-[12%] h-[76%] rounded-[1.2rem] border border-[var(--line)] bg-[rgba(255,255,255,.045)]" />
             </div>
           )}
         </div>
@@ -259,7 +259,7 @@ export default function DistrictMapPriceExplorer({
         <DistrictPriceTable activeId={activeId} onActiveIdChange={setActiveId} />
 
         <div className="pt-6">
-          <p className="px-2 text-[10px] leading-relaxed text-[#111111]">
+          <p className="px-2 text-[10px] leading-relaxed text-[var(--muted)]">
             Please note: The travel times shown on the map are estimates. The actual driving time may vary
             depending on traffic, time of day, and weather conditions. Please plan your departure time accordingly.
           </p>
