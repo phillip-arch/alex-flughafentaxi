@@ -147,6 +147,25 @@ h1 {
   font-weight: 900;
 }
 
+.servus-home-reference {
+  --font-sans: var(--font-reference-sans), "Segoe UI", Arial, sans-serif;
+  --font-display: "Archivo", var(--font-reference-sans), "Segoe UI", Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, monospace;
+}
+
+.servus-home-reference :where(h1, h2, h3) {
+  font-family: var(--font-display) !important;
+  font-stretch: normal;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+.servus-home-reference h1 {
+  font-family: var(--font-display) !important;
+  max-width: clamp(19.75rem, 37.1vw, 29.6875rem);
+  text-shadow: 0.012em 0 currentColor;
+}
+
 p {
   margin: 0;
 }

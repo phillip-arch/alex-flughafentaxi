@@ -1,4 +1,4 @@
-import { Archivo, IBM_Plex_Mono, Instrument_Sans } from 'next/font/google';
+import { Archivo, IBM_Plex_Mono, Instrument_Sans, Inter } from 'next/font/google';
 import { Metadata } from 'next';
 import { connection } from 'next/server';
 import FooterGate from '@/components/FooterGate';
@@ -28,6 +28,12 @@ const plexMono = IBM_Plex_Mono({
   display: 'optional',
   weight: ['400', '500', '600'],
   variable: '--font-mono',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'optional',
+  variable: '--font-reference-sans',
 });
 
 export const metadata: Metadata = {
@@ -72,7 +78,7 @@ export default async function RootLayout({
   const surface = getAppSurface();
 
   return (
-    <html lang="de" className={`${instrumentSans.variable} ${archivo.variable} ${plexMono.variable}`}>
+    <html lang="de" className={`${instrumentSans.variable} ${archivo.variable} ${plexMono.variable} ${inter.variable}`}>
       <head>
         <meta name="theme-color" content="#0A111F" />
         <link rel="icon" href={APP_PHONE_ICON_URL} type="image/jpeg" />
