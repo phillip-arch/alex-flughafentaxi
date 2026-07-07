@@ -20,16 +20,16 @@ export default async function ManageBookingPage({ searchParams }: ManagePageProp
     : ({ error: 'Kein Buchungslink angegeben. Bitte verwenden Sie den Link aus Ihrer Bestätigungs-E-Mail.' } as const);
 
   return (
-    <section className="min-h-screen bg-[var(--color-page-bg)]">
+    <section className="servus-page min-h-screen">
       <div className="app-container pt-[100px] pb-16 md:pt-[8rem]">
         <div className="mx-auto w-full max-w-[640px]">
           {'error' in result ? (
-            <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
-              <h1 className="text-xl font-semibold text-red-700">Buchung nicht gefunden</h1>
-              <p className="mt-2 text-sm text-red-600">{result.error}</p>
-              <p className="mt-4 text-sm text-slate-600">
+            <div className="servus-card p-6 text-center">
+              <h1 className="text-xl font-semibold text-[var(--red)]">Buchung nicht gefunden</h1>
+              <p className="mt-2 text-sm text-[var(--red)]">{result.error}</p>
+              <p className="mt-4 text-sm text-[var(--muted)]">
                 Fragen? Rufen Sie uns an:{' '}
-                <a href="tel:+436764826069" className="font-semibold text-blue-600">
+                <a href="tel:+436764826069" className="font-semibold text-[var(--amber)]">
                   +43 676 482 60 69
                 </a>
               </p>
