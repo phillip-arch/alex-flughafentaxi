@@ -2,11 +2,11 @@
 
 export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <section className="flex min-h-screen items-center justify-center bg-[var(--color-page-bg)] px-6">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">Fehler</p>
-        <h1 className="mt-2 text-2xl font-bold text-slate-900">Etwas ist schiefgelaufen</h1>
-        <p className="mt-3 text-sm text-slate-600">
+    <section className="servus-page flex min-h-screen items-center justify-center px-6">
+      <div className="servus-card w-full max-w-md p-8 text-center">
+        <p className="servus-eyebrow justify-center text-xs">Fehler</p>
+        <h1 className="mt-3 text-2xl font-bold text-[var(--paper)]">Etwas ist schiefgelaufen</h1>
+        <p className="mt-3 text-sm text-[var(--muted)]">
           Bitte versuchen Sie es erneut. Wenn das Problem bestehen bleibt, erreichen Sie uns jederzeit
           telefonisch oder per WhatsApp.
         </p>
@@ -14,13 +14,13 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
           <button
             type="button"
             onClick={() => reset()}
-            className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white"
+            className="rounded-xl bg-[var(--amber)] px-5 py-2.5 text-sm font-semibold text-[var(--night)]"
           >
             Erneut versuchen
           </button>
           <a
             href="tel:+436764826069"
-            className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700"
+            className="rounded-xl border border-[var(--line)] px-5 py-2.5 text-sm font-semibold text-[var(--paper)]"
           >
             Anrufen
           </a>
