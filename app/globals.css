@@ -978,3 +978,45 @@ p {
     transform: none !important;
   }
 }
+
+.servus-book-flow :where(input, textarea, select, button) {
+  font-family: var(--font-sans);
+}
+
+.servus-book-flow :where(input, textarea, select):focus-visible,
+.servus-book-flow :where(button, a):focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.servus-book-flow :where(.ui-input, input, textarea, select) {
+  border-color: var(--line);
+  background: rgba(0, 0, 0, .28);
+  color: var(--paper);
+}
+
+.servus-book-flow :where(.ui-input, input, textarea, select)::placeholder {
+  color: var(--muted);
+}
+
+.servus-book-flow :where(.ui-input, input, textarea, select):focus {
+  border-color: var(--amber);
+  background: rgba(0, 0, 0, .28);
+  box-shadow: none;
+}
+
+.servus-book-flow :where(.ui-button-booking-primary) {
+  background: var(--amber) !important;
+  color: var(--night) !important;
+  box-shadow: 0 6px 26px rgba(255, 182, 41, .30);
+}
+
+.servus-book-flow :where(.ui-button-booking-primary:hover) {
+  box-shadow: 0 12px 34px rgba(255, 182, 41, .45);
+}
+
+.servus-book-flow :where(.ui-card-surface-light) {
+  border-color: var(--line);
+  background: linear-gradient(160deg, var(--panel-2), var(--panel));
+  box-shadow: var(--shadow-xl);
+}

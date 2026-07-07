@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef } from 'react';
@@ -172,7 +172,7 @@ const EMPTY_ACCOUNT_DEFAULTS = {
 };
 const FAVORITE_ADDRESS_ICONS = [House, Building2, MapPin] as const;
 const DEFAULT_BASE_PRICE = 38;
-const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[#7fb3ff] focus:!bg-white focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
+const ADDRESS_FIELD_CLASS = `${BOOKING_FORM_INPUT_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal focus:!border-[var(--amber)] focus:!bg-[var(--panel)] focus:!shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)] md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const ADDRESS_FIELD_INVALID_CLASS = `${BOOKING_FORM_INPUT_INVALID_CLASS} !min-h-[2.8rem] !px-[0.6rem] !py-[0.6rem] !text-[18px] !font-semibold !tracking-[-0.03em] placeholder:!font-normal md:!min-h-[3rem] md:!px-[0.6rem] md:!py-[0.6rem]`;
 const FLIGHT_NUMBER_PATTERN = /^[A-Z0-9]{2,3}\d{1,4}[A-Z0-9]?$/;
 const TIME_VALUE_PATTERN = /^\d{2}:\d{2}$/;
@@ -1764,17 +1764,17 @@ const BookingForm = ({
   const actionButtonGroupClass = 'flex w-full items-center justify-center gap-3';
   const primaryActionButtonClass = 'ui-button-booking-primary';
   const secondaryBackButtonClass =
-    'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[#dbe7f8] bg-white text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[#c9dcfb] hover:bg-[#f8fbff] hover:text-[#0f6ae8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1679ff] focus-visible:ring-offset-2 md:h-[2.7rem] md:w-[2.7rem]';
+    'flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-[var(--line)] bg-[var(--panel)] text-[var(--amber)] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-all hover:border-[rgba(255,182,41,.35)] hover:bg-[rgba(255,255,255,.045)] hover:text-[var(--amber-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--amber)] focus-visible:ring-offset-2 md:h-[2.7rem] md:w-[2.7rem]';
 
   const BookingActionTrustLine = ({ alignWithPrimaryButton = false }: { alignWithPrimaryButton?: boolean }) => {
     const trustItems = (
       <>
         <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-          <Check size={15} className="text-[#10b981]" strokeWidth={2.6} />
+          <Check size={15} className="text-[var(--green)]" strokeWidth={2.6} />
           Fixed price
         </span>
         <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-          <Check size={15} className="text-[#10b981]" strokeWidth={2.6} />
+          <Check size={15} className="text-[var(--green)]" strokeWidth={2.6} />
           On-time pickup
         </span>
       </>
@@ -1783,7 +1783,7 @@ const BookingForm = ({
     if (alignWithPrimaryButton) {
       return (
         <div className="grid w-full min-w-0 grid-cols-[3.5rem_minmax(0,1fr)] gap-3 md:grid-cols-[2.8rem_minmax(0,1fr)]">
-          <div className="col-start-2 flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] font-semibold tracking-[-0.03em] text-[#4b5563] md:text-[13px]">
+          <div className="col-start-2 flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] font-semibold tracking-[-0.03em] text-[var(--muted)] md:text-[13px]">
             {trustItems}
           </div>
         </div>
@@ -1791,7 +1791,7 @@ const BookingForm = ({
     }
 
     return (
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] font-semibold tracking-[-0.03em] text-[#64748b] md:text-[14px]">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[12px] font-semibold tracking-[-0.03em] text-[var(--muted)] md:text-[14px]">
         {trustItems}
       </div>
     );
@@ -1806,12 +1806,12 @@ const BookingForm = ({
         aria-label={copy.stepLabel(currentStep)}
         aria-current="step"
       >
-        <p className="text-[13px] font-semibold tracking-[-0.02em] text-[#6b7280] md:text-[14px]">
+        <p className="text-[13px] font-semibold tracking-[-0.02em] text-[var(--muted)] md:text-[14px]">
           Step {currentStep} of 3
         </p>
-        <div className="mt-2 h-[5px] overflow-hidden rounded-full bg-[#E8EDF5]">
+        <div className="mt-2 h-[5px] overflow-hidden rounded-full bg-[rgba(255,255,255,.08)]">
           <div
-            className="h-full rounded-full bg-[#1679FF] transition-[width] duration-300 ease-out"
+            className="h-full rounded-full bg-[var(--amber)] transition-[width] duration-300 ease-out"
             style={{ width: progressWidth }}
           />
         </div>
@@ -1820,7 +1820,7 @@ const BookingForm = ({
   };
 
   const DirectionSelector = () => (
-    <div className="relative mx-auto grid h-[3.45rem] w-full min-w-0 grid-cols-2 overflow-hidden rounded-[1.1rem] border border-[#e7ebf1] bg-white p-0.5 md:h-[3.45rem] md:rounded-[1.1rem]">
+    <div className="relative mx-auto grid h-[3.45rem] w-full min-w-0 grid-cols-2 overflow-hidden rounded-[1.1rem] border border-[var(--line)] bg-[var(--panel)] p-0.5 md:h-[3.45rem] md:rounded-[1.1rem]">
       {[
         { value: 'to_airport' as Direction, label: 'To Airport' },
         { value: 'from_airport' as Direction, label: 'From Airport' },
@@ -1833,10 +1833,10 @@ const BookingForm = ({
             key={option.value}
             type="button"
             onClick={() => handleDirectionChange(option.value)}
-            className={`relative z-[1] flex min-w-0 items-center justify-center gap-2 rounded-[0.95rem] px-3 text-[15px] font-semibold tracking-[-0.02em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 md:px-4 md:text-[16px] ${
+            className={`relative z-[1] flex min-w-0 items-center justify-center gap-2 rounded-[0.95rem] px-3 text-[15px] font-semibold tracking-[-0.02em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--amber)] focus-visible:ring-offset-2 md:px-4 md:text-[16px] ${
               isActive
-                ? 'bg-[#1166d4] text-white'
-                : 'bg-white text-[#374151]'
+                ? 'bg-[var(--amber)] text-[var(--night)]'
+                : 'bg-[var(--panel)] text-[var(--paper)]'
             }`}
             aria-pressed={isActive}
           >
@@ -1855,21 +1855,21 @@ const BookingForm = ({
           <button
             type="button"
             onClick={() => setIsDatePickerOpen(true)}
-            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-white pl-2 pr-4 text-left outline-none transition-all md:h-[3.6rem] md:pl-3 md:rounded-[1rem] ${
+            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-[var(--panel)] pl-2 pr-4 text-left outline-none transition-all md:h-[3.6rem] md:pl-3 md:rounded-[1rem] ${
               isFieldInvalid('date')
-                ? 'border-[#d70015]'
-                : 'border-[#e4e6ea] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
+                ? 'border-[var(--red)]'
+                : 'border-[var(--line)] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
             }`}
           >
             <span className="flex min-w-0 items-center gap-1.5 md:gap-3">
-              <CalendarDays className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
+              <CalendarDays className="h-[18px] w-[18px] shrink-0 text-[var(--amber)]" strokeWidth={2.2} />
               <span className="min-w-0">
-                <span className={`block truncate text-[14px] font-semibold leading-none ${formData.date ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
+                <span className={`block truncate text-[14px] font-semibold leading-none ${formData.date ? 'text-[var(--paper)]' : 'text-[var(--muted)]'}`}>
                   {formData.date || 'Date'}
                 </span>
               </span>
             </span>
-            <ChevronDown className="h-[18px] w-[18px] shrink-0 text-[#6b7280]" strokeWidth={2.2} />
+            <ChevronDown className="h-[18px] w-[18px] shrink-0 text-[var(--muted)]" strokeWidth={2.2} />
           </button>
           <DatePicker
             isOpen={isDatePickerOpen}
@@ -1885,21 +1885,21 @@ const BookingForm = ({
           <button
             type="button"
             onClick={() => setIsTimePickerOpen(true)}
-            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-white pl-2 pr-4 text-left outline-none transition-all md:h-[3.6rem] md:pl-3 md:rounded-[1rem] ${
+            className={`ui-field-surface flex h-[3.8rem] w-full items-center justify-between rounded-[1.05rem] border bg-[var(--panel)] pl-2 pr-4 text-left outline-none transition-all md:h-[3.6rem] md:pl-3 md:rounded-[1rem] ${
               isFieldInvalid('time')
-                ? 'border-[#d70015]'
-                : 'border-[#e4e6ea] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
+                ? 'border-[var(--red)]'
+                : 'border-[var(--line)] shadow-[0_1px_0_rgba(255,255,255,0.55)]'
             }`}
           >
             <span className="flex min-w-0 items-center gap-1.5 md:gap-3">
-              <Clock3 className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />
+              <Clock3 className="h-[18px] w-[18px] shrink-0 text-[var(--amber)]" strokeWidth={2.2} />
               <span className="min-w-0">
-                <span className={`block truncate text-[14px] font-semibold leading-none ${formData.time ? 'text-[#111827]' : 'text-[#6b7280]'}`}>
+                <span className={`block truncate text-[14px] font-semibold leading-none ${formData.time ? 'text-[var(--paper)]' : 'text-[var(--muted)]'}`}>
                   {formData.time || 'Time'}
                 </span>
               </span>
             </span>
-            <ChevronDown className="h-[18px] w-[18px] shrink-0 text-[#6b7280]" strokeWidth={2.2} />
+            <ChevronDown className="h-[18px] w-[18px] shrink-0 text-[var(--muted)]" strokeWidth={2.2} />
           </button>
           <TimePicker
             isOpen={isTimePickerOpen}
@@ -1928,7 +1928,7 @@ const BookingForm = ({
           }`}
         >
         <div className={BOOKING_FIELD_STACK_CLASS}>
-          <p className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[#687384] md:text-[13px]">Flight number</p>
+          <p className="block pl-0 text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--muted)] md:text-[13px]">Flight number</p>
           <div className="w-full">
             <input
               type="text"
@@ -1938,7 +1938,7 @@ const BookingForm = ({
               onBlur={handleFlightNumberBlur}
               placeholder="e.g. OS 123"
               tabIndex={isFlightDetailsVisible ? undefined : -1}
-              className={`${getInputClassName('flightNumber')} !h-[3.35rem] !rounded-[1.05rem] ${isFieldInvalid('flightNumber') ? '' : '!border-[#e4e6ea] !bg-[#f9fafb]'} !px-5 !text-[14px] !font-semibold !tracking-normal !text-[#111827] placeholder:!text-[14px] placeholder:!text-[#6b7280] md:!h-[3.25rem] md:!rounded-[1rem] md:!px-5 md:!text-[14px]`}
+              className={`${getInputClassName('flightNumber')} !h-[3.35rem] !rounded-[1.05rem] ${isFieldInvalid('flightNumber') ? '' : '!border-[var(--line)] !bg-[rgba(0,0,0,.28)]'} !px-5 !text-[14px] !font-semibold !tracking-normal !text-[var(--paper)] placeholder:!text-[14px] placeholder:!text-[var(--muted)] md:!h-[3.25rem] md:!rounded-[1rem] md:!px-5 md:!text-[14px]`}
             />
           </div>
         </div>
@@ -1960,32 +1960,32 @@ const BookingForm = ({
       <div className="min-h-0 flex-1 space-y-4 md:space-y-3">
         {shouldShowStepOneRouteIntro && (
           <div className="text-center mb-6">
-            <h2 className="text-[15px] font-semibold text-[#111111] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
-            <p className="text-[12px] text-[#6d7075]">{copy.routeDescription}</p>
+            <h2 className="text-[15px] font-semibold text-[var(--paper)] leading-tight mb-2 tracking-[-0.04em]">{copy.routeTitle}</h2>
+            <p className="text-[12px] text-[var(--muted)]">{copy.routeDescription}</p>
           </div>
         )}
-        <div className="rounded-[2.2rem] bg-white pt-0 shadow-none">
+        <div className="rounded-[2.2rem] bg-[var(--panel)] pt-0 shadow-none">
           <div className="min-w-0">
             {DirectionSelector()}
             {routePreset ? (
-              <div className="mt-4 rounded-[1.05rem] border border-[#cfe0f5] bg-[#f4f8ff] px-4 py-3 text-left">
-                <p className="text-[0.78rem] font-bold uppercase tracking-[0.14em] text-[#1166d4]">
+              <div className="mt-4 rounded-[1.05rem] border border-[rgba(255,182,41,.35)] bg-[rgba(255,182,41,.10)] px-4 py-3 text-left">
+                <p className="text-[0.78rem] font-bold uppercase tracking-[0.14em] text-[var(--amber)]">
                   {routePreset.routeLabel}
                 </p>
-                <p className="mt-1 text-[0.86rem] leading-[1.45] text-[#4b5f78]">
+                <p className="mt-1 text-[0.86rem] leading-[1.45] text-[var(--muted)]">
                   We added this route to your booking notes. Enter the exact pickup or drop-off address below.
                 </p>
               </div>
             ) : null}
             <div className="mt-4 space-y-4 md:mt-4 md:space-y-4">
               <div>
-                <p style={{ marginBottom: '14px' }} className="text-[22px] font-semibold leading-[1.05] tracking-[-0.05em] text-[#111827] md:text-[1.75rem]">
+                <p style={{ marginBottom: '14px' }} className="text-[22px] font-semibold leading-[1.05] tracking-[-0.05em] text-[var(--paper)] md:text-[1.75rem]">
                   {addressPlaceholder}
                 </p>
-                <div className={`rounded-[1.05rem] border bg-white transition-shadow ${isFieldInvalid('street') || isFieldInvalid('zip') || unresolvedStreetWarning ? 'border-[#d70015]' : 'border-[#c8d3e0] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
+                <div className={`rounded-[1.05rem] border bg-[var(--panel)] transition-shadow ${isFieldInvalid('street') || isFieldInvalid('zip') || unresolvedStreetWarning ? 'border-[var(--red)]' : 'border-[var(--line)] shadow-[0_2px_8px_rgba(17,17,17,0.06),inset_0_1px_0_rgba(255,255,255,0.65)] hover:shadow-[0_2px_12px_rgba(17,17,17,0.1),inset_0_1px_0_rgba(255,255,255,0.65)]'}`}>
                   <GoogleAddressAutocomplete
                     value={streetInputValue}
-                    leadingIcon={<MapPin className="h-[18px] w-[18px] shrink-0 text-[#1679FF]" strokeWidth={2.2} />}
+                    leadingIcon={<MapPin className="h-[18px] w-[18px] shrink-0 text-[var(--amber)]" strokeWidth={2.2} />}
                     savedLocations={savedAddressLocations}
                     onChange={(value) => clearStreetSelection('street', value)}
                     onSelect={applyGoogleAddressSelection}
@@ -1995,22 +1995,22 @@ const BookingForm = ({
                     }}
                     onBlur={() => validateStreetNumber('street')}
                     placeholder={addressInputPlaceholder}
-                    className="h-[3.8rem] w-full border-0 bg-transparent px-4 py-0 text-[17px] font-medium tracking-[-0.02em] text-[#111111] outline-none placeholder:text-[#96a3b8] focus:outline-none md:h-[3.6rem] md:text-[18px]"
+                    className="h-[3.8rem] w-full border-0 bg-transparent px-4 py-0 text-[17px] font-medium tracking-[-0.02em] text-[var(--paper)] outline-none placeholder:text-[var(--muted)] focus:outline-none md:h-[3.6rem] md:text-[18px]"
                   />
                 </div>
                 {unresolvedStreetWarning && (
-                  <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[#d70015]">
+                  <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[var(--red)]">
                     Select an address from Google suggestions.
                   </p>
                 )}
                 {!unresolvedStreetWarning && streetNumberWarning === 'street' && (
-                  <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[#d70015]">
+                  <p className="mt-1.5 px-1 text-[0.8rem] font-medium text-[var(--red)]">
                     Add a house number to complete this address.
                   </p>
                 )}
               </div>
               <div>
-                <p style={{ marginBottom: '10px' }} className="text-[1.1rem] font-bold leading-[1.1] tracking-[-0.04em] text-[#111827] md:text-[1.1rem]">
+                <p style={{ marginBottom: '10px' }} className="text-[1.1rem] font-bold leading-[1.1] tracking-[-0.04em] text-[var(--paper)] md:text-[1.1rem]">
                   When do you need a ride?
                 </p>
                 {DateTimeFields()}
@@ -2021,7 +2021,7 @@ const BookingForm = ({
         </div>
       </div>
 
-      <div className="mt-2 flex shrink-0 flex-col items-center gap-2 bg-white md:mt-0 md:pt-3">
+      <div className="mt-2 flex shrink-0 flex-col items-center gap-2 bg-[var(--panel)] md:mt-0 md:pt-3">
         <div className="flex w-full items-center justify-center">
           <button
             type="button"
@@ -2093,7 +2093,7 @@ const BookingForm = ({
           type="button"
           aria-label="Information"
           onClick={() => setIsInfoPanelOpen(true)}
-          className={`absolute z-10 inline-flex items-center justify-center text-[#1679ff] transition-colors hover:text-[#0f6ae8] ${
+          className={`absolute z-10 inline-flex items-center justify-center text-[var(--amber)] transition-colors hover:text-[var(--amber-deep)] ${
             isAppSurface
               ? 'right-4 top-4 md:hidden'
               : 'right-3 top-3 md:hidden'
@@ -2110,7 +2110,7 @@ const BookingForm = ({
         <form onSubmit={handleSubmit} className={shouldLockDesktopFormHeight ? 'flex h-full flex-col' : undefined}>
           {headerTitle ? (
             <div className={titleHeaderClassName}>
-              <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[#111111] md:text-[18.2px] sm:text-left lg:pl-[6px]">
+              <p className="text-center text-[13px] font-black leading-[1.1] tracking-[-0.03em] text-[var(--paper)] md:text-[18.2px] sm:text-left lg:pl-[6px]">
                 {headerTitle}
               </p>
               {showStepIndicator ? <StepIndicator /> : null}
@@ -2139,28 +2139,28 @@ const BookingForm = ({
           className="pointer-events-none absolute inset-x-0 bottom-4 z-50 flex justify-center px-4"
         >
           <div
-            className={`pointer-events-auto flex max-w-[24rem] items-center gap-2.5 rounded-[0.9rem] border bg-white px-4 py-3 text-[13.5px] font-medium shadow-[0_8px_28px_rgba(17,17,17,0.13)] animate-in fade-in slide-in-from-bottom-3 duration-200 ${
+            className={`pointer-events-auto flex max-w-[24rem] items-center gap-2.5 rounded-[0.9rem] border bg-[var(--panel)] px-4 py-3 text-[13.5px] font-medium shadow-[0_8px_28px_rgba(17,17,17,0.13)] animate-in fade-in slide-in-from-bottom-3 duration-200 ${
               activeToastIsError
-                ? `border-[#ffd4d8] text-[#d70015] ${isLeadTimeErrorMessage(activeToastMessage) ? 'ui-error-notice-shake' : ''}`
-                : 'border-[#bdd4ff] text-[#1166d4]'
+                ? `border-[rgba(232,106,106,.35)] text-[var(--red)] ${isLeadTimeErrorMessage(activeToastMessage) ? 'ui-error-notice-shake' : ''}`
+                : 'border-[rgba(255,182,41,.35)] text-[var(--amber)]'
             }`}
           >
-            <span className={`block h-1.5 w-1.5 shrink-0 rounded-full ${activeToastIsError ? 'bg-[#d70015]' : 'bg-[#1166d4]'}`} />
+            <span className={`block h-1.5 w-1.5 shrink-0 rounded-full ${activeToastIsError ? 'bg-[var(--red)]' : 'bg-[var(--amber)]'}`} />
             <span>{activeToastMessage}</span>
           </div>
         </div>
       ) : null}
       {isInfoPanelOpen ? (
-        <div className="fixed inset-0 z-[140] bg-white/96 text-[#111827] backdrop-blur-sm md:bg-transparent md:backdrop-blur-0">
+        <div className="fixed inset-0 z-[140] bg-[rgba(10,17,31,.96)] text-[var(--paper)] backdrop-blur-sm md:bg-transparent md:backdrop-blur-0">
           <div className="flex h-[100dvh] md:min-h-full md:justify-end md:p-0">
-            <div className="h-[100dvh] w-full overflow-y-auto overscroll-contain animate-in slide-in-from-right-full duration-300 md:h-screen md:w-[46vw] md:min-w-[34rem] md:max-w-[48rem] md:slide-in-from-right-full md:border-l md:border-[#e8edf3] md:bg-white md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
+            <div className="h-[100dvh] w-full overflow-y-auto overscroll-contain animate-in slide-in-from-right-full duration-300 md:h-screen md:w-[46vw] md:min-w-[34rem] md:max-w-[48rem] md:slide-in-from-right-full md:border-l md:border-[var(--line)] md:bg-[var(--panel)] md:shadow-[-24px_0_60px_rgba(17,17,17,0.12)]">
               <div className="min-h-full px-6 pt-[24px] pb-8 md:px-8 md:py-8">
-              <div className="sticky top-0 z-10 -mx-6 bg-white/96 px-6 pb-4 pt-1 backdrop-blur-sm md:static md:mx-0 md:bg-transparent md:px-0 md:pb-6 md:pt-0 md:backdrop-blur-0">
+              <div className="sticky top-0 z-10 -mx-6 bg-[rgba(10,17,31,.96)] px-6 pb-4 pt-1 backdrop-blur-sm md:static md:mx-0 md:bg-transparent md:px-0 md:pb-6 md:pt-0 md:backdrop-blur-0">
                 <div className="flex items-start justify-between gap-3 md:items-center">
                   <button
                     type="button"
                     onClick={() => setIsInfoPanelOpen(false)}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827] md:hidden"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] text-[var(--paper)] md:hidden"
                     aria-label="Back"
                   >
                     <ChevronRight size={18} />
@@ -2168,7 +2168,7 @@ const BookingForm = ({
                   <button
                     type="button"
                     onClick={() => setIsInfoPanelOpen(false)}
-                    className="hidden md:inline-flex md:h-11 md:w-11 md:items-center md:justify-center md:rounded-full md:border md:border-[#e5e7eb] md:bg-white md:text-[#111827]"
+                    className="hidden md:inline-flex md:h-11 md:w-11 md:items-center md:justify-center md:rounded-full md:border md:border-[var(--line)] md:bg-[var(--panel)] md:text-[var(--paper)]"
                     aria-label="Close"
                   >
                     <X size={18} />

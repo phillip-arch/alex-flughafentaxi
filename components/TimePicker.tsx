@@ -291,7 +291,7 @@ export default function TimePicker({
   const panel = (
     <div
       ref={panelRef}
-      className={`overflow-hidden rounded-[1.1rem] border border-[#e6e1d7] bg-white shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-bottom-4 duration-200 md:slide-in-from-top-2 ${
+      className={`overflow-hidden rounded-[1.1rem] border border-[var(--line)] bg-[var(--panel)] shadow-[0_16px_34px_rgba(17,17,17,0.14)] animate-in fade-in slide-in-from-bottom-4 duration-200 md:slide-in-from-top-2 ${
         isInlineAnchored
           ? 'absolute left-0 top-[calc(100%+6px)] z-[70] w-full'
           : 'relative z-10 w-[min(22rem,calc(100vw-2rem))]'
@@ -307,7 +307,7 @@ export default function TimePicker({
             unavailableNoticePosition === 'bottom' ? 'bottom-3' : 'top-3'
           }`}
         >
-          <div className="rounded-[0.85rem] border border-[#edf1f6] bg-white/96 px-3 py-2 text-[0.8rem] font-medium leading-[1.35] text-[#6b7280] shadow-[0_8px_20px_rgba(17,17,17,0.06)] backdrop-blur-[1px]">
+          <div className="rounded-[0.85rem] border border-[var(--line)] bg-[rgba(10,17,31,.96)] px-3 py-2 text-[0.8rem] font-medium leading-[1.35] text-[var(--muted)] shadow-[0_8px_20px_rgba(17,17,17,0.06)] backdrop-blur-[1px]">
             Unavailable time due to the minimum booking notice.
           </div>
         </div>
@@ -331,10 +331,10 @@ export default function TimePicker({
                 data-time-unavailable={isAvailable ? undefined : 'true'}
                 className={`flex w-full items-center px-4 py-3 text-left text-[14px] font-medium tracking-[-0.03em] transition-colors md:text-[1.05rem] ${
                   isSelected
-                    ? 'text-[#111827]'
+                    ? 'text-[var(--paper)]'
                     : isAvailable
-                      ? 'text-[#1f2937] hover:bg-[#f8fafc]'
-                      : 'cursor-not-allowed text-[#c7cfdb]'
+                      ? 'text-[var(--paper)] hover:bg-[rgba(255,255,255,.06)]'
+                      : 'cursor-not-allowed text-[var(--muted)]'
                 }`}
               >
                 <span>{value}</span>
@@ -342,7 +342,7 @@ export default function TimePicker({
             );
           })
         ) : (
-          <div className="px-4 py-4 text-[0.95rem] font-medium text-[#7b8798]">
+          <div className="px-4 py-4 text-[0.95rem] font-medium text-[var(--muted)]">
             No times available for the selected date.
           </div>
         )}

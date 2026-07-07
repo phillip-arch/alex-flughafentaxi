@@ -22,12 +22,12 @@ const BOOKING_SHEET_OVERLAY_CLASS = `${BOOKING_OVERLAY_BACKDROP_CLASS} z-[9999] 
 const BOOKING_NOTE_SHEET_OVERLAY_CLASS = `${BOOKING_OVERLAY_BACKDROP_CLASS} z-[10000] flex items-end px-0 md:items-center md:justify-center md:px-4`;
 const BOOKING_SHEET_CLOSE_BUTTON_CLASS = 'absolute inset-0 h-full w-full cursor-default';
 const BOOKING_SHEET_PANEL_CLASS =
-  'relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]';
+  'relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-[var(--panel)] px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[34rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]';
 const BOOKING_NOTE_SHEET_PANEL_CLASS =
-  'relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-white px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[32rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]';
-const BOOKING_SHEET_HANDLE_CLASS = 'mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#d9dee7] md:hidden';
+  'relative w-full animate-in slide-in-from-bottom-8 duration-200 rounded-t-[1.5rem] bg-[var(--panel)] px-5 pb-6 pt-4 shadow-[0_-20px_60px_rgba(17,17,17,0.2)] md:max-w-[32rem] md:rounded-[1.5rem] md:px-6 md:py-6 md:shadow-[0_24px_80px_rgba(17,17,17,0.22)]';
+const BOOKING_SHEET_HANDLE_CLASS = 'mx-auto mb-4 h-1.5 w-12 rounded-full bg-[var(--line)] md:hidden';
 const BOOKING_SHEET_ACTION_BUTTON_CLASS =
-  'mt-5 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[#1679FF] text-[1rem] font-semibold text-white transition-colors hover:bg-[#0f6ae8]';
+  'mt-5 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[var(--amber)] text-[1rem] font-semibold text-[var(--night)] transition-colors hover:bg-[var(--amber-deep)]';
 
 function BookingBottomSheet({
   ariaLabel,
@@ -257,19 +257,19 @@ export default function BookingStepTwo({
     const isAtMax = numericValue !== null && numericValue >= max;
 
     return (
-      <div className="flex items-center justify-between gap-4 rounded-[1.1rem] border border-[#e4e8ef] bg-[#f8fbff] px-4 py-4">
+      <div className="flex items-center justify-between gap-4 rounded-[1.1rem] border border-[var(--line)] bg-[rgba(255,255,255,.045)] px-4 py-4">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[#1679FF] shadow-[0_8px_18px_rgba(17,17,17,0.06)]">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--panel)] text-[var(--amber)] shadow-[0_8px_18px_rgba(17,17,17,0.06)]">
             <Icon size={19} />
           </span>
-          <p className="text-[1rem] font-semibold tracking-[-0.03em] text-[#111827]">{label}</p>
+          <p className="text-[1rem] font-semibold tracking-[-0.03em] text-[var(--paper)]">{label}</p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <button
             type="button"
             onClick={() => handleStepperAdjust(name, -1, min, max)}
             disabled={isAtMin}
-            className={`flex h-12 w-12 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-[#f3f4f6] disabled:text-[#b6bcc6] disabled:hover:bg-[#f3f4f6] ${pressedButtonKey === `${name}:-1` ? 'ui-counter-button-pulse' : ''}`}
+            className={`flex h-12 w-12 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] text-[var(--paper)] transition-colors hover:bg-[rgba(255,182,41,.12)] disabled:cursor-not-allowed disabled:border-[var(--line)] disabled:bg-[rgba(255,255,255,.06)] disabled:text-[var(--muted)] disabled:hover:bg-[rgba(255,255,255,.06)] ${pressedButtonKey === `${name}:-1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Decrease ${label}`}
           >
             <Minus size={20} />
@@ -277,13 +277,13 @@ export default function BookingStepTwo({
           <RollingCounter
             value={value}
             prefersReducedMotion={prefersReducedMotion}
-            className="min-w-[2.4rem] text-center text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]"
+            className="min-w-[2.4rem] text-center text-[1.45rem] font-semibold tracking-[-0.04em] text-[var(--paper)]"
           />
           <button
             type="button"
             onClick={() => handleStepperAdjust(name, 1, min, max)}
             disabled={isAtMax}
-            className={`flex h-12 w-12 items-center justify-center rounded-full bg-[#1679FF] text-white transition-colors hover:bg-[#0f6ae8] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] ${pressedButtonKey === `${name}:1` ? 'ui-counter-button-pulse' : ''}`}
+            className={`flex h-12 w-12 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--night)] transition-colors hover:bg-[var(--amber-deep)] disabled:cursor-not-allowed disabled:bg-[var(--line)] disabled:hover:bg-[var(--line)] ${pressedButtonKey === `${name}:1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Increase ${label}`}
           >
             <Plus size={20} />
@@ -308,10 +308,10 @@ export default function BookingStepTwo({
     return (
       <div className="flex min-h-[4.9rem] items-center justify-between gap-4 px-4 py-3 md:min-h-[3.8rem] md:px-4 md:py-2">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="shrink-0 text-[#1679FF]">
+          <span className="shrink-0 text-[var(--amber)]">
             <Icon size={18} />
           </span>
-          <p className="truncate text-[1.02rem] font-semibold leading-tight tracking-[-0.03em] text-[#111827]">
+          <p className="truncate text-[1.02rem] font-semibold leading-tight tracking-[-0.03em] text-[var(--paper)]">
             {label}
           </p>
         </div>
@@ -320,7 +320,7 @@ export default function BookingStepTwo({
             type="button"
             onClick={() => handleStepperAdjust(name, -1, min, max)}
             disabled={isAtMin}
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:border-[#e5e7eb] disabled:bg-white disabled:text-[#c3cad5] disabled:hover:bg-white ${pressedButtonKey === `${name}:-1` ? 'ui-counter-button-pulse' : ''}`}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] text-[var(--paper)] transition-colors hover:bg-[rgba(255,182,41,.12)] disabled:cursor-not-allowed disabled:border-[var(--line)] disabled:bg-[var(--panel)] disabled:text-[var(--muted)] disabled:hover:bg-[var(--panel)] ${pressedButtonKey === `${name}:-1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Decrease ${label}`}
           >
             <Minus size={18} />
@@ -328,13 +328,13 @@ export default function BookingStepTwo({
           <RollingCounter
             value={value}
             prefersReducedMotion={prefersReducedMotion}
-            className="min-w-[1.7rem] text-center text-[1.15rem] font-semibold leading-none tracking-[-0.04em] text-[#111827]"
+            className="min-w-[1.7rem] text-center text-[1.15rem] font-semibold leading-none tracking-[-0.04em] text-[var(--paper)]"
           />
           <button
             type="button"
             onClick={() => handleStepperAdjust(name, 1, min, max)}
             disabled={isAtMax}
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1679FF] text-white transition-colors hover:bg-[#0f6ae8] disabled:cursor-not-allowed disabled:bg-[#d1d5db] disabled:hover:bg-[#d1d5db] ${pressedButtonKey === `${name}:1` ? 'ui-counter-button-pulse' : ''}`}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--night)] transition-colors hover:bg-[var(--amber-deep)] disabled:cursor-not-allowed disabled:bg-[var(--line)] disabled:hover:bg-[var(--line)] ${pressedButtonKey === `${name}:1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Increase ${label}`}
           >
             <Plus size={18} />
@@ -361,16 +361,16 @@ export default function BookingStepTwo({
     return (
       <div className={`grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center justify-between gap-3 px-4 ${isLarger ? 'py-2.5' : 'py-3.5'}`}>
         <div className="flex min-w-0 items-center gap-3">
-          <span className="shrink-0 text-[#1679FF]">
+          <span className="shrink-0 text-[var(--amber)]">
             <Icon size={isLarger ? 20 : 18} />
           </span>
           <div className="min-w-0">
             {options?.labelSup ? (
-              <span className="block text-[0.7rem] font-semibold uppercase tracking-[0.07em] text-[#6b7280]">{options.labelSup}</span>
+              <span className="block text-[0.7rem] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{options.labelSup}</span>
             ) : null}
-            <span className={`block font-semibold leading-tight tracking-[-0.03em] text-[#111827] ${isLarger ? 'text-[1.08rem]' : 'text-[1rem]'}`}>{label}</span>
+            <span className={`block font-semibold leading-tight tracking-[-0.03em] text-[var(--paper)] ${isLarger ? 'text-[1.08rem]' : 'text-[1rem]'}`}>{label}</span>
             {options?.labelSub ? (
-              <span className="mt-0.5 block text-[0.78rem] font-medium leading-none text-[#6b7280]">{options.labelSub}</span>
+              <span className="mt-0.5 block text-[0.78rem] font-medium leading-none text-[var(--muted)]">{options.labelSub}</span>
             ) : null}
           </div>
         </div>
@@ -379,7 +379,7 @@ export default function BookingStepTwo({
             type="button"
             onClick={() => handleStepperAdjust(name, -1, min, max)}
             disabled={isAtMin}
-            className={`flex h-9 w-9 items-center justify-center rounded-full border border-[#dbe7f8] bg-white text-[#111827] transition-colors hover:bg-[#eef5ff] disabled:cursor-not-allowed disabled:text-[#c3cad5] ${pressedButtonKey === `${name}:-1` ? 'ui-counter-button-pulse' : ''}`}
+            className={`flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] text-[var(--paper)] transition-colors hover:bg-[rgba(255,182,41,.12)] disabled:cursor-not-allowed disabled:text-[var(--muted)] ${pressedButtonKey === `${name}:-1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Decrease ${label}`}
           >
             <Minus size={17} />
@@ -387,13 +387,13 @@ export default function BookingStepTwo({
           <RollingCounter
             value={value}
             prefersReducedMotion={prefersReducedMotion}
-            className={`text-center font-semibold leading-none tracking-[-0.04em] text-[#111827] ${isLarger ? 'text-[1.25rem]' : 'text-[1.1rem]'}`}
+            className={`text-center font-semibold leading-none tracking-[-0.04em] text-[var(--paper)] ${isLarger ? 'text-[1.25rem]' : 'text-[1.1rem]'}`}
           />
           <button
             type="button"
             onClick={() => handleStepperAdjust(name, 1, min, max)}
             disabled={isAtMax}
-            className={`flex h-9 w-9 items-center justify-center rounded-full bg-[#1679FF] text-white transition-colors hover:bg-[#0f6ae8] disabled:cursor-not-allowed disabled:bg-[#d1d5db] ${pressedButtonKey === `${name}:1` ? 'ui-counter-button-pulse' : ''}`}
+            className={`flex h-9 w-9 items-center justify-center rounded-full bg-[var(--amber)] text-[var(--night)] transition-colors hover:bg-[var(--amber-deep)] disabled:cursor-not-allowed disabled:bg-[var(--line)] ${pressedButtonKey === `${name}:1` ? 'ui-counter-button-pulse' : ''}`}
             aria-label={`Increase ${label}`}
           >
             <Plus size={17} />
@@ -406,13 +406,13 @@ export default function BookingStepTwo({
   const renderSheetHeader = (title: string, description: string, onClose: () => void) => (
     <div className="mb-8 flex items-start justify-between gap-4">
       <div>
-        <h3 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-[#111827]">{title}</h3>
-        <p className="mt-1 text-[0.92rem] text-[#6d7075]">{description}</p>
+        <h3 className="text-[1.35rem] font-semibold tracking-[-0.04em] text-[var(--paper)]">{title}</h3>
+        <p className="mt-1 text-[0.92rem] text-[var(--muted)]">{description}</p>
       </div>
       <button
         type="button"
         onClick={onClose}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#e4e8ef] bg-white text-[#111827]"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] text-[var(--paper)]"
         aria-label="Close"
       >
         <X size={18} />
@@ -477,7 +477,7 @@ export default function BookingStepTwo({
   const childSeatSummary = childSeatTotal > 0 ? `${childSeatTotal} child seat${childSeatTotal !== 1 ? 's' : ''}` : null;
 
   const renderMeetAndGreetAndOptional = () => (
-    <div className="overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white">
+    <div className="overflow-hidden rounded-[1.15rem] border border-[var(--line)] bg-[var(--panel)]">
       {canUseMeetAndGreet ? (
         <>
           <button
@@ -487,30 +487,30 @@ export default function BookingStepTwo({
             aria-pressed={Boolean(formData.meetAndGreet)}
           >
             <span>
-              <p className="text-[0.78rem] font-bold uppercase tracking-[0.08em] text-[#687384]">Meet &amp; Greet <span className="text-[1rem] text-[#1679FF]">+6€</span></p>
-              <span className="mt-0.5 block text-[0.88rem] font-medium leading-snug text-[#5f6975]">
+              <p className="text-[0.78rem] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Meet &amp; Greet <span className="text-[1rem] text-[var(--amber)]">+6€</span></p>
+              <span className="mt-0.5 block text-[0.88rem] font-medium leading-snug text-[var(--muted)]">
                 Driver waits in arrivals<br className="md:hidden" /> with a name sign
               </span>
             </span>
             <span
               className={`relative h-[2rem] w-[3.25rem] shrink-0 rounded-full transition-colors ${
-                formData.meetAndGreet ? 'bg-[#1679FF]' : 'bg-[#e9edf3]'
+                formData.meetAndGreet ? 'bg-[var(--amber)]' : 'bg-[var(--line)]'
               }`}
             >
               <span
-                className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-white transition-transform ${
+                className={`absolute left-1 top-1/2 h-[1.55rem] w-[1.55rem] -translate-y-1/2 rounded-full bg-[var(--panel)] transition-transform ${
                   formData.meetAndGreet ? 'translate-x-[1.2rem]' : 'translate-x-0'
                 }`}
               />
             </span>
           </button>
-          <div className="border-t border-[#e8eef7]" />
+          <div className="border-t border-[var(--line)]" />
         </>
       ) : null}
-      <div className="grid grid-cols-1 divide-y divide-[#e8eef7] md:grid-cols-2 md:divide-x md:divide-y-0">
+      <div className="grid grid-cols-1 divide-y divide-[var(--line)] md:grid-cols-2 md:divide-x md:divide-y-0">
         <div className="flex w-full items-center justify-between gap-4 px-4 py-3">
           <div className="min-w-0">
-            <p className={`mt-0.5 truncate text-[0.88rem] font-medium ${hasDriverNote ? 'text-[#1679FF]' : 'text-[#9ca3af]'}`}>
+            <p className={`mt-0.5 truncate text-[0.88rem] font-medium ${hasDriverNote ? 'text-[var(--amber)]' : 'text-[var(--muted)]'}`}>
               {hasDriverNote ? 'Note added' : 'Note for driver'}
             </p>
           </div>
@@ -519,14 +519,14 @@ export default function BookingStepTwo({
             onClick={() => setIsNoteSheetOpen(true)}
             aria-haspopup="dialog"
             aria-expanded={isNoteSheetOpen}
-            className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.45rem] bg-[#eef5ff] px-3 text-[0.8rem] font-semibold text-[#1679FF] transition-colors hover:bg-[#ddeeff]"
+            className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.45rem] bg-[rgba(255,182,41,.12)] px-3 text-[0.8rem] font-semibold text-[var(--amber)] transition-colors hover:bg-[rgba(255,182,41,.14)]"
           >
             {hasDriverNote ? 'Edit' : '+ Add'}
           </button>
         </div>
         <div className="flex w-full items-center justify-between gap-4 px-4 py-3">
           <div className="min-w-0">
-            <p className={`mt-0.5 truncate text-[0.88rem] font-medium ${childSeatSummary ? 'text-[#1679FF]' : 'text-[#9ca3af]'}`}>
+            <p className={`mt-0.5 truncate text-[0.88rem] font-medium ${childSeatSummary ? 'text-[var(--amber)]' : 'text-[var(--muted)]'}`}>
               {childSeatSummary || 'Free child seats'}
             </p>
           </div>
@@ -535,7 +535,7 @@ export default function BookingStepTwo({
             onClick={() => setIsOptionalSheetOpen(true)}
             aria-haspopup="dialog"
             aria-expanded={isOptionalSheetOpen}
-            className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.45rem] bg-[#eef5ff] px-3 text-[0.8rem] font-semibold text-[#1679FF] transition-colors hover:bg-[#ddeeff]"
+            className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.45rem] bg-[rgba(255,182,41,.12)] px-3 text-[0.8rem] font-semibold text-[var(--amber)] transition-colors hover:bg-[rgba(255,182,41,.14)]"
           >
             {childSeatSummary ? 'Edit' : '+ Add'}
           </button>
@@ -548,8 +548,8 @@ export default function BookingStepTwo({
     <div className="w-full min-w-0 max-w-full overflow-x-clip space-y-2">
       {inlineVehicleCard ? (
         <div
-          className={`relative grid min-h-[6.55rem] min-w-0 w-full max-w-full grid-cols-[9.8rem_auto] grid-rows-[auto_auto] items-start justify-between gap-x-3 gap-y-1.5 overflow-hidden rounded-[1.15rem] border bg-white px-4 py-1.5 md:min-h-[4.6rem] md:grid-cols-[9rem_minmax(0,1fr)_6.5rem] md:grid-rows-none md:items-center md:justify-normal md:gap-3 md:px-4 md:py-0 ${
-            travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
+          className={`relative grid min-h-[6.55rem] min-w-0 w-full max-w-full grid-cols-[9.8rem_auto] grid-rows-[auto_auto] items-start justify-between gap-x-3 gap-y-1.5 overflow-hidden rounded-[1.15rem] border bg-[var(--panel)] px-4 py-1.5 md:min-h-[4.6rem] md:grid-cols-[9rem_minmax(0,1fr)_6.5rem] md:grid-rows-none md:items-center md:justify-normal md:gap-3 md:px-4 md:py-0 ${
+            travelSummaryInvalid ? 'border-[var(--red)]' : 'border-[var(--line)]'
           }`}
         >
           <div className="relative row-span-2 h-[5.9rem] w-[9.8rem] shrink-0 self-center overflow-hidden md:row-span-1 md:h-[5.8rem] md:w-full md:max-w-[9rem]">
@@ -562,48 +562,48 @@ export default function BookingStepTwo({
             />
           </div>
           <div className="col-start-2 row-start-2 hidden min-w-0 px-0 text-right md:col-start-auto md:row-start-auto md:block md:px-2 md:text-center">
-            <p className="overflow-hidden text-[14px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975] md:overflow-visible md:text-[0.88rem] md:tracking-normal">
+            <p className="overflow-hidden text-[14px] font-medium leading-snug tracking-[-0.02em] text-[var(--muted)] md:overflow-visible md:text-[0.88rem] md:tracking-normal">
               <span className="flex items-center justify-end gap-2 whitespace-nowrap md:justify-center">
-                <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[#5f6975]">Max.</span>
+                <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[var(--muted)]">Max.</span>
                 <span className="whitespace-nowrap">{inlineVehicleCard.maxPassengers}</span>
-                <Users size={15} className="shrink-0 text-[#1679FF]" />
+                <Users size={15} className="shrink-0 text-[var(--amber)]" />
                 <span className="whitespace-nowrap">{inlineVehicleCard.maxSuitcases}</span>
-                <Briefcase size={15} className="shrink-0 text-[#1679FF]" />
+                <Briefcase size={15} className="shrink-0 text-[var(--amber)]" />
               </span>
             </p>
           </div>
           <div className="absolute right-4 top-4 flex w-[8.4rem] flex-col items-end text-right md:static md:col-start-auto md:row-span-1 md:row-start-auto md:block md:w-full md:max-w-[6.5rem] md:justify-self-end">
-            <p className="truncate whitespace-nowrap text-[1.02rem] font-medium leading-tight tracking-[-0.02em] text-[#1679FF] md:text-[0.98rem]">
+            <p className="truncate whitespace-nowrap text-[1.02rem] font-medium leading-tight tracking-[-0.02em] text-[var(--amber)] md:text-[0.98rem]">
               {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
             </p>
-            <p className="mt-1.5 whitespace-nowrap text-right text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827] md:text-[2rem]">
+            <p className="mt-1.5 whitespace-nowrap text-right text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[var(--paper)] md:text-[2rem]">
               {renderPrice(inlineVehiclePrice)}
             </p>
           </div>
           <div className="absolute bottom-3 right-4 md:hidden">
-            <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[14px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-              <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[#5f6975]">Max.</span>
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[14px] font-medium leading-snug tracking-[-0.02em] text-[var(--muted)]">
+              <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[var(--muted)]">Max.</span>
               <span className="whitespace-nowrap">{inlineVehicleCard.maxPassengers}</span>
-              <Users size={15} className="shrink-0 text-[#1679FF]" />
+              <Users size={15} className="shrink-0 text-[var(--amber)]" />
               <span className="whitespace-nowrap">{inlineVehicleCard.maxSuitcases}</span>
-              <Briefcase size={15} className="shrink-0 text-[#1679FF]" />
+              <Briefcase size={15} className="shrink-0 text-[var(--amber)]" />
             </span>
           </div>
         </div>
       ) : null}
-      <div className="overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white">
+      <div className="overflow-hidden rounded-[1.15rem] border border-[var(--line)] bg-[var(--panel)]">
         {renderInlineTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
-        <div className="border-t border-[#e8eef7]" />
+        <div className="border-t border-[var(--line)]" />
         {renderInlineTravelStepper('luggage', 'Check-in luggage', formData.luggage, 0, 8, Briefcase)}
-        <div className="border-t border-[#e8eef7]" />
+        <div className="border-t border-[var(--line)]" />
       </div>
     </div>
   );
 
   const renderErrorNotice = () =>
     error ? (
-      <div className="mt-4 flex items-center gap-2 rounded-xl border border-[#ffd4d8] bg-[#fff2f4] p-3 text-[14px] font-medium text-[#d70015]">
-        <span className="block h-1.5 w-1.5 rounded-full bg-[#d70015]" />
+      <div className="mt-4 flex items-center gap-2 rounded-xl border border-[rgba(232,106,106,.35)] bg-[rgba(232,106,106,.10)] p-3 text-[14px] font-medium text-[var(--red)]">
+        <span className="block h-1.5 w-1.5 rounded-full bg-[var(--red)]" />
         {error}
       </div>
     ) : null;
@@ -613,11 +613,11 @@ export default function BookingStepTwo({
       <div className="min-h-0 flex-1 space-y-2">
         {inlineVehicleCard ? (
           <div
-            className={`grid min-w-0 grid-cols-[7rem_minmax(0,1fr)] gap-3 rounded-[1.15rem] border bg-white px-3 py-1.5 ${
-              travelSummaryInvalid ? 'border-[#d70015]' : 'border-[#dbe7f8]'
+            className={`grid min-w-0 grid-cols-[7rem_minmax(0,1fr)] gap-3 rounded-[1.15rem] border bg-[var(--panel)] px-3 py-1.5 ${
+              travelSummaryInvalid ? 'border-[var(--red)]' : 'border-[var(--line)]'
             }`}
           >
-            <div className="relative h-[5.3rem] min-w-0 overflow-hidden rounded-[0.85rem] bg-white">
+            <div className="relative h-[5.3rem] min-w-0 overflow-hidden rounded-[0.85rem] bg-[var(--panel)]">
               <Image
                 src={inlineVehicleCard.imageSrc}
                 alt={inlineVehicleCard.imageAlt}
@@ -627,28 +627,28 @@ export default function BookingStepTwo({
               />
             </div>
             <div className="flex min-w-0 flex-col items-end justify-center gap-1.5 text-right">
-              <p className="max-w-full truncate text-[0.98rem] font-medium leading-tight tracking-[-0.02em] text-[#1679FF]">
+              <p className="max-w-full truncate text-[0.98rem] font-medium leading-tight tracking-[-0.02em] text-[var(--amber)]">
                 {formatVehicleTypeLabel(inlineVehicleCard.vehicleType)}
               </p>
-              <p className="text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
+              <p className="text-[2rem] font-semibold leading-none tracking-[-0.05em] text-[var(--paper)]">
                 {renderPrice(inlineVehiclePrice)}
               </p>
-              <span className="inline-flex items-center gap-2 whitespace-nowrap text-[13px] font-medium leading-snug tracking-[-0.02em] text-[#5f6975]">
-                <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[#5f6975]">Max.</span>
+              <span className="inline-flex items-center gap-2 whitespace-nowrap text-[13px] font-medium leading-snug tracking-[-0.02em] text-[var(--muted)]">
+                <span className="shrink-0 text-[0.9em] font-semibold uppercase tracking-[0.04em] text-[var(--muted)]">Max.</span>
                 <span className="whitespace-nowrap">{inlineVehicleCard.maxPassengers}</span>
-                <Users size={14} className="shrink-0 text-[#1679FF]" />
+                <Users size={14} className="shrink-0 text-[var(--amber)]" />
                 <span className="whitespace-nowrap">{inlineVehicleCard.maxSuitcases}</span>
-                <Briefcase size={14} className="shrink-0 text-[#1679FF]" />
+                <Briefcase size={14} className="shrink-0 text-[var(--amber)]" />
               </span>
             </div>
           </div>
         ) : null}
 
-        <div className="overflow-hidden rounded-[1.15rem] border border-[#dbe7f8] bg-white">
+        <div className="overflow-hidden rounded-[1.15rem] border border-[var(--line)] bg-[var(--panel)]">
           {renderScratchTravelStepper('passengers', 'Passengers', formData.passengers, 1, 8, Users)}
-          <div className="border-t border-[#e8eef7]" />
+          <div className="border-t border-[var(--line)]" />
           {renderScratchTravelStepper('luggage', 'Luggage', formData.luggage, 0, 8, Briefcase, { labelSup: 'Check-in', larger: true })}
-          <div className="border-t border-[#e8eef7]" />
+          <div className="border-t border-[var(--line)]" />
         </div>
 
         {renderMeetAndGreetAndOptional()}
@@ -682,21 +682,21 @@ export default function BookingStepTwo({
         return (
           <div
             key={card.vehicleType}
-            className={`relative h-[6.55rem] rounded-[0.95rem] border bg-[#f8fbff] px-4 py-4 shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-colors md:h-[8.5rem] ${
+            className={`relative h-[6.55rem] rounded-[0.95rem] border bg-[rgba(255,255,255,.045)] px-4 py-4 shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-colors md:h-[8.5rem] ${
               isUnavailable
-                ? 'border-[#e5e7eb] bg-[#f3f4f6] opacity-60'
+                ? 'border-[var(--line)] bg-[rgba(255,255,255,.06)] opacity-60'
                 : travelSummaryInvalid && isSelected
-                  ? 'border-[#d70015]'
+                  ? 'border-[var(--red)]'
                   : isSelected
-                    ? 'border-[#1679FF]'
-                    : 'border-[#dbe7f8]'
+                    ? 'border-[var(--amber)]'
+                    : 'border-[var(--line)]'
             }`}
           >
             <button
               type="button"
               onClick={() => openTravelSheet(card.vehicleType)}
               disabled={isUnavailable}
-              className="flex h-full w-full items-center gap-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7fb3ff] focus-visible:ring-offset-2 disabled:cursor-not-allowed"
+              className="flex h-full w-full items-center gap-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--amber)] focus-visible:ring-offset-2 disabled:cursor-not-allowed"
               aria-label={`Edit passengers and luggage for ${formatVehicleTypeLabel(card.vehicleType)}`}
             >
               <div className="relative h-[4.55rem] w-[6.37rem] shrink-0 overflow-hidden md:h-[6.5rem] md:w-[9.1rem]">
@@ -708,7 +708,7 @@ export default function BookingStepTwo({
                   sizes="(min-width: 768px) 146px, 102px"
                 />
                 {isUnavailable ? (
-                  <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-[0.45rem] bg-white/90 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-[#6b7280] shadow-[0_4px_10px_rgba(17,17,17,0.08)] md:text-[0.72rem]">
+                  <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-[0.45rem] bg-[var(--panel)]/90 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] shadow-[0_4px_10px_rgba(17,17,17,0.08)] md:text-[0.72rem]">
                     Too Small
                   </span>
                 ) : null}
@@ -716,12 +716,12 @@ export default function BookingStepTwo({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[1.1rem] font-semibold leading-tight tracking-[-0.03em] text-[#1679FF]">
+                    <p className="text-[1.1rem] font-semibold leading-tight tracking-[-0.03em] text-[var(--amber)]">
                       {formatVehicleTypeLabel(card.vehicleType)}
                     </p>
                     <div className="mt-1 flex min-h-[3rem] flex-col justify-start">
                       {isSelected ? (
-                        <div className="flex items-center gap-3 text-[0.9rem] font-semibold text-[#1f2937]">
+                        <div className="flex items-center gap-3 text-[0.9rem] font-semibold text-[var(--paper)]">
                           <span className="inline-flex items-center gap-1">
                             <Users size={17} className="ui-icon-accent" />
                             {passengerValue}
@@ -732,7 +732,7 @@ export default function BookingStepTwo({
                           </span>
                         </div>
                       ) : (
-                        <p className="mt-1 text-[0.86rem] font-medium leading-snug text-[#5f6975]">
+                        <p className="mt-1 text-[0.86rem] font-medium leading-snug text-[var(--muted)]">
                           <span className="block whitespace-nowrap">Max. {card.maxPassengers} passengers</span>
                           <span className="block whitespace-nowrap">{card.maxSuitcases} check-in luggage</span>
                         </p>
@@ -740,7 +740,7 @@ export default function BookingStepTwo({
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
-                    <p className="text-right text-[1.35rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
+                    <p className="text-right text-[1.35rem] font-semibold leading-none tracking-[-0.05em] text-[var(--paper)]">
                       {renderPrice(price)}
                     </p>
                   </div>
@@ -763,7 +763,7 @@ export default function BookingStepTwo({
           >
               {renderSheetHeader('Passengers and luggage', 'Adjust each item before continuing.', () => setIsTravelSheetOpen(false))}
               {currentVehicleCard ? (
-                <div className="mb-4 flex items-center justify-between gap-3 rounded-[1rem] border border-[#dbe7f8] bg-[#f8fbff] px-4 py-2.5">
+                <div className="mb-4 flex items-center justify-between gap-3 rounded-[1rem] border border-[var(--line)] bg-[rgba(255,255,255,.045)] px-4 py-2.5">
                   <div className="relative h-[4.1rem] w-[6rem] shrink-0 overflow-visible md:h-[5rem] md:w-[7.5rem]">
                     <Image
                       src={currentVehicleCard.imageSrc}
@@ -774,18 +774,18 @@ export default function BookingStepTwo({
                     />
                   </div>
                   <div className="min-w-0 flex-1 text-right">
-                    <p className="truncate text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[#1679FF]">
+                    <p className="truncate text-[1rem] font-semibold leading-tight tracking-[-0.03em] text-[var(--amber)]">
                       {formatVehicleTypeLabel(currentVehicleCard.vehicleType)}
                     </p>
-                    <p className="mt-1 text-[1.25rem] font-semibold leading-none tracking-[-0.05em] text-[#111827]">
+                    <p className="mt-1 text-[1.25rem] font-semibold leading-none tracking-[-0.05em] text-[var(--paper)]">
                       {renderPrice(currentVehiclePrice)}
                     </p>
                   </div>
                 </div>
               ) : null}
               {shouldShowTravelUpsell && nextVehicleType ? (
-                <div className="mb-4 flex items-center justify-between gap-3 rounded-[1rem] border border-[#b8efc9] bg-[#f2fff5] px-4 py-3">
-                  <p className="text-[0.95rem] font-semibold leading-tight tracking-[-0.03em] text-[#145b2f]">
+                <div className="mb-4 flex items-center justify-between gap-3 rounded-[1rem] border border-[rgba(62,207,142,.35)] bg-[rgba(62,207,142,.12)] px-4 py-3">
+                  <p className="text-[0.95rem] font-semibold leading-tight tracking-[-0.03em] text-[var(--green)]">
                     Need more room?
                     <br />
                     Upgrade to {formatVehicleTypeLabel(nextVehicleType)}.
@@ -793,7 +793,7 @@ export default function BookingStepTwo({
                   <button
                     type="button"
                     onClick={() => handleTravelUpgrade(nextVehicleType)}
-                    className="shrink-0 rounded-[0.75rem] bg-[#119b45] px-4 py-2.5 text-[0.9rem] font-bold text-white transition-colors hover:bg-[#0c873b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7bd895] focus-visible:ring-offset-2"
+                    className="shrink-0 rounded-[0.75rem] bg-[var(--green)] px-4 py-2.5 text-[0.9rem] font-bold text-[var(--night)] transition-colors hover:bg-[var(--green)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--green)] focus-visible:ring-offset-2"
                   >
                     {upgradePrice && upgradePrice > 0 ? `Upgrade +${upgradePrice}€` : 'Upgrade'}
                   </button>
@@ -805,7 +805,7 @@ export default function BookingStepTwo({
               </div>
               {shouldShowTravelUpsell && nextVehicleType ? (
                 <div className="hidden">
-                  <p className="text-[0.95rem] font-semibold leading-tight tracking-[-0.03em] text-[#145b2f]">
+                  <p className="text-[0.95rem] font-semibold leading-tight tracking-[-0.03em] text-[var(--green)]">
                     Need more room?
                     <br />
                     Upgrade to {formatVehicleTypeLabel(nextVehicleType)}.
@@ -813,7 +813,7 @@ export default function BookingStepTwo({
                   <button
                     type="button"
                     onClick={() => handleTravelUpgrade(nextVehicleType)}
-                    className="shrink-0 rounded-[0.75rem] bg-[#119b45] px-4 py-2.5 text-[0.9rem] font-bold text-white transition-colors hover:bg-[#0c873b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7bd895] focus-visible:ring-offset-2"
+                    className="shrink-0 rounded-[0.75rem] bg-[var(--green)] px-4 py-2.5 text-[0.9rem] font-bold text-[var(--night)] transition-colors hover:bg-[var(--green)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--green)] focus-visible:ring-offset-2"
                   >
                     {upgradePrice && upgradePrice > 0 ? `Upgrade +${upgradePrice}€` : 'Upgrade'}
                   </button>
@@ -877,12 +877,12 @@ export default function BookingStepTwo({
                 onChange={(event) => setDraftNotes(event.target.value)}
                 rows={5}
                 placeholder="Add your note here"
-                className="ui-field-surface w-full resize-none rounded-[var(--radius-field)] border border-[#d2d2d7] p-3 text-[17px] text-[#1d1d1f] placeholder:text-[#86868b] outline-none transition-all focus:border-[#7fb3ff] focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]"
+                className="ui-field-surface w-full resize-none rounded-[var(--radius-field)] border border-[var(--line)] p-3 text-[17px] text-[var(--paper)] placeholder:text-[var(--muted)] outline-none transition-all focus:border-[var(--amber)] focus:bg-[var(--panel)] focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_0_0_2px_rgba(127,179,255,0.12)]"
               />
               <button
                 type="button"
                 onClick={saveDriverNote}
-                className="mt-4 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[#1679FF] text-[1rem] font-semibold text-white transition-colors hover:bg-[#0f6ae8]"
+                className="mt-4 flex h-12 w-full items-center justify-center rounded-[var(--radius-field)] bg-[var(--amber)] text-[1rem] font-semibold text-[var(--night)] transition-colors hover:bg-[var(--amber-deep)]"
               >
                 Save
               </button>
