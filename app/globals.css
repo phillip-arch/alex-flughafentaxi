@@ -1020,3 +1020,290 @@ p {
   background: linear-gradient(160deg, var(--panel-2), var(--panel));
   box-shadow: var(--shadow-xl);
 }
+
+.servus-logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.servus-logo-mark > span {
+  display: block;
+  transform: translateY(-0.075em);
+}
+
+.servus-ticker {
+  overflow: hidden;
+  border-block: 1px solid rgba(244, 241, 232, 0.08);
+  background: #0b1322;
+  padding-block: 1.45rem;
+}
+
+.servus-ticker-track {
+  display: flex;
+  width: max-content;
+  gap: 5.25rem;
+  white-space: nowrap;
+  animation: servus-tick 38s linear infinite;
+}
+
+.servus-ticker-track span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: #93A0B5;
+  font-family: var(--font-mono);
+  font-size: clamp(0.82rem, 0.8vw, 1rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.servus-ticker-track b {
+  color: #8F9AAE;
+  font-weight: 700;
+}
+
+.servus-ticker-track em {
+  color: #F4F1E8;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.servus-ticker-track em.is-gold {
+  color: #FFB629;
+}
+
+.servus-ticker-track b.is-strong {
+  color: #F4F1E8;
+  font-weight: 900;
+}
+
+.servus-district-menu {
+  max-height: min(46vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 182, 41, 0.55) rgba(244, 241, 232, 0.06);
+}
+
+.servus-district-menu::-webkit-scrollbar {
+  width: 10px;
+}
+
+.servus-district-menu::-webkit-scrollbar-track {
+  background: rgba(244, 241, 232, 0.05);
+  border-radius: 999px;
+}
+
+.servus-district-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 182, 41, 0.58);
+  border: 3px solid #0b1322;
+  border-radius: 999px;
+}
+
+.price-flip-tile {
+  position: relative;
+  display: block;
+  min-width: clamp(36px, 2.2vw, 45px);
+  height: clamp(70px, 4.4vw, 90px);
+  overflow: hidden;
+  border-radius: 9px;
+  background: #0c1424;
+  color: #FFB629;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 2.1vw, 42px);
+  font-weight: 900;
+  line-height: 1;
+  box-shadow:
+    inset 0 1px 0 rgba(244, 241, 232, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.72),
+    0 1px 0 rgba(244, 241, 232, 0.05);
+  perspective: 520px;
+  transform-style: preserve-3d;
+}
+
+.price-flip-tile::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  top: 50%;
+  height: 8px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 0 50%, rgba(244, 241, 232, 0.28) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 100% 50%, rgba(244, 241, 232, 0.28) 0 2px, transparent 2.5px);
+  transform: translateY(-50%);
+  z-index: 9;
+  pointer-events: none;
+}
+
+.price-flip-tile::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: rgba(3, 8, 16, 0.92);
+  box-shadow:
+    0 -1px 0 rgba(244, 241, 232, 0.05),
+    0 1px 0 rgba(255, 182, 41, 0.08);
+  transform: translateY(-1px);
+  z-index: 8;
+}
+
+.price-flip-static,
+.price-flip-flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  background: #1b2945;
+}
+
+.price-flip-static span,
+.price-flip-flap span {
+  position: absolute;
+  left: 0;
+  display: grid;
+  width: 100%;
+  height: clamp(70px, 4.4vw, 90px);
+  place-items: center;
+}
+
+.price-flip-static-top {
+  top: 0;
+  z-index: 1;
+  border-radius: 9px 9px 0 0;
+  background:
+    linear-gradient(180deg, rgba(244, 241, 232, 0.08), transparent 36%),
+    linear-gradient(180deg, #263756 0%, #182640 100%);
+}
+
+.price-flip-static-top span {
+  top: 0;
+}
+
+.price-flip-static-bottom {
+  bottom: 0;
+  z-index: 1;
+  border-radius: 0 0 9px 9px;
+  background: linear-gradient(180deg, #14213a 0%, #0f192c 100%);
+}
+
+.price-flip-static-bottom span {
+  bottom: 0;
+}
+
+.price-flip-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.price-flip-flap {
+  backface-visibility: hidden;
+  will-change: transform;
+  box-shadow: 0 0 0 1px rgba(244, 241, 232, 0.035);
+}
+
+.price-flip-flap-old {
+  top: 0;
+  z-index: 7;
+  border-radius: 9px 9px 0 0;
+  background:
+    linear-gradient(180deg, rgba(244, 241, 232, 0.08), transparent 36%),
+    linear-gradient(180deg, #263756 0%, #182640 100%);
+  transform-origin: bottom center;
+  animation: price-flip-old 280ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.price-flip-flap-old span {
+  top: 0;
+}
+
+.price-flip-flap-new {
+  bottom: 0;
+  z-index: 6;
+  border-radius: 0 0 9px 9px;
+  background: linear-gradient(180deg, #14213a 0%, #0f192c 100%);
+  transform: rotateX(90deg);
+  transform-origin: top center;
+  animation: price-flip-new 300ms 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.price-flip-flap-new span {
+  bottom: 0;
+}
+
+.price-flip-tile.is-flipping {
+  animation: price-flip-tile-settle 560ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes servus-tick {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes price-flip-old {
+  0% {
+    transform: rotateX(0deg);
+    filter: brightness(1);
+    box-shadow: 0 1px 0 rgba(244, 241, 232, 0.04);
+  }
+  48% {
+    filter: brightness(0.88);
+    box-shadow: 0 12px 18px rgba(0, 0, 0, 0.28);
+  }
+  100% {
+    transform: rotateX(-90deg);
+    filter: brightness(0.48);
+    box-shadow: 0 22px 26px rgba(0, 0, 0, 0.38);
+  }
+}
+
+@keyframes price-flip-new {
+  0% {
+    transform: rotateX(90deg);
+    filter: brightness(0.5);
+    box-shadow: 0 -20px 24px rgba(0, 0, 0, 0.36);
+  }
+  72% {
+    transform: rotateX(-5deg);
+    filter: brightness(1.08);
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.18);
+  }
+  100% {
+    transform: rotateX(0deg);
+    filter: brightness(1);
+    box-shadow: 0 0 0 1px rgba(244, 241, 232, 0.035);
+  }
+}
+
+@keyframes price-flip-tile-settle {
+  0%,
+  100% {
+    box-shadow: inset 0 -1px 0 rgba(244, 241, 232, 0.16);
+  }
+  56% {
+    box-shadow:
+      inset 0 -1px 0 rgba(244, 241, 232, 0.16),
+      0 10px 18px rgba(0, 0, 0, 0.22);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .servus-ticker-track {
+    animation: none !important;
+  }
+
+  .price-flip-overlay {
+    display: none !important;
+  }
+}

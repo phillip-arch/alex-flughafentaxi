@@ -13,11 +13,10 @@ import {
   Phone,
   Plane,
   ShieldCheck,
-  Star,
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import BookingForm from '@/components/BookingForm';
+import HeroCalculator from '@/components/HeroCalculator';
 import Navbar from '@/components/Navbar';
 import PriceTable from '@/components/PriceTable';
 import { buildAbsoluteMetadata } from '@/lib/seo/metadata';
@@ -471,6 +470,31 @@ function BookingCta({ className = '', label = 'Book Now', icon: Icon }: { classN
   );
 }
 
+function TrustTicker() {
+  const items = [
+    { lead: 'W-TX', copy: 'lizenziertes Wiener Taxi', tone: 'white' },
+    { lead: '24/7', copy: 'auch Feiertage & Nachtfluege', tone: 'gold' },
+    { lead: '* 4,9', copy: '1.240+ Bewertungen', tone: 'gold', strongCopy: true },
+    { lead: '12.400+', copy: 'Flughafenfahrten', tone: 'white' },
+    { lead: '98,6%', copy: 'puenktlich abgeholt', tone: 'gold' },
+  ];
+
+  const loop = [...items, ...items, ...items];
+
+  return (
+    <div className="servus-ticker" aria-label="Service highlights">
+      <div className="servus-ticker-track">
+        {loop.map((item, index) => (
+          <span key={`${item.lead}-${index}`}>
+            <em className={item.tone === 'gold' ? 'is-gold' : ''}>{item.lead}</em>
+            <b className={item.strongCopy ? 'is-strong' : ''}>{item.copy}</b>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default async function Home() {
   return (
     <div className="min-h-screen bg-[var(--night)] text-[var(--paper)]">
@@ -482,50 +506,53 @@ export default async function Home() {
       <main>
 
         {/* ── HERO ─────────────────────────────────────────────────────── */}
-        <section id="hero" className="relative bg-[var(--night)] text-[var(--paper)]">
-          <div className="app-container pb-14 pt-[calc(72px+1.25rem)] md:pb-16 md:pt-[calc(72px+1.75rem)] lg:pb-20 lg:pt-[calc(72px+2.25rem)]">
-            <div className="mx-auto grid items-start gap-10 lg:max-w-[1400px] lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-8 xl:gap-10">
-
-              {/* Form — left 40%, below headline on mobile */}
-              <div className="order-2 self-start lg:order-1 lg:sticky lg:top-24">
-                <div className="mx-auto w-full max-w-[57.5rem] lg:mx-0 lg:max-w-none">
-                  <BookingForm fluidDesktopWidth />
-                </div>
+        <section id="hero" className="relative overflow-hidden bg-[#070d18] text-[#F4F1E8]">
+          <div className="mx-auto grid w-full max-w-[1780px] gap-10 px-5 pb-14 pt-[94px] sm:px-8 lg:pt-[108px] min-[1536px]:grid-cols-[minmax(0,0.9fr)_minmax(410px,540px)] min-[1536px]:items-start min-[1536px]:justify-between min-[1536px]:gap-10 min-[1536px]:px-12 min-[1536px]:pb-16 min-[1536px]:pt-[132px] min-[1900px]:min-h-[1040px] min-[1900px]:grid-cols-[minmax(0,760px)_640px] min-[1900px]:gap-14 min-[1900px]:px-[82px] min-[1900px]:pt-[166px]">
+            <div className="flex flex-col">
+              <div className="mb-8 inline-flex min-h-[42px] w-fit max-w-full items-center rounded-full border border-[rgba(62,207,142,0.35)] bg-[rgba(62,207,142,0.08)] px-5 py-2 font-mono text-[clamp(0.82rem,0.9vw,1rem)] text-[#3ECF8E] sm:mb-10 min-[1900px]:mb-12 min-[1900px]:h-[50px] min-[1900px]:px-6 min-[1900px]:text-[17px]">
+                <span className="mr-3 h-2.5 w-2.5 shrink-0 rounded-full bg-[#3ECF8E] min-[1900px]:mr-4 min-[1900px]:h-3 min-[1900px]:w-3" />
+                Heute verfuegbar, auch nachts &amp; am Wochenende
               </div>
 
-              {/* Editorial headline — right 60%, above form on mobile */}
-              <div className="order-1 flex flex-col gap-8 lg:order-2 lg:py-6">
-                <SectionEyebrow onDark>Vienna, Austria · VIE · Schwechat</SectionEyebrow>
+              <h1 className="max-w-[11ch] font-display text-[clamp(3rem,5.8vw,4.5rem)] font-black leading-[1.06] tracking-[-0.015em] text-[#F4F1E8] min-[1536px]:text-[clamp(3.75rem,4.35vw,4.9rem)] min-[1900px]:max-w-none min-[1900px]:text-[clamp(4.4rem,4.6vw,5.75rem)]">
+                Flughafentaxi<br />
+                Wien.<br />
+                <span className="text-[#FFB629]">Fixpreis.</span><br />
+                <span className="text-[#FFB629]">Punkt.</span>
+              </h1>
 
-                <h1 className="text-[3.4rem] font-black leading-[0.93] tracking-[-0.055em] !text-[var(--paper)] sm:text-[4.2rem] md:text-[5rem] lg:[font-size:clamp(2.8rem,4vw,4.6rem)]">
-                  Vienna<br className="sm:hidden" />{' '}Airport Taxi:<br />
-                  Fixed Prices,<br />
-                  Zero Stress.
-                </h1>
+              <p className="mt-7 max-w-[700px] text-[clamp(1.05rem,1.35vw,1.42rem)] leading-[1.45] text-[#93A0B5] sm:mt-9 min-[1900px]:mt-10 min-[1900px]:text-[25px] min-[1900px]:leading-[1.5]">
+                Wien ? Flughafen Schwechat zum{' '}
+                <span className="font-black text-[#F4F1E8]">Fixpreis ab EUR 33 pro Fahrzeug</span>,
+                mit einem Wiener Team, das Sie beim Namen kennt. Kein Callcenter, keine Plattform,
+                kein Taxameter: Der Preis, den Sie sehen, ist der Preis, den Sie zahlen.
+              </p>
 
-                <p className="max-w-[36rem] text-[1rem] leading-[1.72] text-[var(--muted)] lg:max-w-[28rem]">
-                  Fixed-price transfers to and from Vienna International Airport — tracked in real time, on time, every time.
-                </p>
-
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                  {[
-                    { icon: Star, label: '4.9 Rating' },
-                    { icon: Check, label: 'Fixed price' },
-                    { icon: ShieldCheck, label: '10 + years' },
-                  ].map(({ icon: Icon, label }) => (
-                    <span
-                      key={label}
-                      className="inline-flex items-center gap-2 text-[0.875rem] font-semibold text-[var(--muted)]"
-                    >
-                      <Icon size={14} className="text-[var(--amber)]" strokeWidth={2.4} />
-                      {label}
-                    </span>
-                  ))}
-                </div>
+              <div className="mt-8 grid max-w-[620px] gap-3 sm:grid-cols-2 min-[1900px]:mt-10 min-[1900px]:gap-4">
+                {[
+                  'Gratis Flugverfolgung',
+                  '60 Min Gratis-Wartezeit',
+                  'Storno bis 24h gratis',
+                  'Zahlung beim Fahrer',
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="inline-flex min-h-[50px] items-center gap-3 rounded-full border border-[rgba(244,241,232,0.10)] bg-[rgba(244,241,232,0.055)] px-5 text-[clamp(0.92rem,1vw,1.1rem)] font-semibold text-[#F4F1E8] min-[1900px]:h-[58px] min-[1900px]:gap-4 min-[1900px]:px-6 min-[1900px]:text-[19px]"
+                  >
+                    <Check size={21} strokeWidth={3} className="text-[#3ECF8E]" />
+                    {item}
+                  </div>
+                ))}
               </div>
+            </div>
+
+            <div className="w-full min-[1536px]:pt-5">
+              <HeroCalculator />
             </div>
           </div>
         </section>
+
+        <TrustTicker />
 
         {/* ── PHOTO STRIP ──────────────────────────────────────────────── */}
         <section className="bg-[var(--night)] pb-16 md:pb-20">
