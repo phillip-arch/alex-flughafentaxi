@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
@@ -74,7 +74,7 @@ export default function BookingPageClient({
   return (
     <>
       {!isAppSurface ? <NavbarClient /> : null}
-      <section className="bg-[var(--color-page-bg)]">
+      <section className="servus-book-flow bg-[var(--color-page-bg)]">
         <div className={`app-container pb-10 md:pb-12 ${isAppSurface ? 'pt-5' : 'pt-[100px] md:pt-[8rem] [@media(min-width:768px)_and_(max-height:850px)]:pt-[108px]'}`}>
           <div className="mx-auto grid items-start gap-10 lg:max-w-[1400px] lg:grid-cols-[minmax(0,40%)_minmax(0,60%)] lg:gap-8 xl:gap-10">
             <section className="order-1 self-start">
@@ -121,22 +121,22 @@ export default function BookingPageClient({
           </section>
 
           {!isAppSurface ? (
-            <section className="relative left-1/2 mt-10 w-screen -translate-x-1/2 border-t border-white/8 bg-[#111111] px-5 py-5 text-white md:mt-12 md:px-8 md:py-6">
+            <section className="relative left-1/2 mt-10 w-screen -translate-x-1/2 border-t border-[var(--line)] bg-[var(--night)] px-5 py-5 text-[var(--paper)] md:mt-12 md:px-8 md:py-6">
               <div className="mx-auto flex w-full max-w-[1372px] flex-col gap-3 text-left">
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.92rem] text-white/62">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.92rem] text-[var(--muted)]">
                   <Link
                     href={`/agb?lang=${activeLang}`}
-                    className="font-medium text-[#78a9ff] transition-colors hover:text-white"
+                    className="font-medium text-[var(--amber)] transition-colors hover:text-[var(--paper)]"
                   >
                     {termsLabel}
                   </Link>
                   <Link
                     href={`/datenschutz?lang=${activeLang}`}
-                    className="font-medium text-[#78a9ff] transition-colors hover:text-white"
+                    className="font-medium text-[var(--amber)] transition-colors hover:text-[var(--paper)]"
                   >
                     {privacyLabel}
                   </Link>
-                  <span className="font-medium text-white/72">Flughafentaxi Alex OG</span>
+                  <span className="font-medium text-[var(--muted)]">Flughafentaxi Alex OG</span>
                 </div>
               </div>
             </section>

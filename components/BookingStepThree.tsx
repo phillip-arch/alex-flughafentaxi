@@ -58,7 +58,7 @@ export default function BookingStepThree({
 
       {isLoggedIn ? (
         <div className="flex items-center justify-between gap-4 px-1">
-          <p className="text-[15px] font-medium text-[#1d1d1f]">Booking for myself</p>
+          <p className="text-[15px] font-medium text-[var(--paper)]">Booking for myself</p>
           <label className="relative inline-flex cursor-pointer items-center">
             <input
               type="checkbox"
@@ -66,7 +66,7 @@ export default function BookingStepThree({
               onChange={(e) => handleBookingForMyselfToggle(e.target.checked)}
               className="peer sr-only"
             />
-            <div className="h-[22px] w-[36px] rounded-full bg-[#e9e9ea] peer peer-checked:bg-[#1679FF] peer-focus:outline-none peer-checked:after:translate-x-[14px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[18px] after:w-[18px] after:rounded-full after:border after:border-gray-300 after:bg-white after:shadow-sm after:transition-all after:content-['']"></div>
+            <div className="h-[22px] w-[36px] rounded-full bg-[rgba(255,255,255,.16)] peer peer-checked:bg-[var(--amber)] peer-focus:outline-none peer-checked:after:translate-x-[14px] peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-[18px] after:w-[18px] after:rounded-full after:border after:border-gray-300 after:bg-[var(--panel)] after:shadow-sm after:transition-all after:content-['']"></div>
           </label>
         </div>
       ) : null}
@@ -126,10 +126,10 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('cash')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-[0.59rem] transition-all duration-200 md:gap-[0.35rem] md:py-[0.52rem] ${
               formData.paymentMethod === 'cash'
-                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1679FF] ring-2 ring-inset ring-[#7fb3ff]'
+                ? 'border-[var(--amber)] bg-[rgba(255,255,255,.045)] text-[var(--amber)] ring-2 ring-inset ring-[var(--amber)]'
                 : touched['paymentMethod'] && !formData.paymentMethod
-                  ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
-                  : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
+                  ? 'border-[var(--red)] bg-[rgba(232,106,106,.10)] text-[var(--red)]'
+                  : 'border-[var(--line)] bg-[var(--panel)] text-[var(--paper)] hover:border-[var(--muted)]'
             }`}
           >
             <span className="text-[14px] font-medium md:text-[12px]">Cash</span>
@@ -139,10 +139,10 @@ export default function BookingStepThree({
             onClick={() => handlePaymentChange('card')}
             className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-[var(--radius-field)] border py-[0.59rem] transition-all duration-200 md:gap-[0.35rem] md:py-[0.52rem] ${
               formData.paymentMethod === 'card'
-                ? 'border-[#7fb3ff] bg-[#f8fbff] text-[#1679FF] ring-2 ring-inset ring-[#7fb3ff]'
+                ? 'border-[var(--amber)] bg-[rgba(255,255,255,.045)] text-[var(--amber)] ring-2 ring-inset ring-[var(--amber)]'
                 : touched['paymentMethod'] && !formData.paymentMethod
-                  ? 'border-[#d70015] bg-[#fff2f4] text-[#d70015]'
-                  : 'border-[#d2d2d7] bg-white text-[#1d1d1f] hover:border-[#86868b]'
+                  ? 'border-[var(--red)] bg-[rgba(232,106,106,.10)] text-[var(--red)]'
+                  : 'border-[var(--line)] bg-[var(--panel)] text-[var(--paper)] hover:border-[var(--muted)]'
             }`}
           >
             <span className="text-[14px] font-medium md:text-[12px]">Credit card</span>
@@ -150,15 +150,15 @@ export default function BookingStepThree({
         </div>
       </div>
 
-      <p className="text-left text-[12px] leading-[1.5] text-[#5f6975] md:text-[13px]">
+      <p className="text-left text-[12px] leading-[1.5] text-[var(--muted)] md:text-[13px]">
         By booking, you accept our{' '}
-        <Link href={agbHref} className="font-medium !text-[#1678ff] underline underline-offset-2 hover:!text-[#0f5fcc]">
+        <Link href={agbHref} className="font-medium !text-[var(--amber)] underline underline-offset-2 hover:!text-[var(--amber-deep)]">
           Terms and Conditions
         </Link>{' '}
         and{' '}
         <Link
           href={privacyHref}
-          className="font-medium !text-[#1678ff] underline underline-offset-2 hover:!text-[#0f5fcc]"
+          className="font-medium !text-[var(--amber)] underline underline-offset-2 hover:!text-[var(--amber-deep)]"
         >
           Privacy Policy
         </Link>

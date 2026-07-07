@@ -66,7 +66,7 @@ export default function LoginPageClient({
   };
 
   return (
-    <section className="relative overflow-hidden bg-white">
+    <section className="relative overflow-hidden bg-[var(--panel)]">
       <div className="app-container flex justify-center pb-10 pt-24 lg:pb-14 lg:pt-32">
         <div className="w-full max-w-[34rem]">
           <div className="ui-card-surface-light px-5 py-6 md:px-8 md:py-8">
@@ -81,10 +81,10 @@ export default function LoginPageClient({
             ) : null}
 
             <div className="ui-text-block-sm">
-              <h2 className="ui-heading-lg text-[#111827]">
+              <h2 className="ui-heading-lg text-[var(--paper)]">
                 {isLogin ? 'Anmelden' : 'Registrieren'}
               </h2>
-              <p className="ui-copy-compact text-[#6a7d96]">
+              <p className="ui-copy-compact text-[var(--muted)]">
                 {isLogin
                   ? 'Greifen Sie auf Ihr Kundenkonto zu.'
                   : 'Erstellen Sie Ihr Konto fuer kuenftige Buchungen.'}
@@ -98,7 +98,7 @@ export default function LoginPageClient({
             ) : null}
 
             {isLogin && showAccountDeletedNotice ? (
-              <div className="mt-6 rounded-[1rem] border border-[#dbe7f8] bg-[#eef5ff] px-4 py-3 text-[0.92rem] font-medium text-[#0a63ff]">
+              <div className="mt-6 rounded-[1rem] border border-[var(--line)] bg-[rgba(255,182,41,.12)] px-4 py-3 text-[0.92rem] font-medium text-[var(--amber)]">
                 Ihr Konto wurde geloescht. Ihre Anmeldedaten und Favoriten wurden entfernt.
               </div>
             ) : null}
@@ -112,11 +112,11 @@ export default function LoginPageClient({
               >
                 {!isLogin ? (
                   <label className="block">
-                    <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                    <span className="mb-2 block text-[0.88rem] font-medium text-[var(--paper)]">
                       Vollstaendiger Name
                     </span>
                     <div className="relative">
-                      <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                      <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[var(--muted)]">
                         <User size={15} />
                       </span>
                       <input
@@ -131,11 +131,11 @@ export default function LoginPageClient({
                 ) : null}
 
                 <label className="block">
-                  <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                  <span className="mb-2 block text-[0.88rem] font-medium text-[var(--paper)]">
                     E-Mail
                   </span>
                   <div className="relative">
-                    <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[var(--muted)]">
                       <Mail size={15} />
                     </span>
                     <input
@@ -149,11 +149,11 @@ export default function LoginPageClient({
                 </label>
 
                 <label className="block">
-                  <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                  <span className="mb-2 block text-[0.88rem] font-medium text-[var(--paper)]">
                     Passwort
                   </span>
                   <div className="relative">
-                    <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[var(--muted)]">
                       <Lock size={15} />
                     </span>
                       <input
@@ -171,11 +171,11 @@ export default function LoginPageClient({
 
                 {!isLogin ? (
                   <label className="block">
-                    <span className="mb-2 block text-[0.88rem] font-medium text-[#3a4656]">
+                    <span className="mb-2 block text-[0.88rem] font-medium text-[var(--paper)]">
                       Passwort bestaetigen
                     </span>
                     <div className="relative">
-                      <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[#8a94a3]">
+                      <span className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center text-[var(--muted)]">
                         <Lock size={15} />
                       </span>
                       <input
@@ -205,7 +205,7 @@ export default function LoginPageClient({
                   <div className="text-right">
                     <Link
                       href="/forgot-password"
-                      className="text-[0.88rem] font-medium text-[var(--color-booking-accent)] transition-colors hover:text-[#0f6ae8]"
+                      className="text-[0.88rem] font-medium text-[var(--color-booking-accent)] transition-colors hover:text-[var(--amber-deep)]"
                     >
                       Passwort vergessen?
                     </Link>
@@ -234,15 +234,15 @@ export default function LoginPageClient({
             </form>
 
             {loading ? (
-              <p className="mt-3 text-[0.88rem] font-medium text-[#6a7d96]">
+              <p className="mt-3 text-[0.88rem] font-medium text-[var(--muted)]">
                 {isLogin
                   ? 'Anmeldung wird verarbeitet...'
                   : 'Registrierung wird verarbeitet...'}
               </p>
             ) : null}
 
-            <div className="mt-6 border-t border-[#edf2f7] pt-5">
-              <p className="text-[0.94rem] text-[#6a7d96]">
+            <div className="mt-6 border-t border-[var(--line)] pt-5">
+              <p className="text-[0.94rem] text-[var(--muted)]">
                 {isLogin ? 'Noch kein Konto?' : 'Bereits ein Konto?'}
                 <button
                   type="button"
@@ -253,7 +253,7 @@ export default function LoginPageClient({
                     setPassword('');
                     setConfirmPassword('');
                   }}
-                  className="ml-2 font-semibold text-[var(--color-booking-accent)] transition-colors hover:text-[#0f6ae8]"
+                  className="ml-2 font-semibold text-[var(--color-booking-accent)] transition-colors hover:text-[var(--amber-deep)]"
                 >
                   {isLogin ? 'Jetzt registrieren' : 'Hier anmelden'}
                 </button>

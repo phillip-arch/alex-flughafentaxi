@@ -63,20 +63,20 @@ function AccountSlidePanel({
   children: ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 z-[120] h-[100dvh] overflow-hidden bg-white/96 text-[#111827] backdrop-blur-sm md:hidden">
+    <div className="fixed inset-0 z-[120] h-[100dvh] overflow-hidden bg-[rgba(10,17,31,.96)] text-[var(--paper)] backdrop-blur-sm md:hidden">
       <div className="app-container flex h-[100dvh] flex-col overflow-hidden animate-in slide-in-from-right-full duration-300 pt-[30px]">
         <div className="flex items-center gap-3 pb-6">
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#e5e7eb] bg-white text-[#111827]"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] text-[var(--paper)]"
             aria-label="Back"
           >
             <ChevronRight size={18} />
           </button>
           <div>
-            <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[#111827]">{title}</p>
-            <p className="text-[0.95rem] text-[#6a6a6a]">{subtitle}</p>
+            <p className="text-[1.45rem] font-semibold tracking-[-0.04em] text-[var(--paper)]">{title}</p>
+            <p className="text-[0.95rem] text-[var(--muted)]">{subtitle}</p>
           </div>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-8">
@@ -209,12 +209,12 @@ export default function AccountClient({
   const [bookingsLoading, setBookingsLoading] = useState(false);
   const accountShellClass = 'w-full';
   const contentSectionClass = 'pt-2';
-  const accountSectionTitleClass = 'ui-heading-lg mb-6 text-[#111827]';
+  const accountSectionTitleClass = 'ui-heading-lg mb-6 text-[var(--paper)]';
   const accountSectionIntroClass = 'ui-text-block-sm gap-6';
   const accountSectionStackClass = 'flex flex-col gap-6';
   const bookingsMonthGroupClass = 'space-y-3';
   const bookingsMonthTitleClass =
-    'text-[1.6rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[1.8rem]';
+    'text-[1.6rem] font-semibold tracking-[-0.05em] text-[var(--paper)] md:text-[1.8rem]';
   const firstName = String(name || '')
     .trim()
     .split(/\s+/)
@@ -231,9 +231,9 @@ export default function AccountClient({
   const greetingBase = currentHour < 11 ? 'Good morning' : currentHour < 18 ? 'Good afternoon' : 'Good evening';
   const greetingLabel = firstName ? `${greetingBase} ${firstName}!` : `${greetingBase}!`;
   const accountSecondaryButtonClass =
-    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#dbe7f8] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#1679ff] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#f8fbff] hover:text-[#0a63ff]';
+    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[var(--line)] bg-[var(--panel)] px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[var(--amber)] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[rgba(255,255,255,.045)] hover:text-[var(--amber)]';
   const accountDangerButtonClass =
-    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[#f1d1d6] bg-white px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[#d70015] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[#fff4f6]';
+    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[rgba(232,106,106,.35)] bg-[var(--panel)] px-8 py-4 text-[1.0625rem] font-medium leading-none tracking-normal text-[var(--red)] shadow-[0_10px_24px_rgba(17,17,17,0.04)] transition-colors hover:bg-[rgba(232,106,106,.10)]';
   const activeLanguage = searchParams.get('lang')?.toLowerCase() || 'de';
   const activeLanguageLabel =
     languageOptions.find((option) => option.code === activeLanguage)?.label || 'Deutsch';
@@ -594,10 +594,10 @@ export default function AccountClient({
                     />
                   </div>
                   <div className="flex flex-col gap-3 md:pt-[64px]">
-                    <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[#111827] md:text-[2.35rem]">
+                    <h1 className="text-[2rem] font-semibold leading-[1.03] tracking-[-0.06em] text-[var(--paper)] md:text-[2.35rem]">
                       {greetingLabel}
                     </h1>
-                    <p className="text-[1rem] leading-[1.6] text-[#6a7d96] md:text-[1.05rem]">
+                    <p className="text-[1rem] leading-[1.6] text-[var(--muted)] md:text-[1.05rem]">
                       Book your next ride here.
                     </p>
                   </div>
@@ -665,23 +665,23 @@ export default function AccountClient({
               <div className={accountSectionStackClass}>
                 {!isEditingProfile ? (
                   <div className="space-y-5">
-                    <div className="rounded-[1.35rem] border border-[#e9edf3] bg-white px-4 py-4 shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
+                    <div className="rounded-[1.35rem] border border-[var(--line)] bg-[var(--panel)] px-4 py-4 shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
                       <button
                         type="button"
                         onClick={openProfileEditor}
                         aria-label="Profil bearbeiten"
-                        className="flex w-full items-center gap-4 text-left transition-colors hover:text-[#111827]"
+                        className="flex w-full items-center gap-4 text-left transition-colors hover:text-[var(--paper)]"
                       >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[var(--muted)]">
                           <Edit size={22} strokeWidth={1.8} />
                         </span>
-                        <p className="min-w-0 text-[1.15rem] font-semibold tracking-[-0.03em] text-[#111827]">
+                        <p className="min-w-0 text-[1.15rem] font-semibold tracking-[-0.03em] text-[var(--paper)]">
                           {name || 'Kein Name hinterlegt'}
                         </p>
                       </button>
                     </div>
 
-                    <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+                    <div className="rounded-[1.55rem] border border-[var(--line)] bg-[var(--panel)] px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
                       <button
                         type="button"
                         onClick={() => {
@@ -693,14 +693,14 @@ export default function AccountClient({
                         }}
                         className="flex w-full items-start gap-4 py-3 text-left"
                       >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[var(--muted)]">
                           <Globe size={24} strokeWidth={1.8} />
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="text-[1rem] font-medium text-[#111827]">Sprache</p>
-                          <p className="text-[0.95rem] leading-6 text-[#6a6a6a]">{activeLanguageLabel}</p>
+                          <p className="text-[1rem] font-medium text-[var(--paper)]">Sprache</p>
+                          <p className="text-[0.95rem] leading-6 text-[var(--muted)]">{activeLanguageLabel}</p>
                         </div>
-                        <span className="hidden h-10 w-10 shrink-0 items-center justify-center text-[#676767] md:flex">
+                        <span className="hidden h-10 w-10 shrink-0 items-center justify-center text-[var(--muted)] md:flex">
                           <ChevronDown
                             size={18}
                             strokeWidth={2}
@@ -710,8 +710,8 @@ export default function AccountClient({
                       </button>
 
                       {isLanguageExpanded ? (
-                        <div className="border-t border-[#efebe4] pb-2 pt-4">
-                          <div className="rounded-[1.5rem] border border-[#e8e8ed] bg-white p-3 shadow-[0_18px_40px_rgba(17,17,17,0.08)]">
+                        <div className="border-t border-[var(--line)] pb-2 pt-4">
+                          <div className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--panel)] p-3 shadow-[0_18px_40px_rgba(17,17,17,0.08)]">
                             <div className="grid grid-cols-2 gap-1">
                             {languageOptions.map((option) => {
                               const selected = option.code === activeLanguage;
@@ -724,11 +724,11 @@ export default function AccountClient({
                                     setIsLanguageExpanded(false);
                                   }}
                                   className={`flex items-center justify-between rounded-[16px] px-3 py-3 text-left text-[15px] font-medium transition-colors ${
-                                    selected ? 'bg-[#f5f5f7] text-[#111111]' : 'text-[#111111] hover:bg-[#f5f5f7]'
+                                    selected ? 'bg-[rgba(255,255,255,.06)] text-[var(--paper)]' : 'text-[var(--paper)] hover:bg-[rgba(255,255,255,.06)]'
                                   }`}
                                 >
                                   <span>{option.label}</span>
-                                  <span className="text-[13px] font-semibold uppercase text-[#6b7280]">
+                                  <span className="text-[13px] font-semibold uppercase text-[var(--muted)]">
                                     {option.code}
                                   </span>
                                 </button>
@@ -740,7 +740,7 @@ export default function AccountClient({
                       ) : null}
                     </div>
 
-                    <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+                    <div className="rounded-[1.55rem] border border-[var(--line)] bg-[var(--panel)] px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
                       <button
                         type="button"
                         onClick={() => {
@@ -753,14 +753,14 @@ export default function AccountClient({
                         }}
                         className="flex w-full items-start gap-4 py-3 text-left"
                       >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[var(--muted)]">
                           <Download size={24} strokeWidth={1.8} />
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="text-[1rem] font-medium text-[#111827]">Installieren</p>
-                          <p className="text-[0.95rem] leading-6 text-[#6a6a6a]">{installRowHint}</p>
+                          <p className="text-[1rem] font-medium text-[var(--paper)]">Installieren</p>
+                          <p className="text-[0.95rem] leading-6 text-[var(--muted)]">{installRowHint}</p>
                           {installNotice ? (
-                            <p className="mt-1 text-[0.92rem] leading-6 text-[#6a7d96]">{installNotice}</p>
+                            <p className="mt-1 text-[0.92rem] leading-6 text-[var(--muted)]">{installNotice}</p>
                           ) : null}
                         </div>
                       </button>
@@ -802,7 +802,7 @@ export default function AccountClient({
                       value={userEmail}
                       readOnly
                       aria-label="E-Mail kann nicht geaendert werden"
-                      className="ui-input cursor-not-allowed border-[#e5e7eb] bg-[#f3f4f6] text-[#8b95a7]"
+                      className="ui-input cursor-not-allowed border-[var(--line)] bg-[rgba(255,255,255,.06)] text-[var(--muted)]"
                     />
                     <div className="flex flex-wrap items-center gap-3">
                       <button
@@ -828,15 +828,15 @@ export default function AccountClient({
               </div>
               <div className="space-y-6 pt-2">
                 {favoritesLoading ? (
-                  <p className="text-sm text-[#6a7d96]">Favoriten werden geladen...</p>
+                  <p className="text-sm text-[var(--muted)]">Favoriten werden geladen...</p>
                 ) : null}
 
-                <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+                <div className="rounded-[1.55rem] border border-[var(--line)] bg-[var(--panel)] px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
                   <div className="space-y-1">
-                    <p className="text-[1.9rem] font-semibold tracking-[-0.05em] text-[#111827]">
+                    <p className="text-[1.9rem] font-semibold tracking-[-0.05em] text-[var(--paper)]">
                       Favoriten
                     </p>
-                    <p className="text-[0.95rem] leading-6 text-[#6a7d96]">
+                    <p className="text-[0.95rem] leading-6 text-[var(--muted)]">
                       Gespeicherte Adressen
                     </p>
                   </div>
@@ -852,18 +852,18 @@ export default function AccountClient({
                           <div
                             key={favorite.id}
                             className={`flex items-start justify-between gap-3 py-4 ${
-                              index > 0 ? 'border-t border-[#efebe4]' : ''
+                              index > 0 ? 'border-t border-[var(--line)]' : ''
                             }`}
                           >
                             <div className="flex min-w-0 items-start gap-4">
-                              <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[var(--muted)]">
                                 <FilledIcon size={24} strokeWidth={1.8} />
                               </span>
                               <div className="min-w-0">
-                                <p className="text-[1rem] font-medium text-[#111827]">
+                                <p className="text-[1rem] font-medium text-[var(--paper)]">
                                   {getFavoriteLabelTitle(slot.key)}
                                 </p>
-                                <p className="truncate text-[0.95rem] leading-6 text-[#6a6a6a]">
+                                <p className="truncate text-[0.95rem] leading-6 text-[var(--muted)]">
                                   {formatAddressLine(favorite.street, favorite.zip, favorite.city)}
                                 </p>
                               </div>
@@ -882,7 +882,7 @@ export default function AccountClient({
                                 })
                               }
                               aria-label="Favorit loeschen"
-                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#8a8a8a] transition-colors hover:bg-[#fff4f6] hover:text-[#d70015]"
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[var(--muted)] transition-colors hover:bg-[rgba(232,106,106,.10)] hover:text-[var(--red)]"
                             >
                               <X size={16} strokeWidth={2.1} />
                             </button>
@@ -904,14 +904,14 @@ export default function AccountClient({
                             }
                             setShowFavoriteForm(true);
                           }}
-                          className={`flex w-full items-center gap-4 py-4 text-left transition-colors hover:text-[#111827] ${
-                            index > 0 ? 'border-t border-[#efebe4]' : ''
+                          className={`flex w-full items-center gap-4 py-4 text-left transition-colors hover:text-[var(--paper)] ${
+                            index > 0 ? 'border-t border-[var(--line)]' : ''
                           }`}
                         >
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#111111]">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[var(--paper)]">
                             <EmptyIcon size={24} strokeWidth={1.8} />
                           </span>
-                          <span className="text-[1rem] font-medium text-[#2f2f2f]">{slot.emptyLabel}</span>
+                          <span className="text-[1rem] font-medium text-[var(--paper)]">{slot.emptyLabel}</span>
                         </button>
                       );
                     })}
@@ -948,7 +948,7 @@ export default function AccountClient({
                           setPendingFavoriteSlot(null);
                         });
                       }}
-                      className="mt-5 grid grid-cols-1 gap-3 border-t border-[#efebe4] pt-5"
+                      className="mt-5 grid grid-cols-1 gap-3 border-t border-[var(--line)] pt-5"
                     >
                     <StreetAutocomplete
                       value={favoriteStreetInput}
@@ -973,21 +973,21 @@ export default function AccountClient({
                   ) : null}
                 </div>
 
-                {error ? <p className="text-sm text-[#d70015]">{error}</p> : null}
+                {error ? <p className="text-sm text-[var(--red)]">{error}</p> : null}
 
-                <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+                <div className="rounded-[1.55rem] border border-[var(--line)] bg-[var(--panel)] px-5 py-4 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
                   <button
                     type="button"
                     onClick={() => setIsLogoutConfirmOpen(true)}
-                    className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827]"
+                    className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[var(--paper)]"
                   >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[var(--muted)]">
                       <LogOut size={24} strokeWidth={1.8} />
                     </span>
-                    <span className="text-[1rem] font-medium text-[#111827]">Abmelden</span>
+                    <span className="text-[1rem] font-medium text-[var(--paper)]">Abmelden</span>
                   </button>
 
-                  <div className="border-t border-[#efebe4]" />
+                  <div className="border-t border-[var(--line)]" />
 
                   <button
                     type="button"
@@ -996,12 +996,12 @@ export default function AccountClient({
                       setError(null);
                       setIsDeleteConfirmOpen(true);
                     }}
-                    className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex w-full items-center gap-4 py-3 text-left transition-colors hover:text-[var(--paper)] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[var(--muted)]">
                       <Trash2 size={24} strokeWidth={1.8} />
                     </span>
-                    <span className="text-[1rem] font-medium text-[#111827]">Konto loeschen</span>
+                    <span className="text-[1rem] font-medium text-[var(--paper)]">Konto loeschen</span>
                   </button>
                 </div>
 
@@ -1033,8 +1033,8 @@ export default function AccountClient({
                         }}
                           className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
                             activeTab === 'buchungsverlauf' && bookingFilter === 'upcoming'
-                              ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
-                              : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
+                              ? 'border-[var(--line)] bg-[var(--panel)] text-[var(--amber)]'
+                              : 'border-[var(--line)] bg-[var(--panel)] text-[var(--muted)] hover:text-[var(--paper)]'
                           }`}
                           aria-label="Kommend"
                         >
@@ -1049,8 +1049,8 @@ export default function AccountClient({
                         }}
                           className={`inline-flex min-w-[3.25rem] items-center justify-center gap-2 rounded-[1.05rem] border px-3 py-3 text-[1.02rem] font-medium shadow-[0_8px_18px_rgba(17,17,17,0.04)] transition-all sm:min-w-[9.5rem] sm:px-4 ${
                             activeTab === 'buchungsverlauf' && bookingFilter === 'previous'
-                              ? 'border-[#dbe7f8] bg-[#FDFDFE] text-[#0a63ff]'
-                              : 'border-[#e2e8f2] bg-[#FDFDFE] text-[#657489] hover:text-[#111827]'
+                              ? 'border-[var(--line)] bg-[var(--panel)] text-[var(--amber)]'
+                              : 'border-[var(--line)] bg-[var(--panel)] text-[var(--muted)] hover:text-[var(--paper)]'
                           }`}
                           aria-label="Vergangen"
                         >
@@ -1064,7 +1064,7 @@ export default function AccountClient({
                 {activeTab === 'buchungsverlauf' ? (
                   <>
                     {bookingsLoading ? (
-                      <p className="text-[#6a7d96]">Buchungsverlauf wird geladen...</p>
+                      <p className="text-[var(--muted)]">Buchungsverlauf wird geladen...</p>
                     ) : null}
 
                     <div className="space-y-8">
@@ -1096,12 +1096,12 @@ export default function AccountClient({
                           return (
                             <div
                               key={b.id}
-                              className={`rounded-[1.55rem] border border-[#dde6f2] bg-white px-4 py-4 shadow-[0_10px_26px_rgba(17,17,17,0.03)] md:px-5 ${
+                              className={`rounded-[1.55rem] border border-[var(--line)] bg-[var(--panel)] px-4 py-4 shadow-[0_10px_26px_rgba(17,17,17,0.03)] md:px-5 ${
                                 isCanceled(b.status) ? 'opacity-70' : ''
                               }`}
                             >
                               <div className="flex items-start gap-3 md:gap-4">
-                                <div className="flex h-11 w-11 shrink-0 self-center items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] md:h-12 md:w-12">
+                                <div className="flex h-11 w-11 shrink-0 self-center items-center justify-center rounded-full border border-[var(--line)] bg-[rgba(255,255,255,.045)] text-[var(--amber)] md:h-12 md:w-12">
                                   <Car size={18} className="md:h-[20px] md:w-[20px]" />
                                 </div>
 
@@ -1114,27 +1114,27 @@ export default function AccountClient({
                                   aria-expanded={isExpanded}
                                 >
                                   <div className="min-w-0 flex-1">
-                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.82rem] text-[#7b8798] md:text-[0.88rem]">
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.82rem] text-[var(--muted)] md:text-[0.88rem]">
                                       <span>{fmtRideMeta(b.pickup_at)}</span>
                                     </div>
-                                    <p className="mt-2 line-clamp-2 text-[1.06rem] font-semibold leading-[1.26] tracking-[-0.03em] text-[#111827] md:text-[1.24rem]">
+                                    <p className="mt-2 line-clamp-2 text-[1.06rem] font-semibold leading-[1.26] tracking-[-0.03em] text-[var(--paper)] md:text-[1.24rem]">
                                       {primaryLocation}
                                     </p>
                                     <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                                      <p className="text-[0.82rem] text-[#6a7d96] md:text-[0.9rem]">{secondaryLocation}</p>
+                                      <p className="text-[0.82rem] text-[var(--muted)] md:text-[0.9rem]">{secondaryLocation}</p>
                                       {isCanceled(b.status) ? (
-                                        <span className="rounded-full border border-[#f1d1d6] bg-[#fff4f6] px-2.5 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#d70015]">
+                                        <span className="rounded-full border border-[rgba(232,106,106,.35)] bg-[rgba(232,106,106,.10)] px-2.5 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[var(--red)]">
                                           Storniert
                                         </span>
                                       ) : null}
                                     </div>
-                                    <p className="mt-2 text-[1rem] font-semibold text-[#111827]">
+                                    <p className="mt-2 text-[1rem] font-semibold text-[var(--paper)]">
                                       {fmtPrice(b.price)}
                                     </p>
                                   </div>
                                   <ChevronDown
                                     size={16}
-                                    className={`mt-1 shrink-0 text-[#7b8798] transition-transform md:h-4 md:w-4 ${
+                                    className={`mt-1 shrink-0 text-[var(--muted)] transition-transform md:h-4 md:w-4 ${
                                       isExpanded ? 'rotate-180' : ''
                                     }`}
                                   />
@@ -1176,7 +1176,7 @@ export default function AccountClient({
                                           );
                                         })
                                       }
-                                      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#f1d1d6] bg-[#fff4f6] text-[#d70015] transition-colors hover:bg-[#ffecef] disabled:cursor-not-allowed disabled:opacity-40 md:h-11 md:w-11"
+                                      className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(232,106,106,.35)] bg-[rgba(232,106,106,.10)] text-[var(--red)] transition-colors hover:bg-[rgba(232,106,106,.16)] disabled:cursor-not-allowed disabled:opacity-40 md:h-11 md:w-11"
                                       aria-label="Fahrt stornieren"
                                     >
                                       <XCircle size={18} className="md:h-[19px] md:w-[19px]" />
@@ -1186,23 +1186,23 @@ export default function AccountClient({
                               </div>
 
                               {isExpanded ? (
-                                <div className="mt-4 grid gap-3 border-t border-[#edf2f7] pt-4 md:grid-cols-2">
-                                  <div className="rounded-[1rem] border border-[#edf2f7] bg-[#f8fbff] px-4 py-3">
-                                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
+                                <div className="mt-4 grid gap-3 border-t border-[var(--line)] pt-4 md:grid-cols-2">
+                                  <div className="rounded-[1rem] border border-[var(--line)] bg-[rgba(255,255,255,.045)] px-4 py-3">
+                                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[var(--amber)]">
                                       Route
                                     </p>
-                                    <div className="mt-2 space-y-2 text-[0.95rem] text-[#111827]">
+                                    <div className="mt-2 space-y-2 text-[0.95rem] text-[var(--paper)]">
                                       <p><span className="font-semibold">Abholung:</span> {b.pickup}</p>
                                       <p><span className="font-semibold">Ziel:</span> {b.destination}</p>
                                       <p><span className="font-semibold">Referenz:</span> {b.booking_reference || b.id.slice(0, 8)}</p>
                                     </div>
                                   </div>
 
-                                  <div className="rounded-[1rem] border border-[#edf2f7] bg-[#f8fbff] px-4 py-3">
-                                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
+                                  <div className="rounded-[1rem] border border-[var(--line)] bg-[rgba(255,255,255,.045)] px-4 py-3">
+                                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[var(--amber)]">
                                       Buchung
                                     </p>
-                                    <div className="mt-2 space-y-2 text-[0.95rem] text-[#111827]">
+                                    <div className="mt-2 space-y-2 text-[0.95rem] text-[var(--paper)]">
                                       <p><span className="font-semibold">Name:</span> {b.full_name || '-'}</p>
                                       <p><span className="font-semibold">Telefon:</span> {b.phone || '-'}</p>
                                       <p><span className="font-semibold">E-Mail:</span> {b.email || '-'}</p>
@@ -1214,11 +1214,11 @@ export default function AccountClient({
                                   </div>
 
                                   {(seats.baby > 0 || seats.child > 0 || seats.booster > 0 || parsedNotes.cleanedNotes) ? (
-                                    <div className="rounded-[1rem] border border-[#edf2f7] bg-white px-4 py-3 md:col-span-2">
-                                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
+                                    <div className="rounded-[1rem] border border-[var(--line)] bg-[var(--panel)] px-4 py-3 md:col-span-2">
+                                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[var(--amber)]">
                                         Zusatzinfos
                                       </p>
-                                      <div className="mt-2 space-y-2 text-[0.95rem] text-[#111827]">
+                                      <div className="mt-2 space-y-2 text-[0.95rem] text-[var(--paper)]">
                                         {seats.baby > 0 ? <p><span className="font-semibold">Babyschale:</span> {seats.baby}</p> : null}
                                         {seats.child > 0 ? <p><span className="font-semibold">Kindersitz:</span> {seats.child}</p> : null}
                                         {seats.booster > 0 ? <p><span className="font-semibold">Sitzerhoehung:</span> {seats.booster}</p> : null}
@@ -1230,11 +1230,11 @@ export default function AccountClient({
                                   ) : null}
 
                                   {isPrevious(b) && !isCanceled(b.status) ? (
-                                    <div className="rounded-[1rem] border border-[#edf2f7] bg-white px-4 py-3 md:col-span-2">
-                                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#1679FF]">
+                                    <div className="rounded-[1rem] border border-[var(--line)] bg-[var(--panel)] px-4 py-3 md:col-span-2">
+                                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[var(--amber)]">
                                         Fahrer bewerten
                                       </p>
-                                      <p className="mt-2 text-[0.95rem] text-[#6a7d96]">
+                                      <p className="mt-2 text-[0.95rem] text-[var(--muted)]">
                                         Wie war Ihre Erfahrung mit dieser Fahrt?
                                       </p>
                                       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -1251,7 +1251,7 @@ export default function AccountClient({
                                                 },
                                               }))
                                             }
-                                            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dbe7f8] bg-[#f8fbff] text-[#1679FF] transition-colors hover:bg-[#eef5ff]"
+                                            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] bg-[rgba(255,255,255,.045)] text-[var(--amber)] transition-colors hover:bg-[rgba(255,182,41,.12)]"
                                             aria-label={`${star} Sterne`}
                                           >
                                             <Star
@@ -1273,10 +1273,10 @@ export default function AccountClient({
                                           }))
                                         }
                                         placeholder="Optionaler Kommentar zu Fahrer und Fahrt"
-                                        className="mt-3 min-h-[110px] w-full rounded-[1rem] border border-[#e8edf3] bg-[#f8fbff] px-4 py-3 text-[0.95rem] text-[#111827] outline-none transition-colors focus:border-[#1679FF]"
+                                        className="mt-3 min-h-[110px] w-full rounded-[1rem] border border-[var(--line)] bg-[rgba(255,255,255,.045)] px-4 py-3 text-[0.95rem] text-[var(--paper)] outline-none transition-colors focus:border-[var(--amber)]"
                                       />
                                       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                                        <p className="text-[0.85rem] text-[#6a7d96]">
+                                        <p className="text-[0.85rem] text-[var(--muted)]">
                                           {b.review_rating
                                             ? 'Ihre Bewertung kann aktualisiert werden.'
                                             : 'Noch keine Bewertung gespeichert.'}
@@ -1342,14 +1342,14 @@ export default function AccountClient({
                 ) : null}
 
                 {groupedBookings.length === 0 ? (
-                  <p className="text-[#6a7d96]">
+                  <p className="text-[var(--muted)]">
                     {bookings.length === 0
                       ? 'Noch keine Buchungen vorhanden.'
                       : 'Keine Buchungen fuer diesen Filter.'}
                   </p>
                 ) : null}
-                {bookingNotice ? <p className="text-sm text-[#0a63ff]">{bookingNotice}</p> : null}
-                {bookingError ? <p className="text-sm text-[#d70015]">{bookingError}</p> : null}
+                {bookingNotice ? <p className="text-sm text-[var(--amber)]">{bookingNotice}</p> : null}
+                {bookingError ? <p className="text-sm text-[var(--red)]">{bookingError}</p> : null}
               </div>
             </section>
           ) : null}
@@ -1377,12 +1377,12 @@ export default function AccountClient({
                     setOpenPanel(null);
                     router.push(buildAccountHref({ lang: option.code, panel: null }));
                   }}
-                  className={`flex w-full items-center justify-between rounded-[16px] px-8 py-2 text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111] ${
-                    selected ? 'bg-[#f5f5f7]' : ''
+                  className={`flex w-full items-center justify-between rounded-[16px] px-8 py-2 text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[var(--paper)] ${
+                    selected ? 'bg-[rgba(255,255,255,.06)]' : ''
                   }`}
                 >
                   <span>{option.label}</span>
-                  <span className="text-[0.95rem] font-semibold uppercase text-[#6b7280]">
+                  <span className="text-[0.95rem] font-semibold uppercase text-[var(--muted)]">
                     {option.code}
                   </span>
                 </button>
@@ -1398,32 +1398,32 @@ export default function AccountClient({
           onBack={closePanelRoute}
         >
           <div className="space-y-4">
-            <div className="rounded-[1.55rem] border border-[#0f1722] bg-[#000000] px-5 py-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
+            <div className="rounded-[1.55rem] border border-[var(--line)] bg-[var(--night)] px-5 py-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
               <div className="flex items-center gap-4">
                 <img
                   src="/favtaxi.png"
                   alt="Alex Flughafentaxi"
                   className="h-16 w-16 rounded-[1.2rem] object-cover"
                 />
-                <div className="min-w-0 text-white">
+                <div className="min-w-0 text-[var(--night)]">
                   <p className="text-[1.14rem] font-semibold tracking-[-0.04em]">Alex Flughafentaxi</p>
-                  <p className="mt-1 text-[0.95rem] leading-6 text-white/70">
+                  <p className="mt-1 text-[0.95rem] leading-6 text-[var(--muted)]">
                     Eigene App mit direktem Zugriff auf Buchung, Profil und Fahrten.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+            <div className="rounded-[1.55rem] border border-[var(--line)] bg-[var(--panel)] px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
               <div className="flex items-start gap-4">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#676767]">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[var(--muted)]">
                   <Download size={24} strokeWidth={1.8} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[1rem] font-medium text-[#111827]">{installRowLabel}</p>
-                  <p className="mt-1 text-[0.95rem] leading-6 text-[#6a6a6a]">{installRowHint}</p>
+                  <p className="text-[1rem] font-medium text-[var(--paper)]">{installRowLabel}</p>
+                  <p className="mt-1 text-[0.95rem] leading-6 text-[var(--muted)]">{installRowHint}</p>
                   {installNotice ? (
-                    <p className="mt-2 text-[0.92rem] leading-6 text-[#6a7d96]">{installNotice}</p>
+                    <p className="mt-2 text-[0.92rem] leading-6 text-[var(--muted)]">{installNotice}</p>
                   ) : null}
                 </div>
               </div>
@@ -1454,7 +1454,7 @@ export default function AccountClient({
             setPendingFavoriteSlot(null);
           }}
         >
-          <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+          <div className="rounded-[1.55rem] border border-[var(--line)] bg-[var(--panel)] px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
             <form
               action={() => {
                 setError(null);
@@ -1516,7 +1516,7 @@ export default function AccountClient({
           subtitle="Name und Telefonnummer aktualisieren"
           onBack={closePanelRoute}
         >
-          <div className="rounded-[1.55rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
+          <div className="rounded-[1.55rem] border border-[var(--line)] bg-[var(--panel)] px-5 py-5 shadow-[0_12px_28px_rgba(17,17,17,0.04)]">
             <form
               action={(formData) => {
                 setError(null);
@@ -1551,7 +1551,7 @@ export default function AccountClient({
                 value={userEmail}
                 readOnly
                 aria-label="E-Mail kann nicht geaendert werden"
-                className="ui-input cursor-not-allowed border-[#e5e7eb] bg-[#f3f4f6] text-[#8b95a7]"
+                className="ui-input cursor-not-allowed border-[var(--line)] bg-[rgba(255,255,255,.06)] text-[var(--muted)]"
               />
               <button
                 type="submit"
@@ -1570,11 +1570,11 @@ export default function AccountClient({
           onClick={() => setIsLogoutConfirmOpen(false)}
         >
           <div
-            className="w-full max-w-[34rem] rounded-[2rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_18px_40px_rgba(17,17,17,0.12)] sm:px-6 sm:py-6"
+            className="w-full max-w-[34rem] rounded-[2rem] border border-[var(--line)] bg-[var(--panel)] px-5 py-5 shadow-[0_18px_40px_rgba(17,17,17,0.12)] sm:px-6 sm:py-6"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="text-center">
-              <p className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] sm:text-[2.2rem]">
+              <p className="text-[2rem] font-semibold tracking-[-0.05em] text-[var(--paper)] sm:text-[2.2rem]">
                 Abmelden?
               </p>
             </div>
@@ -1601,14 +1601,14 @@ export default function AccountClient({
           onClick={() => setIsDeleteConfirmOpen(false)}
         >
           <div
-            className="w-full max-w-[34rem] rounded-[2rem] border border-[#ece7df] bg-white px-5 py-5 shadow-[0_18px_40px_rgba(17,17,17,0.12)] sm:px-6 sm:py-6"
+            className="w-full max-w-[34rem] rounded-[2rem] border border-[var(--line)] bg-[var(--panel)] px-5 py-5 shadow-[0_18px_40px_rgba(17,17,17,0.12)] sm:px-6 sm:py-6"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="text-center">
-              <p className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] sm:text-[2.2rem]">
+              <p className="text-[2rem] font-semibold tracking-[-0.05em] text-[var(--paper)] sm:text-[2.2rem]">
                 Account loeschen?
               </p>
-              <p className="mt-5 text-[1.08rem] leading-8 text-[#111827] sm:text-[1.2rem] sm:leading-9">
+              <p className="mt-5 text-[1.08rem] leading-8 text-[var(--paper)] sm:text-[1.2rem] sm:leading-9">
                 Ihr Login, Profil und Ihre Favoriten werden entfernt. Buchungen bleiben fuer interne
                 Nachvollziehbarkeit erhalten, aber E-Mail und Telefonnummer werden daraus entfernt.
               </p>

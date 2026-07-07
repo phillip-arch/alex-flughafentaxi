@@ -14,7 +14,7 @@ type ConfirmStatusCardProps = {
 export default function ConfirmStatusCard({
   icon,
   eyebrow,
-  eyebrowClassName = 'text-[#1679FF]',
+  eyebrowClassName = 'text-[var(--amber)]',
   title,
   description,
   children,
@@ -30,10 +30,10 @@ export default function ConfirmStatusCard({
               {eyebrow}
             </p>
           ) : null}
-          <h1 className="text-[2rem] font-semibold tracking-[-0.05em] text-[#111827] md:text-[2.6rem]">
+          <h1 className="text-[2rem] font-semibold tracking-[-0.05em] text-[var(--paper)] md:text-[2.6rem]">
             {title}
           </h1>
-          <p className="max-w-[34rem] text-[1rem] leading-8 text-[#5d6b7c] md:text-[1.06rem]">
+          <p className="max-w-[34rem] text-[1rem] leading-8 text-[var(--muted)] md:text-[1.06rem]">
             {description}
           </p>
         </div>

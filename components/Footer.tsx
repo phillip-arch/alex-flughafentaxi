@@ -25,17 +25,17 @@ export default function Footer() {
   };
 
   return (
-    <footer id="site-footer" className="mt-auto bg-[#080e1c] text-white">
+    <footer id="site-footer" className="mt-auto bg-[var(--night)] text-[var(--paper)]">
       <div className="app-container py-16 md:py-20">
         <div className="grid gap-14 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-12">
 
           {/* Brand / CTA */}
           <div>
-            <h2 className="text-[2rem] font-black leading-[1.05] tracking-[-0.055em] !text-white md:text-[2.5rem]">
+            <h2 className="text-[2rem] font-black leading-[1.05] tracking-[-0.055em] !text-[var(--paper)] md:text-[2.5rem]">
               Book your airport<br />taxi now
             </h2>
 
-            <p className="mt-4 text-[0.95rem] leading-[1.7] text-white/55">
+            <p className="mt-4 text-[0.95rem] leading-[1.7] text-[var(--muted)]">
               Book in less than 1 minute. On-time pickup, transparent fixed prices, and direct support by phone or WhatsApp.
             </p>
 
@@ -48,23 +48,23 @@ export default function Footer() {
               </Link>
               <Link
                 href={withLang('/preise')}
-                className="inline-flex items-center rounded-[0.9rem] border border-white/15 px-6 py-3.5 text-[0.95rem] font-semibold text-white/75 transition-colors hover:border-white/30 hover:text-white"
+                className="inline-flex items-center rounded-[0.9rem] border border-[var(--line)] px-6 py-3.5 text-[0.95rem] font-semibold text-[var(--paper)] transition-colors hover:border-[rgba(255,182,41,.35)] hover:text-[var(--paper)]"
               >
                 View prices
               </Link>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-[0.88rem] text-white/50">
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-[0.88rem] text-[var(--muted)]">
               <span className="inline-flex items-center gap-2">
-                <Clock3 size={15} className="text-[#1679ff]" />
+                <Clock3 size={15} className="text-[var(--amber)]" />
                 On-time pickup
               </span>
               <span className="inline-flex items-center gap-2">
-                <ShieldEllipsis size={15} className="text-[#1679ff]" />
+                <ShieldEllipsis size={15} className="text-[var(--amber)]" />
                 No hidden costs
               </span>
               <span className="inline-flex items-center gap-2">
-                <ShieldCheck size={15} className="text-[#1679ff]" />
+                <ShieldCheck size={15} className="text-[var(--amber)]" />
                 Reliable airport transfer
               </span>
             </div>
@@ -73,14 +73,14 @@ export default function Footer() {
               <a
                 href="#"
                 aria-label="TikTok"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/45 transition-colors hover:border-white/25 hover:text-white"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] text-[var(--muted)] transition-colors hover:border-[rgba(255,182,41,.35)] hover:text-[var(--paper)]"
               >
                 <TikTokIcon className="h-4 w-4" />
               </a>
               <a
                 href="#"
                 aria-label="Instagram"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/45 transition-colors hover:border-white/25 hover:text-white"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] text-[var(--muted)] transition-colors hover:border-[rgba(255,182,41,.35)] hover:text-[var(--paper)]"
               >
                 <Instagram size={16} />
               </a>
@@ -89,25 +89,25 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/60">Services</p>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Services</p>
             <ul className="mt-5 space-y-4">
               <li>
-                <Link href={withLang('/book')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/book')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Airport Transfer
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/#flotte')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/#flotte')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Group Transfers
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/#flotte')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/#flotte')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Child Seats
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/preise')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/preise')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Fixed Pricing
                 </Link>
               </li>
@@ -116,25 +116,25 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/60">Quick Links</p>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Quick Links</p>
             <ul className="mt-5 space-y-4">
               <li>
-                <Link href={withLang('/preise')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/preise')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Prices
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/#gebiete')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/#gebiete')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Areas
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/#flotte')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/#flotte')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Fleet
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/faq')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/faq')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   FAQ
                 </Link>
               </li>
@@ -143,20 +143,20 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/60">Legal</p>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[var(--muted)]">Legal</p>
             <ul className="mt-5 space-y-4">
               <li>
-                <Link href={`/impressum?lang=${activeLang}`} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={`/impressum?lang=${activeLang}`} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Imprint
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/datenschutz')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/datenschutz')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href={withLang('/agb')} className="text-[0.95rem] text-white/55 transition-colors hover:text-white">
+                <Link href={withLang('/agb')} className="text-[0.95rem] text-[var(--muted)] transition-colors hover:text-[var(--paper)]">
                   Terms and Conditions
                 </Link>
               </li>
@@ -165,7 +165,7 @@ export default function Footer() {
 
         </div>
 
-        <div className="mt-14 border-t border-white/8 pt-6 text-[0.82rem] text-white/50">
+        <div className="mt-14 border-t border-[var(--line)] pt-6 text-[0.82rem] text-[var(--muted)]">
           © 2025 Alex Airport Taxi. All rights reserved.
         </div>
       </div>

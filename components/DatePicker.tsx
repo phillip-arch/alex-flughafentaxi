@@ -80,7 +80,7 @@ function MonthGrid({
     <div className="min-w-0">
       {showHeader ? (
         <div className="mb-4 text-center">
-          <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[#1d1d1f] md:text-[19px]">
+          <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[var(--paper)] md:text-[19px]">
             {MONTH_FORMATTER.format(new Date(year, month, 1))} {year}
           </h2>
         </div>
@@ -88,7 +88,7 @@ function MonthGrid({
 
       <div className="mb-1 grid grid-cols-7 md:mb-2">
         {DAY_NAMES.map((day) => (
-          <div key={day} className="py-1 text-center text-[10px] font-semibold tracking-[0.02em] text-[#86868b] md:text-[11px]">
+          <div key={day} className="py-1 text-center text-[10px] font-semibold tracking-[0.02em] text-[var(--muted)] md:text-[11px]">
             {day}
           </div>
         ))}
@@ -114,13 +114,13 @@ function MonthGrid({
               onClick={() => !disabled && onSelect(date)}
               disabled={disabled}
               className={`mx-auto flex h-[2.35rem] w-[2.35rem] items-center justify-center rounded-full text-[14px] font-medium transition-all md:h-[2rem] md:w-[2rem] md:text-[13px] ${
-                isSelected ? 'bg-[#1679FF] text-white shadow-md' : ''
+                isSelected ? 'bg-[var(--amber)] text-[var(--night)] shadow-md' : ''
               } ${
-                !isSelected && !disabled ? 'text-[#1d1d1f] hover:bg-[#f5f5f7]' : ''
+                !isSelected && !disabled ? 'text-[var(--paper)] hover:bg-[rgba(255,255,255,.06)]' : ''
               } ${
-                isToday && !isSelected && !disabled ? 'font-bold text-[#1679FF]' : ''
+                isToday && !isSelected && !disabled ? 'font-bold text-[var(--amber)]' : ''
               } ${
-                disabled ? 'cursor-not-allowed text-[#d2d2d7]' : ''
+                disabled ? 'cursor-not-allowed text-[var(--line)]' : ''
               }`}
             >
               {day}
@@ -299,7 +299,7 @@ export default function DatePicker({
         onClick={onClose}
       />
       <div
-        className="relative z-10 w-[min(23rem,calc(100vw-2rem))] rounded-[1.45rem] border border-[#e6e1d7] bg-white p-4 shadow-[0_18px_42px_rgba(17,17,17,0.16)] animate-in fade-in duration-150 md:w-[min(42rem,calc(100vw-2rem))] md:rounded-[1.5rem] md:p-4"
+        className="relative z-10 w-[min(23rem,calc(100vw-2rem))] rounded-[1.45rem] border border-[var(--line)] bg-[var(--panel)] p-4 shadow-[0_18px_42px_rgba(17,17,17,0.16)] animate-in fade-in duration-150 md:w-[min(42rem,calc(100vw-2rem))] md:rounded-[1.5rem] md:p-4"
         style={popoverStyle}
         role="dialog"
         aria-modal="true"
@@ -310,17 +310,17 @@ export default function DatePicker({
             type="button"
             onClick={handlePrevMonth}
             disabled={!canGoPrev}
-            className="col-start-1 row-start-1 flex h-10 w-10 items-center justify-center self-center rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#d2d2d7] disabled:hover:bg-transparent md:h-8 md:w-8"
+            className="col-start-1 row-start-1 flex h-10 w-10 items-center justify-center self-center rounded-full text-[var(--paper)] transition-colors hover:bg-[rgba(255,255,255,.06)] disabled:cursor-not-allowed disabled:text-[var(--line)] disabled:hover:bg-transparent md:h-8 md:w-8"
           >
             <ChevronLeft size={22} />
           </button>
           <div className="col-start-2 row-start-1 justify-self-center text-center">
-            <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[#1d1d1f] md:text-[15px]">
+            <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[var(--paper)] md:text-[15px]">
               {MONTH_FORMATTER.format(primaryMonth)} {primaryMonth.getFullYear()}
             </h2>
           </div>
           <div className="hidden justify-self-center text-center md:block md:col-start-3 md:row-start-1">
-            <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[#1d1d1f] md:text-[15px]">
+            <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-[var(--paper)] md:text-[15px]">
               {MONTH_FORMATTER.format(secondaryMonth)} {secondaryMonth.getFullYear()}
             </h2>
           </div>
@@ -328,7 +328,7 @@ export default function DatePicker({
             type="button"
             onClick={handleNextMonth}
             disabled={!canGoNext}
-            className="col-start-3 row-start-1 flex h-10 w-10 items-center justify-center self-center justify-self-end rounded-full text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7] disabled:cursor-not-allowed disabled:text-[#d2d2d7] disabled:hover:bg-transparent md:col-start-4 md:h-8 md:w-8"
+            className="col-start-3 row-start-1 flex h-10 w-10 items-center justify-center self-center justify-self-end rounded-full text-[var(--paper)] transition-colors hover:bg-[rgba(255,255,255,.06)] disabled:cursor-not-allowed disabled:text-[var(--line)] disabled:hover:bg-transparent md:col-start-4 md:h-8 md:w-8"
           >
             <ChevronRight size={22} />
           </button>
@@ -355,7 +355,7 @@ export default function DatePicker({
           </div>
         </div>
 
-        <p className="mt-4 text-center text-[12px] font-medium text-[#7b8798] md:mt-3 md:text-[11px]">
+        <p className="mt-4 text-center text-[12px] font-medium text-[var(--muted)] md:mt-3 md:text-[11px]">
           Reserve your ride up to 90 days in advance
         </p>
       </div>

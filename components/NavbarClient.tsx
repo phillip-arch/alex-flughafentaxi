@@ -99,10 +99,10 @@ export default function NavbarClient({
   if (isAdminPage) return null;
 
   const headerClass = isHomePage && !isScrolled
-    ? 'border-b border-white/10 bg-[#000000] text-white'
-    : 'border-b border-white/10 bg-[rgba(0,0,0,0.94)] text-white backdrop-blur-xl';
+    ? 'border-b border-[var(--line)] bg-[var(--night)] text-[var(--paper)]'
+    : 'border-b border-[var(--line)] bg-[rgba(10,17,31,.94)] text-[var(--paper)] backdrop-blur-xl';
 
-  const navItemClass = 'text-sm font-medium text-white/72 transition-colors hover:text-white';
+  const navItemClass = 'text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--paper)]';
 
   const withLang = (href: string) => {
     const [pathWithSearch, hash = ''] = href.split('#');
@@ -150,7 +150,7 @@ export default function NavbarClient({
         key={language.code}
         href={buildLangHref(language.code)}
         onClick={() => handleLanguageSelect(language.code)}
-        className={`${itemClassName}${activeLang === language.code ? ' bg-[#f5f5f7]' : ''}`}
+        className={`${itemClassName}${activeLang === language.code ? ' bg-[rgba(255,255,255,.06)]' : ''}`}
       >
         <span>{language.label}</span>
         <span className={codeClassName}>{language.code}</span>
@@ -186,7 +186,7 @@ export default function NavbarClient({
             <button
               type="button"
               onClick={toggleDesktopLangMenu}
-              className="inline-flex items-center gap-1 text-[15px] font-medium text-white transition-colors hover:text-white/78"
+              className="inline-flex items-center gap-1 text-[15px] font-medium text-[var(--paper)] transition-colors hover:text-[var(--paper)]"
               aria-haspopup="menu"
               aria-expanded={isDesktopLangMenuOpen}
               aria-label="Choose language"
@@ -199,11 +199,11 @@ export default function NavbarClient({
             </button>
 
             {isDesktopLangMenuOpen ? (
-              <div className="absolute right-0 top-[calc(100%+12px)] w-[280px] rounded-[24px] border border-[#e8e8ed] bg-white p-3 text-[#111111] shadow-[0_22px_60px_rgba(17,17,17,0.16)]">
+              <div className="absolute right-0 top-[calc(100%+12px)] w-[280px] rounded-[24px] border border-[var(--line)] bg-[var(--panel)] p-3 text-[var(--paper)] shadow-[0_22px_60px_rgba(17,17,17,0.16)]">
                 <div className="grid grid-cols-2 gap-1">
                   {renderLanguageItems(
-                    'flex items-center justify-between rounded-[16px] px-4 py-3.5 text-[15px] font-medium transition-colors hover:bg-[#f5f5f7]',
-                    'text-[13px] font-semibold uppercase text-[#6b7280]'
+                    'flex items-center justify-between rounded-[16px] px-4 py-3.5 text-[15px] font-medium transition-colors hover:bg-[rgba(255,255,255,.06)]',
+                    'text-[13px] font-semibold uppercase text-[var(--muted)]'
                   )}
                 </div>
               </div>
@@ -212,7 +212,7 @@ export default function NavbarClient({
 
           {showAccountEntry ? (
             <Link href={withLang(accountHref)} className="ui-icon-button-accent -translate-y-px" aria-label="Go to account">
-              <User size={18} strokeWidth={2.1} className="text-[#111111]" />
+              <User size={18} strokeWidth={2.1} className="text-[var(--night)]" />
             </Link>
           ) : null}
         </div>
@@ -222,7 +222,7 @@ export default function NavbarClient({
             <button
               type="button"
               onClick={toggleMobileLangMenu}
-              className="inline-flex min-w-[4.75rem] items-center gap-1.5 text-[0.95rem] font-medium text-white"
+              className="inline-flex min-w-[4.75rem] items-center gap-1.5 text-[0.95rem] font-medium text-[var(--paper)]"
               aria-haspopup="menu"
               aria-expanded={isMobileLangMenuOpen}
               aria-label="Choose language"
@@ -237,12 +237,12 @@ export default function NavbarClient({
 
           {showAccountEntry ? (
             <Link href={withLang(accountHref)} className="ui-icon-button-accent" aria-label="Go to account">
-              <User size={18} strokeWidth={2.1} className="text-[#111111]" />
+              <User size={18} strokeWidth={2.1} className="text-[var(--night)]" />
             </Link>
           ) : null}
 
           <button
-            className="ml-2 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-white"
+            className="ml-2 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-[var(--paper)]"
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
             onClick={toggleMobileMenu}
           >
@@ -255,8 +255,8 @@ export default function NavbarClient({
       </header>
 
       {isMobileMenuOpen ? (
-        <div className="fixed inset-0 z-[80] bg-white text-[#111111] lg:hidden">
-          <div className="app-container flex h-[66px] items-center justify-between bg-[#000000] text-white">
+        <div className="fixed inset-0 z-[80] bg-[var(--panel)] text-[var(--paper)] lg:hidden">
+          <div className="app-container flex h-[66px] items-center justify-between bg-[var(--night)] text-[var(--paper)]">
             <Link href={withLang('/')} className="flex items-center" onClick={closeMobileMenu}>
               <span className="relative block h-11 w-[120px] overflow-hidden">
                 <Image
@@ -274,7 +274,7 @@ export default function NavbarClient({
                 <button
                   type="button"
                   onClick={toggleMobileLangMenu}
-                  className="inline-flex min-w-[4.75rem] items-center gap-1.5 text-[0.95rem] font-medium text-white"
+                  className="inline-flex min-w-[4.75rem] items-center gap-1.5 text-[0.95rem] font-medium text-[var(--paper)]"
                   aria-haspopup="menu"
                   aria-expanded={isMobileLangMenuOpen}
                   aria-label="Choose language"
@@ -294,14 +294,14 @@ export default function NavbarClient({
                   className="ui-icon-button-accent"
                   aria-label="Go to account"
                 >
-                  <User size={18} strokeWidth={2.1} className="text-[#111111]" />
+                  <User size={18} strokeWidth={2.1} className="text-[var(--night)]" />
                 </Link>
               ) : null}
 
               <button
                 type="button"
                 onClick={closeMobileMenu}
-                className="ml-2 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-white"
+                className="ml-2 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center text-[var(--paper)]"
                 aria-label="Close menu"
               >
                 <span className="flex h-5 w-5 items-center justify-center">
@@ -318,7 +318,7 @@ export default function NavbarClient({
                   key={item.name}
                   href={withLang(item.href)}
                   onClick={closeMobileMenu}
-                  className="text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111]"
+                  className="text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[var(--paper)]"
                 >
                   {item.name}
                 </Link>
@@ -329,12 +329,12 @@ export default function NavbarClient({
       ) : null}
 
       {isMobileLangMenuOpen ? (
-        <div className="fixed inset-x-0 top-[66px] bottom-0 z-[75] bg-white text-[#111111] lg:hidden">
+        <div className="fixed inset-x-0 top-[66px] bottom-0 z-[75] bg-[var(--panel)] text-[var(--paper)] lg:hidden">
           <div className="px-8 pt-8">
             <div className="flex flex-col items-start gap-8">
               {renderLanguageItems(
-                'flex w-full items-center justify-between rounded-[16px] px-8 py-2 text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[#111111]',
-                'text-[0.95rem] font-semibold uppercase text-[#6b7280]'
+                'flex w-full items-center justify-between rounded-[16px] px-8 py-2 text-left text-[1.55rem] font-semibold tracking-[-0.05em] text-[var(--paper)]',
+                'text-[0.95rem] font-semibold uppercase text-[var(--muted)]'
               )}
             </div>
           </div>

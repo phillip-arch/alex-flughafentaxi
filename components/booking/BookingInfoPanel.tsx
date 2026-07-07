@@ -33,21 +33,21 @@ const paymentMethodBadges: PaymentMethodBadge[] = [
 ];
 
 const getInfoCardClassName = (isBookVariant: boolean, marginClassName: string) =>
-  `${marginClassName} ${isBookVariant ? 'rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[#e8edf3] bg-white`;
+  `${marginClassName} ${isBookVariant ? 'rounded-[1.45rem] px-5 py-6 md:px-6 md:py-7' : 'rounded-[1.4rem] px-4 py-4 md:px-5'} border border-[var(--line)] bg-[var(--panel)]`;
 
 const getInfoTitleClassName = (isBookVariant: boolean) =>
-  `${isBookVariant ? 'text-[1rem] tracking-[0.04em]' : 'text-[12px] tracking-[0.18em] md:text-[13px]'} font-semibold uppercase text-[#1679FF]`;
+  `${isBookVariant ? 'text-[1rem] tracking-[0.04em]' : 'text-[12px] tracking-[0.18em] md:text-[13px]'} font-semibold uppercase text-[var(--amber)]`;
 
 const getInfoBodyClassName = (isBookVariant: boolean) =>
   `${isBookVariant ? 'mt-3 text-[1rem] md:text-[1.08rem]' : 'mt-2 text-sm'} font-medium text-[var(--color-text)]`;
 
 const getInfoItemsClassName = (isBookVariant: boolean) =>
-  `${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-2 text-sm leading-6'} text-[#64748b]`;
+  `${isBookVariant ? 'mt-5 space-y-2 text-[1.02rem] leading-7 md:text-[1.15rem]' : 'ui-copy mt-3 space-y-2 text-sm leading-6'} text-[var(--muted)]`;
 
 function PaymentBadgeIcon({ kind }: { kind: PaymentMethodBadge['kind'] }) {
   if (kind === 'cash') {
     return (
-      <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[#eef5ff] text-[#1679FF]">
+      <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[rgba(255,182,41,.12)] text-[var(--amber)]">
         <Wallet size={18} strokeWidth={2.2} />
       </div>
     );
@@ -55,18 +55,18 @@ function PaymentBadgeIcon({ kind }: { kind: PaymentMethodBadge['kind'] }) {
 
   if (kind === 'visa') {
     return (
-      <div className="flex h-10 min-w-[4.25rem] items-center justify-center rounded-[0.9rem] bg-[#eef5ff] px-3">
-        <span className="text-[0.95rem] font-black uppercase tracking-[0.1em] text-[#1434CB]">VISA</span>
+      <div className="flex h-10 min-w-[4.25rem] items-center justify-center rounded-[0.9rem] bg-[rgba(255,182,41,.12)] px-3">
+        <span className="text-[0.95rem] font-black uppercase tracking-[0.1em] text-[var(--blue)]">VISA</span>
       </div>
     );
   }
 
   if (kind === 'mastercard') {
     return (
-      <div className="flex h-10 min-w-[4.6rem] items-center justify-center rounded-[0.9rem] bg-[#fff4ef] px-3">
+      <div className="flex h-10 min-w-[4.6rem] items-center justify-center rounded-[0.9rem] bg-[rgba(255,182,41,.10)] px-3">
         <div className="relative h-5 w-8">
-          <span className="absolute left-0 top-0 h-5 w-5 rounded-full bg-[#EA001B]" />
-          <span className="absolute right-0 top-0 h-5 w-5 rounded-full bg-[#F79E1B]" />
+          <span className="absolute left-0 top-0 h-5 w-5 rounded-full bg-[var(--red)]" />
+          <span className="absolute right-0 top-0 h-5 w-5 rounded-full bg-[var(--amber)]" />
           <span className="absolute left-[0.75rem] top-0 h-5 w-2.5 bg-[rgba(255,94,0,0.72)]" />
         </div>
       </div>
@@ -75,21 +75,21 @@ function PaymentBadgeIcon({ kind }: { kind: PaymentMethodBadge['kind'] }) {
 
   if (kind === 'googlepay') {
     return (
-      <div className="flex h-10 min-w-[5.25rem] items-center justify-center rounded-[0.9rem] bg-[#f5f7fb] px-3">
+      <div className="flex h-10 min-w-[5.25rem] items-center justify-center rounded-[0.9rem] bg-[rgba(255,255,255,.06)] px-3">
         <span className="text-[1rem] font-black tracking-[-0.06em]">
-          <span className="text-[#4285F4]">G</span>
-          <span className="text-[#EA4335]">o</span>
-          <span className="text-[#FBBC05]">o</span>
-          <span className="text-[#4285F4]">g</span>
-          <span className="text-[#34A853]">le</span>
+          <span className="text-[var(--blue)]">G</span>
+          <span className="text-[var(--red)]">o</span>
+          <span className="text-[var(--amber)]">o</span>
+          <span className="text-[var(--blue)]">g</span>
+          <span className="text-[var(--green)]">le</span>
         </span>
       </div>
     );
   }
 
   return (
-    <div className="flex h-10 min-w-[5.4rem] items-center justify-center rounded-[0.9rem] bg-[#f5f5f7] px-3">
-      <span className="text-[0.98rem] font-semibold tracking-[-0.04em] text-[#111827]">Apple Pay</span>
+    <div className="flex h-10 min-w-[5.4rem] items-center justify-center rounded-[0.9rem] bg-[rgba(255,255,255,.06)] px-3">
+      <span className="text-[0.98rem] font-semibold tracking-[-0.04em] text-[var(--paper)]">Apple Pay</span>
     </div>
   );
 }
@@ -100,11 +100,11 @@ function PaymentMethodsGrid({ isBookVariant }: { isBookVariant: boolean }) {
       {paymentMethodBadges.map((method) => (
         <div
           key={method.label}
-          className={`flex items-center justify-center gap-2 rounded-[1rem] border border-[#edf2f7] bg-[#fbfdff] ${isBookVariant ? 'px-3 py-3' : 'px-3 py-2.5'}`}
+          className={`flex items-center justify-center gap-2 rounded-[1rem] border border-[var(--line)] bg-[rgba(255,255,255,.045)] ${isBookVariant ? 'px-3 py-3' : 'px-3 py-2.5'}`}
         >
           <PaymentBadgeIcon kind={method.kind} />
           {method.kind === 'cash' ? (
-            <span className={`${isBookVariant ? 'text-[0.95rem]' : 'text-[0.88rem]'} font-semibold leading-tight text-[#111827]`}>
+            <span className={`${isBookVariant ? 'text-[0.95rem]' : 'text-[0.88rem]'} font-semibold leading-tight text-[var(--paper)]`}>
               {method.label}
             </span>
           ) : null}

@@ -40,7 +40,7 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
       return (
         <ConfirmStatusCard
           icon={
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#8fc3ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[rgba(255,182,41,.35)] bg-[linear-gradient(135deg,rgba(255,182,41,.12)_0%,rgba(255,182,41,.18)_100%)] text-[var(--amber)]">
               <CheckCircle2 size={38} />
             </div>
           }
@@ -58,7 +58,7 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
     return (
       <ConfirmStatusCard
         icon={
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#8fc3ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.12)_0%,rgba(36,144,255,0.18)_100%)] text-[#0a63ff]">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[rgba(255,182,41,.35)] bg-[linear-gradient(135deg,rgba(255,182,41,.12)_0%,rgba(255,182,41,.18)_100%)] text-[var(--amber)]">
             <CheckCircle2 size={38} />
           </div>
         }
@@ -71,23 +71,23 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
         }
       >
         <div className="mt-8 grid w-full gap-4 md:grid-cols-2">
-            <div className="rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5 text-left">
-              <div className="flex items-center gap-2 text-[#1679FF]">
+            <div className="rounded-[1.4rem] border border-[var(--line)] bg-[var(--night)] px-5 py-5 text-left">
+              <div className="flex items-center gap-2 text-[var(--amber)]">
                 <Mail size={18} />
                 <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">Status</p>
               </div>
-              <p className="mt-3 text-[0.98rem] leading-7 text-[#42566f]">
+              <p className="mt-3 text-[0.98rem] leading-7 text-[var(--muted)]">
                 {alreadyConfirmed
                   ? 'No further action is required. The ride remains confirmed.'
                   : 'Your confirmation has been saved successfully and shared internally.'}
               </p>
             </div>
-            <div className="rounded-[1.4rem] border border-[#e8edf3] bg-white px-5 py-5 text-left">
-              <div className="flex items-center gap-2 text-[#1679FF]">
+            <div className="rounded-[1.4rem] border border-[var(--line)] bg-[var(--night)] px-5 py-5 text-left">
+              <div className="flex items-center gap-2 text-[var(--amber)]">
                 <ShieldCheck size={18} />
                 <p className="text-[0.78rem] font-semibold uppercase tracking-[0.18em]">Reference</p>
               </div>
-              <p className="mt-3 text-[0.98rem] leading-7 text-[#42566f]">
+              <p className="mt-3 text-[0.98rem] leading-7 text-[var(--muted)]">
                 {driverId
                   ? 'The driver confirmation has been processed for this ride.'
                   : reference
@@ -100,10 +100,10 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
         <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#1679FF] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#0f6ae8] hover:text-white visited:text-white"
+            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[var(--amber)] px-7 py-4 text-[1.0625rem] font-medium leading-none text-[var(--night)] no-underline transition-colors hover:bg-[var(--amber-deep)] hover:text-[var(--night)] visited:text-[var(--night)]"
           >
-            <span className="text-white">Back to homepage</span>
-            <ArrowRight size={17} className="text-white" />
+            <span className="text-[var(--night)]">Back to homepage</span>
+            <ArrowRight size={17} className="text-[var(--night)]" />
           </Link>
         </div>
       </ConfirmStatusCard>
@@ -114,21 +114,21 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
     return (
       <ConfirmStatusCard
         icon={
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#f1d1d6] bg-[#fff4f6] text-[#d70015]">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[rgba(232,106,106,.35)] bg-[rgba(232,106,106,.10)] text-[var(--red)]">
             <XCircle size={38} />
           </div>
         }
         eyebrow="Error"
-        eyebrowClassName="text-[#d70015]"
+        eyebrowClassName="text-[var(--red)]"
         title="Confirmation not possible"
         description={message}
       >
         <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-[var(--radius-field)] bg-[#1679FF] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white no-underline transition-colors hover:bg-[#0f6ae8] hover:text-white visited:text-white"
+            className="inline-flex items-center justify-center rounded-[var(--radius-field)] bg-[var(--amber)] px-7 py-4 text-[1.0625rem] font-medium leading-none text-[var(--night)] no-underline transition-colors hover:bg-[var(--amber-deep)] hover:text-[var(--night)] visited:text-[var(--night)]"
           >
-            <span className="text-white">Back to homepage</span>
+            <span className="text-[var(--night)]">Back to homepage</span>
           </Link>
         </div>
       </ConfirmStatusCard>
@@ -138,7 +138,7 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
   return (
     <ConfirmStatusCard
       icon={
-        <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#8fc3ff] bg-[linear-gradient(135deg,rgba(10,99,255,0.10)_0%,rgba(36,144,255,0.14)_100%)] text-[#0a63ff]">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[rgba(255,182,41,.35)] bg-[linear-gradient(135deg,rgba(255,182,41,.10)_0%,rgba(255,182,41,.14)_100%)] text-[var(--amber)]">
           <ShieldCheck size={38} />
         </div>
       }
@@ -150,17 +150,17 @@ export default function ConfirmClient({ token, driverId }: { token: string; driv
           <button
             onClick={handleConfirm}
             disabled={status === 'loading'}
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[#1679FF] px-7 py-4 text-[1.0625rem] font-medium leading-none text-white transition-colors hover:bg-[#0f6ae8] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] bg-[var(--amber)] px-7 py-4 text-[1.0625rem] font-medium leading-none text-[var(--night)] transition-colors hover:bg-[var(--amber-deep)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {status === 'loading' ? (
               <>
-                <Loader2 className="animate-spin text-white" size={17} />
-                <span className="text-white">Confirming...</span>
+                <Loader2 className="animate-spin text-[var(--night)]" size={17} />
+                <span className="text-[var(--night)]">Confirming...</span>
               </>
             ) : (
               <>
-                <span className="text-white">Confirm now</span>
-                <ArrowRight size={17} className="text-white" />
+                <span className="text-[var(--night)]">Confirm now</span>
+                <ArrowRight size={17} className="text-[var(--night)]" />
               </>
             )}
           </button>

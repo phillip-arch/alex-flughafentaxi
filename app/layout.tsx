@@ -1,4 +1,4 @@
-import { Archivo, Inter } from 'next/font/google';
+import { Archivo, IBM_Plex_Mono, Instrument_Sans } from 'next/font/google';
 import { Metadata } from 'next';
 import { connection } from 'next/server';
 import FooterGate from '@/components/FooterGate';
@@ -10,7 +10,7 @@ import './globals.css';
 const APP_PHONE_ICON_URL =
   'https://dmyr5rcjsjpgfdx8.public.blob.vercel-storage.com/images/appphoneicon.jpg';
 
-const inter = Inter({
+const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
   display: 'optional',
   variable: '--font-sans',
@@ -21,6 +21,13 @@ const archivo = Archivo({
   display: 'optional',
   weight: ['400', '500', '600', '700', '800', '900'],
   variable: '--font-display',
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  display: 'optional',
+  weight: ['400', '500', '600'],
+  variable: '--font-mono',
 });
 
 export const metadata: Metadata = {
@@ -65,9 +72,9 @@ export default async function RootLayout({
   const surface = getAppSurface();
 
   return (
-    <html lang="de" className={`${inter.variable} ${archivo.variable}`}>
+    <html lang="de" className={`${instrumentSans.variable} ${archivo.variable} ${plexMono.variable}`}>
       <head>
-        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#0A111F" />
         <link rel="icon" href={APP_PHONE_ICON_URL} type="image/jpeg" />
       </head>
       <body suppressHydrationWarning className="app-shell font-sans antialiased">
