@@ -180,6 +180,24 @@ h1 {
   text-shadow: 0.012em 0 currentColor;
 }
 
+@media (min-width: 1180px) {
+  .servus-hero-grid {
+    padding-top: 74px !important;
+  }
+}
+
+@media (min-width: 1536px) {
+  .servus-hero-grid {
+    padding-top: 100px !important;
+  }
+}
+
+@media (min-width: 1900px) {
+  .servus-hero-grid {
+    padding-top: 100px !important;
+  }
+}
+
 p {
   margin: 0;
 }
@@ -1154,6 +1172,17 @@ p {
     0 1px 0 rgba(244, 241, 232, 0.05);
   perspective: 520px;
   transform-style: preserve-3d;
+}
+
+.servus-hero-calculator .price-flip-tile {
+  min-width: clamp(32px, 2vw, 40px);
+  height: clamp(58px, 3.55vw, 72px);
+  font-size: clamp(28px, 1.85vw, 36px);
+}
+
+.servus-hero-calculator .price-flip-static span,
+.servus-hero-calculator .price-flip-flap span {
+  height: clamp(58px, 3.55vw, 72px);
 }
 
 .price-flip-tile::before {

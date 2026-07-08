@@ -132,7 +132,7 @@ export default function HeroCalculator() {
   }, [direction, district.value, vehicle.value]);
 
   return (
-    <div className="mx-auto w-full max-w-[560px] rounded-[22px] border border-[#26344a] bg-[#142039] px-5 py-6 shadow-[0_28px_80px_rgba(0,0,0,0.35)] sm:px-7 lg:px-8 lg:py-8 min-[1536px]:max-w-[620px] min-[1900px]:max-w-[680px] min-[1900px]:rounded-[25px] min-[1900px]:px-10 min-[1900px]:py-10">
+    <div className="servus-hero-calculator mx-auto w-full max-w-[560px] rounded-[22px] border border-[#26344a] bg-[#142039] px-5 py-5 shadow-[0_28px_80px_rgba(0,0,0,0.35)] sm:px-6 lg:px-6 lg:py-6 min-[1536px]:max-w-[620px] min-[1900px]:max-w-[680px] min-[1900px]:rounded-[25px] min-[1900px]:px-8 min-[1900px]:py-8">
       <div className="flex items-center justify-between gap-6">
         <h2 className="font-display text-[clamp(1.45rem,1.6vw,1.75rem)] font-black tracking-[-0.03em] text-[#F4F1E8]">
           Fixpreis berechnen
@@ -142,12 +142,12 @@ export default function HeroCalculator() {
         </span>
       </div>
 
-      <div className="mt-6 grid rounded-[15px] border border-[rgba(244,241,232,0.08)] bg-[#0b1322] p-1 min-[1900px]:mt-8">
+      <div className="mt-4 grid rounded-[15px] border border-[rgba(244,241,232,0.08)] bg-[#0b1322] p-1 min-[1900px]:mt-6">
         <div className="grid grid-cols-2 gap-1">
           <button
             type="button"
             onClick={() => setDirection('from-airport')}
-            className={`inline-flex h-[48px] items-center justify-center rounded-[12px] text-[clamp(0.9rem,0.95vw,1.1rem)] font-black sm:h-[52px] min-[1900px]:h-[58px] min-[1900px]:text-[20px] ${
+            className={`inline-flex h-[44px] items-center justify-center rounded-[12px] text-[clamp(0.9rem,0.95vw,1.1rem)] font-black sm:h-[46px] min-[1900px]:h-[54px] min-[1900px]:text-[20px] ${
               direction === 'from-airport' ? 'bg-[#F4F1E8] text-[#0b1322]' : 'text-[#93A0B5]'
             }`}
           >
@@ -157,7 +157,7 @@ export default function HeroCalculator() {
           <button
             type="button"
             onClick={() => setDirection('to-airport')}
-            className={`inline-flex h-[48px] items-center justify-center rounded-[12px] text-[clamp(0.9rem,0.95vw,1.1rem)] font-black sm:h-[52px] min-[1900px]:h-[58px] min-[1900px]:text-[20px] ${
+            className={`inline-flex h-[44px] items-center justify-center rounded-[12px] text-[clamp(0.9rem,0.95vw,1.1rem)] font-black sm:h-[46px] min-[1900px]:h-[54px] min-[1900px]:text-[20px] ${
               direction === 'to-airport' ? 'bg-[#F4F1E8] text-[#0b1322]' : 'text-[#93A0B5]'
             }`}
           >
@@ -167,14 +167,14 @@ export default function HeroCalculator() {
         </div>
       </div>
 
-      <div className="relative mt-6 min-[1900px]:mt-8">
+      <div className="relative mt-4 min-[1900px]:mt-6">
         <p className="font-mono text-[clamp(0.78rem,0.82vw,0.94rem)] uppercase tracking-[0.28em] text-[#93A0B5]">Bezirk in Wien</p>
         <button
           type="button"
           onClick={() => setIsDistrictOpen((current) => !current)}
           aria-expanded={isDistrictOpen}
           aria-controls="hero-district-menu"
-          className="mt-3 flex h-[54px] w-full items-center justify-between rounded-[15px] border border-[rgba(244,241,232,0.08)] bg-[#0b1322] px-5 text-left text-[clamp(0.98rem,1vw,1.16rem)] font-semibold text-[#F4F1E8] min-[1900px]:mt-4 min-[1900px]:h-[62px] min-[1900px]:text-[21px]"
+          className="mt-2 flex h-[46px] w-full items-center justify-between rounded-[15px] border border-[rgba(244,241,232,0.08)] bg-[#0b1322] px-5 text-left text-[clamp(0.98rem,1vw,1.16rem)] font-semibold text-[#F4F1E8] min-[1900px]:mt-3 min-[1900px]:h-[58px] min-[1900px]:text-[21px]"
         >
           <span className="truncate pr-4">{district.label}</span>
           <ChevronDown size={24} className={`text-[#93A0B5] transition-transform ${isDistrictOpen ? 'rotate-180' : ''}`} />
@@ -207,9 +207,9 @@ export default function HeroCalculator() {
         ) : null}
       </div>
 
-      <div className="mt-6 min-[1900px]:mt-8">
+      <div className="mt-4 min-[1900px]:mt-6">
         <p className="font-mono text-[clamp(0.78rem,0.82vw,0.94rem)] uppercase tracking-[0.28em] text-[#93A0B5]">Fahrzeug</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {vehicles.map((option) => {
             const active = vehicle.value === option.value;
             return (
@@ -217,7 +217,7 @@ export default function HeroCalculator() {
                 key={option.value}
                 type="button"
                 onClick={() => setVehicle(option)}
-                className={`relative flex min-h-[92px] flex-col items-center justify-center rounded-[15px] border px-3 text-center min-[1900px]:min-h-[116px] min-[1900px]:px-4 ${
+                className={`relative flex min-h-[74px] flex-col items-center justify-center rounded-[15px] border px-3 text-center min-[1900px]:min-h-[104px] min-[1900px]:px-4 ${
                   active ? 'border-[#FFB629] bg-[rgba(244,241,232,0.08)]' : 'border-[rgba(244,241,232,0.08)] bg-[#0b1322]'
                 }`}
               >
@@ -245,10 +245,10 @@ export default function HeroCalculator() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-5 rounded-[18px] bg-[#050b15] px-5 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:px-6 min-[1900px]:mt-8 min-[1900px]:gap-6 min-[1900px]:rounded-[20px] min-[1900px]:px-8 min-[1900px]:py-8">
+      <div className="mt-4 grid gap-4 rounded-[18px] bg-[#050b15] px-5 py-4 sm:grid-cols-[1fr_auto] sm:items-center sm:px-5 min-[1900px]:mt-6 min-[1900px]:gap-6 min-[1900px]:rounded-[20px] min-[1900px]:px-7 min-[1900px]:py-6">
         <div>
           <p className="font-mono text-[clamp(0.75rem,0.82vw,0.94rem)] uppercase tracking-[0.28em] text-[#93A0B5]">Ihr garantierter Fixpreis</p>
-          <div className="mt-5 flex gap-2" aria-label={`Fixpreis ${price} Euro`}>
+          <div className="mt-3 flex gap-2" aria-label={`Fixpreis ${price} Euro`}>
             {currentPriceTiles.map((value, index) => (
               <PriceFlipTile
                 key={index}
@@ -267,23 +267,23 @@ export default function HeroCalculator() {
         </div>
       </div>
 
-      <div className="mt-6 flex gap-3 sm:gap-4 min-[1900px]:mt-7">
+      <div className="mt-4 flex gap-3 sm:gap-4 min-[1900px]:mt-6">
         <Link
           href={bookingHref}
-          className="inline-flex h-[58px] flex-1 items-center justify-center rounded-[16px] bg-[#FFB629] px-5 text-center text-[clamp(1rem,1vw,1.16rem)] font-black text-[#070d18] shadow-[0_18px_55px_rgba(255,182,41,0.24)] transition-transform duration-200 hover:scale-[1.01] sm:h-[64px] min-[1900px]:h-[74px] min-[1900px]:rounded-[18px] min-[1900px]:px-6 min-[1900px]:text-[21px]"
+          className="inline-flex h-[52px] flex-1 items-center justify-center rounded-[16px] bg-[#FFB629] px-5 text-center text-[clamp(1rem,1vw,1.16rem)] font-black text-[#070d18] shadow-[0_18px_55px_rgba(255,182,41,0.24)] transition-transform duration-200 hover:scale-[1.01] sm:h-[56px] min-[1900px]:h-[68px] min-[1900px]:rounded-[18px] min-[1900px]:px-6 min-[1900px]:text-[21px]"
         >
           Jetzt zum Fixpreis buchen
         </Link>
         <a
           href="https://wa.me/436600000000"
           aria-label="WhatsApp"
-          className="grid h-[58px] w-[66px] shrink-0 place-items-center rounded-[16px] bg-[#22C55E] text-[#070d18] transition-transform duration-200 hover:scale-[1.03] sm:h-[64px] sm:w-[76px] min-[1900px]:h-[74px] min-[1900px]:w-[90px] min-[1900px]:rounded-[18px]"
+          className="grid h-[52px] w-[62px] shrink-0 place-items-center rounded-[16px] bg-[#22C55E] text-[#070d18] transition-transform duration-200 hover:scale-[1.03] sm:h-[56px] sm:w-[70px] min-[1900px]:h-[68px] min-[1900px]:w-[82px] min-[1900px]:rounded-[18px]"
         >
           <WhatsAppIcon className="h-8 w-8" />
         </a>
       </div>
 
-      <div className="mt-7 flex items-start gap-4 text-[clamp(0.98rem,1vw,1.13rem)] leading-[1.55] text-[#93A0B5]">
+      <div className="mt-4 flex items-start gap-3 text-[clamp(0.9rem,0.94vw,1.05rem)] leading-[1.45] text-[#93A0B5]">
         <ShieldCheck size={21} className="mt-1 shrink-0" />
         <p>Keine Vorauszahlung. Preis gilt auch bei Stau, Umleitung &amp; Flugverspaetung.</p>
       </div>
