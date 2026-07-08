@@ -181,15 +181,13 @@ export default function NavbarClient({
         </nav>
 
         <div className="hidden items-center justify-end gap-2 min-[1180px]:flex min-[1536px]:gap-3 min-[1900px]:gap-[18px]">
-          <div className="flex h-[44px] w-[106px] shrink-0 overflow-hidden rounded-full border border-[rgba(244,241,232,0.10)] bg-[#1a1e25] min-[1900px]:h-[48px] min-[1900px]:w-[116px]">
+          <div className="servus-lang-switch flex h-[44px] w-[106px] shrink-0 overflow-hidden rounded-full border border-[rgba(244,241,232,0.10)] bg-[#1a1e25] min-[1900px]:h-[48px] min-[1900px]:w-[116px]">
             {(['de', 'en'] as const).map((languageCode) => (
               <Link
                 key={languageCode}
                 href={buildLangHref(languageCode)}
-                className={`grid h-full flex-1 place-items-center text-[13px] font-medium uppercase transition-colors min-[1900px]:text-[15px] ${
-                  activeLang === languageCode
-                    ? 'bg-[#F4F1E8] text-[#070d18]'
-                    : 'text-[#93A0B5] hover:text-[#F4F1E8]'
+                className={`servus-lang-switch__item grid h-full flex-1 place-items-center text-[13px] font-medium uppercase transition-colors min-[1900px]:text-[15px] ${
+                  activeLang === languageCode ? 'is-active' : ''
                 }`}
               >
                 {languageCode}

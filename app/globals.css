@@ -109,6 +109,20 @@ a {
   text-decoration: none;
 }
 
+.servus-lang-switch__item {
+  color: #93A0B5;
+}
+
+.servus-lang-switch__item:hover {
+  color: #F4F1E8;
+}
+
+.servus-lang-switch__item.is-active,
+.servus-lang-switch__item.is-active:hover {
+  background: #F4F1E8;
+  color: #070d18;
+}
+
 button,
 input,
 select,
