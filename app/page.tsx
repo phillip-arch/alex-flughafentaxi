@@ -795,14 +795,6 @@ export default async function Home() {
             <source src="/servus-ride.webm" type="video/webm" />
             <source src="/servus-ride.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-x-0 bottom-10 z-[2]">
-            <div className="app-container">
-              <h2 className="max-w-[40rem] font-display text-[clamp(1.8rem,4.6vw,3.4rem)] font-black leading-[1.04] tracking-[-0.015em] text-[#F4F1E8] drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
-                Airport transfers that feel arranged before you land.
-              </h2>
-              <p className="servus-eyebrow mt-4">Vienna, Schwechat, every terminal</p>
-            </div>
-          </div>
         </section>
         {/* ── VEHICLES ─────────────────────────────────────────────────── */}
         <section id="team" className="border-y border-[rgba(244,241,232,0.09)] bg-[#101A2C] py-20 text-[#F4F1E8] md:py-28">
