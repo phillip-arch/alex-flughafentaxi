@@ -157,7 +157,7 @@ export default function NavbarClient({
   return (
     <>
       <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
-        <div className="mx-auto flex h-[70px] w-full max-w-[1780px] items-center justify-between px-5 sm:px-8 lg:h-[76px] lg:px-8 min-[1180px]:grid min-[1180px]:grid-cols-[minmax(250px,0.82fr)_minmax(380px,1fr)_minmax(300px,0.78fr)] min-[1180px]:gap-4 min-[1180px]:px-8 min-[1536px]:grid-cols-[minmax(255px,0.92fr)_minmax(430px,1fr)_minmax(330px,0.8fr)] min-[1536px]:gap-6 min-[1536px]:px-12 min-[1900px]:h-[96px] min-[1900px]:grid-cols-[minmax(330px,0.95fr)_minmax(520px,1fr)_minmax(390px,0.8fr)] min-[1900px]:px-[82px]">
+        <div className="mx-auto flex h-[70px] w-full max-w-[1500px] items-center justify-between px-5 sm:px-8 lg:h-[76px] lg:px-8 min-[1180px]:grid min-[1180px]:grid-cols-[minmax(250px,0.82fr)_minmax(380px,1fr)_minmax(300px,0.78fr)] min-[1180px]:gap-4 min-[1180px]:px-8 min-[1536px]:grid-cols-[minmax(255px,0.92fr)_minmax(430px,1fr)_minmax(330px,0.8fr)] min-[1536px]:gap-6 min-[1536px]:px-12 min-[1900px]:h-[96px] min-[1900px]:grid-cols-[minmax(330px,0.95fr)_minmax(520px,1fr)_minmax(390px,0.8fr)] min-[1900px]:px-[82px]">
         <Link href={withLang('/')} className="flex min-w-0 items-center gap-3 justify-self-start min-[1536px]:gap-[18px]" aria-label="Servus Transfer home">
           <span className="servus-logo-mark h-[48px] w-[48px] shrink-0 rounded-[13px] bg-[#FFB629] font-display text-[31px] font-black text-[#070d18] shadow-[0_18px_45px_rgba(255,182,41,0.22)] min-[1536px]:h-[62px] min-[1536px]:w-[62px] min-[1536px]:rounded-[16px] min-[1536px]:text-[40px]">
             <span>s</span>
