@@ -99,7 +99,7 @@ export default function NavbarClient({
 
   const headerClass = 'bg-[#070d18]/72 text-white backdrop-blur-xl';
 
-  const navItemClass = 'text-[clamp(1rem,1.05vw,1.25rem)] font-medium whitespace-nowrap text-[#9AA4B6] transition-colors hover:text-[#F4F1E8]';
+  const navItemClass = 'text-[clamp(0.92rem,0.9vw,1.08rem)] font-medium whitespace-nowrap text-[#9AA4B6] transition-colors hover:text-[#F4F1E8] min-[1536px]:text-[clamp(1rem,1.05vw,1.25rem)]';
 
   const withLang = (href: string) => {
     const [pathWithSearch, hash = ''] = href.split('#');
@@ -157,7 +157,7 @@ export default function NavbarClient({
   return (
     <>
       <header className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${headerClass}`}>
-        <div className="mx-auto flex h-[70px] w-full max-w-[1780px] items-center justify-between px-5 sm:px-8 lg:h-[76px] lg:px-8 min-[1536px]:grid min-[1536px]:grid-cols-[minmax(255px,0.92fr)_minmax(430px,1fr)_minmax(330px,0.8fr)] min-[1536px]:gap-6 min-[1536px]:px-12 min-[1900px]:h-[96px] min-[1900px]:grid-cols-[minmax(330px,0.95fr)_minmax(520px,1fr)_minmax(390px,0.8fr)] min-[1900px]:px-[82px]">
+        <div className="mx-auto flex h-[70px] w-full max-w-[1780px] items-center justify-between px-5 sm:px-8 lg:h-[76px] lg:px-8 min-[1180px]:grid min-[1180px]:grid-cols-[minmax(250px,0.82fr)_minmax(380px,1fr)_minmax(300px,0.78fr)] min-[1180px]:gap-4 min-[1180px]:px-8 min-[1536px]:grid-cols-[minmax(255px,0.92fr)_minmax(430px,1fr)_minmax(330px,0.8fr)] min-[1536px]:gap-6 min-[1536px]:px-12 min-[1900px]:h-[96px] min-[1900px]:grid-cols-[minmax(330px,0.95fr)_minmax(520px,1fr)_minmax(390px,0.8fr)] min-[1900px]:px-[82px]">
         <Link href={withLang('/')} className="flex min-w-0 items-center gap-3 justify-self-start min-[1536px]:gap-[18px]" aria-label="Servus Transfer home">
           <span className="servus-logo-mark h-[48px] w-[48px] shrink-0 rounded-[13px] bg-[#FFB629] font-display text-[31px] font-black text-[#070d18] shadow-[0_18px_45px_rgba(255,182,41,0.22)] min-[1536px]:h-[62px] min-[1536px]:w-[62px] min-[1536px]:rounded-[16px] min-[1536px]:text-[40px]">
             <span>s</span>
@@ -172,7 +172,7 @@ export default function NavbarClient({
           </span>
         </Link>
 
-        <nav className="hidden min-w-0 items-center justify-center gap-[clamp(1.15rem,2vw,2.45rem)] min-[1536px]:flex">
+        <nav className="hidden min-w-0 items-center justify-center gap-[clamp(0.9rem,1.35vw,1.6rem)] min-[1180px]:flex min-[1536px]:gap-[clamp(1.15rem,2vw,2.45rem)]">
           {navItems.map((item) => (
             <Link key={item.name} href={withLang(item.href)} className={navItemClass}>
               {item.name}
@@ -180,7 +180,7 @@ export default function NavbarClient({
           ))}
         </nav>
 
-        <div className="hidden items-center justify-end gap-3 lg:flex min-[1900px]:gap-[18px]">
+        <div className="hidden items-center justify-end gap-2 min-[1180px]:flex min-[1536px]:gap-3 min-[1900px]:gap-[18px]">
           <div className="flex h-[44px] w-[106px] shrink-0 overflow-hidden rounded-full border border-[rgba(244,241,232,0.10)] bg-[#1a1e25] min-[1900px]:h-[48px] min-[1900px]:w-[116px]">
             {(['de', 'en'] as const).map((languageCode) => (
               <Link
@@ -199,14 +199,14 @@ export default function NavbarClient({
 
           <a
             href="tel:+436600000000"
-            className="inline-flex h-[54px] w-[clamp(220px,16vw,270px)] shrink-0 items-center justify-center gap-3 rounded-[999px] bg-[#FFB629] px-5 text-[clamp(0.96rem,1.06vw,1.2rem)] font-black leading-none text-[#050914] shadow-[0_18px_42px_rgba(255,182,41,0.30)] transition-colors duration-200 hover:bg-[#FFC247] min-[1900px]:h-[60px] min-[1900px]:w-[285px] min-[1900px]:gap-[14px] min-[1900px]:px-7 min-[1900px]:text-[21px]"
+            className="inline-flex h-[50px] w-[clamp(202px,15vw,245px)] shrink-0 items-center justify-center gap-2.5 rounded-[999px] bg-[#FFB629] px-4 text-[clamp(0.88rem,0.95vw,1.08rem)] font-black leading-none text-[#050914] shadow-[0_18px_42px_rgba(255,182,41,0.30)] transition-colors duration-200 hover:bg-[#FFC247] min-[1536px]:h-[54px] min-[1536px]:w-[clamp(220px,16vw,270px)] min-[1536px]:gap-3 min-[1536px]:px-5 min-[1536px]:text-[clamp(0.96rem,1.06vw,1.2rem)] min-[1900px]:h-[60px] min-[1900px]:w-[285px] min-[1900px]:gap-[14px] min-[1900px]:px-7 min-[1900px]:text-[21px]"
           >
             <Phone size={23} strokeWidth={3.2} className="shrink-0 text-[#050914]" />
             <span className="whitespace-nowrap">+43 660 000 00 00</span>
           </a>
         </div>
 
-        <div className="flex h-10 items-center gap-4 lg:hidden">
+        <div className="flex h-10 items-center gap-4 min-[1180px]:hidden">
           <div className="relative flex h-10 items-center" data-mobile-lang-menu-root="true">
             <button
               type="button"
@@ -244,7 +244,7 @@ export default function NavbarClient({
       </header>
 
       {isMobileMenuOpen ? (
-        <div className="fixed inset-0 z-[80] bg-white text-[#111111] lg:hidden">
+        <div className="fixed inset-0 z-[80] bg-white text-[#111111] min-[1180px]:hidden">
           <div className="app-container flex h-[66px] items-center justify-between bg-[#000000] text-white">
             <Link href={withLang('/')} className="flex items-center gap-2.5" onClick={closeMobileMenu} aria-label="Servus Transfer home">
               <span className="servus-logo-mark h-[34px] w-[34px] rounded-[9px] bg-[#FFB629] font-display text-[20px] font-black text-[#0A111F]">
@@ -316,7 +316,7 @@ export default function NavbarClient({
       ) : null}
 
       {isMobileLangMenuOpen ? (
-        <div className="fixed inset-x-0 top-[66px] bottom-0 z-[75] bg-white text-[#111111] lg:hidden">
+        <div className="fixed inset-x-0 top-[66px] bottom-0 z-[75] bg-white text-[#111111] min-[1180px]:hidden">
           <div className="px-8 pt-8">
             <div className="flex flex-col items-start gap-8">
               {renderLanguageItems(
